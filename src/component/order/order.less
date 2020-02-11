@@ -1,0 +1,69 @@
+
+@import "../../styles/theme.less";
+
+@orderItemPrefix: component-order-item;
+
+@order-item-width: 690px;
+@order-item-icon: 50px;
+
+.@{orderItemPrefix} {
+  position: relative;
+  background-color: #ffffff;
+  width: @order-item-width;
+  .padding(30px, lr);
+  .padding(33px, tb);
+  .flex(center, space-between, row);
+  &::after {
+    .border1px;
+  }
+  &-left {
+    flex-direction: row;
+    display: flex;
+    flex: 1;
+    align-items: center;
+    &-icon {
+      width: @order-item-icon;
+      height: @order-item-icon;
+      .margin(14px, r);
+    }
+    &-detail {
+      flex-direction: column;
+      &-margin {
+        .margin(9px, t);
+      }
+    }
+    &-text {
+      font-size: 24px;
+      color: #666666;
+    }
+    &-img {
+      width: 60px;
+      height: 60px;
+      .margin(20px, r);
+    }
+  }
+  &-right {
+    position: absolute;
+    right: 30px;
+    top: 50%;
+    transform: translateY(-50%);
+    .flex(center, center, column);
+    font-size: 30px;
+  }
+  &-no {
+    font-size: 30px;
+    line-height: 30px;
+    color: #333333;
+  }
+  &-time {
+    font-size: 26px;
+    line-height: 26px;
+    color: #999999;
+    .margin(17px, t);
+  }
+  &-price {
+    font-size: 30px;
+    color: #4d4d4d;
+    font-weight: bold;
+  }
+}

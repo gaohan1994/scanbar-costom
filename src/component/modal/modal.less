@@ -1,0 +1,90 @@
+@import "../../styles/theme.less";
+
+@modal-header-font: 36px;                   // modal 标题字体大小
+@modal-header-color: #4d4d4d;
+@modal-header-max-size: 400px;    
+@modal-button-font: 30px;                   // modal 标题按钮字体大小
+@modal-font-color: #ffffff;               // modal 字体颜色
+@modal-button-height: 60px;                 // modal 按钮高度
+@modal-button-cancel-color: #999999;      // modal 取消按钮颜色
+@modal-button-confirm-color: @theme-color;  // modal 确认按钮颜色
+
+@modal-prefix: component-modal;
+
+.@{modal-prefix} {
+  background-color: #ffffff;
+  &-header {
+    max-height: 50px;
+    .margin(50px, tb);
+    .padding(30px, lr);
+    display: flex;
+    justify-content: center;
+    &-text {
+      font-weight: bold;
+      color: @modal-header-color;
+      text-align: center;
+      font-size: @modal-header-font;
+      display: -webkit-box;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-clamp: 1;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+    }
+  }
+  &-buttons {
+    flex: 1;
+    .flex(center, space-between);
+    .padding(42px, lr);
+    .padding(50px, b);
+  }
+  &-content {
+    .padding(40px, lr);
+    .padding(5px, t);
+    .padding(46px, b);
+    display: flex;
+    flex-direction: column;
+    &-tip {
+      font-size: 26px;
+      color: #999999;
+      .margin(27px, b);
+    }
+    &-item {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      .margin(14px, b);
+      position: relative;
+      &-title {
+        position: relative;
+        font-size: 30px;
+        min-width: 120px;
+        color: #4d4d4d;
+        .margin(22px, r);
+        &-main {
+          position: absolute;
+          top: 0;
+          left: -20px;
+          color: #FC4E44;
+          font-size: 32px;
+        }
+        &-short {
+          min-width: 70px !important;
+        }
+      }
+      &-input {
+        background-color: #F8F8FA;
+        border-radius: 20px;
+        // width: 360px;
+        flex: 1;
+        height: 74px;
+        font-size: 30px;
+        .padding(30px, lr);
+        &-place {
+          font-size: 30px;
+          color: #cccccc;
+        }
+      }
+    }
+  }
+}

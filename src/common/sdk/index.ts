@@ -1,0 +1,1 @@
+export { default as LoginManager } from './sign/login.manager';

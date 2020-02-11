@@ -1,0 +1,162 @@
+@import "../../styles/theme.less";
+
+@user-prefix: user;
+@user-bg-size: 305px;
+
+.@{user-prefix} {
+  background-color: #f9f9f9;
+  &-bg {
+    height: @user-bg-size;
+    width: 100%;
+    .background-image('//net.huanmusic.com/weapp/v1/bg_mine.png');
+  }
+  &-container {
+    .flex(center, flex-start, column);
+    .padding(30px, lr);
+    height: 100%;
+    width: 100%;
+  }
+  &-user {
+    position: relative;
+    .flex(center, flex-start, row);
+    .margin(-140px - 120px, t);
+    // .margin(46px, t);
+    width: 100%;
+    &-image {
+      width: 140px;
+      height: 140px;
+    }
+    &-box {
+      display: flex;
+      flex-direction: column;
+      .margin(36px, l);
+    }
+    &-name {
+      .title-text(#ffffff);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    &-level {
+      background-color: #64A7FE;
+      height: 34px;
+      border-radius: 17px;
+      .flex(center, center);
+      .padding(14px, lr);
+      color: #ffffff;
+      font-size: 24px;
+      .margin(13px, l);
+    }
+    &-text {
+      font-size: 28px;
+      color: #ffffff;
+    }
+    &-edit {
+      position: absolute;
+      top: 40px;
+      right: 40px;
+      &-img {
+        width: 36px;
+        height: 36px;
+      }
+    }
+  }
+  &-rows {
+    width: 100%;
+    margin-top: 60px !important;
+  }
+  &-row {
+    position: relative;
+    .flex(center, space-between, row);
+    .padding(27px, tb);
+    .padding(29px, lr);
+    &::after {
+      .border1px;
+    }
+    &-title {
+      font-size: 30px;
+      color: #333333;
+    }
+    &-left {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      &-icon {
+        width: 39px;
+        height: 36px;
+        .margin(20px, r);
+      }
+      &-text {
+        font-size: 28px;
+        color: #666666;
+      }
+    }
+    &-right {
+      &-icon {
+        width: 14px;
+        height: 24px;
+        .background-image('//net.huanmusic.com/weapp/icon_into.png');
+      }
+    }
+  }
+  &-merchant {
+    .padding(30px, t);
+    .padding(30px, lr);
+    &-button {
+      .margin(80px, t);
+    }
+    &-input {
+      position: relative;
+      font-size: 30px;
+      color: #4d4d4d;
+      .padding(20px, tb);
+      background-color: #f2f2f2;
+      &::after {
+        .border1px;
+        border-color: #cccccc !important;
+      }
+    }
+    &-phone {
+      .padding(24px, tb);
+      color: #999999;
+      font-size: 30px;
+    }
+  }
+  &-detail {
+    &-img {
+      width: 80px;
+      height: 80px;
+    }
+  }
+  &-about {
+    &-box {
+      .padding(76px, t);
+      width: 100%;
+      .flex(center, center, column);
+      &-img {
+        width: 200px;
+        height: 200px;
+      }
+      &-title {
+        font-size: 36px;
+        color: #333333;
+        .margin(30px, t);
+      }
+      &-version {
+        font-size: 30px;
+        color: #666666;
+        .margin(18px, t);
+      }
+    }
+    &-bottom {
+      position: absolute;
+      bottom: 50px;
+      width: 100%;
+      .flex(center, center, column);
+      &-text {
+        font-size: 24px;
+        color: #BFBFBF;
+      }
+    }
+  }
+}
