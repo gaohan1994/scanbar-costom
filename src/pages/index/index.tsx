@@ -6,11 +6,13 @@ import './index.less'
 import '../style/product.less'
 import ProductListView from '../../component/product/product.listview'
 import ProductMenu from '../../component/product/product.menu'
-
 import invariant from 'invariant'
 import { ProductAction } from '../../actions'
 import { ResponseCode, ProductInterface } from '../../constants'
 import { LoginManager } from '../../common/sdk'
+import { store } from '../../app'
+// import Cart from '../../component/cart/cart'
+
 
 const cssPrefix = 'product';
 
@@ -42,6 +44,7 @@ class Index extends Component<any> {
       LoginManager.login({phoneNumber: '15659995443', password: '111111'});
     }
     this.init();
+
   }
 
   public changeCurrentType = (typeInfo: any, fetchProduct: boolean = true) => {
@@ -105,6 +108,7 @@ class Index extends Component<any> {
             />
           </View>
         </View>
+        {/* <Cart /> */}
       </View>
     )
   }

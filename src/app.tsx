@@ -5,8 +5,7 @@ import { Provider } from '@tarojs/redux'
 import Index from './pages/index'
 import "./styles/reset.less";
 import configStore from './store'
-
-import './app.less'
+import 'taro-ui/dist/style/index.scss' // 引入组件样式 - 方式一
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -29,7 +28,9 @@ class App extends Component {
     pages: [
       'pages/index/index',
       'pages/order/order',
-      'pages/user/user'
+      'pages/user/user',
+      'pages/test/test',
+      'pages/product/product.detail'
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -52,6 +53,11 @@ class App extends Component {
         iconPath: "./assets/tab-bar/icon_nav_order.png",
         selectedIconPath: "./assets/tab-bar/icon_nav_order_selected.png",
         text: "订单"
+      }, {
+        pagePath: "pages/order/order",
+        iconPath: "./assets/tab-bar/icon_nav_cart.png",
+        selectedIconPath: "./assets/tab-bar/icon_nav_cart_selected.png",
+        text: "购物车"
       }, {
         pagePath: "pages/user/user",
         iconPath: "./assets/tab-bar/icon_nav_mine.png",

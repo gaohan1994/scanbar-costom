@@ -1,0 +1,197 @@
+@import '../../../styles/theme.less';
+
+@prefix: product-detail-component;
+
+@swiper-width: 750px;
+@swiper-height: 650px;
+
+.@{prefix} {
+
+  &-swiper {
+    width: @swiper-width;
+    height: @swiper-height;
+    background-color: #fff;
+    &-item {
+      width: 100%;
+      height: 100%;
+      .bg;
+    }
+  }
+
+  &-detail {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(245,245,245,1);;
+    &-box {
+      position: relative;
+      .padding(30px);
+      background-color: #fff;
+      &-bor {
+        &::after{
+          .border1px;
+        }
+      }
+    }
+    &-name {
+      width: 100%;
+      font-size:36px;
+      font-weight:500;
+      color:rgba(51,51,51,1);
+      line-height:48px;
+      .clamp(2);
+    }
+    &-tip {
+      width: 100%;
+      font-size:24px;
+      font-weight:500;
+      color:rgba(153,153,153,1);
+      line-height:48px;
+      .margin(20px, t);
+      .clamp();
+    }
+
+    &-items {
+      display: flex;
+      flex-direction: row;
+    }
+
+    &-inventory {
+      .act-item(#FC4E44);
+      .margin(30px, t);
+    }
+
+    &-price {
+      .margin(23px, t) !important;
+      &-big {
+        font-size: 38px !important;
+      }
+      &-nor {
+        font-size: 23px !important;
+      }
+      &-gory {
+        font-size: 22px !important;
+      }
+    }
+
+    &-act {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      &-title {
+        font-size:24px;
+        font-weight:500;
+        color:rgba(179,179,179,1);
+        .margin(20px, r);
+      }
+      &-boxs {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+      }
+      &-box {
+        .flex(center, flex-start, row);
+      }
+      &-discount {
+        .act-item-bg(#FF893B, rgba(255,240,226,1));
+        .margin(14px, r);
+      }
+      &-reduce {
+        .act-item-bg(#FC4E44, rgba(255,235,235,1));
+        .margin(14px, r);
+      }
+      &-bor {
+        .margin(23px, b);
+      }
+      &-text {
+        font-size:24px;
+        font-weight:500;
+        color:rgba(51,51,51,1);
+      }
+    }
+  }
+
+  &-message {
+    .margin(20px, t);
+    display: flex;
+    flex-direction: column;
+    &-item {
+      display: flex;
+      flex-direction: row;
+      .margin(17px, b);
+    }
+    &-title {
+      font-size:30px;
+      font-weight:500;
+      color:rgba(102,102,102,1);
+      .margin(34px, b);
+    }
+    &-subtitle {
+      font-size:24px;
+      font-weight:500;
+      color:rgba(179,179,179,1);
+      .margin(24px, r)
+    }
+    &-text {
+      font-size:24px;
+      font-weight:500;
+      color:rgba(51,51,51,1);
+    }
+  }
+
+  &-cart {
+    border-top: 1px solid rgba(227,227,227,1);;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #fff;
+    &-box {
+      width: 100%;
+      height: 120px;
+      .flex(center, space-between, row);
+      .padding(60px, lr);
+    }
+    &-left {
+      position: relative;
+      .flex(center, center, column);
+      &-icon {
+        width:46px;
+        height:46px;
+        .bg;
+        background-image: url('//net.huanmusic.com/scarbar-c/icon_nav_cart.png');
+      }
+      &-text {
+        font-size:22px;
+        font-weight:500;
+        color:rgba(102,102,102,1);
+        .margin(8px, t);
+      }
+    }
+
+    &-right {
+
+      &-button {
+        width:344px;
+        height:80px;
+        background:rgba(42,134,252,1);
+        border-radius:40px;
+        .flex(center, center);
+        font-size:32px;
+        font-weight:500;
+        color:rgba(255,255,255,1);
+      }
+      &-empty {
+        background:rgba(204,204,204,1) !important;
+      }
+
+      &-stepper {
+        width:66px !important; 
+        height:66px !important; 
+      }
+      &-text {
+        min-width: 100px !important;
+        font-size: 40px !important;
+      }
+    }
+  }
+}

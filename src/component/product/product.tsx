@@ -58,14 +58,10 @@ class ProductComponent extends Taro.Component<Props, State> {
   }
 
   public onContentClick = () => {
-    const { sort, product } = this.props;
-    if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE) {
-      Taro.navigateTo({
-        url: `/pages/product/product.detail?id=${product.id}`
-      });
-      return;
-    }
-    this.changePriceModal();
+    const { product } = this.props;
+    Taro.navigateTo({
+      url: `/pages/product/product.detail?id=${product.id}`
+    })
   }
 
   public renderPrice = () => {

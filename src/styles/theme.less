@@ -48,6 +48,37 @@
   color: @small-text-color;
 }
 
+.bg {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+}
+
+.clamp (@line: 1) {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-clamp: @line;
+  -webkit-line-clamp: @line;
+  -webkit-box-orient: vertical;
+}
+
+.act-item (@color) {
+  .padding(3px, tb);
+  .padding(10px, lr);
+  .flex(center, center);
+  height:30px;
+  border:1px solid @color;
+  border-radius:10px;
+  color: @color;
+  font-size:24px;
+}
+
+.act-item-bg (@color, @bgcolor) {
+  .act-item(@color);
+  background-color: @bgcolor;
+}
+
 .border1px {
   content: '';
   position: absolute;

@@ -230,7 +230,7 @@ class ProductInterfaceMap {
     SET_SELECT_PRODUCT: 'SET_SELECT_PRODUCT',
   };
 
-  public productInfoType = '/product/productInfo/type';
+  public productInfoType = '/product/type';
   public productInfoSupplier = '/product/productInfo/supplier';
   public productInfoEdit = '/product/productInfo/edit';
   public productInfoGetBarcode = '/product/productInfo/genBarcode';
@@ -247,11 +247,11 @@ class ProductInterfaceMap {
   }
 
   public productInfoList = (params?: ProductInterface.ProductInfoListFetchFidle) => {
-    return `/product/productInfo/getList${params ? jsonToQueryString(params) : ''}`;
+    return `/product/list${params ? jsonToQueryString(params) : ''}`;
   }
 
   public productInfoDetail = (params: ProductInterface.ProductDetailFetchFidle) => {
-    return `/product/productInfo/detail/${params.id}`;
+    return `/product/detail/${params.id}`;
   }
 
   public productInfoScanGet = (params: ProductInterface.ProductInfoScanGetFetchFidle) => {
