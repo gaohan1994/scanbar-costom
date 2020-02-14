@@ -32,15 +32,16 @@ export declare namespace ProductCartInterface {
   }
 
   interface ProductOrderPayload {
-    authCode: string;     // 权限码 -1/为空=非被扫
-    orderNo: string;      // 订单号,用于再次支付
-    terminalCd: string;   // 终端号,获取不到填-1
-    terminalSn: string;   // 终端序列号,获取不到填-1
+    address: string;
+		addressDetail: string;
+		deliveryPhone: string;
+		delivery_time: string;
+		receiver: string;
+		remark: string;
     discount: number;     // 优惠价格
     erase: number;        // 抹零金额
     memberId: number;     // 会员id，非会员设为-1
     orderSource: number;  // 订单来源 0=收银机,1=微信,2=终端
-    payType: number;      // 支付方式 0=现金,1=支付宝主扫,2=微信主扫,3=支付宝被扫,4微信被扫,5=银行卡,6=刷脸
     totalAmount: number;  // 交易总金额=交易金额就好
     totalNum: number;     // 商品总数量
     transAmount: number;  // 实付金额
@@ -66,23 +67,23 @@ export declare namespace ProductCartInterface {
   }
 
   interface ProductInfoPayload {
-    activities: Array<Partial<ProductOrderActivity>>;
-    barcode: string;
-    brand: string;
-    discountAmount: number;
-    discountType: number;
+    // activities: Array<Partial<ProductOrderActivity>>;
+    // barcode: string;
+    // brand: string;
+    // discountAmount: number;
+    // discountType: number;
     productId: number;
     productName: string;
     sellNum: number;
-    standard: string;
+    // standard: string;
     unitPrice: number;
     totalAmount: number;
     transAmount: number;
-    type: number;
+    // type: number;
   }
 
   interface ProductPayPayload {
-    flag: boolean;
+    // flag: boolean;
     order: ProductOrderPayload;
     pic?: string;
     productInfoList: Array<ProductInfoPayload>;
@@ -454,57 +455,37 @@ class ProductSDK {
   public getProductInterfacePayload = (products?: ProductCartInterface.ProductCartInfo[]): ProductCartInterface.ProductPayPayload => {
     const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
     const payload: ProductCartInterface.ProductPayPayload = {
-      flag: false,
       order: {
-        authCode: '-1',
+        address: "福建省福州市晋安区福新中路128号",
+        addressDetail: "晋安区岳峰镇福新中路",
+        deliveryPhone: "15659995443",
+        delivery_time: "",
+        receiver: "",
+        remark: "",
         discount: 0,
         erase: this.getErase(),
         memberId: this.member !== undefined ? this.member.id : -1,
-        orderNo: '',
         orderSource: 1,
-        payType: 2,
-        terminalCd: '-1',
-        terminalSn: '-1',
         totalAmount: this.getProductPrice(),
         totalNum: this.getProductNumber(),
         transAmount: this.getProductTransPrice(),
       },
       productInfoList: productList.map((item) => {
-        if (!this.isNonBarcodeProduct(item)) {
-          // 如果是称重商品和普通商品，则 改价价格 > 会员价格 > 普通价格
-          const itemPrice: number = item.changePrice !== undefined
-            ? numeral(item.changePrice).value()
-            : this.member !== undefined 
-              ? item.memberPrice
-              : item.price;
-          return {
-            activities: [],
-            barcode: item.barcode,
-            brand: item.brand,
-            discountAmount: 0,
-            discountType: 0,
-            productId: item.id,
-            productName: item.name,
-            sellNum: item.sellNum,
-            standard: item.standard,
-            totalAmount: item.price * item.sellNum,
-            transAmount: itemPrice * item.sellNum,
-            type: item.typeId,
-            unitPrice: itemPrice,
-          } as ProductCartInterface.ProductInfoPayload;
-        } else {
-          // 如果是无码商品则特殊处理
-          return {
-            activities: [],
-            sellNum: 1,
-            id: null,
-            barcode: null,
-            price: item.price,
-            unitPrice: item.unitPrice,
-            totalAmount: item.price * item.sellNum,
-            transAmount: item.price * item.sellNum,
-          } as any;
-        }
+        const itemPrice: number = item.changePrice !== undefined
+          ? numeral(item.changePrice).value()
+          : this.member !== undefined 
+            ? item.memberPrice
+            : item.price;
+        return {
+
+          productId: item.id,
+          productName: item.name,
+          remark: "",
+          sellNum: item.sellNum,
+          totalAmount: item.price * item.sellNum,
+          transAmount: itemPrice * item.sellNum,
+          unitPrice: itemPrice
+        } as ProductCartInterface.ProductInfoPayload;
       }),
       transProp: true
     };
@@ -513,20 +494,20 @@ class ProductSDK {
 
   public getDirectProductInterfacePayload = (money: number, payType: number = 2): ProductCartInterface.ProductPayPayload  => {
     return {
-      flag: true,
       order: {
-        authCode: '-1',
         discount: 0,
         erase: 0,
         memberId: -1,
-        orderNo: '',
         orderSource: 1,
-        payType,
-        terminalCd: '-1',
-        terminalSn: '-1',
         totalAmount: money,
         totalNum: 0,
         transAmount: money,
+        address: "",
+        addressDetail: "",
+        deliveryPhone: "",
+        delivery_time: "",
+        receiver: "",
+        remark: "",
       },
       productInfoList: [],
       transProp: true

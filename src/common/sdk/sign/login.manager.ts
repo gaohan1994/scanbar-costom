@@ -10,7 +10,7 @@ import md5 from 'blueimp-md5';
 import requestHttp from '../../request/request.http';
 import { ResponseCode, ActionsInterface } from '../../../constants/index';
 
-export const CentermOAuthKey: string = 'CentermOAuthToken';
+export const CentermOAuthKey: string = 'CentermOAuthTokenCostom';
 
 export declare namespace LoginInterface {
 
@@ -46,6 +46,7 @@ export declare namespace LoginInterface {
 
   interface LoginManagerConfig {
     oatuhToken: string;
+    wxAuthToken: string;
   }
 
   type RECEIVE_AUTH = string;
@@ -62,6 +63,7 @@ class LoginManager {
 
   public LoginManagerConfig: LoginInterface.LoginManagerConfig = {
     oatuhToken: '/oauth/token',
+    wxAuthToken: '/login'
   };
 
   public autoToken = async (params: LoginInterface.OAuthTokenParams): Promise<any> => {
@@ -70,6 +72,34 @@ class LoginManager {
       return { success: true, result: result.data };
     } else {
       return { success: false, result: result.msg };
+    }
+  }
+
+  public wxAuthToken = async (): Promise<any> => {
+    return new Promise((resolve) => {
+      Taro.login({
+        success: async (res) => {
+          const {code} = res;
+          const result = await requestHttp.post(`${this.LoginManagerConfig.wxAuthToken}/${code}`, {});
+          console.log('result', result)
+          resolve(result)
+        }
+      })
+    })
+    
+  }
+
+  public wxLogin = async () => {
+    const result = await this.wxAuthToken();
+    if (result.code === ResponseCode.success) {
+      return new Promise((resolve) => {
+        Taro
+          .setStorage({ key: CentermOAuthKey, data: JSON.stringify(result.data) })
+          .then(() => {
+            resolve({success: true, result: result.data, msg: ''});
+          })
+          .catch(error => resolve({success: false, result: {} as any, msg: error.message || '登录失败'}));
+      });
     }
   }
 

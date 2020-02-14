@@ -31,7 +31,7 @@ class WeixinSDK {
   public chooseAddress = async () => {
 
     return new Promise((resolve) => {
-      Taro.chooseAddress({
+      Taro.chooseLocation({
         success: (result) => {
           console.log('result: ', result);
           resolve({success: true, result})

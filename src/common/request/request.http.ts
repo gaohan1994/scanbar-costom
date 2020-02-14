@@ -21,6 +21,7 @@ class HttpRequest {
       }
     };
 
+    // console.log('token', result)
     if (result !== '') {
       option.header.Authorization = result;
     }

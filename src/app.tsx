@@ -1,8 +1,9 @@
 import '@tarojs/async-await'
 import Taro, { Component, Config } from '@tarojs/taro'
 import { Provider } from '@tarojs/redux'
+import { View } from '@tarojs/components'
 
-import Index from './pages/index'
+// import Index from './pages/index'
 import "./styles/reset.less";
 import configStore from './store'
 import 'taro-ui/dist/style/index.scss' // 引入组件样式 - 方式一
@@ -30,6 +31,7 @@ class App extends Component {
       'pages/order/order',
       'pages/user/user',
       'pages/test/test',
+      'pages/cart/cart',
       'pages/product/product.detail'
     ],
     window: {
@@ -54,7 +56,7 @@ class App extends Component {
         selectedIconPath: "./assets/tab-bar/icon_nav_order_selected.png",
         text: "订单"
       }, {
-        pagePath: "pages/order/order",
+        pagePath: "pages/cart/cart",
         iconPath: "./assets/tab-bar/icon_nav_cart.png",
         selectedIconPath: "./assets/tab-bar/icon_nav_cart_selected.png",
         text: "购物车"
@@ -71,7 +73,8 @@ class App extends Component {
   render () {
     return (
       <Provider store={store}>
-        <Index />
+        {/* <Index /> */}
+        <View>asd</View>
       </Provider>
     )
   }

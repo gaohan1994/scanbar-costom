@@ -40,8 +40,8 @@ class Index extends Component<any> {
 
   async componentDidShow () {
     const result = await LoginManager.getUserInfo();
-    if (!result.success) {
-      LoginManager.login({phoneNumber: '15659995443', password: '111111'});
+    if (!result.success) {  
+      await LoginManager.wxLogin();
     }
     this.init();
 

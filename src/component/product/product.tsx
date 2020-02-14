@@ -11,6 +11,7 @@ import numeral from 'numeral';
 const cssPrefix = 'component-product';
 interface Props { 
   product: ProductInterface.ProductInfo;
+  direct?: boolean;
   productInCart?: ProductCartInterface.ProductCartInfo;
   sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
 }
@@ -22,6 +23,10 @@ interface State {
 }
 
 class ProductComponent extends Taro.Component<Props, State> {
+
+  defaultProps = {
+    direct: false
+  }
 
   state = {
     priceModal: false,
@@ -117,7 +122,6 @@ class ProductComponent extends Taro.Component<Props, State> {
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE;
 
-    const showUnitToken = false
     return (
       <View className={classnames(`${cssPrefix}-content-detail`)}>
         <View className={`${cssPrefix}-title`} >
@@ -163,43 +167,39 @@ class ProductComponent extends Taro.Component<Props, State> {
   }
 
   private renderStepper = () => {
-    const { product, productInCart, sort } = this.props;
-
-    if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE) {
+    // direct 黑魔法code 不加这段代码 购物车页面减少时有渲染bug
+    const { product, productInCart, direct } = this.props;
+    if (direct === true) {
       return (
-        <View className={`${cssPrefix}-manage-corner`}>
-          <Text className={`${cssPrefix}-manage-font`}>库存: {product.number}{product.unit}</Text>
-        </View>
-      );
-    }
-
-    if (
-      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
-      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
-    ) {
-      return (
-        <View 
-          className={classnames(`${cssPrefix}-stepper`, {
-            [`${cssPrefix}-stepper-purchase`]: productInCart !== undefined
-          })}
-        >
-          {productInCart === undefined ? (
-            <View className={`${cssPrefix}-stepper-container`}>            
-              <View className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)} />  
+        <View className={`${cssPrefix}-stepper`}>
+          {product !== undefined ? (
+            <View className={`${cssPrefix}-stepper-container`}>    
+              <View 
+                className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-reduce`)}
+                onClick={this.manageProduct.bind(this, productSdk.productCartManageType.REDUCE)}
+              />
+              <Text className={`${cssPrefix}-stepper-text`}>{(product as any).sellNum}</Text>
+              <View 
+                className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
+                onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD)}
+              />  
+            </View>
+          ) : (product as any).number === 0 ? (
+            <View className={`${cssPrefix}-stepper-empty`}>            
+              售罄
             </View>
           ) : (
-            <View>
-              {productInCart.sellNum}
-              <Image 
-                src="//net.huanmusic.com/weapp/icon_edit_blue.png"
-                className={`${cssPrefix}-stepper-edit`}
-              />
+            <View className={`${cssPrefix}-stepper-container`}>            
+              <View 
+                className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
+                onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD)}
+              />  
             </View>
           )}
         </View>
-      );
+      )
+      
     }
-
     return (
       <View className={`${cssPrefix}-stepper`}>
         {productInCart !== undefined ? (
