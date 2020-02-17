@@ -30,6 +30,27 @@ class MerchantAction {
     }
     return result;
   }
+
+  public addressList = async () => {
+    const result = await MerchantService.addressList();
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_ADDRESS_LIST,
+        payload: result.data
+      });
+    }
+    return result;
+  }
+
+  public addressEdit = async (params: any) => {
+    const result = await MerchantService.addressEdit(params);
+    return result;
+  }
+
+  public addressAdd = async (params: any) => {
+    const result = await MerchantService.addressAdd(params);
+    return result;
+  }
 }
 
 export default new MerchantAction();

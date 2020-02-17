@@ -6,8 +6,11 @@ import WeixinSDK from '../../common/sdk/weixin/weixin';
 class Page extends Taro.Component {
 
   public address = async () => {
-    const result = await WeixinSDK.chooseAddress();
-    console.log(result);
+    // const result = await WeixinSDK.chooseAddress();
+    // console.log(result);
+    Taro.navigateTo({
+      url: '/pages/address/address.list'
+    })
   }
   render () {
     return (

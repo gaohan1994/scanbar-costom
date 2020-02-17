@@ -29,10 +29,14 @@ class App extends Component {
     pages: [
       'pages/index/index',
       'pages/order/order',
+      'pages/order/order.pay',
       'pages/user/user',
       'pages/test/test',
       'pages/cart/cart',
-      'pages/product/product.detail'
+      'pages/product/product.detail',
+      'pages/address/address.list',
+      'pages/address/address.add',
+      'pages/address/address.change.index'
     ],
     window: {
       backgroundTextStyle: 'light',

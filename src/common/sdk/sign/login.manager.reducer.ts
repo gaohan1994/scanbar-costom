@@ -11,7 +11,7 @@ import merge from 'lodash.merge';
 
 declare namespace LoginManagerReducer {
   interface State {
-    auth: LoginInterface.OAuthToken;
+
   }
 
   interface Action {
@@ -21,13 +21,7 @@ declare namespace LoginManagerReducer {
 }
 
 const initState: LoginManagerReducer.State = {
-  auth: {
-    token: '',
-    phone: '',
-    loginId: '',
-    name: '',
-    menus: []
-  }
+  
 };
 
 export default function loginManagerReducer (state: LoginManagerReducer.State = initState, action: LoginManagerReducer.Action): LoginManagerReducer.State {

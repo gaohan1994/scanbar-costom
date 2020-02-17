@@ -32,6 +32,21 @@ class MerchantService {
     const result = await requestHttp.get(MerchantInterfaceMap.profileInfo);
     return result;
   }
+
+  public addressList = async (): Promise<HTTPInterface.ResponseResultBase<MerchantInterface.Address[]>> => {
+    const result = await requestHttp.get('/api/address/list');
+    return result;
+  }
+
+  public addressAdd = async (params: Partial<MerchantInterface.Address>): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.post('/api/address/add', params);
+    return result;
+  }
+
+  public addressEdit = async (params: Partial<MerchantInterface.Address>): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.post('/api/address/edit', params);
+    return result;
+  }
 }
 
 export default new MerchantService();

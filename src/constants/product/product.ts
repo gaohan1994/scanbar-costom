@@ -236,6 +236,7 @@ class ProductInterfaceMap {
   public productInfoGetBarcode = '/product/productInfo/genBarcode';
   public productInfoAdd = '/product/productInfo/add';
   public cashierPay = '/cashier/pay';
+  public cashierOrder = '/api/cashier/order';
   public cashierRefund = '/cashier/refund';
 
   public cashierQueryStatus = (params: ProductInterface.ProductCashierQueryStatus) => {

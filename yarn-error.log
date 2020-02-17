@@ -1,5 +1,5 @@
 Arguments: 
-  E:\node\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add src/common/request/request.http --silent --no-progress
+  E:\node\node.exe C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add src/common/sdk/product/product.sdk --silent --no-progress
 
 PATH: 
   E:\node\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;E:\scanbar-c\node_modules\.bin;E:\node\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;E:\scanbar-c\node_modules\.bin;E:\cmder_mini\vendor\bin;E:\cmder_mini\vendor\conemu-maximus5\ConEmu\Scripts;E:\cmder_mini\vendor\conemu-maximus5;E:\cmder_mini\vendor\conemu-maximus5\ConEmu;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NGX;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;E:\node\;E:\git\Git\cmd;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;E:\cmder_mini\bin;C:\Users\Administrator\AppData\Roaming\npm;E:\Microsoft VS Code\bin;C:\Users\Administrator\AppData\Local\GitHubDesktop\bin;E:\git\Git\mingw64\bin;E:\git\Git\usr\bin;E:\cmder_mini
@@ -14,7 +14,7 @@ Platform:
   win32 x64
 
 Trace: 
-  Error: https://registry.npm.taobao.org/src%2fcommon/request/request.http: [not_found] document not found
+  Error: https://registry.npm.taobao.org/src%2fcommon/sdk/product/product.sdk: [not_found] document not found
       at Request.params.callback [as _callback] (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:66975:18)
       at Request.self.callback (C:\Users\Administrator\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:140727:22)
       at Request.emit (events.js:223:5)

@@ -3,22 +3,27 @@ import Taro from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
-import ProductListView from '../../component/product/product.listview'
-import ProductMenu from '../../component/product/product.menu'
-import invariant from 'invariant'
-import { ProductAction } from '../../actions'
-import { ResponseCode, ProductInterface } from '../../constants'
-import { LoginManager } from '../../common/sdk'
 import ProductComponent from '../../component/product/product'
 import Footer from './component/footer'
 import { AppReducer } from '../../reducers'
-import { ProductCartInterface } from '../../common/sdk/product/product.sdk'
+import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk'
 
 type Props = {
   productCartList: ProductCartInterface.ProductCartInfo[]
 }
 
 class Page extends Taro.Component<Props> {
+
+  componentDidShow () {
+    const { productCartList } = this.props;
+    const total = productSdk.getProductNumber(productCartList);
+    if (total !== 0) {
+      Taro.setTabBarBadge({
+        index: 2,
+        text: `${total}`
+      });
+    }
+  }
 
   render () {
     const { productCartList } = this.props;
@@ -34,7 +39,7 @@ class Page extends Taro.Component<Props> {
             /> 
           )
         })}
-        <Footer/>
+        <Footer />
       </View>
     )
   }

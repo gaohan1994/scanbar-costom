@@ -18,7 +18,7 @@
  * ```
  */
 import Taro from '@tarojs/taro';
-import { ProductInterface, ProductService, MemberInterface, HTTPInterface } from '../../../constants';
+import { ProductInterface, ProductService, MemberInterface, HTTPInterface, MerchantInterface } from '../../../constants';
 import { store } from '../../../app';
 import { ProductSDKReducer, getSuspensionCartList } from './product.sdk.reducer';
 import numeral from 'numeral';
@@ -35,11 +35,15 @@ export declare namespace ProductCartInterface {
     address: string;
 		addressDetail: string;
 		deliveryPhone: string;
-		delivery_time: string;
-		receiver: string;
+    delivery_time: string;
+    deliveryType: number;
+    receiver: string;
+    receiverPhone: string;
+    payType: number;
 		remark: string;
     discount: number;     // 优惠价格
     erase: number;        // 抹零金额
+    merchantId: number;
     memberId: number;     // 会员id，非会员设为-1
     orderSource: number;  // 订单来源 0=收银机,1=微信,2=终端
     totalAmount: number;  // 交易总金额=交易金额就好
@@ -87,7 +91,7 @@ export declare namespace ProductCartInterface {
     order: ProductOrderPayload;
     pic?: string;
     productInfoList: Array<ProductInfoPayload>;
-    transProp: boolean;   // true=正常支付流程,false=订单再次支付],直接收款=true
+    // transProp: boolean;   // true=正常支付流程,false=订单再次支付],直接收款=true
   }
 
   interface QueryStatusListItem extends Partial<ProductInterface.ProductInfo> {
@@ -128,6 +132,8 @@ export declare namespace ProductCartInterface {
   type PAYLOAD_PURCHASE = string;
   type PAYLOAD_MANAGE = string;
   type PAYLOAD_STOCK = string;
+  type RECEIVE_ORDER_PAY = string;
+  type RECEIVE_ORDER_PAY_ADDRESS = string;
   
   type PAYLOAD_SORT = {
     PAYLOAD_ORDER: PAYLOAD_ORDER;
@@ -151,6 +157,8 @@ export declare namespace ProductCartInterface {
     CHANGE_PRODUCT: CHANGE_PRODUCT; // 改价和改数量
     CHANGE_PRODUCT_VISIBLE: CHANGE_PRODUCT_VISIBLE; // 改价modal是否显示
     PAYLOAD_SORT: PAYLOAD_SORT;
+    RECEIVE_ORDER_PAY: RECEIVE_ORDER_PAY;
+    RECEIVE_ORDER_PAY_ADDRESS: RECEIVE_ORDER_PAY_ADDRESS;
   };
 
   type ProductCartAdd = string;
@@ -193,6 +201,8 @@ class ProductSDK {
     CHANGE_PRODUCT: 'CHANGE_PRODUCT',
     CHANGE_PRODUCT_VISIBLE: 'CHANGE_PRODUCT_VISIBLE',
     DELETE_PRODUCT_ITEM: 'DELETE_PRODUCT_ITEM',
+    RECEIVE_ORDER_PAY: 'RECEIVE_ORDER_PAY',
+    RECEIVE_ORDER_PAY_ADDRESS: 'RECEIVE_ORDER_PAY_ADDRESS',
     PAYLOAD_SORT: {
       PAYLOAD_ORDER: 'PAYLOAD_ORDER',
       PAYLOAD_REFUND: 'PAYLOAD_REFUND',
@@ -416,6 +426,32 @@ class ProductSDK {
     }
   }
 
+  public preparePayOrderAddress = async (address: MerchantInterface.Address) => {
+    store.dispatch({
+      type: this.reducerInterface.RECEIVE_ORDER_PAY_ADDRESS,
+      payload: address
+    })
+  }
+
+  public preparePayOrderDetail = async (params) => {
+
+  }
+
+  /**
+   * @todo 把要下单的数据传到order.pay redux中
+   */
+  public preparePayOrder = async (products?: ProductCartInterface.ProductCartInfo[]) => {
+    const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    store.dispatch({
+      type: this.reducerInterface.RECEIVE_ORDER_PAY,
+      payload: {productList}
+    });
+  }
+
+  public prepareEmptyPayOrder = async () => {
+    this.preparePayOrder([]);
+  }
+
   /**
    * @todo 计算交易价格
    * 
@@ -452,16 +488,20 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public getProductInterfacePayload = (products?: ProductCartInterface.ProductCartInfo[]): ProductCartInterface.ProductPayPayload => {
+  public getProductInterfacePayload = (products?: ProductCartInterface.ProductCartInfo[], address?: MerchantInterface.Address, payOrderDetail: any): ProductCartInterface.ProductPayPayload => {
     const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
     const payload: ProductCartInterface.ProductPayPayload = {
       order: {
-        address: "福建省福州市晋安区福新中路128号",
-        addressDetail: "晋安区岳峰镇福新中路",
-        deliveryPhone: "15659995443",
-        delivery_time: "",
-        receiver: "",
-        remark: "",
+        address: address && address.address || '',
+        addressDetail: address && address.address || '',
+        deliveryPhone: address && address.phone || '',
+        delivery_time: payOrderDetail.delivery_time || '',
+        deliveryType: payOrderDetail.deliveryType || 0,
+        receiver: address && address.contact || "",
+        receiverPhone: address && address.phone || '',
+        remark: payOrderDetail.remark || "",
+        payType: 8,
+        merchantId: 1,
         discount: 0,
         erase: this.getErase(),
         memberId: this.member !== undefined ? this.member.id : -1,
@@ -487,7 +527,7 @@ class ProductSDK {
           unitPrice: itemPrice
         } as ProductCartInterface.ProductInfoPayload;
       }),
-      transProp: true
+      // transProp: true
     };
     return payload;
   }
@@ -510,7 +550,7 @@ class ProductSDK {
         remark: "",
       },
       productInfoList: [],
-      transProp: true
+      // transProp: true
     };
   }
 
@@ -716,6 +756,11 @@ class ProductSDK {
       }
     };
     store.dispatch(reducer);
+  }
+  
+  public cashierOrder = async (params: ProductCartInterface.ProductPayPayload) => {
+    const result = await ProductService.cashierOrder(params);
+    return result;
   }
 
   public cashierPay = async (params: ProductCartInterface.ProductPayPayload) => {

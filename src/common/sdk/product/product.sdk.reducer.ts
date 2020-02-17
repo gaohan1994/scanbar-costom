@@ -1,6 +1,6 @@
 import productSdk, { ProductCartInterface } from "./product.sdk";
 import { AppReducer } from "../../../reducers";
-import { ProductInterface } from "../../../constants";
+import { ProductInterface, MerchantInterface } from "../../../constants";
 import merge from 'lodash.merge';
 
 /**
@@ -21,6 +21,9 @@ export declare namespace ProductSDKReducer {
   interface State {
     productCartList: Array<ProductCartInterface.ProductCartInfo>;
     productStockList: Array<ProductCartInterface.ProductCartInfo>;
+    payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
+    payOrderDetail: any;
+    payOrderAddress: MerchantInterface.Address;
     changeWeightProduct: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo;
     nonBarcodeProduct?: Partial<ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo>;
     suspensionCartList: Array<SuspensionCartBase>;
@@ -60,7 +63,12 @@ export declare namespace ProductSDKReducer {
   }
 
   namespace Reducers {
-
+    interface ReceivePayOrderReducer {
+      type: string;
+      payload: {
+        productList: ProductCartInterface.ProductCartInfo[];
+      }
+    }
     interface DeleteProductItemreducer {
       type: ProductCartInterface.DELETE_PRODUCT_ITEM;
       payload: {
@@ -142,6 +150,9 @@ const initState: ProductSDKReducer.State = {
   productCartList: [],
   productStockList: [],
   productRefundList: [],
+  payOrderProductList: [],
+  payOrderDetail: {},
+  payOrderAddress: {} as any,
   suspensionCartList: [],
   productPurchaseList: [],
   changeWeightProduct: {} as any,
@@ -156,6 +167,26 @@ export default function productSDKReducer (
   action: ProductSDKReducer.Action
 ): ProductSDKReducer.State {
   switch (action.type) {
+
+    case productSdk.reducerInterface.RECEIVE_ORDER_PAY_ADDRESS: {
+      const { payload } = action as any;
+
+      return {
+        ...state,
+        payOrderAddress: payload
+      };
+    }
+
+    case productSdk.reducerInterface.RECEIVE_ORDER_PAY: {
+      const { payload } = action as ProductSDKReducer.Reducers.ReceivePayOrderReducer;
+      const { productList } = payload;
+
+      return {
+        ...state,
+        payOrderProductList: productList
+      };
+    }
+
     case productSdk.reducerInterface.DELETE_PRODUCT_ITEM: {
       const { payload } = action as ProductSDKReducer.Reducers.DeleteProductItemreducer;
       const { product, sort } = payload;
@@ -340,7 +371,6 @@ export default function productSDKReducer (
       }
 
       const nextProductKey = productSdk.getSortDataKey(sort);
-      console.log('nextProductKey: ', nextProductKey);
       const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], state[nextProductKey]);
       const index = productCartList.findIndex(p => p.id === product.id);
       if (type === productSdk.productCartManageType.ADD) {
@@ -487,3 +517,5 @@ export const getProductRefundList = (state: AppReducer.AppState) => state.produc
 export const getProductPurchaseList = (state: AppReducer.AppState) => state.productSDK.productPurchaseList;
 
 export const getProductStockList = (state: AppReducer.AppState) => state.productSDK.productStockList;
+
+export const getPayOrderAddress = (state: AppReducer.AppState) => state.productSDK.payOrderAddress;

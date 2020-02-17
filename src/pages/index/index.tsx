@@ -6,12 +6,12 @@ import './index.less'
 import '../style/product.less'
 import ProductListView from '../../component/product/product.listview'
 import ProductMenu from '../../component/product/product.menu'
+import IndexAddress from './component/address'
 import invariant from 'invariant'
 import { ProductAction } from '../../actions'
 import { ResponseCode, ProductInterface } from '../../constants'
 import { LoginManager } from '../../common/sdk'
-import { store } from '../../app'
-// import Cart from '../../component/cart/cart'
+import WeixinSdk from '../../common/sdk/weixin/weixin'
 
 
 const cssPrefix = 'product';
@@ -39,12 +39,23 @@ class Index extends Component<any> {
   }
 
   async componentDidShow () {
-    const result = await LoginManager.getUserInfo();
-    if (!result.success) {  
-      await LoginManager.wxLogin();
-    }
-    this.init();
+    try {
+      const result = await LoginManager.getUserInfo();
+      console.log('userinfo: ', result);
+      if (!result.success) {  
+        const { success, msg } = await LoginManager.wxLogin();
+        invariant(!!success, msg || '登陆失败');
+        this.init();
+        return;
+      }
 
+      this.init();
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      })
+    }
   }
 
   public changeCurrentType = (typeInfo: any, fetchProduct: boolean = true) => {
@@ -55,8 +66,15 @@ class Index extends Component<any> {
     });
   }
 
+  public initAddress = async () => {
+    /**
+     * @todo 判断当前
+     */
+  }
+
   public init = async (): Promise<void> => {
     try {
+      WeixinSdk.initAddress();
       const productTypeResult = await ProductAction.productInfoType();
       invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
       const { data } = productTypeResult;
@@ -91,6 +109,7 @@ class Index extends Component<any> {
     const { productList, productType } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
+        <IndexAddress />
         <View className={`${cssPrefix}-list-container-costom`}>
           <ProductMenu 
             menu={productType}
@@ -124,7 +143,7 @@ class Index extends Component<any> {
 const select = (state) => {
   return {
     productType: state.product.productType,
-    productList: state.product.productList
+    productList: state.product.productList,
   }
 }
 

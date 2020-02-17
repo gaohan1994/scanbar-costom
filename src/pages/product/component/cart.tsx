@@ -3,7 +3,7 @@ import { View, Text } from '@tarojs/components'
 import './index.less'
 import '../../../component/product/product.less'
 import classnames from 'classnames'
-import { ProductInterface } from 'src/constants'
+import { ProductInterface } from '../../../constants'
 import { connect } from '@tarojs/redux'
 import productSdk from '../../../common/sdk/product/product.sdk';
 import { AppReducer } from 'src/reducers'

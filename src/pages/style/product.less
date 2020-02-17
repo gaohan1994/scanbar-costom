@@ -104,7 +104,7 @@
       }
       &-costom {
         position: absolute;
-        top: @product-header-height;
+        top: 140px;
         bottom: 0;
         width: 100%;
         display: flex;
@@ -361,7 +361,8 @@
       left: 0;
       right: 0;
       z-index: 100;
-      background-color: #fafafa;
+      border-top: 1px solid rgba(227,227,227,1);
+      background-color: #fff;
       .padding(40px, t);
       .padding(50px, b);
       .padding(30px, lr);
@@ -413,7 +414,8 @@
       .padding(@cart-height + 50px, b);
     }
     &-pos {
-      .padding(20px, lr);
+      .padding(30px, lr);
+      .margin(6px, t);
       background-color: #f2f2f2;
     }
     &-list {
@@ -548,6 +550,27 @@
     position: relative;
     .padding(24px, tb);
     .padding(40px, lr);
+    &-items {
+      position: relative;
+      &::after {
+        .border1px;
+      }
+    }
+    &-totals {
+      display: flex;
+      flex-direction: column;
+    }
+    &-box {
+      display: flex;
+      flex-direction: row;
+    }
+    &-cover {
+      width:120px;
+      height:120px;
+      border:1px solid rgba(229,229,229,1);
+      border-radius:10px;
+      .bg;
+    }
     &-icon {
       .margin(16px, lr);
       .padding(17px, lr);
@@ -575,15 +598,36 @@
     }
     &-name {
       font-size: 30px;
-      color: #444444;
-      width: 400px;
+      width: 494px;
       display: -webkit-box;
       overflow: hidden;
       text-overflow: ellipsis;
       line-clamp: 1;
       -webkit-line-clamp: 1;
       -webkit-box-orient: vertical;
+      font-weight:500;
+      color:rgba(51,51,51,1);
     }
+    &-corner {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      &-origin {
+        font-size:18px;
+        font-weight:500;
+        text-decoration:line-through;
+        color:rgba(179,179,179,1);
+      }
+      &-pirce {
+        font-size:24px;
+        font-weight:bold;
+        color:rgba(51,51,51,1);
+      }
+    }
+    
     &-bold {
       font-weight: bold;
     }
@@ -594,8 +638,17 @@
     &-content {
       display: flex;
       flex-direction: column;
+      flex: 1;
+      position: relative;
+      &-box {
+        justify-content: space-between;
+        .margin(20px, l);
+        position: relative;
+      }
       &-item {
         .flex(center, space-between, row);
+        .padding(30px, lr);
+        .padding(35px, tb);
       }
       &-items {
         .flex(center, center, row);

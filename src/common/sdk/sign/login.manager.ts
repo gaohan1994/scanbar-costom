@@ -89,7 +89,7 @@ class LoginManager {
     
   }
 
-  public wxLogin = async () => {
+  public wxLogin = async (): Promise<any> => {
     const result = await this.wxAuthToken();
     if (result.code === ResponseCode.success) {
       return new Promise((resolve) => {

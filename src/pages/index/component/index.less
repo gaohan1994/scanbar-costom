@@ -1,0 +1,71 @@
+@import "../../../styles/theme.less";
+
+@prefix: index-component;
+
+@address-height: 140px;
+
+.@{prefix} {
+  &-address {
+    height: @address-height;
+    .padding(30px, lr);
+    .padding(19px, t);
+    position: relative;
+    background-color: @theme-color;
+    display: flex;
+    flex-direction: column;
+
+    &-title {
+      .flex(center, flex-start, row);
+      &-icon {
+        width:34px;
+        height:34px;  
+        .margin(10px, r);
+      }
+      &-text {
+        .clamp(1);
+        max-width: 320px;
+        font-size:36px;
+        font-weight:bold;
+        color:rgba(255,255,255,1);
+        .margin(10px, r)
+      }
+    }
+    &-box {
+      .margin(18px, t);
+      display: flex;
+    }
+    &-merchant {
+      .padding(20px, lr);
+      .padding(8px, tb);
+      height:38px;
+      background-color:rgba(0,0,0, 0.1);
+      border-radius:19px;
+      .flex(center, center, row);
+      &-name {
+        font-size: 22px;
+        font-weight:500;
+        color:rgba(255,255,255,1);
+      }
+    }
+    &-search {
+      position: absolute;
+      bottom: 30px;
+      right: 23px;
+      .flex(center, center, row);
+      width:300px;
+      height:54px;
+      background:rgba(255,255,255, 0.2);
+      border-radius:27px;
+      &-icon {
+        width:31px;
+        height:31px;
+        .margin(14px, r)
+      }
+      &-text {
+        font-size:28px;
+        font-weight:500;
+        color:rgba(255,255,255,1);
+      }
+    }
+  }
+}
