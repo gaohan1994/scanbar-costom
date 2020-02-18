@@ -15,6 +15,14 @@ class OrderService {
   public orderDetail = async (params: OrderInterface.OrderDetailFetchField): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.get(OrderInterfaceMap.orderDetail(params));
   }
+
+  public orderCount = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(OrderInterfaceMap.orderCount());
+  }
+
+  public orderClose = async (params: OrderInterface.OrderDetailFetchField): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(OrderInterfaceMap.orderClose(params));
+  }
 }
 
 export default new OrderService();
