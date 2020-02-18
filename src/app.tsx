@@ -30,6 +30,7 @@ class App extends Component {
       'pages/index/index',
       'pages/order/order',
       'pages/order/order.pay',
+      'pages/order/order.detail',
       'pages/user/user',
       'pages/user/user.set',
       'pages/test/test',
