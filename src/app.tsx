@@ -31,6 +31,7 @@ class App extends Component {
       'pages/order/order',
       'pages/order/order.pay',
       'pages/user/user',
+      'pages/user/user.set',
       'pages/test/test',
       'pages/cart/cart',
       'pages/product/product.detail',
