@@ -70,6 +70,11 @@ class App extends Component {
         selectedIconPath: "./assets/tab-bar/icon_nav_mine_selected.png",
         text: "我的"
       }]
+    },
+    permission: {
+      "scope.userLocation": {
+        "desc": "你的位置信息将用于小程序位置接口的效果展示" // 高速公路行驶持续后台定位
+      }
     }
   }
   // 在 App 类中的 render() 函数没有实际作用

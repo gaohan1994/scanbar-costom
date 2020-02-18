@@ -8,7 +8,7 @@ import "../cart/cart.less";
 import classnames from 'classnames';
 import numeral from 'numeral';
 import { SelectMember } from '../../pages/product/product.pay';
-import { isInventoryProduct } from '../../constants/inventory/inventory';
+import Price from '../price';
 
 const cssPrefix = 'product';
 
@@ -46,7 +46,7 @@ class ProductPayListView extends Taro.Component<Props> {
           })}
         >
           {
-            productList && productList.length > 0 && productList.map((item, index) => {
+            productList && productList.length > 0 && productList.map((item) => {
               return (
                 <View
                   key={item.id}
@@ -63,7 +63,7 @@ class ProductPayListView extends Taro.Component<Props> {
                       <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
                       <Text className={`${cssPrefix}-row-normal`}>{`x ${item.sellNum}`}</Text>
                       <View className={`${cssPrefix}-row-corner`}>
-                        <Text className={`${cssPrefix}-row-corner-price`}>{`￥${item.price}`}</Text>
+                        <Text className={`${cssPrefix}-row-corner-price`}>{`￥${item.memberPrice}`}</Text>
                         <Text className={`${cssPrefix}-row-corner-origin`}>{`￥${item.price}`}</Text>
                       </View>
                     </View>
@@ -82,8 +82,12 @@ class ProductPayListView extends Taro.Component<Props> {
     return (
       <View className={`${cssPrefix}-row-totals`}>
         <View className={`${cssPrefix}-row-content-item`}>
-          <View></View>
-          <View>合计：{numeral(productSdk.getProductTransPrice()).format('0.00')}</View>
+          <View />
+          <Price
+            preText='已优惠￥0.00   合计：'
+            priceColor='#333333'
+            price={numeral(productSdk.getProductTransPrice()).format('0.00')}
+          />
         </View>
       </View>
     )

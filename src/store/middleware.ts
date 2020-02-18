@@ -28,6 +28,5 @@ export default store => next => action => {
       }
     }
   }
-  console.log('total: ', total)
   return next(action)
 }

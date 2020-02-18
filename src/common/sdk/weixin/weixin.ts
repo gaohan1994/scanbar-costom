@@ -56,6 +56,14 @@ class WeixinSDK {
     })
   }
 
+  public getWeixinUserinfo = async () => {
+    return new Promise((resolve) => {
+      Taro.getUserInfo({
+        
+      })
+    })
+  }
+
   public getLocation = async (): Promise<{success: boolean, result: any, msg: string}> => {
     const that = this;
     return new Promise((resolve) => {

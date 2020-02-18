@@ -18,7 +18,7 @@
  * ```
  */
 import Taro from '@tarojs/taro';
-import { ProductInterface, ProductService, MemberInterface, HTTPInterface, MerchantInterface } from '../../../constants';
+import { ProductInterface, ProductService, MemberInterface, HTTPInterface, MerchantInterface, OrderInterface } from '../../../constants';
 import { store } from '../../../app';
 import { ProductSDKReducer, getSuspensionCartList } from './product.sdk.reducer';
 import numeral from 'numeral';
@@ -348,22 +348,6 @@ class ProductSDK {
   }
 
   /**
-   * @todo [获取盈亏金额]
-   *
-   * @memberof ProductSDK
-   */
-  public getStockPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
-    const key = this.getSortDataKey();
-    const productList = products !== undefined ? products : store.getState().productSDK[key];
-    const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
-      const costNumber = item.sellNum - item.number;
-      return prevTotal + (costNumber * item.avgCost);
-    };
-    const total = productList.reduce(reduceCallback, 0);
-    return total;
-  }
-
-  /**
    * @todo 获取商品的价格
    *
    * @memberof ProductSDK
@@ -375,25 +359,8 @@ class ProductSDK {
     const key = this.getSortDataKey();
     const productList = products !== undefined ? products : store.getState().productSDK[key];
     const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
-      /**
-       * @todo [如果没有改价，但是是进货则返回进价]
-       */
-      if (key === 'productPurchaseList') {
-        return prevTotal + (item.cost * item.sellNum);
-      }
-      /**
-       * @todo [如果是盘点，则用盘盈数量乘上平均进价，这个进价字段后面改成avgCost]
-       */
-      if (this.sort === this.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK) {
-        return prevTotal + ((item.sellNum - item.number) * item.avgCost);
-      }
-      /**
-       * @todo 如果有改价价格，则计算改价价格
-       */
-      if (item.changePrice !== undefined) {
-        return prevTotal + (item.changePrice * item.sellNum); 
-      }
-      return prevTotal + (item.price * item.sellNum);
+      const itemPrice = item.memberPrice || item.price;
+      return prevTotal + (itemPrice * item.sellNum);
     };
     const total = productList.reduce(reduceCallback, 0);
     return total;
@@ -488,7 +455,7 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public getProductInterfacePayload = (products?: ProductCartInterface.ProductCartInfo[], address?: MerchantInterface.Address, payOrderDetail: any): ProductCartInterface.ProductPayPayload => {
+  public getProductInterfacePayload = (products?: ProductCartInterface.ProductCartInfo[], address?: MerchantInterface.Address, payOrderDetail?: any): ProductCartInterface.ProductPayPayload => {
     const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
     const payload: ProductCartInterface.ProductPayPayload = {
       order: {
@@ -505,53 +472,28 @@ class ProductSDK {
         discount: 0,
         erase: this.getErase(),
         memberId: this.member !== undefined ? this.member.id : -1,
-        orderSource: 1,
+        orderSource: 3,
         totalAmount: this.getProductPrice(),
         totalNum: this.getProductNumber(),
         transAmount: this.getProductTransPrice(),
       },
       productInfoList: productList.map((item) => {
-        const itemPrice: number = item.changePrice !== undefined
-          ? numeral(item.changePrice).value()
-          : this.member !== undefined 
-            ? item.memberPrice
-            : item.price;
+        /**
+         * @todo [默认会员价，有就用会员价，没有就用普通价格]
+         */
+        const itemPrice: number = item.memberPrice || item.price;
         return {
-
           productId: item.id,
           productName: item.name,
           remark: "",
           sellNum: item.sellNum,
-          totalAmount: item.price * item.sellNum,
+          totalAmount: itemPrice * item.sellNum,
           transAmount: itemPrice * item.sellNum,
           unitPrice: itemPrice
         } as ProductCartInterface.ProductInfoPayload;
       }),
-      // transProp: true
     };
     return payload;
-  }
-
-  public getDirectProductInterfacePayload = (money: number, payType: number = 2): ProductCartInterface.ProductPayPayload  => {
-    return {
-      order: {
-        discount: 0,
-        erase: 0,
-        memberId: -1,
-        orderSource: 1,
-        totalAmount: money,
-        totalNum: 0,
-        transAmount: money,
-        address: "",
-        addressDetail: "",
-        deliveryPhone: "",
-        delivery_time: "",
-        receiver: "",
-        remark: "",
-      },
-      productInfoList: [],
-      // transProp: true
-    };
   }
 
   public isWeighProduct (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): product is ProductCartInterface.ProductCartInfo {
@@ -768,17 +710,20 @@ class ProductSDK {
     return result;
   }
 
-  public suspensionCart = async () => {
-    const state = await store.getState();
-    if (state.productSDK.productCartList.length > 0) {
-      const reducer: ProductSDKReducer.AddSuspensionCartPayload & { type: ProductCartInterface.ADD_SUSPENSION_CART } = {
-        type: this.reducerInterface.ADD_SUSPENSION_CART,
-        payload: {
-          productCartList: merge([], state.productSDK.productCartList)
-        }
-      };
-      store.dispatch(reducer);
-    }
+  /**
+   * @todo [清空购物车]
+   * @todo [清空下单信息]
+   */
+  public cashierOrderCallback = (result: OrderInterface.OrderDetail) => {
+
+    this.empty();
+    this.preparePayOrder([])
+    this.preparePayOrderAddress({} as any)
+
+    const { order } = result;
+    Taro.navigateTo({
+      url: `/pages/order/order.detail?id=${order.orderNo}`
+    })
   }
 
   public scanProduct = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
@@ -802,48 +747,6 @@ class ProductSDK {
       })
       .catch(error => resolve(error));
     });
-  }
-
-  public suspensionOrder = async (suspension: number): Promise<{success: boolean}> => {
-    const state = await store.getState();
-    const suspensionCartList = getSuspensionCartList(state);
-    const currentSuspension = suspensionCartList.find(s => s.suspension.date === suspension);
-    if (currentSuspension && currentSuspension.productCartList.length > 0) {
-      const orderSuspensionList = merge([], currentSuspension.productCartList);
-      await this.manageCart(orderSuspensionList);
-      setTimeout(() => {
-        /**
-         * 延后删除挂单防止空页面
-         */
-        this.deleteSuspension(suspension);
-      }, 500);
-      return { success: true };
-    }
-    return { success: false };
-  }
-
-  /**
-   * @todo [删除挂单如果传入suspension则删除该suspension，如果不传全部删除]
-   *
-   * @memberof ProductSDK
-   */
-  public deleteSuspension = (suspension?: number) => {
-
-    if (suspension) {
-      const reducer: ProductSDKReducer.Reducers.DeleteSuspensionAction = {
-        type: this.reducerInterface.DELETE_SUSPENSION_CART,
-        payload: { suspension }
-      };
-      store.dispatch(reducer);
-      return;
-    }
-
-    const reducer: ProductSDKReducer.Reducers.EmptySuspensionAction = {
-      type: this.reducerInterface.EMPTY_SUSPENSION_CART,
-      payload: {}
-    };
-    store.dispatch(reducer);
-    return;
   }
 }
 
