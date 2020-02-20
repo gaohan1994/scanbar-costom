@@ -72,7 +72,14 @@ class Cart extends Taro.Component<Props> {
       <View className={`${prefix}-cart`}>
         <View className={`${prefix}-cart-box`}>
           <View className={`${prefix}-cart-left`}>
-            <View className={`${prefix}-cart-left-icon`} />
+            <View 
+              className={`${prefix}-cart-left-icon`} 
+              onClick={() => {
+                Taro.switchTab({
+                  url: `/pages/cart/cart`
+                })
+              }}
+            />
             <View className={`${prefix}-cart-left-text`} >购物车</View>
           </View>
           {this.renderStepper()}

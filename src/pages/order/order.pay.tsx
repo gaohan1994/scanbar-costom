@@ -24,13 +24,13 @@ type Props = {
 }
 
 type State = {
-  remark: string;
+
 }
 
 class Page extends Taro.Component<Props, State> {
 
   state = { 
-    remark: ''
+
   }
 
   public onSubmit = async () => {
@@ -67,8 +67,7 @@ class Page extends Taro.Component<Props, State> {
   }
 
   render () {
-    const { remark } = this.state;
-    const { payOrderProductList } = this.props;
+    const { payOrderProductList, payOrderDetail } = this.props;
     const price = payOrderProductList && payOrderProductList.length > 0 
       ? numeral(productSdk.getProductPrice(payOrderProductList)).format('0.00')
       : '0.00'
@@ -83,14 +82,15 @@ class Page extends Taro.Component<Props, State> {
           <FormCard
             items={[{
               title: '备注',
-              isInput: true,
-              inputValue: remark,
-              inputPlaceHolder: '请输入备注信息',
+              onClick: () => {
+                Taro.navigateTo({
+                  url: `/pages/order/order.pay.remark`
+                })
+              },
+              extraText: payOrderDetail && payOrderDetail.remark ? payOrderDetail.remark : '请输入备注信息',
+              extraTextColor: payOrderDetail && payOrderDetail.remark ? '#333333' : '#CCCCCC',
               arrow: 'right',
               hasBorder: false,
-              inputOnChange: (value) => {
-                this.setState({remark: value})
-              },
             }]}
           />
         </View>

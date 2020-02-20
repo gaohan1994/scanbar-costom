@@ -10,6 +10,7 @@ import { MerchantInterface } from '../../constants'
 import AddressItem from '../../component/address/item'
 import ButtonFooter from '../../component/button/button.footer'
 import productSdk from '../../common/sdk/product/product.sdk'
+import Empty from '../../component/empty'
 
 type Props = {
   addressList: MerchantInterface.Address[];
@@ -58,7 +59,10 @@ class Page extends Taro.Component<Props, State> {
             />
           )
         }) : (
-          <View>asd</View>
+          <Empty
+            img='//net.huanmusic.com/scanbar-c/img_location.png'
+            text='还没有地址，快去新增吧'
+          />
         )}
 
         <ButtonFooter

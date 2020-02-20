@@ -34,7 +34,7 @@ export declare namespace ProductCartInterface {
 
   interface ProductOrderPayload {
     address: string;
-		addressDetail: string;
+		// addressDetail: string;
 		deliveryPhone: string;
     delivery_time: string;
     deliveryType: number;
@@ -464,26 +464,34 @@ class ProductSDK {
    */
   public getProductInterfacePayload = (products?: ProductCartInterface.ProductCartInfo[], address?: MerchantInterface.Address, payOrderDetail?: any): ProductCartInterface.ProductPayPayload => {
     const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
-    const payload: ProductCartInterface.ProductPayPayload = {
-      order: {
-        address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
-        addressDetail: payOrderDetail.deliveryType === 0 ? address && address.address || '' : '',
-        deliveryPhone: '',
-        delivery_time: payOrderDetail.delivery_time || '',
-        deliveryType: payOrderDetail.deliveryType || 0,
+
+    let order: Partial<ProductCartInterface.ProductOrderPayload> = {
+      address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
+      deliveryPhone: '',
+      delivery_time: payOrderDetail.delivery_time || '',
+      deliveryType: payOrderDetail.deliveryType || 0,
+      remark: payOrderDetail.remark || "",
+      payType: 8,
+      merchantId: 1,
+      discount: 0,
+      erase: this.getErase(),
+      memberId: this.member !== undefined ? this.member.id : -1,
+      orderSource: 3,
+      totalAmount: this.getProductPrice(),
+      totalNum: this.getProductNumber(),
+      transAmount: this.getProductTransPrice(),
+    }
+
+    if (payOrderDetail.deliveryType === 1) {
+      order = {
+        ...order,
         receiver: address && address.contact || "",
         receiverPhone: address && address.phone || '',
-        remark: payOrderDetail.remark || "",
-        payType: 8,
-        merchantId: 1,
-        discount: 0,
-        erase: this.getErase(),
-        memberId: this.member !== undefined ? this.member.id : -1,
-        orderSource: 3,
-        totalAmount: this.getProductPrice(),
-        totalNum: this.getProductNumber(),
-        transAmount: this.getProductTransPrice(),
-      },
+      }
+    }
+
+    const payload: ProductCartInterface.ProductPayPayload = {
+      order: order as any,
       productInfoList: productList.map((item) => {
         /**
          * @todo [默认会员价，有就用会员价，没有就用普通价格]
@@ -751,6 +759,7 @@ class ProductSDK {
     this.empty();
     this.preparePayOrder([])
     this.preparePayOrderAddress({} as any)
+    this.preparePayOrderDetail({} as any)
 
     const { order } = result;
     Taro.navigateTo({

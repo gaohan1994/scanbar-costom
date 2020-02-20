@@ -7,6 +7,7 @@ import ProductComponent from '../../component/product/product'
 import Footer from './component/footer'
 import { AppReducer } from '../../reducers'
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk'
+import Empty from '../../component/empty'
 
 type Props = {
   productCartList: ProductCartInterface.ProductCartInfo[]
@@ -29,8 +30,8 @@ class Page extends Taro.Component<Props> {
     const { productCartList } = this.props;
     return (
       <View className='container'>
-        {productCartList.map((item) => {
-          console.log('product ouside', item)
+        {productCartList && productCartList.length > 0 
+        ? productCartList.map((item) => {
           return (
             <ProductComponent
               direct={true}
@@ -38,8 +39,24 @@ class Page extends Taro.Component<Props> {
               product={item}
             /> 
           )
-        })}
-        <Footer />
+        })
+        : (
+          <Empty
+            img='//net.huanmusic.com/scanbar-c/img_cart.png'
+            text='还没有商品，快去选购吧'
+            button={{
+              title: '去选购',
+              onClick: () => {
+                Taro.switchTab({
+                  url: `/pages/index/index`
+                })
+              }
+            }}
+          />
+        )}
+        {productCartList && productCartList.length > 0 && (
+          <Footer />
+        )}
       </View>
     )
   }

@@ -1,0 +1,38 @@
+@import "../../styles/theme.less";
+
+@prefix: component-empty;
+
+.@{prefix} {
+  &-layout {
+    width: 100%;
+    .flex(center, center, column);
+    .margin(200px, t)
+  }
+  &-img {
+    width: 562px;
+    height: 388px;
+    .bg;
+    position: relative;
+  }
+  &-text {
+    position: absolute;
+    bottom: 28px;
+    left: 0;
+    height: 50px;
+    right: 0;
+    .flex(center, center);
+    font-size:30px;
+    font-weight:500;
+    color:rgba(153,153,153,1);
+  }
+  &-button {
+    width:240px;
+    height:80px;
+    background:rgba(42,134,252,1);
+    border-radius:40px;
+    .flex(center, center);
+    font-size:32px;
+    font-weight:500;
+    color:rgba(255,255,255,1);
+  }
+}
