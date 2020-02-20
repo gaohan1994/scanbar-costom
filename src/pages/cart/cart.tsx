@@ -1,5 +1,5 @@
 
-import Taro from '@tarojs/taro'
+import Taro, { Config } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
@@ -14,6 +14,9 @@ type Props = {
 }
 
 class Page extends Taro.Component<Props> {
+  config: Config = {
+    navigationBarTitleText: '购物车'
+  }
 
   componentDidShow () {
     productSdk.refreshCartNumber();
