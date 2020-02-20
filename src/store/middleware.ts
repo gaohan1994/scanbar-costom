@@ -14,7 +14,7 @@ export default store => next => action => {
     if (payload.type === 'ADD') {
       Taro.setTabBarBadge({
         index: tabIndex,
-        text: `${total + 1}`
+        text: `${total + (payload.num || 1)}`
       });
     } else {
       

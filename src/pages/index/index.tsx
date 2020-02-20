@@ -12,7 +12,7 @@ import { ProductAction } from '../../actions'
 import { ResponseCode, ProductInterface } from '../../constants'
 import { LoginManager } from '../../common/sdk'
 import WeixinSdk from '../../common/sdk/weixin/weixin'
-
+import LoginModal from '../../component/login/login.modal'
 
 const cssPrefix = 'product';
 
@@ -25,28 +25,33 @@ class Index extends Component<any> {
       createTime: ''
     },
     loading: false,
+    isOpen: false,
   };
 
-    /**
-   * 指定config的类型声明为: Taro.Config
-   *
-   * 由于 typescript 对于 object 类型推导只能推出 Key 的基本类型
-   * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
-   * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
-   */
+  /**
+ * 指定config的类型声明为: Taro.Config
+ *
+ * 由于 typescript 对于 object 类型推导只能推出 Key 的基本类型
+ * 对于像 navigationBarTextStyle: 'black' 这样的推导出的类型是 string
+ * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
+ */
   config: Config = {
     navigationBarTitleText: '首页'
   }
 
-  async componentDidShow () {
+  async componentDidShow() {
     try {
       const result = await LoginManager.getUserInfo();
       console.log('userinfo: ', result);
-      if (!result.success) {  
+      if (!result.success) {
         const { success, msg } = await LoginManager.wxLogin();
         invariant(!!success, msg || '登陆失败');
         this.init();
         return;
+      }
+
+      if (result.success && (!result.result.phone || result.result.phone.length === 0)) {
+        this.setState({ isOpen: true });
       }
 
       this.init();
@@ -87,7 +92,7 @@ class Index extends Component<any> {
       });
     }
   }
-  
+
   /**
    * @todo [点击菜单的时候修改当前菜单并跳转至对应商品]
    *
@@ -96,29 +101,29 @@ class Index extends Component<any> {
   public onTypeClick = (params: ProductInterface.ProductTypeInfo) => {
     this.changeCurrentType(params);
   }
-  
+
   public fetchData = async (type: any) => {
     this.setState({ loading: true });
-    const result = await ProductAction.productOrderInfoList({type: `${type.id}`, status: 0});
+    const result = await ProductAction.productOrderInfoList({ type: `${type.id}`, status: 0 });
     this.setState({ loading: false });
     return result;
   }
 
-  render () {
-    const { currentType } = this.state;
+  render() {
+    const { currentType, isOpen } = this.state;
     const { productList, productType } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
         <IndexAddress />
         <View className={`${cssPrefix}-list-container-costom`}>
-          <ProductMenu 
+          <ProductMenu
             menu={productType}
             currentMenu={currentType}
             onClick={(type) => this.onTypeClick(type)}
           />
           <View className={`${cssPrefix}-list-right`}>
             <View className={`${cssPrefix}-list-right-header product-component-section-header-height`}>
-              <View className={`${cssPrefix}-list-right-header-bge`}/>
+              <View className={`${cssPrefix}-list-right-header-bge`} />
               <Text className={`${cssPrefix}-list-right-header-text`}>{currentType.name}</Text>
             </View>
             <ProductListView
@@ -128,6 +133,7 @@ class Index extends Component<any> {
           </View>
         </View>
         {/* <Cart /> */}
+        <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }}/>
       </View>
     )
   }

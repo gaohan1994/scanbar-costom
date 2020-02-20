@@ -43,7 +43,6 @@ class Page extends Taro.Component {
 
   render() {
     // const { userinfo } = this.props;
-    // console.log('test kkk', userinfo);
     return (
       <View className={`container ${cssPrefix}`} >
         <View className={`${cssPrefix}-container`}>

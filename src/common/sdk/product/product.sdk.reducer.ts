@@ -49,6 +49,7 @@ export declare namespace ProductSDKReducer {
     type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce;
     suspension?: number;
     sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
+    num?: number;
   }
 
   /**
@@ -348,7 +349,7 @@ export default function productSDKReducer (
     }
     case productSdk.reducerInterface.MANAGE_CART_PRODUCT: {
       const { payload } = action as ProductSDKReducer.ProductManageCart;
-      const { product, type, suspension, sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER } = payload;
+      const { product, type, suspension, sort = productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER, num } = payload;
 
       if (!!suspension) {
         // 如果是挂单的话修改挂单中的商品,首先找到这个挂单list没找到直接返回
@@ -392,14 +393,14 @@ export default function productSDKReducer (
         if (index === -1) {
           newProductCartList.push({
             ...product,
-            sellNum: 1
+            sellNum: (num || 1)
           });
           return {
             ...state,
             [`${nextProductKey}`]: newProductCartList
           };
         } else {
-          newProductCartList[index].sellNum += 1;
+          newProductCartList[index].sellNum += (num || 1);;
           return {
             ...state,
             [`${nextProductKey}`]: newProductCartList

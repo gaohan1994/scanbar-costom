@@ -180,6 +180,17 @@ class LoginManager {
     }
   }
 
+  public setUserInfo = (userInfo: LoginInterface.OAuthToken) => {
+    return new Promise((resolve) => {
+      Taro
+        .setStorage({ key: CentermOAuthKey, data: JSON.stringify(userInfo) })
+        .then(() => {
+          resolve({success: true, userInfo, msg: ''});
+        })
+        .catch(error => resolve({success: false, result: {} as any, msg: error.message || '保存用户信息失败'}));
+    });
+  }
+
   /**
    * @todo [获取用户权限]
    *
