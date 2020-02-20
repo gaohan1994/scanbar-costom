@@ -50,14 +50,6 @@ class Order extends Taro.Component<Props, State> {
     });
   }
 
-  public onOrderPress = (order: any) => {
-    console.log('test fff', order);
-    // Taro.navigateTo({
-    //   url: `/pages/order/order.detail?id=${order.orderNo}`
-    //   // url: `/pages/order/order.detail`
-    // });
-  }
-
   public init = async () => {
     pageNum = 1;
     OrderAction.orderList({ pageNum: pageNum++, pageSize });
@@ -142,7 +134,7 @@ class Order extends Taro.Component<Props, State> {
               })
               : (
                 <View className={`product-suspension order-list-empty`}>
-                  <Image src="//net.huanmusic.com/weapp/img_kong.png" className={`product-suspension-image`} />
+                  <Image src="//net.huanmusic.com/scanbar-c/img_order_empty.png" className={`product-suspension-image`} />
                   <Text className={`product-suspension-text`}>暂无内容</Text>
                 </View>
               )
