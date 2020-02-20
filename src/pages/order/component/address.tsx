@@ -121,7 +121,6 @@ class Comp extends Taro.Component<Props, State> {
             pre={true}
             showEdit={false}
             showArrow={true}
-            onClick={() => this.onAddAddress()}
           />
           <View className={`${prefix}-detail-row ${prefix}-detail-row-border `}>
             <View className={`${prefix}-detail-row-title`}>自提时间</View>
