@@ -31,7 +31,7 @@ export declare namespace OrderInterface {
     barcode: string;
     brand: string;
     orderNo: string;
-    imgPaths: string;
+    picUrl: string;
   }
 
   interface OrderInfo {

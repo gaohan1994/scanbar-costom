@@ -30,6 +30,7 @@
     &-image {
       width: 140px;
       height: 140px;
+      border-radius: 70px;
     }
 
     &-box {
@@ -39,15 +40,23 @@
     }
 
     &-name {
-      .title-text(#ffffff);
+      color: #fff;
+      font-size: 36px;
+      height: 38px;
+      font-weight: bold;
       display: flex;
       flex-direction: row;
       align-items: center;
+      &-get {
+        background-color: transparent;
+        padding: 0;
+      }
     }
 
-    &-text {
-      font-size: 28px;
+    &-phone {
+      font-size: 30px;
       color: #ffffff;
+      margin-top: 24px;
     }
   }
 
