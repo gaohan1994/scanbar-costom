@@ -3,12 +3,15 @@ import { View, Image } from '@tarojs/components'
 import './index.less'
 import '../../../component/product/product.less'
 import classnames from 'classnames'
-import { ProductInterface, MerchantInterface } from '../../../constants'
+import { MerchantInterface } from '../../../constants'
 import { connect } from '@tarojs/redux'
 import productSdk from '../../../common/sdk/product/product.sdk';
 import { AppReducer } from 'src/reducers'
+import numeral from 'numeral'
 import AddressItem from '../../../component/address/item'
 import { getPayOrderAddress } from '../../../common/sdk/product/product.sdk.reducer'
+import merchantAction from '../../../actions/merchant.action'
+import { getMerchantDistance, getCurrentPostion } from '../../../reducers/app.merchant'
 
 const tabs = [
   {
@@ -25,6 +28,8 @@ const prefix = 'order-component-address'
 
 type Props = {
   payOrderAddress: MerchantInterface.Address;
+  merchantDistance: MerchantInterface.Distance;
+  currentPostion: any;
 }
 
 type State = {
@@ -37,9 +42,28 @@ class Comp extends Taro.Component<Props, State> {
     currentTab: 0
   }
 
+  componentDidShow () {
+    const { currentPostion } = this.props;
+    this.changeTab(tabs[0])
+    merchantAction.merchantDistance({
+      latitude: currentPostion.latitude,
+      longitude: currentPostion.longitude,
+      merchantId: 1,
+    })
+  }
+
   public changeTab = (tab) => {
     this.setState({
       currentTab: tab.id
+    }, () => {
+      if (tab.id === 1) {
+        /**
+         * @todo 自提
+         */
+        productSdk.preparePayOrderDetail({deliveryType: 0})
+      } else {
+        productSdk.preparePayOrderDetail({deliveryType: 1})
+      }
     })
   } 
 
@@ -83,12 +107,38 @@ class Comp extends Taro.Component<Props, State> {
 
   private renderDetail = () => {
     const { currentTab } = this.state;
-    const { payOrderAddress } = this.props;
+    const { payOrderAddress, merchantDistance } = this.props;
 
     if (currentTab === 1) {
       return (
         <View className={`${prefix}-detail`}>
-          renderDetail
+          <AddressItem 
+            address={{
+              contact: merchantDistance.name,
+              phone: `${numeral(merchantDistance.distance).format('0')}米`,
+              address: merchantDistance.location,
+            } as any} 
+            pre={true}
+            showEdit={false}
+            showArrow={true}
+            onClick={() => this.onAddAddress()}
+          />
+          <View className={`${prefix}-detail-row ${prefix}-detail-row-border `}>
+            <View className={`${prefix}-detail-row-title`}>自提时间</View>
+            <View 
+              className={classnames(`${prefix}-detail-row-title`, {
+                [`${prefix}-detail-row-main`]: true,
+                [`${prefix}-detail-row-title-right`]: true,
+              })}
+            >
+              立即送出
+            </View>
+            <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
+          </View>
+          <View className={`${prefix}-detail-row`}>
+            <View className={`${prefix}-detail-row-title`}>支付方式</View>
+            <View className={classnames(`${prefix}-detail-row-title`)}>微信支付</View>
+          </View>
         </View>
       );
     }
@@ -137,7 +187,9 @@ class Comp extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => {
   return {
-    payOrderAddress: getPayOrderAddress(state)
+    currentPostion: getCurrentPostion(state),
+    payOrderAddress: getPayOrderAddress(state),
+    merchantDistance: getMerchantDistance(state)
   }
 }
 

@@ -20,6 +20,7 @@ const cssPrefix = 'order'
 type Props = {
   payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
   payOrderAddress: MerchantInterface.Address;
+  payOrderDetail: any;
 }
 
 type State = {
@@ -34,16 +35,30 @@ class Page extends Taro.Component<Props, State> {
 
   public onSubmit = async () => {
     try {
-      const { payOrderAddress, payOrderProductList } = this.props;
+      Taro.showLoading();
+      const { payOrderAddress, payOrderProductList, payOrderDetail } = this.props;
       invariant(payOrderProductList.length > 0, '请选择要下单的商品')
-      invariant(payOrderAddress.id, '请选择地址');
 
-      const payload = productSdk.getProductInterfacePayload(payOrderProductList, payOrderAddress, {delivery_time: dayJs().format('YYYY-MM-DD HH:mm:ss'), deliveryType: 0});
+      if (payOrderDetail && payOrderDetail.deliveryType === 1) {
+        invariant(payOrderAddress.id, '请选择地址');
+      }
+      const payload = productSdk.getProductInterfacePayload(
+        payOrderProductList, 
+        payOrderAddress, 
+        {
+          ...payOrderDetail,
+          delivery_time: dayJs().format('YYYY-MM-DD HH:mm:ss'),
+        }
+      );
       const result = await productSdk.cashierOrder(payload) 
       console.log('result', result)
       invariant(result.code === ResponseCode.success, result.msg || ' ');
+      Taro.hideLoading();
+      const payment = await productSdk.requestPayment(result.data.order.orderNo)
+      console.log('payment: ', payment)
       productSdk.cashierOrderCallback(result.data)
     } catch (error) {
+      Taro.hideLoading();
       Taro.showToast({
         title: error.message,
         icon: 'none'
@@ -96,6 +111,7 @@ const select = (state: AppReducer.AppState) => {
   return {
     payOrderProductList: state.productSDK.payOrderProductList,
     payOrderAddress: state.productSDK.payOrderAddress,
+    payOrderDetail: state.productSDK.payOrderDetail,
   }
 }
 export default connect(select)(Page);

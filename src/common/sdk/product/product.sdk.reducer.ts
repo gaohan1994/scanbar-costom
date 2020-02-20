@@ -151,7 +151,9 @@ const initState: ProductSDKReducer.State = {
   productStockList: [],
   productRefundList: [],
   payOrderProductList: [],
-  payOrderDetail: {},
+  payOrderDetail: {
+    deliveryType: 0
+  },
   payOrderAddress: {} as any,
   suspensionCartList: [],
   productPurchaseList: [],
@@ -167,6 +169,14 @@ export default function productSDKReducer (
   action: ProductSDKReducer.Action
 ): ProductSDKReducer.State {
   switch (action.type) {
+
+    case productSdk.reducerInterface.RECEIVE_ORDER_PAY_DETAIL: {
+      const { payload } = action as any;
+      return {
+        ...state,
+        payOrderDetail: payload
+      }
+    }
 
     case productSdk.reducerInterface.RECEIVE_ORDER_PAY_ADDRESS: {
       const { payload } = action as any;
@@ -519,3 +529,5 @@ export const getProductPurchaseList = (state: AppReducer.AppState) => state.prod
 export const getProductStockList = (state: AppReducer.AppState) => state.productSDK.productStockList;
 
 export const getPayOrderAddress = (state: AppReducer.AppState) => state.productSDK.payOrderAddress;
+
+export const getPayOrderDetail = (state: AppReducer.AppState) => state.productSDK.payOrderDetail;
