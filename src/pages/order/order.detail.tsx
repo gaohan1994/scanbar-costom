@@ -7,12 +7,13 @@ import { getOrderDetail } from '../../reducers/app.order';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
 import invariant from 'invariant';
-import { OrderAction } from '../../actions';
+import { OrderAction, ProductAction } from '../../actions';
 import { ResponseCode, OrderInterface } from '../../constants';
 import "../../pages/style/product.less";
 import numeral from 'numeral';
 import dayjs from 'dayjs'
 import Price from '../../component/price';
+import productSdk from '../../common/sdk/product/product.sdk';
 
 const cssPrefix = 'order-detail';
 const productCssPrefix = 'product';
@@ -136,6 +137,21 @@ class OrderDetail extends Taro.Component<Props, State> {
     }
   }
 
+  public onPay = async (order: OrderInterface.OrderInfo) => {
+    const { orderNo } = order;
+    const payment = await productSdk.requestPayment(orderNo)
+    console.log('payment: ', payment)
+    if (payment.code === ResponseCode.success) {
+      const { params: { id } } = this.$router;
+      this.init(id);
+    } else {
+      Taro.showToast({
+        title: payment.msg,
+        icon: 'none'
+      });
+    }
+  }
+
   public renderPrice = (num: number) => {
     const price = num ? numeral(num).format('0.00') : '0.00';
     return (
@@ -156,6 +172,28 @@ class OrderDetail extends Taro.Component<Props, State> {
         <Text>{`.${price.split('.')[1]}`}</Text>
       </Text>
     );
+  }
+
+  public orderOneMore = async (order: OrderInterface.OrderDetail) => {
+    const { orderDetailList } = order;
+    if (orderDetailList && orderDetailList.length > 0) {
+      for (let i = 0; i < orderDetailList.length; i++) {
+        const res = await ProductAction.productInfoDetail({ id: orderDetailList[i].productId });
+        if (res.code === ResponseCode.success) {
+          // for (let j = 0; j < orderDetailList[i].num; j++) {
+          //   productSdk.manage({
+          //     type: productSdk.productCartManageType.ADD,
+          //     product: res.data,
+          //   });
+          // }
+          productSdk.manage({
+            type: productSdk.productCartManageType.ADD,
+            product: res.data,
+            num: orderDetailList[i].num,
+          });
+        }
+      }
+    }
   }
 
   render() {
@@ -244,14 +282,33 @@ class OrderDetail extends Taro.Component<Props, State> {
               </AtButton>
             )
           }
-          <AtButton
-            className={`${cssPrefix}-card-status-button-common ${cssPrefix}-card-status-button-again`}
-            type='secondary'
-            size='small'
-            full={false}
-          >
-            再来一单
-          </AtButton>
+          {
+            res.title === '待支付' && (
+              <AtButton
+                className={`${cssPrefix}-card-status-button-common ${cssPrefix}-card-status-button-again`}
+                type='secondary'
+                size='small'
+                full={false}
+                onClick={() => { this.onPay(orderDetail.order); }}
+              >
+                去支付
+              </AtButton>
+            )
+          }
+          {
+            res.title !== '待支付' && (
+              <AtButton
+                className={`${cssPrefix}-card-status-button-common ${cssPrefix}-card-status-button-again`}
+                type='secondary'
+                size='small'
+                full={false}
+                onClick={() => { this.orderOneMore(orderDetail); }}
+              >
+                再来一单
+              </AtButton>
+            )
+          }
+
         </View>
       </View>
     )
@@ -370,7 +427,7 @@ class OrderDetail extends Taro.Component<Props, State> {
                 <View className={`${productCssPrefix}-row-box`}>
                   <View
                     className={`${productCssPrefix}-row-cover`}
-                    style={`background-image: url(${item.imgPaths || '//net.huanmusic.com/weapp/pic_default.png'})`}
+                    style={`background-image: url(${item.picUrl || '//net.huanmusic.com/weapp/pic_default.png'})`}
                   />
                   <View className={`${productCssPrefix}-row-content ${productCssPrefix}-row-content-box`}>
                     <Text className={`${productCssPrefix}-row-name`}>{item.productName}</Text>
@@ -462,12 +519,12 @@ class OrderDetail extends Taro.Component<Props, State> {
         <View className={`${productCssPrefix}-row-totals`}>
           <View className={`${productCssPrefix}-row-content-item`}>
             <View></View>
-            
+
             <Price
-            preText='已优惠￥0.00   合计：'
-            priceColor='#333333'
-            price={numeral(orderDetail.order.transAmount).format('0.00')}
-          />
+              preText='已优惠￥0.00   合计：'
+              priceColor='#333333'
+              price={numeral(orderDetail.order.transAmount).format('0.00')}
+            />
           </View>
         </View>
 
