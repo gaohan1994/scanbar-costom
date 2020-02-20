@@ -63,6 +63,11 @@ class MerchantAction {
     const result = await MerchantService.addressAdd(params);
     return result;
   }
+
+  public wxUserInfoSave = async (params: Partial<MerchantInterface.WxUserInfo>) => {
+    const result = await MerchantService.wxUserInfoSave(params);
+    return result;
+  }
 }
 
 export default new MerchantAction();

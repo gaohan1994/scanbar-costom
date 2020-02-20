@@ -1,8 +1,8 @@
 import Taro from '@tarojs/taro';
 import { View, Image } from '@tarojs/components';
 import classnames from 'classnames';
-import "./header.layout.less";
 const cssPrefix = 'tabs-switch';
+import './tabs.switch.less';
 
 interface Props {
   current: number,

@@ -51,6 +51,11 @@ export declare namespace MerchantInterface {
     userName: string;
   }
 
+  interface WxUserInfo {
+    avatar: string;
+    nickname: string;
+  }
+
   namespace PayloadInterface {
     interface MerchantInfoAdd extends Partial<MerchantDetail> {
       pageNum?: number;

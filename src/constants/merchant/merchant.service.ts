@@ -47,6 +47,11 @@ class MerchantService {
     const result = await requestHttp.post('/api/address/edit', params);
     return result;
   }
+
+  public wxUserInfoSave = async (params: Partial<MerchantInterface.WxUserInfo>): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.post('/api/save', params);
+    return result;
+  }
 }
 
 export default new MerchantService();

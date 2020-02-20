@@ -3,8 +3,7 @@ import { View, Image, Text } from '@tarojs/components';
 import './order.less';
 import { OrderInterface, ResponseCode } from '../../constants';
 import numeral from 'numeral';
-import { AtButton } from 'taro-ui';
-import { OrderAction } from '../../actions';
+import { OrderAction, ProductAction } from '../../actions';
 import classnames from 'classnames'
 import invariant from 'invariant';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
@@ -57,12 +56,43 @@ class OrderItem extends Taro.Component<Props, State> {
     }
   }
 
-  public manageProduct = (type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce, e: any) => {
-    if (e.stopPropagation) {
-      e.stopPropagation();
+
+  public onPay = async (order: OrderInterface.OrderInfo) => {
+    const { orderNo } = order;
+    const payment = await productSdk.requestPayment(orderNo)
+    console.log('payment: ', payment)
+    if (payment.code === ResponseCode.success) {
+      Taro.navigateTo({
+        url: `/pages/order/order.detail?id=${orderNo}`
+      })
+    } else {
+      Taro.showToast({
+        title: payment.msg,
+        icon: 'none'
+      });
     }
-    // const { product, sort } = this.props;
-    // productSdk.manage({ type, product, sort });
+  }
+
+  public orderOneMore = async (order: OrderInterface.OrderDetail) => {
+    const { orderDetailList } = order;
+    if (orderDetailList && orderDetailList.length > 0) {
+      for (let i = 0; i < orderDetailList.length; i++) {
+        const res = await ProductAction.productInfoDetail({ id: orderDetailList[i].productId });
+        if (res.code === ResponseCode.success) {
+          // for (let j = 0; j < orderDetailList[i].num; j++) {
+          //   productSdk.manage({
+          //     type: productSdk.productCartManageType.ADD,
+          //     product: res.data,
+          //   });
+          // }
+          productSdk.manage({
+            type: productSdk.productCartManageType.ADD,
+            product: res.data,
+            num: orderDetailList[i].num,
+          });
+        }
+      }
+    }
   }
 
   render() {
@@ -110,10 +140,22 @@ class OrderItem extends Taro.Component<Props, State> {
               products.map((product: any) => {
                 return (
                   <View className={`${cssPrefix}-card-center-product`}>
-                    <Image
-                      src="//net.huanmusic.com/weapp/pic_default.png"
-                      className={`${cssPrefix}-card-center-product-pic`}
-                    />
+                    {
+                      product.picUrl && product.picUrl.length > 0
+                        ? (
+                          <Image
+                            src={product.picUrl}
+                            className={`${cssPrefix}-card-center-product-pic`}
+                          />
+                        )
+                        : (
+                          <Image
+                            src="//net.huanmusic.com/weapp/pic_default.png"
+                            className={`${cssPrefix}-card-center-product-pic`}
+                          />
+                        )
+                    }
+
                     <Text className={`${cssPrefix}-card-center-product-text`}>
                       {product.productName}
                     </Text>
@@ -138,7 +180,10 @@ class OrderItem extends Taro.Component<Props, State> {
                 >
                   取消订单
                 </View>
-                <View className={`${cssPrefix}-card-button-common ${cssPrefix}-card-button-pay`}>
+                <View 
+                  className={`${cssPrefix}-card-button-common ${cssPrefix}-card-button-pay`}
+                  onClick={() => { this.onPay(order); }}
+                >
                   去支付
                 </View>
               </View>
@@ -147,7 +192,7 @@ class OrderItem extends Taro.Component<Props, State> {
               <View className={`${cssPrefix}-card-button`}>
                 <View
                   className={`${cssPrefix}-card-button-common ${cssPrefix}-card-button-again`}
-                  onClick={this.manageProduct.bind(this, productSdk.productCartManageType.REDUCE)}
+                  onClick={() => { this.orderOneMore(data); }}
                 >
                   再来一单
                 </View>
