@@ -27,6 +27,7 @@ class ProductAction {
     return result;
   }
 
+
   public productInfoGetList = async (params?: any) => {
     const result = await ProductService.productInfoGetList();
     if (result.code === ResponseCode.success) {
@@ -40,8 +41,8 @@ class ProductAction {
     }
   }
 
-  public productInfoSearchList = async (params: ProductInterface.ProductInfoGetListFetchFidle) => {
-    const result = await ProductService.productInfoGetList(params);
+  public productInfoSearchList = async (params: ProductInterface.ProductInfoListFetchFidle) => {
+    const result = await ProductService.productInfoList(params);
     if (result.code === ResponseCode.success) {
       store.dispatch({
         type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_SEARCH_LIST,

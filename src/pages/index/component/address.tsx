@@ -54,7 +54,14 @@ class Comp extends Taro.Component<Props, State> {
             </View>
           </View>
         </View>
-        <View className={`${prefix}-search`}>
+        <View 
+          className={`${prefix}-search`}
+          onClick={() => {
+            Taro.navigateTo({
+              url: `/pages/product/product.search`
+            })
+          }}
+        >
           <Image className={`${prefix}-search-icon`} src='//net.huanmusic.com/scanbar-c/icon_search.png' />
           <View className={`${prefix}-search-text`}>请输入商品名称</View>
         </View>

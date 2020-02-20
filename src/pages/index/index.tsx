@@ -13,6 +13,7 @@ import { ResponseCode, ProductInterface } from '../../constants'
 import { LoginManager } from '../../common/sdk'
 import WeixinSdk from '../../common/sdk/weixin/weixin'
 import LoginModal from '../../component/login/login.modal'
+import productSdk from '../../common/sdk/product/product.sdk'
 
 const cssPrefix = 'product';
 
@@ -55,6 +56,7 @@ class Index extends Component<any> {
       }
 
       this.init();
+      productSdk.refreshCartNumber();
     } catch (error) {
       Taro.showToast({
         title: error.message,
