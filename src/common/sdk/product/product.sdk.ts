@@ -178,6 +178,7 @@ export declare namespace ProductCartInterface {
     product: ProductInterface.ProductInfo | ProductCartInfo;
     suspension?: number;
     sort?: PAYLOAD_ORDER | PAYLOAD_REFUND;
+    num?: number;
   }
 }
 
@@ -576,7 +577,8 @@ class ProductSDK {
     sellNum?: number, 
     suspension?: number,
     sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND | ProductCartInterface.PAYLOAD_PURCHASE 
-      = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+      = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER,
+      num?: number,
   ) => {
     Taro.showToast({
       title: '加入购物车'
@@ -603,6 +605,7 @@ class ProductSDK {
           product,
           suspension,
           sort,
+          num
         }
       };
       store.dispatch(reducer);
@@ -667,7 +670,7 @@ class ProductSDK {
   }
 
   public manage = (params: ProductCartInterface.ProductSDKManageInterface) => {
-    const { product, type, suspension, sort } = params;
+    const { product, type, suspension, sort, num } = params;
     if (type === this.productCartManageType.EMPTY) {
       this.empty(sort);
       return;
@@ -695,7 +698,7 @@ class ProductSDK {
     } else {
       // 如果是其他商品
       if (type === this.productCartManageType.ADD) {
-        this.add(product, undefined, suspension, sort);
+        this.add(product, undefined, suspension, sort, num);
       } else {
         this.reduce(product, undefined, suspension, sort);
       }

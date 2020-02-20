@@ -57,11 +57,21 @@ class WeixinSDK {
   }
 
   public getWeixinUserinfo = async () => {
-    return new Promise((resolve) => {
-      Taro.getUserInfo({
-        
+    const authRes: any = await this.checkAuth('userInfo');
+    if (authRes.success) {
+      return new Promise((resolve) => {
+        Taro.getUserInfo({
+          success: (res) => {
+            resolve({ success: true, result: res.userInfo, msg: '' })
+          },
+          fail: (error: any) => {
+            resolve({ success: false, result: undefined, msg: error.errMsg })
+          }
+        })
       })
-    })
+    } else {
+      return { success: false, result: undefined, msg: '未授权获取微信头像和昵称' };
+    }
   }
 
   public getLocation = async (): Promise<{success: boolean, result: any, msg: string}> => {
