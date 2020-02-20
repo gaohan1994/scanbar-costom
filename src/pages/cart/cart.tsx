@@ -23,6 +23,8 @@ class Page extends Taro.Component<Props> {
         index: 2,
         text: `${total}`
       });
+    } else {
+      Taro.removeTabBarBadge({index: 2});
     }
   }
 

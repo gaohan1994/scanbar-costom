@@ -763,7 +763,7 @@ class ProductSDK {
     this.preparePayOrder([])
     this.preparePayOrderAddress({} as any)
     this.preparePayOrderDetail({} as any)
-
+    console.log('result callback', result)
     const { order } = result;
     Taro.navigateTo({
       url: `/pages/order/order.detail?id=${order.orderNo}`
