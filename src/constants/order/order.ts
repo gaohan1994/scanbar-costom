@@ -31,7 +31,6 @@ export declare namespace OrderInterface {
     barcode: string;
     brand: string;
     orderNo: string;
-    imgPaths: string;
   }
 
   interface OrderInfo {
@@ -55,15 +54,6 @@ export declare namespace OrderInterface {
     transAmount: number;
     transFlag: number;
     transType: number;
-    createTime: string;
-    planDeliveryTime: string;
-    deliveryType: number;
-    deliveryFee: number;
-    remark: string;
-    expireMinute?: number;
-    address: string;
-    receiver: string;
-    receiverPhone: string;
   }
 
   interface OrderDetail {
@@ -91,20 +81,12 @@ export declare namespace OrderInterface {
     orderNo: string;
   }
 
-  interface OrderCount {
-    inTransNum: number;
-    initNum: number;
-    waitForReceiptNum: number;
-  }
-
   type RECEIVE_ORDER_DETAIL = string;
   type RECEIVE_ORDER_LIST = string;
-  type RECEIVE_ORDER_COUNT = string;
 
   type ReducerInterface = {
     RECEIVE_ORDER_LIST: RECEIVE_ORDER_LIST;
     RECEIVE_ORDER_DETAIL: RECEIVE_ORDER_DETAIL;
-    RECEIVE_ORDER_COUNT: RECEIVE_ORDER_COUNT;
   };
 
   interface OrderInterfaceMapImp {
@@ -119,7 +101,6 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
   public reducerInterfaces = {
     RECEIVE_ORDER_LIST: 'RECEIVE_ORDER_LIST',
     RECEIVE_ORDER_DETAIL: 'RECEIVE_ORDER_DETAIL',
-    RECEIVE_ORDER_COUNT: 'RECEIVE_ORDER_COUNT',
   };
 
   public orderList = (params?: OrderInterface.OrderListFetchFidle) => {
@@ -128,14 +109,6 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
 
   public orderDetail = (params: OrderInterface.OrderDetailFetchField) => {
     return `/order/detail/${params.orderNo}`;
-  }
-
-  public orderCount = () => {
-    return `/order/count`;
-  } 
-
-  public orderClose = (params: OrderInterface.OrderDetailFetchField) => {
-    return `/order/closeOrder/${params.orderNo}`;
   }
 }
 

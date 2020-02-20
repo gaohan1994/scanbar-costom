@@ -27,33 +27,23 @@ export declare namespace OrderReducer {
         data: OrderInterface.OrderDetail;
       };
     }
-
-    interface OrderCountReducer {
-      type: OrderInterface.RECEIVE_ORDER_COUNT;
-      payload: {
-        data: OrderInterface.OrderCount;
-      };
-    }
   } 
 
   interface State {
     orderList: Array<OrderInterface.OrderDetail>;
     orderListTotal: number;
     orderDetail: OrderInterface.OrderDetail;
-    orderCount: OrderInterface.OrderCount;
   }
 
   type Action = 
     Reducers.OrderListReducer
-    | Reducers.OrderDetailReducer
-    | Reducers.OrderCountReducer;
+    | Reducers.OrderDetailReducer;
 }
 
 const initState: OrderReducer.State = {
   orderList: [],
   orderListTotal: -1,
   orderDetail: {} as any,
-  orderCount: {} as any,
 };
 
 export default function orderReducer (
@@ -89,15 +79,6 @@ export default function orderReducer (
       };
     }
 
-    case OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_COUNT: {
-      const { payload } = action as OrderReducer.Reducers.OrderCountReducer;
-      const { data } = payload;
-      return {
-        ...state,
-        orderCount: data
-      };
-    }
-
     default: {
       return {
         ...state
@@ -111,5 +92,3 @@ export const getOrderList = (state: AppReducer.AppState) => state.order.orderLis
 export const getOrderListTotal = (state: AppReducer.AppState) => state.order.orderListTotal;
 
 export const getOrderDetail = (state: AppReducer.AppState) => state.order.orderDetail;
-
-export const getOrderCount = (state: AppReducer.AppState) => state.order.orderCount;
