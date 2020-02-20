@@ -1,17 +1,15 @@
 import Taro, { Config } from '@tarojs/taro'
-import { View, ScrollView, Image, Text } from '@tarojs/components'
+import { View, ScrollView } from '@tarojs/components'
 import TabsSwitch from '../../component/tabs/tabs.switch';
-import classnames from 'classnames';
 import './index.less'
-import { AtButton } from 'taro-ui';
 import { OrderInterface, ResponseCode } from '../../constants';
 import { OrderAction } from '../../actions';
 import invariant from 'invariant';
 import { getOrderList, getOrderListTotal, getOrderCount } from '../../reducers/app.order';
 import { connect } from '@tarojs/redux';
-import numeral from 'numeral';
 import OrderItem from '../../component/order/order';
 import "../style/product.less";
+import Empty from '../../component/empty';
 
 const cssPrefix = 'order';
 
@@ -133,10 +131,22 @@ class Order extends Taro.Component<Props, State> {
                 )
               })
               : (
-                <View className={`product-suspension order-list-empty`}>
-                  <Image src="//net.huanmusic.com/scanbar-c/img_order_empty.png" className={`product-suspension-image`} />
-                  <Text className={`product-suspension-text`}>暂无内容</Text>
-                </View>
+                // <View className={`product-suspension order-list-empty`}>
+                //   <Image src="//net.huanmusic.com/scanbar-c/img_order_empty.png" className={`product-suspension-image`} />
+                //   <Text className={`product-suspension-text`}>暂无内容</Text>
+                // </View>
+                <Empty
+                  img='//net.huanmusic.com/scanbar-c/img_order_empty.png'
+                  text='还没有商品，快去选购吧'
+                  button={{
+                    title: '去选购',
+                    onClick: () => {
+                      Taro.switchTab({
+                        url: `/pages/index/index`
+                      })
+                    }
+                  }}
+                />
               )
           }
 

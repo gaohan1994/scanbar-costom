@@ -8,6 +8,7 @@ import invariant from 'invariant';
 import { LoginManager } from '../../common/sdk';
 import merchantAction from '../../actions/merchant.action';
 import { ResponseCode } from '../../constants';
+import LoginModal from '../../component/login/login.modal';
 
 
 const Rows = [
@@ -26,15 +27,17 @@ const Rows = [
 const cssPrefix = 'user';
 
 interface Props {
-  
+
 }
 interface State {
   userinfo: any;
+  isOpen: boolean;
 }
 class User extends Taro.Component<Props, State> {
 
   state = {
     userinfo: {} as any,
+    isOpen: false as any,
   }
 
   config: Config = {
@@ -63,13 +66,24 @@ class User extends Taro.Component<Props, State> {
   }
 
   public onRowClick = (row: any) => {
+    if (row.title === '我的地址') {
+      const { userinfo } = this.state;
+      if ((!userinfo.phone || userinfo.phone.length === 0)) {
+        this.setState({ isOpen: true });
+      };
+    }
     Taro.navigateTo({
       url: `${row.url}`
     });
   }
 
+
   public getWxInfo = async (show?: boolean) => {
     try {
+      const { userinfo } = this.state;
+      if ((!userinfo.phone || userinfo.phone.length === 0)) {
+        this.setState({ isOpen: true });
+      };
       const result: any = await WeixinSDK.getWeixinUserinfo();
       invariant(result.success, result.msg || '获取用户昵称和头像失败');
       const params = {
@@ -78,7 +92,7 @@ class User extends Taro.Component<Props, State> {
       }
       const saveResult: any = await merchantAction.wxUserInfoSave(params);
       invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
-      const { userinfo } = this.state;
+      
       const newUserinfo = {
         ...userinfo,
         avatar: result.result.avatarUrl,
@@ -101,14 +115,19 @@ class User extends Taro.Component<Props, State> {
 
   render() {
     // const { userinfo } = this.props;
-    const { userinfo } = this.state;
+    const { userinfo, isOpen } = this.state;
     return (
-      <View className="container container-color">
+      <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-bg`} />
         <View className={`${cssPrefix}-container`}>
-          <View
+          {/* <View
             className={`${cssPrefix}-user`}
             onClick={() => this.getWxInfo(true)}
+          > */}
+          <Button
+            openType='getUserInfo'
+            onGetUserInfo={() => this.getWxInfo(true)}
+            className={`${cssPrefix}-user`}
           >
             {
               userinfo && userinfo.avatar && userinfo.avatar.length > 0
@@ -142,7 +161,7 @@ class User extends Taro.Component<Props, State> {
               }
               <View className={`${cssPrefix}-user-phone`}>{userinfo.phone}</View>
             </View>
-          </View>
+          </Button>
           <View className={`${cssPrefix}-rows`}>
             {
               Rows.map((item: any) => {
@@ -168,7 +187,7 @@ class User extends Taro.Component<Props, State> {
             }
           </View>
         </View>
-        <LoginButton />
+        <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }}/>
       </View>
     );
   }
