@@ -21,6 +21,12 @@ export declare namespace MerchantInterface {
     type: number;
   }
 
+  interface Distance {
+    distance: number;
+    location: string;
+    name: string;
+  }
+
   interface Address {
     address: string;
 		contact: string;
@@ -79,7 +85,8 @@ class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
   public reducerInterface = {
     RECEIVE_MERCHANT_DETAIL: 'RECEIVE_MERCHANT_DETAIL',
     RECEIVE_PROFILE_INFO: 'RECEIVE_PROFILE_INFO',
-    RECEIVE_ADDRESS_LIST: 'RECEIVE_ADDRESS_LIST'
+    RECEIVE_ADDRESS_LIST: 'RECEIVE_ADDRESS_LIST',
+    RECEIVE_MERCHANT_DISTANCE: 'RECEIVE_MERCHANT_DISTANCE'
   };
   public merchantInfoAdd = '/merchantInfo/add';
   public merchantInfoDetail = '/merchantInfo/detail';

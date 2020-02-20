@@ -18,12 +18,13 @@
  * ```
  */
 import Taro from '@tarojs/taro';
-import { ProductInterface, ProductService, MemberInterface, HTTPInterface, MerchantInterface, OrderInterface } from '../../../constants';
+import { ProductInterface, ProductService, MemberInterface, HTTPInterface, MerchantInterface, OrderInterface, ResponseCode } from '../../../constants';
 import { store } from '../../../app';
 import { ProductSDKReducer, getSuspensionCartList } from './product.sdk.reducer';
 import numeral from 'numeral';
 import merge from 'lodash.merge';
 import productService from '../../../constants/product/product.service';
+import requestHttp from '../../../common/request/request.http';
 
 export declare namespace ProductCartInterface {
   interface ProductCartInfo extends ProductInterface.ProductInfo {
@@ -134,6 +135,7 @@ export declare namespace ProductCartInterface {
   type PAYLOAD_STOCK = string;
   type RECEIVE_ORDER_PAY = string;
   type RECEIVE_ORDER_PAY_ADDRESS = string;
+  type RECEIVE_ORDER_PAY_DETAIL = string;
   
   type PAYLOAD_SORT = {
     PAYLOAD_ORDER: PAYLOAD_ORDER;
@@ -158,6 +160,7 @@ export declare namespace ProductCartInterface {
     CHANGE_PRODUCT_VISIBLE: CHANGE_PRODUCT_VISIBLE; // 改价modal是否显示
     PAYLOAD_SORT: PAYLOAD_SORT;
     RECEIVE_ORDER_PAY: RECEIVE_ORDER_PAY;
+    RECEIVE_ORDER_PAY_DETAIL: RECEIVE_ORDER_PAY_DETAIL;
     RECEIVE_ORDER_PAY_ADDRESS: RECEIVE_ORDER_PAY_ADDRESS;
   };
 
@@ -203,6 +206,7 @@ class ProductSDK {
     DELETE_PRODUCT_ITEM: 'DELETE_PRODUCT_ITEM',
     RECEIVE_ORDER_PAY: 'RECEIVE_ORDER_PAY',
     RECEIVE_ORDER_PAY_ADDRESS: 'RECEIVE_ORDER_PAY_ADDRESS',
+    RECEIVE_ORDER_PAY_DETAIL: 'RECEIVE_ORDER_PAY_DETAIL',
     PAYLOAD_SORT: {
       PAYLOAD_ORDER: 'PAYLOAD_ORDER',
       PAYLOAD_REFUND: 'PAYLOAD_REFUND',
@@ -401,7 +405,10 @@ class ProductSDK {
   }
 
   public preparePayOrderDetail = async (params) => {
-
+    store.dispatch({
+      type: this.reducerInterface.RECEIVE_ORDER_PAY_DETAIL,
+      payload: params
+    })
   }
 
   /**
@@ -459,9 +466,9 @@ class ProductSDK {
     const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
     const payload: ProductCartInterface.ProductPayPayload = {
       order: {
-        address: address && address.address || '',
-        addressDetail: address && address.address || '',
-        deliveryPhone: address && address.phone || '',
+        address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
+        addressDetail: payOrderDetail.deliveryType === 0 ? address && address.address || '' : '',
+        deliveryPhone: '',
         delivery_time: payOrderDetail.delivery_time || '',
         deliveryType: payOrderDetail.deliveryType || 0,
         receiver: address && address.contact || "",
@@ -494,6 +501,31 @@ class ProductSDK {
       }),
     };
     return payload;
+  }
+
+  public requestPayment = async (orderNo: string) => {
+    const payload = { orderNo };
+    const result = await requestHttp.post(`/api/cashier/pay`, payload);
+
+    if (result.code === ResponseCode.success) {
+      return new Promise((resolve) => {
+        const payload = JSON.parse(result.data.param);
+        console.log('payload: ', payload)
+        delete payload.appId;
+        const paymentPayload = {
+          ...payload,
+          success: (result) => {
+            resolve(result)
+          },
+          fail: (error) => {
+            resolve(error)
+          }
+        };
+        console.log('paymentPayload: ', paymentPayload)
+        Taro.requestPayment(paymentPayload)
+      })
+    }
+    return result;
   }
 
   public isWeighProduct (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): product is ProductCartInterface.ProductCartInfo {

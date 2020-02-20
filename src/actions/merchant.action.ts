@@ -1,6 +1,7 @@
-import { MerchantService, MerchantInterface, MerchantInterfaceMap } from "../constants";
+import { MerchantService, MerchantInterface, MerchantInterfaceMap, jsonToQueryString } from "../constants";
 import { ResponseCode } from '../constants/index';
 import { store } from '../app';
+import requestHttp from "../common/request/request.http";
 
 class MerchantAction {
 
@@ -17,6 +18,17 @@ class MerchantAction {
 
   public merchantInfoAdd = async (params: MerchantInterface.PayloadInterface.MerchantInfoAdd) => {
     const result = await MerchantService.merchantInfoAdd(params);
+    return result;
+  }
+
+  public merchantDistance = async (params: any) => {
+    const result = await requestHttp.get(`/api/merchantInfo/distance${jsonToQueryString(params)}`)
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_DISTANCE,
+        payload: result.data
+      })
+    }
     return result;
   }
 

@@ -29,6 +29,7 @@ export declare namespace MerchantReducer {
     indexAddress: MerchantInterface.Address;
     addressList: MerchantInterface.Address[];
     currentPostion: MerchantInterface.Address;
+    merchantDistance: MerchantInterface.Distance;
   }
 
   type Action = 
@@ -37,6 +38,7 @@ export declare namespace MerchantReducer {
 
 export const initState: MerchantReducer.State = {
   merchantDetail: {} as any,
+  merchantDistance: {} as any,
   profileInfo: {} as any,
   indexAddress: {} as any,
   addressList: [],
@@ -45,6 +47,14 @@ export const initState: MerchantReducer.State = {
 
 export default function merchant (state: MerchantReducer.State = initState, action: MerchantReducer.Action): MerchantReducer.State {
   switch (action.type) {
+
+    case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_DISTANCE: {
+      const { payload } = action as any;
+      return {
+        ...state,
+        merchantDistance: payload
+      }
+    }
 
     case weixinSdk.reducerInterface.RECEIVE_CURRENT_ADDRESS: {
       const { payload } = action as any;
@@ -101,3 +111,5 @@ export const getIndexAddress = (state: AppReducer.AppState) => state.merchant.in
 export const getAddressList = (state: AppReducer.AppState) => state.merchant.addressList;
 
 export const getCurrentPostion = (state: AppReducer.AppState) => state.merchant.currentPostion;
+
+export const getMerchantDistance = (state: AppReducer.AppState) => state.merchant.merchantDistance;
