@@ -38,6 +38,7 @@ class App extends Component {
       'pages/test/test',
       'pages/cart/cart',
       'pages/product/product.detail',
+      'pages/product/product.search',
       'pages/address/address.list',
       'pages/address/address.add',
       'pages/address/address.change.index'

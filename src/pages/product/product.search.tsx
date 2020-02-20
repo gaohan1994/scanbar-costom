@@ -1,28 +1,25 @@
 
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View } from '@tarojs/components'
+import { View, Input } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import './index.less'
 import '../style/product.less'
 import ProductListView from '../../component/product/product.listview'
-import ProductMenu from '../../component/product/product.menu'
 import invariant from 'invariant'
 import { ProductAction } from '../../actions'
 import { ResponseCode, ProductInterface } from '../../constants'
-import LoginModal from '../../component/login/login.modal'
+import productAction from '../../actions/product.action'
+import { getProductSearchList } from '../../reducers/app.product'
+import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer'
+import productSdk from '../../common/sdk/product/product.sdk'
 
 const cssPrefix = 'product';
+const prefix = 'page-search'
 
 class Index extends Component<any> {
 
   readonly state = {
-    currentType: {
-      name: '',
-      id: 0,
-      createTime: ''
-    },
-    loading: false,
-    isOpen: false,
+    value: ''
   };
 
   /**
@@ -37,32 +34,99 @@ class Index extends Component<any> {
   }
 
   async componentDidShow() {
-
+    this.setState({value: ''})
+    productAction.productInfoEmptySearchList();
+  }
+  
+  public onSearch = () => {
+    const { value } = this.state;
+    if (!value) {
+      Taro.showToast({
+        title: '请输入要搜索的商品',
+        icon: 'none'
+      })
+      return
+    }
+    this.fetchData();
   }
 
-
-  public fetchData = async (type: any) => {
+  public fetchData = async () => {
+    const { value } = this.state;
+    if (!value) {
+      Taro.showToast({
+        title: '请输入要搜索的商品',
+        icon: 'none'
+      })
+      return
+    }
     this.setState({ loading: true });
-    const result = await ProductAction.productOrderInfoList({ type: `${type.id}`, status: 0 });
+    const result = await ProductAction.productInfoSearchList({ status: 0, words: value });
     this.setState({ loading: false });
     return result;
   }
 
   render() {
-    const { isOpen } = this.state;
-    const { productList } = this.props;
+    const { productList, productCartList } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
+        {this.renderHeader()}
         <View className={`${cssPrefix}-list-container-costom`}>
           <View className={`${cssPrefix}-list-right`}>
             <ProductListView
               productList={productList}
-              className={`${cssPrefix}-list-right-container`}
+              className={`${prefix}-header-container`}
             />
           </View>
         </View>
         {/* <Cart /> */}
-        <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }}/>
+
+        {productCartList && productCartList.length > 0 && (
+          <View 
+            className={`${prefix}-cart`}
+            onClick={() => {
+              Taro.switchTab({
+                url: '/pages/cart/cart'
+              })
+            }}
+          >
+            <View className={`${prefix}-cart-bge`}>
+              {productSdk.getProductNumber()}
+            </View>
+          </View>
+        )}
+      </View>
+    )
+  }
+
+  private renderHeader = () => {
+    const { value } = this.state;
+    return (
+      <View className={`${prefix}-header`}>
+        <View className={`${prefix}-header-input`}>
+          <Input
+            value={value}
+            onInput={({detail: {value}}) => this.setState({
+              value: value
+            })}
+            className={`${prefix}-header-input-area`}
+            placeholder='请输入商品名称'
+          />
+          {!!value && (
+            <View 
+              className={`${prefix}-header-input-icon`} 
+              onClick={() => {
+                this.setState({value: ''})
+                productAction.productInfoEmptySearchList();
+              }}
+            />
+          )}
+        </View>
+        <View 
+          className={`${prefix}-header-button`}
+          onClick={() => this.onSearch()}
+        >
+          搜索
+        </View>
       </View>
     )
   }
@@ -71,7 +135,8 @@ class Index extends Component<any> {
 
 const select = (state) => {
   return {
-    productList: state.product.productList,
+    productList: getProductSearchList(state),
+    productCartList: getProductCartList(state)
   }
 }
 

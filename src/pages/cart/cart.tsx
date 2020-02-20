@@ -16,16 +16,7 @@ type Props = {
 class Page extends Taro.Component<Props> {
 
   componentDidShow () {
-    const { productCartList } = this.props;
-    const total = productSdk.getProductNumber(productCartList);
-    if (total !== 0) {
-      Taro.setTabBarBadge({
-        index: 2,
-        text: `${total}`
-      });
-    } else {
-      Taro.removeTabBarBadge({index: 2});
-    }
+    productSdk.refreshCartNumber();
   }
 
   render () {

@@ -20,9 +20,8 @@
 import Taro from '@tarojs/taro';
 import { ProductInterface, ProductService, MemberInterface, HTTPInterface, MerchantInterface, OrderInterface, ResponseCode } from '../../../constants';
 import { store } from '../../../app';
-import { ProductSDKReducer, getSuspensionCartList } from './product.sdk.reducer';
+import { ProductSDKReducer, getProductCartList } from './product.sdk.reducer';
 import numeral from 'numeral';
-import merge from 'lodash.merge';
 import productService from '../../../constants/product/product.service';
 import requestHttp from '../../../common/request/request.http';
 
@@ -303,6 +302,20 @@ class ProductSDK {
       default: {
         return 'productCartList';
       }
+    }
+  }
+
+  public refreshCartNumber = () => {
+    const state = store.getState()
+    const productCartList = getProductCartList(state)
+    const total = this.getProductNumber(productCartList);
+    if (total !== 0) {
+      Taro.setTabBarBadge({
+        index: 2,
+        text: `${total}`
+      });
+    } else {
+      Taro.removeTabBarBadge({index: 2});
     }
   }
 
