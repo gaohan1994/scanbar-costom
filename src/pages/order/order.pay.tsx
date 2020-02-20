@@ -14,6 +14,8 @@ import invariant from 'invariant'
 import dayJs from 'dayjs'
 import { MerchantInterface, ResponseCode } from '../../constants'
 import FormCard from '../../component/card/form.card'
+import { LoginManager } from '../../common/sdk'
+import LoginModal from '../../component/login/login.modal'
 
 const cssPrefix = 'order'
 
@@ -24,33 +26,43 @@ type Props = {
 }
 
 type State = {
-
+  isOpen: boolean;
 }
 
 class Page extends Taro.Component<Props, State> {
 
-  state = { 
-
+  state = {
+    isOpen: false,
   }
 
   public onSubmit = async () => {
     try {
       Taro.showLoading();
+
       const { payOrderAddress, payOrderProductList, payOrderDetail } = this.props;
       invariant(payOrderProductList.length > 0, '请选择要下单的商品')
 
       if (payOrderDetail && payOrderDetail.deliveryType === 1) {
         invariant(payOrderAddress.id, '请选择地址');
       }
+
+      const loginResult = await LoginManager.getUserInfo();
+      console.log('userinfo: ', loginResult);
+
+      invariant(loginResult.success, '获取用户信息失败');
+      if ((!loginResult.result.phone || loginResult.result.phone.length === 0)) {
+        this.setState({ isOpen: true });
+      }
+
       const payload = productSdk.getProductInterfacePayload(
-        payOrderProductList, 
-        payOrderAddress, 
+        payOrderProductList,
+        payOrderAddress,
         {
           ...payOrderDetail,
           delivery_time: dayJs().format('YYYY-MM-DD HH:mm:ss'),
         }
       );
-      const result = await productSdk.cashierOrder(payload) 
+      const result = await productSdk.cashierOrder(payload)
       console.log('result', result)
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       Taro.hideLoading();
@@ -66,9 +78,10 @@ class Page extends Taro.Component<Props, State> {
     }
   }
 
-  render () {
+  render() {
     const { payOrderProductList, payOrderDetail } = this.props;
-    const price = payOrderProductList && payOrderProductList.length > 0 
+    const { isOpen } = this.state;
+    const price = payOrderProductList && payOrderProductList.length > 0
       ? numeral(productSdk.getProductPrice(payOrderProductList)).format('0.00')
       : '0.00'
     return (
@@ -102,6 +115,7 @@ class Page extends Taro.Component<Props, State> {
           price={price}
           priceOrigin={price}
         />
+        <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }}/>
       </View>
     )
   }
