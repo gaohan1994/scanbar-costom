@@ -536,8 +536,8 @@ class ProductSDK {
         delete payload.appId;
         const paymentPayload = {
           ...payload,
-          success: (result) => {
-            resolve(result)
+          success: (res) => {
+            resolve(res)
           },
           fail: (error) => {
             resolve(error)
