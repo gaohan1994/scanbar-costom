@@ -12,6 +12,7 @@ import AddressItem from '../../../component/address/item'
 import { getPayOrderAddress } from '../../../common/sdk/product/product.sdk.reducer'
 import merchantAction from '../../../actions/merchant.action'
 import { getMerchantDistance, getCurrentPostion } from '../../../reducers/app.merchant'
+import PickerComponent from '../../../component/picker/index'
 
 const tabs = [
   {
@@ -101,6 +102,7 @@ class Comp extends Taro.Component<Props, State> {
           })}
         </View>
         {this.renderDetail()}
+        {/* <PickerComponent /> */}
       </View>
     )
   }
