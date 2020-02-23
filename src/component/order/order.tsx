@@ -6,7 +6,7 @@ import numeral from 'numeral';
 import { OrderAction, ProductAction } from '../../actions';
 import classnames from 'classnames'
 import invariant from 'invariant';
-import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import productSdk from '../../common/sdk/product/product.sdk';
 
 const cssPrefix = 'component-order-item';
 
@@ -79,12 +79,6 @@ class OrderItem extends Taro.Component<Props, State> {
       for (let i = 0; i < orderDetailList.length; i++) {
         const res = await ProductAction.productInfoDetail({ id: orderDetailList[i].productId });
         if (res.code === ResponseCode.success) {
-          // for (let j = 0; j < orderDetailList[i].num; j++) {
-          //   productSdk.manage({
-          //     type: productSdk.productCartManageType.ADD,
-          //     product: res.data,
-          //   });
-          // }
           productSdk.manage({
             type: productSdk.productCartManageType.ADD,
             product: res.data,
@@ -121,12 +115,12 @@ class OrderItem extends Taro.Component<Props, State> {
 
         <View className={`${cssPrefix}-card-header`}>
           <Image
-            src="//net.huanmusic.com/weapp/icon_shop.png"
+            src='//net.huanmusic.com/scanbar-c//icon_order_store.png'
             className={`${cssPrefix}-card-header-icon`}
           />
           <View className={`${cssPrefix}-card-header-text`}>
             <View className={`${cssPrefix}-card-header-text-shop`}>
-              {order.merchantName || ''}
+              {order.merchantName || '未知商店'}
             </View>
             <View className={`${cssPrefix}-card-header-text-time`}>
               {order.createTime || ''}

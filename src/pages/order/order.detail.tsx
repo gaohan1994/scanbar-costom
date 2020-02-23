@@ -364,9 +364,17 @@ class OrderDetail extends Taro.Component<Props, State> {
                 />
               )
           }
+          
 
           <View className={`${cssPrefix}-card-logistics-item-info`}>
-            <Text className={`${cssPrefix}-card-logistics-item-info-content`}>
+            <Text 
+            
+            className={classnames(
+              {
+                [`${cssPrefix}-card-logistics-item-info-content`]: order.deliveryType !== 0,
+                [`${cssPrefix}-card-logistics-item-info-title`]: order.deliveryType === 0,
+              })}
+            >
               {
                 order.deliveryType == 0
                   ? order.merchantName && order.merchantName.length
@@ -377,11 +385,17 @@ class OrderDetail extends Taro.Component<Props, State> {
                     : '未设置收货地址'
               }
             </Text>
-            <Text className={`${cssPrefix}-card-logistics-item-info-title`}>
+            <Text 
+              className={classnames(
+                {
+                  [`${cssPrefix}-card-logistics-item-info-content`]: order.deliveryType === 0,
+                  [`${cssPrefix}-card-logistics-item-info-title`]: order.deliveryType !== 0,
+                })}
+            >
               {
                 order.deliveryType == 0
-                  ? order.address && order.address.length > 0
-                    ? order.address
+                  ? order.merhcantAddress && order.merhcantAddress.length > 0
+                    ? order.merhcantAddress
                     : '未获取到商店地址'
                   : (order.receiver && order.receiver.length > 0) || (order.receiverPhone && order.receiverPhone.length > 0)
                     ? `${order.receiver} ${order.receiverPhone}`
@@ -401,7 +415,7 @@ class OrderDetail extends Taro.Component<Props, State> {
       <View className={`${cssPrefix}-card`}>
         <View className={`${cssPrefix}-card-products-header`}>
           <View className={`${cssPrefix}-card-products-header-item`}>
-            <Text className={`${cssPrefix}-card-products-header-shop`}>{order.merchantName || '阳光便利店'}</Text>
+            <Text className={`${cssPrefix}-card-products-header-shop`}>{order.merchantName || '未知商店'}</Text>
             {/* <Image
               className={`${cssPrefix}-card-products-header-next`}
               src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
@@ -433,8 +447,8 @@ class OrderDetail extends Taro.Component<Props, State> {
                     <Text className={`${productCssPrefix}-row-name`}>{item.productName}</Text>
                     <Text className={`${productCssPrefix}-row-normal`}>{`x ${item.num}`}</Text>
                     <View className={`${productCssPrefix}-row-corner`}>
-                      <Text className={`${productCssPrefix}-row-corner-price`}>{this.renderPrice(item.totalAmount)}</Text>
-                      <Text className={`${productCssPrefix}-row-corner-origin`}>{`￥${numeral(item.transAmount).format('0.00')}`}</Text>
+                      <Text className={`${productCssPrefix}-row-corner-price`}>{this.renderPrice(item.transAmount)}</Text>
+                      <Text className={`${productCssPrefix}-row-corner-origin`}>{`￥${numeral(item.totalAmount).format('0.00')}`}</Text>
                     </View>
                   </View>
                 </View>
@@ -555,7 +569,7 @@ class OrderDetail extends Taro.Component<Props, State> {
       },
     ];
     return (
-      <View className={`${cssPrefix}-card`}>
+      <View className={`${cssPrefix}-card ${cssPrefix}-card-order`}>
         {
           items.map((item: any) => {
             return (
