@@ -52,8 +52,22 @@ class Page extends Taro.Component<Props, State> {
       invariant(loginResult.success, '获取用户信息失败');
       if ((!loginResult.result.phone || loginResult.result.phone.length === 0)) {
         this.setState({ isOpen: true });
+        return;
       }
+      this.createOrder();
 
+    } catch (error) {
+      Taro.hideLoading();
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      })
+    }
+  }
+
+  public createOrder = async () => {
+    try {
+      const { payOrderAddress, payOrderProductList, payOrderDetail } = this.props;
       const payload = productSdk.getProductInterfacePayload(
         payOrderProductList,
         payOrderAddress,
@@ -63,9 +77,11 @@ class Page extends Taro.Component<Props, State> {
         }
       );
       const result = await productSdk.cashierOrder(payload)
+      console.log('result', result)
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       Taro.hideLoading();
       const payment = await productSdk.requestPayment(result.data.order.orderNo)
+      console.log('payment: ', payment)
       productSdk.cashierOrderCallback(result.data)
     } catch (error) {
       Taro.hideLoading();
@@ -114,7 +130,7 @@ class Page extends Taro.Component<Props, State> {
           price={price}
           priceOrigin={price}
         />
-        <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }}/>
+        <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }} callback={this.createOrder} />
       </View>
     )
   }

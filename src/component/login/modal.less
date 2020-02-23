@@ -4,10 +4,33 @@
 
 .@{loginModal} {
 
+  &-modal {
+    justify-self: center;
+    align-self: center;
+  }
+
   &-content {
     .flex(center, center, column);
     height: 100px;
     font-size: 30px;
+    color: #666666;
   }
 
+  &-buttons {
+    .flex(center, center, row);
+  }
+
+  &-button {
+    width: 230px;
+    height: 66px;
+    border-radius: 33px;
+    font-size: 30px;
+    margin-bottom: 39px;
+    background-color: #999999;
+    color: #fff;
+  }
+
+  &-blue {
+    background-color: #2A86FC;
+  }
 }

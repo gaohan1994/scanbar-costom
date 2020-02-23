@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro';
-import { View, Image, Button } from '@tarojs/components';
+import { View, Button } from '@tarojs/components';
 import './modal.less';
-import { AtModal, AtModalHeader, AtModalContent, AtModalAction } from 'taro-ui';
+import { AtModal, AtModalContent } from 'taro-ui';
 import requestHttp from '../../common/request/request.http';
 import { LoginManager } from '../../common/sdk';
 import invariant from 'invariant';
@@ -12,6 +12,7 @@ const cssPrefix = 'login-modal';
 interface Props {
   isOpen: boolean;
   onCancle: () => void;
+  callback?: () => void;
 }
 
 interface State {
@@ -21,7 +22,7 @@ interface State {
 class LoginModal extends Taro.Component<Props, State> {
 
   public onGetPhoneNumber = async (params) => {
-    const { onCancle } = this.props;
+    const { onCancle, callback } = this.props;
     console.log('params: ', params)
     const { detail } = params;
     if (detail.errMsg === "getPhoneNumber:ok") {
@@ -29,7 +30,7 @@ class LoginModal extends Taro.Component<Props, State> {
         encryptedData: detail.encryptedData,
         ivStr: detail.iv
       };
-      
+
       try {
         onCancle();
         const result = await requestHttp.post('/api/decrypt', payload);
@@ -44,6 +45,10 @@ class LoginModal extends Taro.Component<Props, State> {
         };
         const setResult: any = await LoginManager.setUserInfo(newUserinfo);
         invariant(setResult.success, setResult.msg || '存储用户信息失败');
+
+        if (callback) {
+          callback;
+        }
       } catch (error) {
         Taro.showToast({
           title: error.message,
@@ -56,23 +61,28 @@ class LoginModal extends Taro.Component<Props, State> {
   render() {
     const { isOpen, onCancle } = this.props
     return (
-      <AtModal isOpened={isOpen}>
-        <AtModalHeader>请先登录</AtModalHeader>
+      <AtModal isOpened={isOpen} className={`${cssPrefix}-modal`}>
         <AtModalContent>
           <View className={`${cssPrefix}-content`}>
             部分功能需要登录才能使用
           </View>
         </AtModalContent>
-        <AtModalAction>
-          <Button onClick={onCancle}>取消</Button>
+        <View className={`${cssPrefix}-buttons`}>
           <Button
+            className={`${cssPrefix}-button`}
+            onClick={onCancle}
+          >
+            取消
+        </Button>
+          <Button
+            className={`${cssPrefix}-button ${cssPrefix}-blue`}
             openType='getPhoneNumber'
             onGetPhoneNumber={this.onGetPhoneNumber}
-            // onClick={onCancle}
+          // onClick={onCancle}
           >
             确定
-          </Button>
-        </AtModalAction>
+        </Button>
+        </View>
       </AtModal>
     )
   }
