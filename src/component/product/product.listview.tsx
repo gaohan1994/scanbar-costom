@@ -1,5 +1,5 @@
-import Taro, { clearStorage } from '@tarojs/taro';
-import { ScrollView, View, Text } from '@tarojs/components';
+import Taro from '@tarojs/taro';
+import { ScrollView, View } from '@tarojs/components';
 import ProductComponent from './product';
 import "../../pages/style/product.less";
 import { ProductInterface } from '../../constants';
@@ -7,6 +7,7 @@ import productSdk, { ProductCartInterface } from '../../common/sdk/product/produ
 import { AtActivityIndicator } from 'taro-ui';
 import classnames from 'classnames';
 import merge from 'lodash.merge'
+import Empty from '../empty';
 
 const cssPrefix = 'product';
 
@@ -80,7 +81,13 @@ class ProductListView extends Taro.Component<Props> {
                 </View>
               );
             })
-            : <View />
+            : (
+              <Empty 
+                img={'//net.huanmusic.com/scanbar-c/v1/img_commodity.png'}
+                css='index'
+                text={'还没有商品'}
+              />
+            )
           : (
             <View className="container">
               <AtActivityIndicator mode='center' />
@@ -97,4 +104,5 @@ class ProductListView extends Taro.Component<Props> {
     );
   }
 }
-export default ProductListView;
+
+export default ProductListView

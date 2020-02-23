@@ -9,6 +9,31 @@
     .padding(50px, lr);
   }
 
+  &-buttons {
+    display: flex;
+    flex-direction: row;
+    &-button {
+      .margin(30px, t);
+      .flex(center, center);
+      .margin(30px, l);
+      font-size:32px;
+      font-weight:500;
+      color:rgba(255,255,255,1);
+    }
+    &-delete {
+      width:240px;
+      height:80px;
+      background:rgba(153,153,153,1);
+      border-radius:40px;
+    }
+    &-confirm {
+      width:407px;
+      height:80px;
+      background:rgba(42,134,252,1);
+      border-radius:40px;
+    }
+  }
+
   &-list {
     border-bottom: 20px solid rgba(245,245,245,1);
   }

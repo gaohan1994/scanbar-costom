@@ -46,6 +46,7 @@ class Comp extends Taro.Component<Props, State> {
           <View className={`${prefix}-title-text`}>
             {address}
           </View>
+          <View className={`${prefix}-icon`} />
         </View>
         <View className={`${prefix}-box`}>
           <View className={`${prefix}-merchant`}>
@@ -76,4 +77,4 @@ const select = (state: AppReducer.AppState) => {
   }
 }
 
-export default connect(select)(Comp);
+export default connect(select)(Comp as any);

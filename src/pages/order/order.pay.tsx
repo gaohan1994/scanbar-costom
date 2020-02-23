@@ -63,11 +63,9 @@ class Page extends Taro.Component<Props, State> {
         }
       );
       const result = await productSdk.cashierOrder(payload)
-      console.log('result', result)
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       Taro.hideLoading();
       const payment = await productSdk.requestPayment(result.data.order.orderNo)
-      console.log('payment: ', payment)
       productSdk.cashierOrderCallback(result.data)
     } catch (error) {
       Taro.hideLoading();
@@ -107,6 +105,7 @@ class Page extends Taro.Component<Props, State> {
             }]}
           />
         </View>
+        <View style='width: 100%; height: 100px' className={'container-color'} />
         <CartFooter
           buttonTitle={'提交订单'}
           buttonClick={() => this.onSubmit()}

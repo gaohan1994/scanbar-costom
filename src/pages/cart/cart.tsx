@@ -38,7 +38,7 @@ class Page extends Taro.Component<Props> {
         })
         : (
           <Empty
-            img='//net.huanmusic.com/scanbar-c/img_cart.png'
+            img='//net.huanmusic.com/scanbar-c/v1/img_cart.png'
             text='还没有商品，快去选购吧'
             button={{
               title: '去选购',

@@ -2,6 +2,7 @@ import Taro from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import '../../pages/product/component/index.less'
 import '../product/product.less'
+import "./index.less"
 
 const cssPrefix = 'component-product';
 const prefix = 'product-detail-component'
@@ -36,20 +37,20 @@ class Footer extends Taro.Component<Props> {
   public renderPrice = () => {
     const { priceTitle, priceSubtitle, price, priceOrigin } = this.props;
     return (
-      <View className={`${cssPrefix}-normal `}>
+      <View className={`${cssPrefix}-normal component-cart-text`}>
         <Text className={`${prefix}-price-title`}>{priceTitle}</Text>
         {priceSubtitle && (
           <Text className={`${cssPrefix}-price-bge `}>{priceSubtitle}</Text>
         )}
         {price && (
-          <Text className={`${cssPrefix}-price `}>{price.split('.')[0]}</Text>
+          <Text className={`${cssPrefix}-price component-cart-text-price`}>{price.split('.')[0]}</Text>
         )}
         {price && (
           <Text className={`${cssPrefix}-price-bge ${cssPrefix}-price-pos `}>{`.${price.split('.')[1]}`}</Text>
         )}
-        {priceOrigin && ( 
+        {/* {priceOrigin && ( 
           <Text className={`${cssPrefix}-price-origin `}>{priceOrigin}</Text>
-        )}
+        )} */}
       </View>
     )
   }

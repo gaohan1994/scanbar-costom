@@ -23,9 +23,9 @@ class Page extends Taro.Component<Props> {
     const price = product && product.price ? numeral(product.price).format('0.00') : '0.00';
     return (
       <View className={`${cssPrefix}-normal ${prefix}-detail-price`}>
-        <Text className={`${cssPrefix}-price-bge ${prefix}-detail-price-nor`}>￥</Text>
+        <Text className={`${cssPrefix}-price-bge`}>￥</Text>
         <Text className={`${cssPrefix}-price ${prefix}-detail-price-big`}>{price.split('.')[0]}</Text>
-        <Text className={`${cssPrefix}-price-bge ${cssPrefix}-price-pos ${prefix}-detail-price-nor`}>{`.${price.split('.')[1]}`}</Text>
+        <Text className={`${cssPrefix}-price-bge ${cssPrefix}-price-pos`}>{`.${price.split('.')[1]}`}</Text>
         <Text className={`${cssPrefix}-price-origin ${prefix}-detail-price-gory`}>{price}</Text>
       </View>
     )
@@ -69,6 +69,7 @@ class Page extends Taro.Component<Props> {
             <View className={`${prefix}-message-text`}>箱</View>
           </View>
         </View>
+        <View style='width: 100%; height: 100px' />
       </View>
     )
   }
