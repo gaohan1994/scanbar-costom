@@ -83,7 +83,22 @@ class User extends Taro.Component<Props, State> {
       const { userinfo } = this.state;
       if ((!userinfo.phone || userinfo.phone.length === 0)) {
         this.setState({ isOpen: true });
+        return;
       };
+      this.getWxUserInfo(show);
+    } catch (error) {
+      if (show != false) {
+        Taro.showToast({
+          title: error.message,
+          icon: 'none'
+        });
+      }
+    }
+  }
+
+  public getWxUserInfo = async (show?: boolean) => {
+    try {
+      const { userinfo } = this.state;
       const result: any = await WeixinSDK.getWeixinUserinfo();
       invariant(result.success, result.msg || '获取用户昵称和头像失败');
       const params = {
@@ -92,7 +107,7 @@ class User extends Taro.Component<Props, State> {
       }
       const saveResult: any = await merchantAction.wxUserInfoSave(params);
       invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
-      
+
       const newUserinfo = {
         ...userinfo,
         avatar: result.result.avatarUrl,
@@ -111,6 +126,7 @@ class User extends Taro.Component<Props, State> {
         });
       }
     }
+
   }
 
   render() {
@@ -187,7 +203,7 @@ class User extends Taro.Component<Props, State> {
             }
           </View>
         </View>
-        <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }}/>
+        <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }} callback={this.getWxUserInfo}/>
       </View>
     );
   }

@@ -3,130 +3,130 @@
  * 比较理想的是 View 标签统一为 display: flex; flex-direction: column
  * 但是 H5 上内置组件样式可能会错乱，因此暂时不这样处理，有用到 flex 的地方都显式声明主轴方向即可
  */
-@import "./theme.less";
-/* weapp */
-page {
-  height: 100%;
-}
-
-view,
-text,
-scroll-view {
-  box-sizing: border-box;
-}
-
-button {
-  &:after {
-    display: none;
-  }
-}
-
-/* h5 */
-/*postcss-pxtransform rn eject enable*/
-div {
-  box-sizing: border-box;
-}
-
-button {
-  outline: none;
-}
-
-.taro-text {
-  box-sizing: border-box;
-}
-
-.taro-tabbar__panel,
-.taro_router {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-.taro_page {
-  flex: 1;
-}
-/*postcss-pxtransform rn eject disable*/
-.content-inner__text {
-  color: #acacac !important;
-  font-size: 28px !important;
-}
-
-.item-content__info-title {
-  font-size: 26px !important;
-  color: #666666 !important;
-}
-
-.item-extra__info {
-  font-size: 30px !important;
-  line-height: 32px !important;
-  color: #999999 !important;
-}
-
-.at-input {
-  margin-left: 0px !important;
-}
-
-.at-input__title {
-  padding-left: 30px !important;
-  font-size:30px !important;
-  font-weight:500 !important;
-  color:rgba(51,51,51,1) !important;
-}
-
-.at-input__input {
-  font-size: 30px !important;
-}
-
-.at-modal__container {
-  width: 590px !important;
-  border-radius: 30px !important;
-  top: 10% !important;
-  transform: translate(-50%) !important;
-}
-
-.at-button--circle {
-  min-width: 60rpx !important;
-  max-width: 60rpx !important;
-  width: 60rpx !important; 
-}
-
-.at-badge__num {
-  right: 0PX !important;
-  border-radius: 14px !important;
-}
-
-.component-cart-bge .at-badge__num {
-  right: 12PX !important;
-  top: 2PX !important;
-}
-
-
-.layout-body {
-  padding: 0px !important;
-}
-
-.at-tabs__header {
-  background-color: #2a86fc;
-  padding-left: 35px !important;
-  padding-right: 80px !important;
-  padding-bottom: 10px !important;
-}
-
-.at-tabs__item {
-  background-color: #2a86fc !important;
-  color: #9DC8FF !important;
-  font-size: 28px !important;
-  padding-left: 0px !important;
-  padding-bottom: 16px !important;
-  padding-right: 0px !important;
-  padding-top: 12px !important;
-  margin-right: 40px !important;
-}
-.at-tabs__item--active {
-  color: #ffffff !important;
-}
-
-.at-tabs__item-underline {
-  background-color: #ffffff !important;
-  height: 4px !important;
-  bottom: 7px !important;
-}
+ @import "./theme.less";
+ /* weapp */
+ page {
+   height: 100%;
+ }
+ 
+ view,
+ text,
+ scroll-view {
+   box-sizing: border-box;
+ }
+ 
+ button {
+   &:after {
+     display: none;
+   }
+ }
+ 
+ /* h5 */
+ /*postcss-pxtransform rn eject enable*/
+ div {
+   box-sizing: border-box;
+ }
+ 
+ button {
+   outline: none;
+ }
+ 
+ .taro-text {
+   box-sizing: border-box;
+ }
+ 
+ .taro-tabbar__panel,
+ .taro_router {
+   flex: 1;
+   display: flex;
+   flex-direction: column;
+ }
+ .taro_page {
+   flex: 1;
+ }
+ /*postcss-pxtransform rn eject disable*/
+ .content-inner__text {
+   color: #acacac !important;
+   font-size: 28px !important;
+ }
+ 
+ .item-content__info-title {
+   font-size: 26px !important;
+   color: #666666 !important;
+ }
+ 
+ .item-extra__info {
+   font-size: 30px !important;
+   line-height: 32px !important;
+   color: #999999 !important;
+ }
+ 
+ .at-input {
+   margin-left: 0px !important;
+ }
+ 
+ .at-input__title {
+   padding-left: 30px !important;
+   font-size:30px !important;
+   font-weight:500 !important;
+   color:rgba(51,51,51,1) !important;
+ }
+ 
+ .at-input__input {
+   font-size: 30px !important;
+ }
+ 
+ .at-modal__container {
+   width: 590px !important;
+   border-radius: 30px !important;
+   // top: 10% !important;
+   // transform: translate(-50%) !important;
+ }
+ 
+ .at-button--circle {
+   min-width: 60rpx !important;
+   max-width: 60rpx !important;
+   width: 60rpx !important; 
+ }
+ 
+ .at-badge__num {
+   right: 0PX !important;
+   border-radius: 14px !important;
+ }
+ 
+ .component-cart-bge .at-badge__num {
+   right: 12PX !important;
+   top: 2PX !important;
+ }
+ 
+ 
+ .layout-body {
+   padding: 0px !important;
+ }
+ 
+ .at-tabs__header {
+   background-color: #2a86fc;
+   padding-left: 35px !important;
+   padding-right: 80px !important;
+   padding-bottom: 10px !important;
+ }
+ 
+ .at-tabs__item {
+   background-color: #2a86fc !important;
+   color: #9DC8FF !important;
+   font-size: 28px !important;
+   padding-left: 0px !important;
+   padding-bottom: 16px !important;
+   padding-right: 0px !important;
+   padding-top: 12px !important;
+   margin-right: 40px !important;
+ }
+ .at-tabs__item--active {
+   color: #ffffff !important;
+ }
+ 
+ .at-tabs__item-underline {
+   background-color: #ffffff !important;
+   height: 4px !important;
+   bottom: 7px !important;
+ }

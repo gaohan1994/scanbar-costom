@@ -136,7 +136,7 @@ class Order extends Taro.Component<Props, State> {
                 //   <Text className={`product-suspension-text`}>暂无内容</Text>
                 // </View>
                 <Empty
-                  img='//net.huanmusic.com/scanbar-c/img_order_empty.png'
+                  img='//net.huanmusic.com/img_order_empty.png'
                   text='还没有商品，快去选购吧'
                   button={{
                     title: '去选购',

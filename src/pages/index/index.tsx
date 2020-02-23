@@ -1,6 +1,6 @@
 
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, ScrollView } from '@tarojs/components'
+import { View, Text } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import './index.less'
 import '../style/product.less'
@@ -51,10 +51,6 @@ class Index extends Component<any> {
         return;
       }
 
-      if (result.success && (!result.result.phone || result.result.phone.length === 0)) {
-        this.setState({ isOpen: true });
-      }
-
       this.init();
       productSdk.refreshCartNumber();
     } catch (error) {
@@ -62,6 +58,13 @@ class Index extends Component<any> {
         title: error.message,
         icon: 'none'
       })
+    }
+  }
+
+  async componentDidMount() {
+    const result = await LoginManager.getUserInfo();
+    if (result.success && (!result.result.phone || result.result.phone.length === 0)) {
+      this.setState({ isOpen: true });
     }
   }
 
@@ -112,7 +115,7 @@ class Index extends Component<any> {
   }
 
   render() {
-    const { currentType, isOpen, loading } = this.state;
+    const { currentType, isOpen } = this.state;
     const { productList, productType } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
@@ -129,12 +132,12 @@ class Index extends Component<any> {
               <Text className={`${cssPrefix}-list-right-header-text`}>{currentType.name}</Text>
             </View>
             <ProductListView
-              loading={loading}
               productList={productList}
               className={`${cssPrefix}-list-right-container`}
             />
           </View>
         </View>
+        {/* <Cart /> */}
         <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }}/>
       </View>
     )
