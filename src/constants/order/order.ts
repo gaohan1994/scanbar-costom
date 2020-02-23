@@ -2,8 +2,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-25 16:08:28
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-23 16:50:20
  * 
  * @todo [商品相关的类型定义]
  */
@@ -64,6 +64,7 @@ export declare namespace OrderInterface {
     address: string;
     receiver: string;
     receiverPhone: string;
+    merhcantAddress: string;
   }
 
   interface OrderDetail {
