@@ -56,6 +56,10 @@ class Page extends Taro.Component <Props, State> {
             onInput={({detail: {value}}) => this.changeRemark(value)}
             placeholder='请输入备注'
           />
+
+          <View className={`${prefix}-input-corner`}>
+            {`${remark.length}/300`}
+          </View>
         </View>
         <View className={`${prefix}-title`}>快捷输入</View>
 

@@ -43,7 +43,12 @@ class Page extends Taro.Component<Props, State> {
     if (entry === 'order.pay') {
       productSdk.preparePayOrderAddress(address);
       Taro.navigateBack({})
+      return;
     }
+
+    Taro.navigateTo({
+      url: `/pages/address/address.edit?address=${JSON.stringify(address)}`
+    })
   }
 
   render () {
@@ -60,7 +65,7 @@ class Page extends Taro.Component<Props, State> {
           )
         }) : (
           <Empty
-            img='//net.huanmusic.com/scanbar-c/img_location.png'
+            img='//net.huanmusic.com/scanbar-c/v1/img_location.png'
             text='还没有地址，快去新增吧'
           />
         )}

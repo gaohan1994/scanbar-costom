@@ -8,12 +8,18 @@
   &-address {
     height: @address-height;
     .padding(30px, lr);
-    .padding(19px, t);
+    .padding(3px, t);
     position: relative;
     background-color: @theme-color;
     display: flex;
     flex-direction: column;
-
+    &-icon {
+      .margin(10px, l);
+      width:10px;
+      height:5px;
+      .bg;
+      background-image: url(//net.huanmusic.com/scanbar-c/block.png);
+    }
     &-title {
       .flex(center, flex-start, row);
       &-icon {

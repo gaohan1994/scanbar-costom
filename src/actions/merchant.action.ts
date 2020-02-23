@@ -43,6 +43,11 @@ class MerchantAction {
     return result;
   }
 
+  public addressDelete = async (params: any) => {
+    const result = await requestHttp.delete(`/api/address/remove/${params.id}`, '');
+    return result;
+  }
+
   public addressList = async () => {
     const result = await MerchantService.addressList();
     if (result.code === ResponseCode.success) {

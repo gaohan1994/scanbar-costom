@@ -40,7 +40,9 @@ class Item extends Taro.Component<Props> {
         <View className={`${prefix}-box`}>
           <View className={`${prefix}-title`}>
             {showFlag && (
-              <Text className={`${prefix}-bge`}>
+              <Text 
+                className={classNames(`${prefix}-bge`, `${prefix}-bge-${address.flag}`)}
+              >
                 {address.flag === 0 
                   ? '家' 
                   : address.flag === 1 

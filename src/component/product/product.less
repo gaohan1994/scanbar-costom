@@ -77,6 +77,7 @@
         .flex(center, flex-start, row);
       }
       &-box {
+        .margin(17px, t);
         display: flex;
         flex-direction: column;
       }
@@ -95,6 +96,8 @@
 
   &-title {
     font-size: @product-title-font;
+    line-height: @product-title-font;
+    height: @product-title-font;
     color: @product-title-color;
     display: -webkit-box;
     overflow: hidden;
@@ -108,7 +111,10 @@
   }
 
   &-tips {
+    .margin(9px, t);
     font-size: 22px;
+    height: 22px;
+    line-height: 22px;
     font-weight:500;
     color:rgba(153,153,153,1);
     display: -webkit-box;
@@ -132,7 +138,7 @@
   }
 
   &-price {
-    font-size: @product-price-font + 10px;
+    font-size: 34px;
     color: @product-price-color;
     font-weight: bold;
     .margin(6px, r);
@@ -142,7 +148,7 @@
       color:rgba(51,51,51,1);
     }
     &-bge {
-      font-size: @product-price-font;
+      // font-size: 24px;
       color: @product-price-color;
       font-weight: bold;
     }
@@ -158,7 +164,9 @@
     }
   }
   &-normal {
-    font-size: @product-price-font;
+    .margin(18px, t);
+    font-size: 24px;
+    line-height: 34px;
     color: @product-normal-color;
   }
 
@@ -225,10 +233,10 @@
       width: 50px;
       height: 50px;
       &-reduce {
-        .background-image('//net.huanmusic.com/weapp/bt_shanchu.png');
+        .background-image('//net.huanmusic.com/scanbar-c/bt_shanchu_l.png');
       }
       &-add {
-        .background-image('//net.huanmusic.com/weapp/bt_yixuan_increase.png');
+        .background-image('//net.huanmusic.com/scanbar-c/bt_increase_l.png');
       }
     }
   }
