@@ -109,13 +109,13 @@ class Index extends Component<any> {
 
   public fetchData = async (type: any) => {
     this.setState({ loading: true });
-    const result = await ProductAction.productOrderInfoList({ type: `${type.id}`, status: 0 });
+    const result = await ProductAction.productOrderInfoList({ type: `${type.id}`, status: 0, saleType: 0 } as any);
     this.setState({ loading: false });
     return result;
   }
 
   render() {
-    const { currentType, isOpen } = this.state;
+    const { currentType, isOpen, loading } = this.state;
     const { productList, productType } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
@@ -132,6 +132,7 @@ class Index extends Component<any> {
               <Text className={`${cssPrefix}-list-right-header-text`}>{currentType.name}</Text>
             </View>
             <ProductListView
+              loading={loading}
               productList={productList}
               className={`${cssPrefix}-list-right-container`}
             />

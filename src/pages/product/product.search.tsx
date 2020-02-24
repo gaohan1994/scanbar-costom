@@ -60,7 +60,7 @@ class Index extends Component<any> {
       return
     }
     this.setState({ loading: true });
-    const result = await ProductAction.productInfoSearchList({ status: 0, words: value });
+    const result = await ProductAction.productInfoSearchList({ status: 0, words: value, saleType: 0 } as any);
     this.setState({ loading: false });
     return result;
   }
