@@ -39,7 +39,7 @@ class WeixinSDK {
   public authorize = async (auth: string): Promise<any> => {
     const key = `scope.${auth}`;
     const result = await Taro.authorize({ scope: key });
-    console.log('result', result);
+    console.log('result aaa', result);
     return result;
   }
 

@@ -43,6 +43,7 @@
       color:rgba(51,51,51,1);
       width: 540px;
       .clamp(2);
+      .flex(flex-start, flex-start, row);
     }
     &-detail {
       display: flex;
@@ -67,15 +68,17 @@
       font-weight:500;
       color:rgba(252,146,42,1);
       .margin(10px, r);
+      .margin(10px, t);
+      white-space: nowrap;
 
       &-1 {
         background:#E1EEFF;
-        color: #3EBD4D
+        color:#2A86FC
       }
 
       &-2 {
         background: #E2F7ED;
-        color:#2A86FC
+        color:#3EBD4D
       }
     }
     &-edit {
@@ -83,8 +86,14 @@
       top: 50%;
       right: 30px;
       transform: translateY(-50%);
-      width: 34px;
-      height: 34px;
+      width: 64px;
+      height: 64px;
+      .flex(center, center, row);
+
+      &-img {
+        width: 34px;
+        height: 34px;
+      }
     }
     &-arrow {
       position: absolute;

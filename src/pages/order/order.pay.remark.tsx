@@ -1,4 +1,4 @@
-import Taro from '@tarojs/taro'
+import Taro, { Config } from '@tarojs/taro'
 import { View, Textarea } from '@tarojs/components'
 import './index.less'
 import '../style/product.less'
@@ -26,6 +26,10 @@ type State = {
 
 class Page extends Taro.Component <Props, State> {
 
+  config: Config = {
+    navigationBarTitleText: '输入备注'
+  }
+  
   state = {
     remark: ''
   }
@@ -45,6 +49,14 @@ class Page extends Taro.Component <Props, State> {
     Taro.navigateBack({})
   }
 
+  public onClick = (item) => {
+    let { remark } = this.state;
+    if (remark.length !== 0) {
+      remark = remark.concat(';')
+    }
+    this.setState({ remark: remark.concat(item) });
+  }
+
   render () {
     const {remark } = this.state;
     return (
@@ -55,6 +67,7 @@ class Page extends Taro.Component <Props, State> {
             value={remark}
             onInput={({detail: {value}}) => this.changeRemark(value)}
             placeholder='请输入备注'
+            maxlength={300}
           />
 
           <View className={`${prefix}-input-corner`}>
@@ -69,7 +82,7 @@ class Page extends Taro.Component <Props, State> {
               <View 
                 key={item} 
                 className={`${prefix}-button`}
-                onClick={() => this.changeRemark(item)}
+                onClick={() => this.onClick(item)}
               >
                 {item}
               </View>

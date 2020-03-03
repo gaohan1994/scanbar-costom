@@ -5,52 +5,68 @@
 .@{prefix} {
 
   &-header {
-    width:750px;
-    height: 140px;
+    width: 750px;
+    height: 120px;
     background-color: @theme-color;
     .flex(center, center, row);
+
     &-container {
       position: absolute !important;
       top: 0;
       bottom: 0;
     }
+
     &-button {
       .flex(center, center);
-      width:120px;
-      height:66px;
-      background:rgba(255,255,255,1);
-      border-radius:33px;
-      font-size:28px;
-      font-weight:500;
-      color:rgba(42,134,252,1);
+      width: 120px;
+      height: 66px;
+      background: rgba(255, 255, 255, 1);
+      border-radius: 33px;
+      font-size: 28px;
+      font-weight: 500;
+      color: rgba(42, 134, 252, 1);
     }
+
     &-input {
-      width:550px;
-      height:66px;
-      background:rgba(255,255,255,1);
-      border-radius:33px;
+      width: 550px;
+      height: 66px;
+      background: rgba(255, 255, 255, 1);
+      border-radius: 33px;
       position: relative;
       .margin(20px, r);
+      .flex(center, flex-start, row);
+
+      &-img {
+        width: 23px;
+        height: 23px;
+        margin-left: 30px;
+      }
 
       &-area {
-        width: 100%;
+        width: 400px;
         height: 100%;
         .padding(30px, lr);
-        font-size:28px;
-        font-weight:500;
-        color:rgba(102,102,102,1);
+        font-size: 28px;
+        font-weight: 500;
+        color: rgba(102, 102, 102, 1);
       }
 
       &-icon {
         z-index: 99;
         position: absolute;
-        right: 30px;
+        right: 14px;
         top: 50%;
         transform: translateY(-50%);
-        width:27px;
-        height:26px;
-        .bg;
-        background-image: url(//net.huanmusic.com/scanbar-c/icon_del.png);
+        width: 60px;
+        height: 60px;
+        .flex(center, center, row);
+
+        &-img {
+          width: 27px;
+          height: 26px;
+          .bg;
+          background-image: url(//net.huanmusic.com/scanbar-c/icon_del_1.png);
+        }
       }
     }
   }
@@ -59,24 +75,77 @@
     position: absolute;
     right: 30px;
     bottom: 50px;
-    width:120px;
-    height:120px;
-    background:rgba(245,245,245,1);
-    border-radius:50%;
+    width: 120px;
+    height: 120px;
+    background: rgba(245, 245, 245, 1);
+    border-radius: 50%;
     .bg;
-    background-image: url(//net.huanmusic.com/scanbar-c/icon_search_cart.png);
+    background-image: url(//net.huanmusic.com/scanbar-c/v1/icon_search_cart1.png);
+    background-size: 100% 100%;
+
     &-bge {
       position: absolute;
-      width:44px;
+      width: 44px;
       .flex(center, center);
-      height:44px;
-      background:rgba(252,78,68,1);
-      border-radius:50%;
+      height: 44px;
+      background: rgba(252, 78, 68, 1);
+      border-radius: 50%;
       right: 2px;
       top: 2px;
-      font-size:26px;
-      font-weight:bold;
-      color:rgba(255,255,255,1);
+      font-size: 26px;
+      font-weight: bold;
+      color: rgba(255, 255, 255, 1);
+    }
+  }
+
+  &-record {
+    padding-left: 30px;
+
+    &-title {
+      // width: 100%;
+      height: 76px;
+      .flex(center, space-between, row);
+      color: #999999;
+      font-size: 24px;
+    }
+
+    &-del {
+      width: 76px;
+      height: 76px;
+      .flex(center, center, row);
+
+      &-img {
+        background-image: url('//net.huanmusic.com/scanbar-c/v1/icon_empty.png');
+        width: 23px;
+        height: 25px;
+        background-size: 100% 100%;
+      }
+    }
+
+    &-list {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+
+      &-item {
+        height: 60px;
+        padding: 10px 39px;
+        .flex(center, center, row);
+        color: #808080;
+        font-size: 28px;
+        line-height: 28px;
+        border: #cccccc solid 1px;
+        border-radius: 20px;
+        margin-right: 20px;
+        margin-bottom: 23px;
+        text-align: center;
+        display: -webkit-box;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-clamp: 1;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+      }
     }
   }
 }
