@@ -16,6 +16,7 @@ interface Props {
   priceSubtitle: string;
   price: string;
   priceOrigin: string;
+  priceDiscount?: string;
 }
 
 class Footer extends Taro.Component<Props> {
@@ -24,7 +25,7 @@ class Footer extends Taro.Component<Props> {
     const { buttonType, buttonTitle, buttonClick } = this.props;
     return (
       <View className={`${prefix}-cart-right`}>
-        <View 
+        <View
           className={`${prefix}-cart-right-button ${prefix}-cart-right-button-pay`}
           onClick={() => buttonClick()}
         >
@@ -35,27 +36,36 @@ class Footer extends Taro.Component<Props> {
   }
 
   public renderPrice = () => {
-    const { priceTitle, priceSubtitle, price, priceOrigin } = this.props;
+    const { priceTitle, priceSubtitle, price, priceOrigin, priceDiscount } = this.props;
     return (
-      <View className={`${cssPrefix}-normal component-cart-text`}>
-        <Text className={`${prefix}-price-title`}>{priceTitle}</Text>
-        {priceSubtitle && (
-          <Text className={`${cssPrefix}-price-bge `}>{priceSubtitle}</Text>
-        )}
-        {price && (
-          <Text className={`${cssPrefix}-price component-cart-text-price`}>{price.split('.')[0]}</Text>
-        )}
-        {price && (
-          <Text className={`${cssPrefix}-price-bge ${cssPrefix}-price-pos `}>{`.${price.split('.')[1]}`}</Text>
-        )}
-        {/* {priceOrigin && ( 
+      <View>
+        <View className={`${cssPrefix}-normal component-cart-text`}>
+          {/* <Text className={`${cssPrefix}-price-title`}>{priceTitle}</Text> */}
+          {priceSubtitle && (
+            <Text className={`${cssPrefix}-price-bge `}>{priceSubtitle}</Text>
+          )}
+          {price && (
+            <Text className={`${cssPrefix}-price component-cart-text-price`}>{price.split('.')[0]}</Text>
+          )}
+          {price && (
+            <Text className={`${cssPrefix}-price-bge ${cssPrefix}-price-pos `}>{`.${price.split('.')[1]}`}</Text>
+          )}
+          {/* {priceOrigin && ( 
           <Text className={`${cssPrefix}-price-origin `}>{priceOrigin}</Text>
-        )} */}
+          )} */}
+
+        </View>
+        {
+          priceDiscount && (
+            <Text className={`${cssPrefix}-price-discount `}>{priceDiscount}</Text>
+          )
+        }
       </View>
+
     )
   }
 
-  render () {
+  render() {
     return (
       <View className={`${prefix}-cart`}>
         <View className={`${prefix}-cart-box`}>

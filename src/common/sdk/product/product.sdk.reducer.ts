@@ -6,8 +6,8 @@ import merge from 'lodash.merge';
 /**
  * @Author: Ghan 
  * @Date: 2019-11-22 14:20:31 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-13 15:20:07
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-01 16:34:26
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {

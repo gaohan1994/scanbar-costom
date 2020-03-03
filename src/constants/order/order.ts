@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-23 16:50:20
+ * @Last Modified time: 2020-02-28 16:37:04
  * 
  * @todo [商品相关的类型定义]
  */
@@ -64,7 +64,7 @@ export declare namespace OrderInterface {
     address: string;
     receiver: string;
     receiverPhone: string;
-    merhcantAddress: string;
+    merchantAddress: string;
   }
 
   interface OrderDetail {
@@ -98,14 +98,21 @@ export declare namespace OrderInterface {
     waitForReceiptNum: number;
   }
 
+  interface DateItem {
+    id: number;
+    name: string;
+  }
+
   type RECEIVE_ORDER_DETAIL = string;
   type RECEIVE_ORDER_LIST = string;
   type RECEIVE_ORDER_COUNT = string;
+  type RECEIVE_ORDER_ALL_STATUS = string;
 
   type ReducerInterface = {
     RECEIVE_ORDER_LIST: RECEIVE_ORDER_LIST;
     RECEIVE_ORDER_DETAIL: RECEIVE_ORDER_DETAIL;
     RECEIVE_ORDER_COUNT: RECEIVE_ORDER_COUNT;
+    RECEIVE_ORDER_ALL_STATUS: RECEIVE_ORDER_ALL_STATUS;
   };
 
   interface OrderInterfaceMapImp {
@@ -121,6 +128,7 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
     RECEIVE_ORDER_LIST: 'RECEIVE_ORDER_LIST',
     RECEIVE_ORDER_DETAIL: 'RECEIVE_ORDER_DETAIL',
     RECEIVE_ORDER_COUNT: 'RECEIVE_ORDER_COUNT',
+    RECEIVE_ORDER_ALL_STATUS: 'RECEIVE_ORDER_ALL_STATUS',
   };
 
   public orderList = (params?: OrderInterface.OrderListFetchFidle) => {
@@ -137,6 +145,10 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
 
   public orderClose = (params: OrderInterface.OrderDetailFetchField) => {
     return `/order/closeOrder/${params.orderNo}`;
+  }
+
+  public orderAllStatus = () => {
+    return `/order/getAllOrderStatus`;
   }
 }
 

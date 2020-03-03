@@ -2,8 +2,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-17 09:38:18
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-02 11:30:32
  * 
  * @todo [商品相关的类型定义]
  */
@@ -43,6 +43,7 @@ export declare namespace ProductInterface {
     number: number;       // 库存
     price: number;        // 售价
     unitPrice?: number;   // 单价 无码商品要穿
+    saleNumber: number;   // 可售商品数量（显示给用户的库存）
     saleType: number;     // 销售类型（0：按件卖[默认]；1称重）
     status: number;       // 状态(0：启用;1：停用)
     type: number;         // 品类
@@ -58,12 +59,14 @@ export declare namespace ProductInterface {
     imgs: string[];       // 商品图片
     remark?: string;      // 商品备注
     name: string;
+    description: string;
     updateBy: string;
     createBy: string;
     createTime: string;
     updateTime: string;
     supplierId: number;
     supplierName: string; 
+    activityInfos: any[];
   }
 
   interface ProductTypeInfo {

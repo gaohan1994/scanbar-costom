@@ -5,11 +5,14 @@ import './index.less'
 import { OrderInterface, ResponseCode } from '../../constants';
 import { OrderAction } from '../../actions';
 import invariant from 'invariant';
-import { getOrderList, getOrderListTotal, getOrderCount } from '../../reducers/app.order';
+import { getOrderList, getOrderListTotal, getOrderCount, getOrderAllStatus } from '../../reducers/app.order';
 import { connect } from '@tarojs/redux';
 import OrderItem from '../../component/order/order';
 import "../style/product.less";
 import Empty from '../../component/empty';
+import GetUserinfoModal from '../../component/login/login.userinfo';
+import LoginModal from '../../component/login/login.modal';
+import { LoginManager } from '../../common/sdk';
 
 const cssPrefix = 'order';
 
@@ -22,35 +25,64 @@ interface Props {
   orderList: OrderInterface.OrderDetail[];
   orderListTotal: number;
   orderCount: OrderInterface.OrderCount;
+  orderAllStatus: any[];
 }
 
 interface State {
   currentType: number;
+  getUserinfoModal: boolean;
+  loginModal: boolean;
 }
 class Order extends Taro.Component<Props, State> {
   state = {
-    currentType: 0
+    currentType: 0,
+    getUserinfoModal: false,
+    loginModal: false
   }
 
   config: Config = {
-    navigationBarTitleText: '订单'
+    navigationBarTitleText: '订单',
   }
 
-  componentDidMount() {
+  async componentDidShow() {
+    const { orderAllStatus } = this.props;
+    const result = await LoginManager.getUserInfo();
+    if (result.success) {
+      const userinfo = result.result;
+      if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
+        this.setState({ getUserinfoModal: true });
+        return;
+      }
+      if ((!userinfo.phone || userinfo.phone.length === 0)) {
+        this.setState({ loginModal: true });
+        return;
+      };
+    } else {
+      Taro.showToast({
+        title: '获取用户信息失败',
+        icon: 'none'
+      });
+    }
+
     this.init();
   }
+
+  // componentDidMount() {
+  //   this.init();
+  // }
 
   public onChangeTab = (tabNum: number) => {
     this.setState({
       currentType: tabNum
     }, () => {
       this.fetchOrder(1);
+      OrderAction.orderCount();
     });
   }
 
   public init = async () => {
     pageNum = 1;
-    OrderAction.orderList({ pageNum: pageNum++, pageSize });
+    OrderAction.orderList({ pageNum: pageNum++, pageSize, ...this.getFetchType() });
     OrderAction.orderCount();
   }
 
@@ -61,20 +93,15 @@ class Order extends Taro.Component<Props, State> {
         return {};
       case 1:
         return {
-          transFlag: 0,
-          transType: 0,
+          transFlags: 0
         }
       case 2:
         return {
-          transFlag: 4,
-          transType: 0,
-          deliveryType: 1
+          transFlags: '10,12,3,4'
         }
       case 3:
         return {
-          transFlag: 4,
-          transType: 0,
-          deliveryType: 0
+          transFlags: 11
         }
       default:
         return {};
@@ -104,56 +131,68 @@ class Order extends Taro.Component<Props, State> {
     }
   }
 
+  getPhoneNumber = (userinfo: any) => {
+    if (userinfo.phone === undefined || userinfo.phone.length === 0) {
+      this.setState({
+        loginModal: true
+      });
+    }
+  }
+
   render() {
-    const { orderList, orderListTotal } = this.props;
+    const { orderList, orderListTotal, orderAllStatus} = this.props;
     const hasMore = orderList.length < orderListTotal;
+    const { getUserinfoModal, loginModal } = this.state;
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-tabs`}>
           {this.renderTabs()}
         </View>
-        <ScrollView
-          scrollY={true}
-          className={`${cssPrefix}-scrollview`}
-          onScrollToLower={() => {
-            if (hasMore) {
-              this.fetchOrder();
-            }
-          }}
-        >
-          {
-            orderList.length > 0
-              ? orderList.map((item: any) => {
-                return (
-                  <View className={`${cssPrefix}-scrollview-item`} key={item.orderNo}>
-                    <OrderItem data={item} />
-                  </View>
-                )
-              })
-              : (
-                // <View className={`product-suspension order-list-empty`}>
-                //   <Image src="//net.huanmusic.com/scanbar-c/img_order_empty.png" className={`product-suspension-image`} />
-                //   <Text className={`product-suspension-text`}>暂无内容</Text>
-                // </View>
-                <Empty
-                  img='//net.huanmusic.com/img_order_empty.png'
-                  text='还没有商品，快去选购吧'
-                  button={{
-                    title: '去选购',
-                    onClick: () => {
-                      Taro.switchTab({
-                        url: `/pages/index/index`
-                      })
-                    }
-                  }}
-                />
-              )
-          }
+        {
+          orderList && orderList.length > 0
+            ? (
+              <ScrollView
+                scrollY={true}
+                className={`${cssPrefix}-scrollview`}
+                onScrollToLower={() => {
+                  if (hasMore) {
+                    this.fetchOrder();
+                  }
+                }}
+              >
+                {
+                  orderList.map((item: any) => {
+                    return (
+                      <View className={`${cssPrefix}-scrollview-item`} key={item.orderNo}>
+                        <OrderItem data={item} orderAllStatus={orderAllStatus}/>
+                      </View>
+                    )
+                  })
+                }
 
-          {!hasMore && orderList.length > 0 && (
-            <View className={`${cssPrefix}-scrollview-bottom`}>已经到底了</View>
-          )}
-        </ScrollView>
+                {!hasMore && orderList.length > 0 && (
+                  <View className={`${cssPrefix}-scrollview-bottom`}>已经到底了</View>
+                )}
+              </ScrollView>
+            )
+            : (
+              <Empty
+                img='//net.huanmusic.com/img_order_empty.png'
+                text='还没有订单，快去选购吧'
+                button={{
+                  title: '去选购',
+                  onClick: () => {
+                    Taro.switchTab({
+                      url: `/pages/index/index`
+                    })
+                  }
+                }}
+              />
+            )
+        }
+
+        <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
+        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} />
 
       </View>
     )
@@ -178,7 +217,7 @@ class Order extends Taro.Component<Props, State> {
         title: '待自提',
         num: orderCount.waitForReceiptNum || 0,
       },
-    ]
+    ];
     return (
       <TabsSwitch
         current={currentType}
@@ -194,6 +233,7 @@ const select = (state: any) => ({
   orderList: getOrderList(state),
   orderListTotal: getOrderListTotal(state),
   orderCount: getOrderCount(state),
+  orderAllStatus: getOrderAllStatus(state)
 });
 
 export default connect(select)(Order);

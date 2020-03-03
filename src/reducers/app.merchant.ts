@@ -10,9 +10,9 @@ export declare namespace MerchantReducer {
       payload: MerchantInterface.MerchantDetail;
     }
 
-    interface ReceiveUserProfileInfo {
-      type: MerchantInterface.ReducerTypes.RECEIVE_PROFILE_INFO;
-      payload: MerchantInterface.ProfileInfo;
+    interface ReceiveMerchantList {
+      type: MerchantInterface.ReducerTypes.RECEIVE_MERCHANT_LIST;
+      payload: MerchantInterface.MerchantDetail;
     }
 
     interface ChangeCostomIndexAddress {
@@ -25,7 +25,8 @@ export declare namespace MerchantReducer {
   
   interface State {
     merchantDetail: MerchantInterface.MerchantDetail;
-    profileInfo: MerchantInterface.ProfileInfo;
+    merchantList: MerchantInterface.MerchantDetail[];
+    currentMerchantDetail: MerchantInterface.MerchantDetail;
     indexAddress: MerchantInterface.Address;
     addressList: MerchantInterface.Address[];
     currentPostion: MerchantInterface.Address;
@@ -33,13 +34,14 @@ export declare namespace MerchantReducer {
   }
 
   type Action = 
-    Reducers.ReceiveMerchantDetail | Reducers.ReceiveUserProfileInfo | Reducers.ChangeCostomIndexAddress;
+    Reducers.ReceiveMerchantDetail | Reducers.ChangeCostomIndexAddress;
 }
 
 export const initState: MerchantReducer.State = {
   merchantDetail: {} as any,
+  merchantList: [],
+  currentMerchantDetail: {} as any,
   merchantDistance: {} as any,
-  profileInfo: {} as any,
   indexAddress: {} as any,
   addressList: [],
   currentPostion: {} as any,
@@ -88,11 +90,18 @@ export default function merchant (state: MerchantReducer.State = initState, acti
       };
     }
 
-    case MerchantInterfaceMap.reducerInterface.RECEIVE_PROFILE_INFO: {
-      const { payload } = action as MerchantReducer.Reducers.ReceiveUserProfileInfo;
+    case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_LIST: {
+      const { payload } = action as any
       return {
         ...state,
-        profileInfo: payload
+        merchantList: payload
+      };
+    }
+    case MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_LIST: {
+      const { payload } = action as any
+      return {
+        ...state,
+        currentMerchantDetail: payload
       };
     }
 
@@ -105,6 +114,10 @@ export default function merchant (state: MerchantReducer.State = initState, acti
 }
 
 export const getMerchantDetail = (state: AppReducer.AppState) => state.merchant.merchantDetail;
+
+export const getMerchantList = (state: AppReducer.AppState) => state.merchant.merchantList;
+
+export const getCurrentMerchantDetail = (state: AppReducer.AppState) => state.merchant.currentMerchantDetail;
 
 export const getIndexAddress = (state: AppReducer.AppState) => state.merchant.indexAddress; 
 

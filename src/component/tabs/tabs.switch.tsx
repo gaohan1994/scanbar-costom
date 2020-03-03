@@ -28,7 +28,7 @@ class TabsSwitch extends Taro.Component<Props, State> {
     return (
       <View className={`${cssPrefix}`}>
         {
-          tabs.map((tab: any, index: number) => {
+          tabs && tabs.length && tabs.map((tab: any, index: number) => {
             return (
               <View className={`${cssPrefix}-tab`} style={`width: ${750 / tabs.length}px`}>
                 <View

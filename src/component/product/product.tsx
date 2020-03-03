@@ -9,11 +9,13 @@ import classnames from 'classnames';
 import numeral from 'numeral';
 
 const cssPrefix = 'component-product';
-interface Props { 
+interface Props {
   product: ProductInterface.ProductInfo;
   direct?: boolean;
   productInCart?: ProductCartInterface.ProductCartInfo;
   sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
+  last?: boolean;
+  isHome?: boolean;
 }
 
 interface State {
@@ -59,7 +61,7 @@ class ProductComponent extends Taro.Component<Props, State> {
       e.stopPropagation();
     }
     const { product, sort } = this.props;
-    productSdk.manage({type, product, sort});
+    productSdk.manage({ type, product, sort });
   }
 
   public onContentClick = () => {
@@ -71,42 +73,58 @@ class ProductComponent extends Taro.Component<Props, State> {
 
   public renderPrice = () => {
     const { product } = this.props;
-    const price = product && product.price ? numeral(product.price).format('0.00') : '0.00';
+    const priceNum = product && product.price ? numeral(product.price).value() : 0;
+    const price = numeral(priceNum).format('0.00');
+    const discountPriceNum = numeral(productSdk.getProductItemDiscountPrice(product)).value();
+    const discountPrice = numeral(discountPriceNum).format('0.00');
     return (
       <View className={`${cssPrefix}-normal`}>
         <Text className={`${cssPrefix}-price-bge`}>￥</Text>
-        <Text className={`${cssPrefix}-price`}>{price.split('.')[0]}</Text>
-        <Text className={`${cssPrefix}-price-bge ${cssPrefix}-price-pos`}>{`.${price.split('.')[1]}`}</Text>
-        <Text className={`${cssPrefix}-price-origin`}>{price}</Text>
+        <Text className={`${cssPrefix}-price`}>{discountPrice.split('.')[0]}</Text>
+        <Text className={`${cssPrefix}-price-bge ${cssPrefix}-price-pos`}>{`.${discountPrice.split('.')[1]}`}</Text>
+        {
+          priceNum !== discountPriceNum && (
+            <Text className={`${cssPrefix}-price-origin`}>{price}</Text>
+          )
+        }
+
       </View>
     );
   }
 
-  render () {
-    const { product, sort } = this.props;
-    const showManageDetailToken = 
+  render() {
+    const { product, sort, last, isHome } = this.props;
+    const showManageDetailToken =
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE;
     return (
-      <View 
+      <View
         className={classnames(`${cssPrefix}-border`, {
           [`${cssPrefix} `]: !showManageDetailToken,
-          [`${cssPrefix}-manage`]: showManageDetailToken
+          [`${cssPrefix}-manage`]: showManageDetailToken,
+          [`${cssPrefix}-last`]: last,
+          [`${cssPrefix}-full`]: isHome !== undefined && isHome === false,
         })}
       >
-        <View 
+        <View
           className={`${cssPrefix}-content`}
           onClick={this.onContentClick.bind(this)}
         >
           <View className={`${cssPrefix}-content-cover`} >
-            {product.number === 0 && (
+            {product.saleNumber <= 0 && (
               <View className={`${cssPrefix}-content-cover-empty`} >补货中</View>
             )}
             {product.pictures && product.pictures !== '' ? (
-              <Image src={product.pictures[0]} className={`${cssPrefix}-content-cover-image`} />
+              <View
+                className={`${cssPrefix}-content-cover-image`}
+                style={`background-image: url(${product.pictures[0]})`}
+              />
             ) : (
-              <Image src="//net.huanmusic.com/weapp/img_nolist.png" className={`${cssPrefix}-content-cover-image`} />
-            )}
+                <Image 
+                  src="//net.huanmusic.com/scanbar-c/v1/pic_nopicture.png" 
+                  className={`${cssPrefix}-content-cover-image`} 
+                />
+              )}
           </View>
           {this.renderDetail()}
           {this.renderStepper()}
@@ -117,51 +135,70 @@ class ProductComponent extends Taro.Component<Props, State> {
 
   private renderDetail = () => {
     const { product, sort } = this.props;
-
-    const showManageDetailToken = 
+    const showManageDetailToken =
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
       sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE;
 
     return (
       <View className={classnames(`${cssPrefix}-content-detail`)}>
-        <View className={`${cssPrefix}-title`} >
-          {product.name}
-        </View>
-        <View className={`${cssPrefix}-tips`} >
-          {product.name}
+        <View>
+          <View className={`${cssPrefix}-title`} >
+            {product.name}
+          </View>
+          <View className={`${cssPrefix}-tips`} >
+            {product.description && product.description.length > 0 ? product.description : product.name }
+          </View>
         </View>
         <View className={`${cssPrefix}-activity`}>
-          <View className={`${cssPrefix}-inventory`} >{'仅剩10份'}</View>
-          <View className={`${cssPrefix}-discount`} >{'8折 限1份'}</View>
+          {
+            product && product.saleNumber && product.saleNumber > 0 && product.saleNumber <= 20 && (
+              <View className={`${cssPrefix}-inventory`} >
+                <Text className={`${cssPrefix}-inventory-text`}>
+                  {`仅剩${product.saleNumber}份`}
+                </Text>
+              </View>
+            )
+          }
+          {
+            product && product.activityInfos && product.activityInfos.length && product.activityInfos.map((item) => {
+              return (
+                <View className={`${cssPrefix}-discount`} >
+                  <Text className={`${cssPrefix}-discount-text`}>
+                    {`${productSdk.getDiscountString(item)}`}
+                  </Text>
+                </View>
+              )
+            })
+          }
         </View>
         {showManageDetailToken
-        ? (
-          <View className={classnames(`${cssPrefix}-content-detail-box`)}>
-            <Text className={`${cssPrefix}-manage-font`}>进价: ￥{product.cost}</Text>
-            {sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE
-            ? (
-              <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
-                库存: {product.number}
-              </Text>
-            )
-            : (
-              <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
-                售价: ￥{product.price}
-              </Text>
-            )}
-          </View>
-        )
-        : sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
           ? (
             <View className={classnames(`${cssPrefix}-content-detail-box`)}>
-              <Text className={`${cssPrefix}-manage-font`}>进价: ￥{numeral(product.cost).format('0.00')}</Text>
-              <View className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
-                库存：{` ${product.number || 0}${product.unit || ''}`}
-              </View>
+              <Text className={`${cssPrefix}-manage-font`}>进价: ￥{product.cost}</Text>
+              {sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE
+                ? (
+                  <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
+                    库存: {product.saleNumber}
+                  </Text>
+                )
+                : (
+                  <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
+                    售价: ￥{product.price}
+                  </Text>
+                )}
             </View>
           )
-          : this.renderPrice()
-          }
+          : sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
+            ? (
+              <View className={classnames(`${cssPrefix}-content-detail-box`)}>
+                <Text className={`${cssPrefix}-manage-font`}>进价: ￥{numeral(product.cost).format('0.00')}</Text>
+                <View className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
+                  库存：{` ${product.saleNumber || 0}${product.unit || ''}`}
+                </View>
+              </View>
+            )
+            : this.renderPrice()
+        }
       </View>
     );
   }
@@ -173,59 +210,84 @@ class ProductComponent extends Taro.Component<Props, State> {
       return (
         <View className={`${cssPrefix}-stepper`}>
           {product !== undefined ? (
-            <View className={`${cssPrefix}-stepper-container`}>    
-              <View 
-                className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-reduce`)}
+            <View className={`${cssPrefix}-stepper-container`}>
+              <View
+                className={`${cssPrefix}-stepper-touch`}
                 onClick={this.manageProduct.bind(this, productSdk.productCartManageType.REDUCE)}
-              />
+              >
+                <View
+                  className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-reduce`)}
+                />
+              </View>
               <Text className={`${cssPrefix}-stepper-text`}>{(product as any).sellNum}</Text>
-              <View 
-                className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
+              <View
+                className={`${cssPrefix}-stepper-touch`}
                 onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD)}
-              />  
+              >
+                <View
+                  className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
+                />
+              </View>
+
             </View>
-          ) : (product as any).number === 0 ? (
-            <View className={`${cssPrefix}-stepper-empty`}>            
+          ) : (product as any).saleNumber <= 0 ? (
+            <View className={`${cssPrefix}-stepper-empty`}>
               售罄
             </View>
           ) : (
-            <View className={`${cssPrefix}-stepper-container`}>            
-              <View 
-                className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
-                onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD)}
-              />  
-            </View>
-          )}
+                <View className={`${cssPrefix}-stepper-container`}>
+                  <View
+                    className={`${cssPrefix}-stepper-touch`}
+                    onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD)}
+                  >
+                    <View
+                      className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
+                    />
+                  </View>
+                </View>
+              )}
         </View>
       )
-      
+
     }
     return (
       <View className={`${cssPrefix}-stepper`}>
         {productInCart !== undefined ? (
-          <View className={`${cssPrefix}-stepper-container`}>    
-            <View 
-              className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-reduce`)}
+          <View className={`${cssPrefix}-stepper-container`}>
+            <View
+              className={`${cssPrefix}-stepper-touch`}
               onClick={this.manageProduct.bind(this, productSdk.productCartManageType.REDUCE)}
-            />
+            >
+              <View
+                className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-reduce`)}
+              />
+            </View>
             <Text className={`${cssPrefix}-stepper-text`}>{productInCart.sellNum}</Text>
-            <View 
-              className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
+            <View
+              className={`${cssPrefix}-stepper-touch`}
               onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD)}
-            />  
+            >
+              <View
+                className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
+              />
+            </View>
           </View>
-        ) : product.number === 0 ? (
-          <View className={`${cssPrefix}-stepper-empty`}>            
+        ) : product.saleNumber <= 0 ? (
+          <View className={`${cssPrefix}-stepper-empty`}>
             售罄
           </View>
         ) : (
-          <View className={`${cssPrefix}-stepper-container`}>            
-            <View 
-              className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
-              onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD)}
-            />  
-          </View>
-        )}
+              <View className={`${cssPrefix}-stepper-container`}>
+                <View
+                  className={`${cssPrefix}-stepper-touch`}
+                  onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD)}
+                >
+                  <View
+                    className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
+                  />
+                </View>
+              </View>
+            )}
       </View>
     );
   }

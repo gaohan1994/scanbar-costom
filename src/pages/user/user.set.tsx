@@ -68,14 +68,14 @@ class Page extends Taro.Component {
               })
             }
           </View>
-          <View className={`${cssPrefix}-set-button`}>
+          {/* <View className={`${cssPrefix}-set-button`}>
             <AtButton
               className="theme-button"
               onClick={this.logout}
             >
               <Text className="theme-button-text" >退出登录</Text>
             </AtButton>
-          </View>
+          </View> */}
 
         </View>
       </View>

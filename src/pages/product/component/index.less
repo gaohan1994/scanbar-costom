@@ -59,6 +59,7 @@
     &-inventory {
       .act-item(#FC4E44);
       .margin(23px, t);
+      border: 1px #FC4E44 solid;
     }
 
     &-price {
@@ -156,11 +157,15 @@
       width: 100%;
       height: 120px;
       .flex(center, space-between, row);
-      .padding(30px, lr);
+      .padding(30px, r);
+      .padding(30px, l);
     }
     &-left {
       position: relative;
       .flex(center, center, column);
+      &-detail {
+        .margin(40px, l);
+      }
       &-icon {
         width:46px;
         height:46px;

@@ -1,6 +1,6 @@
 
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Input } from '@tarojs/components'
+import { View, Input, Image } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import './index.less'
 import '../style/product.less'
@@ -12,6 +12,8 @@ import productAction from '../../actions/product.action'
 import { getProductSearchList } from '../../reducers/app.product'
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer'
 import productSdk from '../../common/sdk/product/product.sdk'
+import HeaderInput from '../../component/header/header.input'
+import ButtonCostom from '../../component/button/button'
 
 const cssPrefix = 'product';
 const prefix = 'page-search'
@@ -19,7 +21,9 @@ const prefix = 'page-search'
 class Index extends Component<any> {
 
   readonly state = {
-    value: ''
+    value: '',
+    searchRecordList: [] as any[],
+    searchFlag: false,
   };
 
   /**
@@ -30,16 +34,28 @@ class Index extends Component<any> {
  * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
  */
   config: Config = {
-    navigationBarTitleText: '首页'
+    navigationBarTitleText: '商品搜索'
   }
 
   async componentDidShow() {
-    this.setState({value: ''})
+    this.setState({ value: '' })
     productAction.productInfoEmptySearchList();
+    const res = await productAction.getSearchRecord();
+    if (res.success) {
+      this.setState({ searchRecordList: res.result });
+    }
   }
-  
+
+  public onValueChange = ({ detail: { value } }) => {
+    this.setState({ value });
+    if (value === '') {
+      this.setState({ searchFlag: false });
+      productAction.productInfoEmptySearchList();
+    }
+  }
+
   public onSearch = () => {
-    const { value } = this.state;
+    const { value, searchRecordList } = this.state;
     if (!value) {
       Taro.showToast({
         title: '请输入要搜索的商品',
@@ -48,6 +64,16 @@ class Index extends Component<any> {
       return
     }
     this.fetchData();
+    let newList: any[] = [];
+    newList.push(value);
+    const index = searchRecordList.length > 10 ? 10 : searchRecordList.length;
+    for (let i = 0; i < index; i++) {
+      if (searchRecordList[i] !== value) {
+        newList.push(searchRecordList[i]);
+      }
+    }
+    this.setState({ searchRecordList: newList, searchFlag: true });
+    productAction.setSearchRecord(newList);
   }
 
   public fetchData = async () => {
@@ -65,23 +91,37 @@ class Index extends Component<any> {
     return result;
   }
 
+  public delSearchRecord = () => {
+    this.setState({ searchRecordList: [] });
+    productAction.setSearchRecord([]);
+  }
+
   render() {
     const { productList, productCartList } = this.props;
+    const { value, searchFlag } = this.state;
     return (
       <View className={`container ${cssPrefix}`}>
         {this.renderHeader()}
-        <View className={`${cssPrefix}-list-container-costom`}>
-          <View className={`${cssPrefix}-list-right`}>
-            <ProductListView
-              productList={productList}
-              className={`${prefix}-header-container`}
-            />
-          </View>
-        </View>
-        {/* <Cart /> */}
+        {
+          (value === '' || searchFlag === false) && this.renderSearchRecord()
+        }
+        {
+          ((productList && productList.length > 0) || (searchFlag === true)) && (
+            <View className={`${cssPrefix}-list-container-costom`}>
+              <View className={`${cssPrefix}-list-right`}>
+                <ProductListView
+                  productList={productList}
+                  className={`${prefix}-header-container`}
+                  isHome={false}
+                />
+              </View>
+            </View>
+          )
+        }
 
-        {productCartList && productCartList.length > 0 && (
-          <View 
+        {/* <Cart /> */}
+        {value !== '' && productCartList && productCartList.length > 0 && (
+          <View
             className={`${prefix}-cart`}
             onClick={() => {
               Taro.switchTab({
@@ -102,30 +142,54 @@ class Index extends Component<any> {
     const { value } = this.state;
     return (
       <View className={`${prefix}-header`}>
-        <View className={`${prefix}-header-input`}>
-          <Input
-            value={value}
-            onInput={({detail: {value}}) => this.setState({
-              value: value
-            })}
-            className={`${prefix}-header-input-area`}
-            placeholder='请输入商品名称'
-          />
-          {!!value && (
-            <View 
-              className={`${prefix}-header-input-icon`} 
-              onClick={() => {
-                this.setState({value: ''})
-                productAction.productInfoEmptySearchList();
-              }}
-            />
-          )}
-        </View>
-        <View 
-          className={`${prefix}-header-button`}
-          onClick={() => this.onSearch()}
+        <HeaderInput
+          placeholder="请输入商品名称"
+          value={value}
+          onInput={this.onValueChange}
+          isRenderInputRight={true}
+          inputRightClick={() => {
+            this.setState({ value: '', searchFlag: false });
+            productAction.productInfoEmptySearchList();
+          }}
         >
-          搜索
+          <ButtonCostom
+            title="搜索"
+            onClick={() => this.onSearch()}
+            className={`${prefix}-header-button`}
+          />
+        </HeaderInput>
+      </View >
+    )
+  }
+
+  private renderSearchRecord = () => {
+    const { searchRecordList } = this.state;
+    return (
+      <View className={`${prefix}-record`}>
+        <View className={`${prefix}-record-title`}>
+          <View>历史搜索</View>
+          <View className={`${prefix}-record-del`} onClick={this.delSearchRecord}>
+            <View className={`${prefix}-record-del-img`} />
+          </View>
+        </View>
+        <View className={`${prefix}-record-list`}>
+          {
+            searchRecordList && searchRecordList.length && searchRecordList.map((item) => {
+              return (
+                <View
+                  key={item}
+                  className={`${prefix}-record-list-item`}
+                  onClick={() => {
+                    this.setState({
+                      value: item
+                    }, () => {
+                      this.onSearch();
+                    })
+                  }}
+                >{item}</View>
+              )
+            })
+          }
         </View>
       </View>
     )

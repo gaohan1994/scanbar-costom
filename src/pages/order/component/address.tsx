@@ -6,13 +6,12 @@ import classnames from 'classnames'
 import { MerchantInterface } from '../../../constants'
 import { connect } from '@tarojs/redux'
 import productSdk from '../../../common/sdk/product/product.sdk';
-import { AppReducer } from 'src/reducers'
+import { AppReducer } from '../../../reducers'
 import numeral from 'numeral'
 import AddressItem from '../../../component/address/item'
 import { getPayOrderAddress } from '../../../common/sdk/product/product.sdk.reducer'
 import merchantAction from '../../../actions/merchant.action'
-import { getMerchantDistance, getCurrentPostion } from '../../../reducers/app.merchant'
-import PickerComponent from '../../../component/picker/index'
+import { getMerchantDistance, getCurrentPostion, getCurrentMerchantDetail } from '../../../reducers/app.merchant'
 
 const tabs = [
   {
@@ -30,7 +29,11 @@ const prefix = 'order-component-address'
 type Props = {
   payOrderAddress: MerchantInterface.Address;
   merchantDistance: MerchantInterface.Distance;
+  currentMerchantDetail: MerchantInterface.MerchantDetail;
   currentPostion: any;
+  timeSelectClick?: () => void;
+  currentTime?: string;
+  changeTabCallback?: () => void;
 }
 
 type State = {
@@ -43,30 +46,34 @@ class Comp extends Taro.Component<Props, State> {
     currentTab: 0
   }
 
-  componentDidShow () {
-    const { currentPostion } = this.props;
+  componentDidMount() {
+    const { currentPostion, currentMerchantDetail } = this.props;
     this.changeTab(tabs[0])
     merchantAction.merchantDistance({
       latitude: currentPostion.latitude,
       longitude: currentPostion.longitude,
-      merchantId: 1,
+      merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1,
     })
   }
 
   public changeTab = (tab) => {
+    const { changeTabCallback } = this.props;
     this.setState({
       currentTab: tab.id
-    }, () => {
+    }, async () => {
       if (tab.id === 1) {
         /**
          * @todo 自提
          */
-        productSdk.preparePayOrderDetail({deliveryType: 0})
+        await productSdk.preparePayOrderDetail({ deliveryType: 0 })
       } else {
-        productSdk.preparePayOrderDetail({deliveryType: 1})
+        await productSdk.preparePayOrderDetail({ deliveryType: 1 })
+      }
+      if (changeTabCallback) {
+        changeTabCallback();
       }
     })
-  } 
+  }
 
   public onAddAddress = () => {
     Taro.navigateTo({
@@ -74,10 +81,15 @@ class Comp extends Taro.Component<Props, State> {
     })
   }
 
-  render () {
+  public onTimeClick = () => {
+    const { timeSelectClick } = this.props;
+    timeSelectClick ? timeSelectClick() : () => { };
+  }
+
+  render() {
     const { currentTab } = this.state;
     return (
-      <View 
+      <View
         className={classnames(`${prefix}`, {
           [`${prefix}-pad`]: true
         })}
@@ -109,32 +121,34 @@ class Comp extends Taro.Component<Props, State> {
 
   private renderDetail = () => {
     const { currentTab } = this.state;
-    const { payOrderAddress, merchantDistance } = this.props;
+    const { payOrderAddress, merchantDistance, currentTime } = this.props;
 
     if (currentTab === 1) {
       return (
         <View className={`${prefix}-detail`}>
-          <AddressItem 
+          <AddressItem
             address={{
               contact: merchantDistance.name,
               phone: `${numeral(merchantDistance.distance).format('0')}米`,
               address: merchantDistance.location,
-            } as any} 
+            } as any}
             pre={true}
             showEdit={false}
             showArrow={true}
           />
           <View className={`${prefix}-detail-row ${prefix}-detail-row-border `}>
             <View className={`${prefix}-detail-row-title`}>自提时间</View>
-            <View 
-              className={classnames(`${prefix}-detail-row-title`, {
-                [`${prefix}-detail-row-main`]: true,
-                [`${prefix}-detail-row-title-right`]: true,
-              })}
-            >
-              立即送出
+            <View onClick={this.onTimeClick}>
+              <View
+                className={classnames(`${prefix}-detail-row-title`, {
+                  [`${prefix}-detail-row-main`]: true,
+                  [`${prefix}-detail-row-title-right`]: true,
+                })}
+              >
+                {currentTime || ''}
             </View>
-            <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
+              <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
+            </View>
           </View>
           <View className={`${prefix}-detail-row`}>
             <View className={`${prefix}-detail-row-title`}>支付方式</View>
@@ -147,35 +161,38 @@ class Comp extends Taro.Component<Props, State> {
       <View className={`${prefix}-detail`}>
         {payOrderAddress.address ? (
           <View>
-            <AddressItem 
-              address={payOrderAddress} 
+            <AddressItem
+              address={payOrderAddress}
               showEdit={false}
               showArrow={true}
               onClick={() => this.onAddAddress()}
             />
           </View>
         ) : (
-          <View className={`${prefix}-detail-empty`}>
-            <View 
-              className={`${prefix}-detail-button`}
-              onClick={() => this.onAddAddress()}
-            >
-              <Image className={`${prefix}-detail-button-icon`} src='//net.huanmusic.com/scanbar-c/icon_add.png' />
-              <View className={`${prefix}-detail-button-text`}>新增收货地址</View>
+            <View className={`${prefix}-detail-empty`}>
+              <View
+                className={`${prefix}-detail-button`}
+                onClick={() => this.onAddAddress()}
+              >
+                <Image className={`${prefix}-detail-button-icon`} src='//net.huanmusic.com/scanbar-c/icon_add.png' />
+                <View className={`${prefix}-detail-button-text`}>选择收货地址</View>
+              </View>
             </View>
-          </View>
-        )}
+          )}
         <View className={`${prefix}-detail-row ${prefix}-detail-row-border `}>
           <View className={`${prefix}-detail-row-title`}>配送时间</View>
-          <View 
-            className={classnames(`${prefix}-detail-row-title`, {
-              [`${prefix}-detail-row-main`]: true,
-              [`${prefix}-detail-row-title-right`]: true,
-            })}
-          >
-            立即送出
+          <View>
+            <View
+              className={classnames(`${prefix}-detail-row-title`, {
+                [`${prefix}-detail-row-main`]: true,
+                [`${prefix}-detail-row-title-right`]: true,
+              })}
+              onClick={this.onTimeClick}
+            >
+              {currentTime || '立即送出'}
           </View>
-          <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
+            <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
+          </View>
         </View>
         <View className={`${prefix}-detail-row`}>
           <View className={`${prefix}-detail-row-title`}>支付方式</View>
@@ -190,7 +207,8 @@ const select = (state: AppReducer.AppState) => {
   return {
     currentPostion: getCurrentPostion(state),
     payOrderAddress: getPayOrderAddress(state),
-    merchantDistance: getMerchantDistance(state)
+    merchantDistance: getMerchantDistance(state),
+    currentMerchantDetail: getCurrentMerchantDetail(state),
   }
 }
 
