@@ -12,6 +12,7 @@ const cssPrefix = 'component-order-item';
 
 type Props = {
   data: OrderInterface.OrderDetail;
+  orderAllStatus: any[];
 };
 type State = {};
 
@@ -48,6 +49,8 @@ class OrderItem extends Taro.Component<Props, State> {
         title: '取消订单成功',
         icon: 'success'
       });
+      OrderAction.orderList({ pageNum: 1, pageSize: 20 });
+      OrderAction.orderCount();
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -84,15 +87,21 @@ class OrderItem extends Taro.Component<Props, State> {
             product: res.data,
             num: orderDetailList[i].num,
           });
+          setTimeout(() => {
+            Taro.switchTab({
+              url: `/pages/cart/cart`
+            });
+          }, 1000);
+
         }
       }
     }
   }
 
   render() {
-    const { data } = this.props;
+    const { data, orderAllStatus } = this.props;
     const { order, orderDetailList } = data;
-    const res = OrderAction.orderStatus(data);
+    const res = OrderAction.orderStatus(orderAllStatus, data);
     let products: any[] = [];
 
     if (orderDetailList && orderDetailList.length > 3) {
@@ -137,14 +146,17 @@ class OrderItem extends Taro.Component<Props, State> {
                     {
                       product.picUrl && product.picUrl.length > 0
                         ? (
-                          <Image
-                            src={product.picUrl}
+                          <View
                             className={`${cssPrefix}-card-center-product-pic`}
+                            style={`background-image: url(${product.picUrl})`}
                           />
                         )
                         : (
-                          <Image
-                            src="//net.huanmusic.com/weapp/pic_default.png"
+                          // <Image
+                          //   src="//net.huanmusic.com/scanbar-c/v1/pic_nopicture.png"
+                          //   className={`${cssPrefix}-card-center-product-pic`}
+                          // />
+                          <View
                             className={`${cssPrefix}-card-center-product-pic`}
                           />
                         )
@@ -174,7 +186,7 @@ class OrderItem extends Taro.Component<Props, State> {
                 >
                   取消订单
                 </View>
-                <View 
+                <View
                   className={`${cssPrefix}-card-button-common ${cssPrefix}-card-button-pay`}
                   onClick={() => { this.onPay(order); }}
                 >

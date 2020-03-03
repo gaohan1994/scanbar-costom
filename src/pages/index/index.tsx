@@ -14,6 +14,8 @@ import { LoginManager } from '../../common/sdk'
 import WeixinSdk from '../../common/sdk/weixin/weixin'
 import LoginModal from '../../component/login/login.modal'
 import productSdk from '../../common/sdk/product/product.sdk'
+import orderAction from '../../actions/order.action'
+import merchantAction from '../../actions/merchant.action'
 
 const cssPrefix = 'product';
 
@@ -50,7 +52,6 @@ class Index extends Component<any> {
         this.init();
         return;
       }
-
       this.init();
       productSdk.refreshCartNumber();
     } catch (error) {
@@ -62,10 +63,11 @@ class Index extends Component<any> {
   }
 
   async componentDidMount() {
-    const result = await LoginManager.getUserInfo();
-    if (result.success && (!result.result.phone || result.result.phone.length === 0)) {
-      this.setState({ isOpen: true });
-    }
+    // const result = await LoginManager.getUserInfo();
+    // if (result.success && (!result.result.phone || result.result.phone.length === 0)) {
+    //   this.setState({ isOpen: true });
+    // }
+    orderAction.orderAllStatus();
   }
 
   public changeCurrentType = (typeInfo: any, fetchProduct: boolean = true) => {
@@ -84,6 +86,7 @@ class Index extends Component<any> {
 
   public init = async (): Promise<void> => {
     try {
+      merchantAction.merchantList();
       WeixinSdk.initAddress();
       const productTypeResult = await ProductAction.productInfoType();
       invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
@@ -114,6 +117,17 @@ class Index extends Component<any> {
     return result;
   }
 
+  public onScrollToLower = async () => {
+    const { currentType } = this.state;
+    const { productType } = this.props;
+    for (let i = 0; i < productType.length; i ++) {
+      if (currentType.id === productType[i].id && (i !== productType.length - 1)) {
+        this.onTypeClick(productType[i + 1]);
+        break;
+      }
+    }
+  }
+
   render() {
     const { currentType, isOpen, loading } = this.state;
     const { productList, productType } = this.props;
@@ -135,11 +149,12 @@ class Index extends Component<any> {
               loading={loading}
               productList={productList}
               className={`${cssPrefix}-list-right-container`}
+              // onScrollToLower={this.onScrollToLower}
             />
           </View>
         </View>
         {/* <Cart /> */}
-        <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }}/>
+        {/* <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }} /> */}
       </View>
     )
   }

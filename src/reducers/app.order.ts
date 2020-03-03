@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-12-09 13:51:19 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-18 11:48:34
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-02-28 16:49:39
  */
 
 import merge from 'lodash.merge';
@@ -34,6 +34,13 @@ export declare namespace OrderReducer {
         data: OrderInterface.OrderCount;
       };
     }
+
+    interface OrderAllStatusReducer {
+      type: OrderInterface.RECEIVE_ORDER_ALL_STATUS;
+      payload: {
+        orderAllStatus: any[];
+      };
+    }
   } 
 
   interface State {
@@ -41,12 +48,14 @@ export declare namespace OrderReducer {
     orderListTotal: number;
     orderDetail: OrderInterface.OrderDetail;
     orderCount: OrderInterface.OrderCount;
+    orderAllStatus: any[];
   }
 
   type Action = 
     Reducers.OrderListReducer
     | Reducers.OrderDetailReducer
-    | Reducers.OrderCountReducer;
+    | Reducers.OrderCountReducer
+    | Reducers.OrderAllStatusReducer;
 }
 
 const initState: OrderReducer.State = {
@@ -54,6 +63,7 @@ const initState: OrderReducer.State = {
   orderListTotal: -1,
   orderDetail: {} as any,
   orderCount: {} as any,
+  orderAllStatus: [],
 };
 
 export default function orderReducer (
@@ -97,6 +107,14 @@ export default function orderReducer (
         orderCount: data
       };
     }
+    case OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_ALL_STATUS: {
+      const { payload } = action as OrderReducer.Reducers.OrderAllStatusReducer;
+      const { orderAllStatus } = payload;
+      return {
+        ...state,
+        orderAllStatus: orderAllStatus
+      };
+    }
 
     default: {
       return {
@@ -113,3 +131,5 @@ export const getOrderListTotal = (state: AppReducer.AppState) => state.order.ord
 export const getOrderDetail = (state: AppReducer.AppState) => state.order.orderDetail;
 
 export const getOrderCount = (state: AppReducer.AppState) => state.order.orderCount;
+
+export const getOrderAllStatus = (state: AppReducer.AppState) => state.order.orderAllStatus;

@@ -42,60 +42,43 @@ export declare namespace MerchantInterface {
 		userId: number;
   }
 
-  interface ProfileInfo {
-    avatar: string;
-    email: string;
-    merchantName: string;
-    phone: string;
-    sex: string;
-    userName: string;
-  }
-
   interface WxUserInfo {
     avatar: string;
     nickname: string;
   }
 
   namespace PayloadInterface {
-    interface MerchantInfoAdd extends Partial<MerchantDetail> {
-      pageNum?: number;
-      pageSize?: number;
-      parentId?: number;
-      prop?: number;
-      status?: number;
-      type?: number;
-      orderByColumn?: string;
-      phoneNumber?: string;
-    }
+
   }
 
   namespace ReducerTypes {
     type RECEIVE_MERCHANT_DETAIL = string;
     type RECEIVE_PROFILE_INFO = string;
+    type RECEIVE_MERCHANT_LIST = string;
+    type RECEIVE_CURRENT_MERCHANT_LIST = string;
   }
 
   interface MerchantInterfaceMap {
     reducerInterface: {
       RECEIVE_MERCHANT_DETAIL: ReducerTypes.RECEIVE_MERCHANT_DETAIL;
-      RECEIVE_PROFILE_INFO: ReducerTypes.RECEIVE_PROFILE_INFO;
+      RECEIVE_MERCHANT_LIST: ReducerTypes.RECEIVE_MERCHANT_LIST;
+      RECEIVE_CURRENT_MERCHANT_LIST: ReducerTypes.RECEIVE_CURRENT_MERCHANT_LIST;
     };
     
-    merchantInfoAdd: string;
     merchantInfoDetail: string;
-    profileInfo: string;
   }
 }
 
 class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
   public reducerInterface = {
     RECEIVE_MERCHANT_DETAIL: 'RECEIVE_MERCHANT_DETAIL',
-    RECEIVE_PROFILE_INFO: 'RECEIVE_PROFILE_INFO',
     RECEIVE_ADDRESS_LIST: 'RECEIVE_ADDRESS_LIST',
-    RECEIVE_MERCHANT_DISTANCE: 'RECEIVE_MERCHANT_DISTANCE'
+    RECEIVE_MERCHANT_DISTANCE: 'RECEIVE_MERCHANT_DISTANCE',
+    RECEIVE_MERCHANT_LIST: 'RECEIVE_MERCHANT_LIST',
+    RECEIVE_CURRENT_MERCHANT_LIST: 'RECEIVE_CURRENT_MERCHANT_LIST',
   };
-  public merchantInfoAdd = '/merchantInfo/add';
   public merchantInfoDetail = '/merchantInfo/detail';
-  public profileInfo = '/user/profile/info';
+  public merchantList = '/merchantInfo/merchantList';
 }
 
 export default new MerchantInterfaceMap();

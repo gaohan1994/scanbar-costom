@@ -1,5 +1,5 @@
 
-import Taro from '@tarojs/taro'
+import Taro, { Config } from '@tarojs/taro'
 import { View } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
@@ -21,6 +21,10 @@ type State = {
 }
 
 class Page extends Taro.Component<Props, State> {
+
+  config: Config = {
+    navigationBarTitleText: '我的地址'
+  }
 
   state = {
     entry: ''
@@ -61,6 +65,11 @@ class Page extends Taro.Component<Props, State> {
               key={`address${index}`}
               address={address}
               onClick={() => this.onAddressClick(address)}
+              onEditClick={() => {
+                Taro.navigateTo({
+                  url: `/pages/address/address.edit?address=${JSON.stringify(address)}`
+                })
+              }}
             />
           )
         }) : (

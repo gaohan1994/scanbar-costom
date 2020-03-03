@@ -41,7 +41,7 @@ export interface FormRowProps {
   inputOnChange?: (params: any) => any; // 输入改变函数
   infoColor?: '333333' | '666666';
   inputType?: 'text' | 'number' | 'password' | 'phone' | 'digit'; // 输入框类型
-  extraTextStyle?: 'price' | 'black' | 'gray' | 'title';      // 右边文字颜色
+  extraTextStyle?: 'price' | 'black' | 'gray' | 'title' | 'maxWidth';      // 右边文字颜色
   extraTextColor?: string;      // 右边字体颜色
   extraTextSize?: string;       // 右边字体大小
   extraTextBold?: 'bold';       // 是否加粗

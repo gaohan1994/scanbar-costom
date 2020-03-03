@@ -9,6 +9,7 @@ import { LoginManager } from '../../common/sdk';
 import merchantAction from '../../actions/merchant.action';
 import { ResponseCode } from '../../constants';
 import LoginModal from '../../component/login/login.modal';
+import GetUserinfoModal from '../../component/login/login.userinfo';
 
 
 const Rows = [
@@ -31,20 +32,22 @@ interface Props {
 }
 interface State {
   userinfo: any;
-  isOpen: boolean;
+  getUserinfoModal: boolean;
+  loginModal: boolean;
 }
 class User extends Taro.Component<Props, State> {
 
   state = {
     userinfo: {} as any,
-    isOpen: false as any,
+    getUserinfoModal: false as any,
+    loginModal: false as any
   }
 
   config: Config = {
     navigationBarTitleText: '我的'
   }
 
-  async componentDidMount() {
+  async componentDidShow() {
     const result = await LoginManager.getUserInfo();
     if (result.success) {
       this.setState({
@@ -68,8 +71,13 @@ class User extends Taro.Component<Props, State> {
   public onRowClick = (row: any) => {
     if (row.title === '我的地址') {
       const { userinfo } = this.state;
+      if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
+        this.setState({ getUserinfoModal: true });
+        return;
+      }
       if ((!userinfo.phone || userinfo.phone.length === 0)) {
-        this.setState({ isOpen: true });
+        this.setState({ loginModal: true });
+        return;
       };
     }
     Taro.navigateTo({
@@ -81,8 +89,12 @@ class User extends Taro.Component<Props, State> {
   public getWxInfo = async (show?: boolean) => {
     try {
       const { userinfo } = this.state;
+      if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
+        this.setState({ getUserinfoModal: true });
+        return;
+      }
       if ((!userinfo.phone || userinfo.phone.length === 0)) {
-        this.setState({ isOpen: true });
+        this.setState({ loginModal: true });
         return;
       };
       this.getWxUserInfo(show);
@@ -101,18 +113,16 @@ class User extends Taro.Component<Props, State> {
       const { userinfo } = this.state;
       const result: any = await WeixinSDK.getWeixinUserinfo();
       invariant(result.success, result.msg || '获取用户昵称和头像失败');
-      const params = {
-        avatar: result.result.avatarUrl,
-        nickname: result.result.nickName,
-      }
-      const saveResult: any = await merchantAction.wxUserInfoSave(params);
-      invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
-
       const newUserinfo = {
         ...userinfo,
         avatar: result.result.avatarUrl,
         nickname: result.result.nickName,
       }
+      if (userinfo && userinfo.phone && userinfo.phone.length > 0) {
+        const saveResult: any = await merchantAction.wxUserInfoSave(newUserinfo);
+        invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
+      }
+
       this.setState({
         userinfo: newUserinfo
       })
@@ -126,12 +136,20 @@ class User extends Taro.Component<Props, State> {
         });
       }
     }
+  }
 
+  getPhoneNumber = (userinfo: any) => {
+    this.setState({ userinfo })
+    if (userinfo.phone === undefined || userinfo.phone.length === 0) {
+      this.setState({
+        loginModal: true
+      });
+    }
   }
 
   render() {
     // const { userinfo } = this.props;
-    const { userinfo, isOpen } = this.state;
+    const { userinfo, loginModal, getUserinfoModal } = this.state;
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-bg`} />
@@ -140,44 +158,82 @@ class User extends Taro.Component<Props, State> {
             className={`${cssPrefix}-user`}
             onClick={() => this.getWxInfo(true)}
           > */}
-          <Button
-            openType='getUserInfo'
-            onGetUserInfo={() => this.getWxInfo(true)}
-            className={`${cssPrefix}-user`}
-          >
-            {
-              userinfo && userinfo.avatar && userinfo.avatar.length > 0
-                ? (
-                  <Image
-                    src={userinfo.avatar}
-                    className={`${cssPrefix}-user-image`}
-                  />
-                )
-                : (
-                  <Image
-                    src="//net.huanmusic.com/weapp/icon_mine_touxiang.png"
-                    className={`${cssPrefix}-user-image`}
-                  />
-                )
-            }
-
-            <View className={`${cssPrefix}-user-box`} >
-              {
-                userinfo && userinfo.nickname && userinfo.nickname.length > 0
-                  ? <View className={`${cssPrefix}-user-name`}>
-                    {userinfo.nickname}
+          {
+            userinfo && userinfo.phone && userinfo.phone.length > 0
+              ? (
+                <Button
+                  openType='getUserInfo'
+                  onGetUserInfo={() => this.getWxInfo(true)}
+                  className={`${cssPrefix}-user`}
+                >
+                  {
+                    userinfo && userinfo.avatar && userinfo.avatar.length > 0
+                      ? (
+                        <Image
+                          src={userinfo.avatar}
+                          className={`${cssPrefix}-user-image`}
+                        />
+                      )
+                      : (
+                        <Image
+                          src="//net.huanmusic.com/weapp/icon_mine_touxiang.png"
+                          className={`${cssPrefix}-user-image`}
+                        />
+                      )
+                  }
+                  <View className={`${cssPrefix}-user-box`} >
+                    {
+                      userinfo && userinfo.nickname && userinfo.nickname.length > 0
+                        ? <View className={`${cssPrefix}-user-name`}>
+                          {userinfo.nickname}
+                        </View>
+                        : <View
+                          // openType='getUserInfo'
+                          // onGetUserInfo={() => this.getWxInfo(true)}
+                          className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
+                        >
+                          点击登录
                   </View>
-                  : <Button
-                    openType='getUserInfo'
-                    onGetUserInfo={() => this.getWxInfo(true)}
-                    className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
-                  >
-                    获取用户昵称
+                    }
+                    <View className={`${cssPrefix}-user-phone`}>{userinfo.phone}</View>
+                  </View>
                 </Button>
-              }
-              <View className={`${cssPrefix}-user-phone`}>{userinfo.phone}</View>
-            </View>
-          </Button>
+              )
+              : (
+                <View
+                  className={`${cssPrefix}-user`}
+                >
+                  {
+                    userinfo && userinfo.avatar && userinfo.avatar.length > 0
+                      ? (
+                        <Image
+                          src={userinfo.avatar}
+                          className={`${cssPrefix}-user-image`}
+                        />
+                      )
+                      : (
+                        <Image
+                          src="//net.huanmusic.com/weapp/icon_mine_touxiang.png"
+                          className={`${cssPrefix}-user-image`}
+                        />
+                      )
+                  }
+                  <View className={`${cssPrefix}-user-box`} >
+                    <View
+                      className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
+                      onClick={() => {
+                        userinfo && userinfo.nickname && userinfo.nickname.length > 0
+                          ? this.setState({ loginModal: true })
+                          : this.setState({ getUserinfoModal: true })
+                      }}
+                    >
+                      点击登录
+                  </View>
+                  </View>
+                </View>
+              )
+          }
+
           <View className={`${cssPrefix}-rows`}>
             {
               Rows.map((item: any) => {
@@ -203,7 +259,8 @@ class User extends Taro.Component<Props, State> {
             }
           </View>
         </View>
-        <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }} callback={this.getWxUserInfo}/>
+        <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
+        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} callback={(userinfo: any) => this.setState({ userinfo })} />
       </View>
     );
   }

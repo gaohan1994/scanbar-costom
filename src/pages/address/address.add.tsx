@@ -1,5 +1,5 @@
 
-import Taro from '@tarojs/taro'
+import Taro, { Config } from '@tarojs/taro'
 import { View, Text } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
@@ -31,6 +31,10 @@ type State = {
 
 class Page extends Taro.Component<Props, State> {
 
+  config: Config = {
+    navigationBarTitleText: '新增地址'
+  }
+
   state = {
     address: '',
     latitude: 0,
@@ -38,8 +42,8 @@ class Page extends Taro.Component<Props, State> {
     detail: '',
     contact: '',
     phone: '',
-    sex: 'man',
-    flag: 0,
+    sex: '',
+    flag: -1,
   }
 
   public chooseAddress = async () => {
@@ -155,7 +159,7 @@ class Page extends Taro.Component<Props, State> {
           isInput={true}
           inputValue={phone}
           isBorderTop={true}
-          inputPlaceHolder=''
+          inputPlaceHolder='联系人手机号'
           inputOnChange={(value) => this.changeValue('phone', value)}
         />
 

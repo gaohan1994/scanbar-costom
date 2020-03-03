@@ -7,17 +7,18 @@ import '../../styles/theme.less';
 import "../cart/cart.less";
 import classnames from 'classnames';
 import numeral from 'numeral';
-import { SelectMember } from '../../pages/product/product.pay';
-import Price from '../price';
+import { AppReducer } from '../../reducers';
+import { connect } from '@tarojs/redux';
 
 const cssPrefix = 'product';
 
-type Props = { 
+type Props = {
   productList: Array<ProductCartInterface.ProductCartInfo>;
-  selectMember?: SelectMember;
+  selectMember?: any;
   className?: string;
   padding?: boolean;
   sort?: string;
+  payOrderDetail: any;
 };
 
 class ProductPayListView extends Taro.Component<Props> {
@@ -28,18 +29,19 @@ class ProductPayListView extends Taro.Component<Props> {
 
   static defaultProps = {
     padding: true,
-    sort: productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
+    sort: productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER,
+    payOrderDetail: {} as any,
   };
 
-  render () {
-    const { productList, className, padding, sort } = this.props;
+  render() {
+    const { productList, className, padding, sort, payOrderDetail } = this.props;
     return (
-      <View 
+      <View
         className={classnames(className, {
           [`${cssPrefix}-pay-pos`]: padding
         })}
       >
-        <View 
+        <View
           className={classnames('component-form', {
             'component-form-shadow': true,
             [`${cssPrefix}-row-items`]: true
@@ -55,16 +57,37 @@ class ProductPayListView extends Taro.Component<Props> {
                   })}
                 >
                   <View className={`${cssPrefix}-row-box`}>
-                    <View
-                      className={`${cssPrefix}-row-cover`}
-                      style={`background-image: url(${item.pictures[0]})`}
-                    />
+                    {
+                      item && item.pictures && item.pictures.length > 0
+                        ? (
+                          <View
+                            className={`${cssPrefix}-row-cover`}
+                            style={`background-image: url(${item.pictures[0]})`}
+                          />
+                        )
+                        : (
+                          <View
+                            className={`${cssPrefix}-row-cover`}
+                            style={`background-image: url(${"//net.huanmusic.com/scanbar-c/v1/pic_nopicture.png"})`}
+                          />
+                        )
+                    }
+
                     <View className={`${cssPrefix}-row-content ${cssPrefix}-row-content-box`}>
                       <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
                       <Text className={`${cssPrefix}-row-normal`}>{`x ${item.sellNum}`}</Text>
                       <View className={`${cssPrefix}-row-corner`}>
-                        <Text className={`${cssPrefix}-row-corner-price`}>{`￥${item.memberPrice}`}</Text>
-                        <Text className={`${cssPrefix}-row-corner-origin`}>{`￥${item.price}`}</Text>
+                        <View>
+                          <Text className={`${cssPrefix}-row-corner-price`}>￥</Text>
+                          <Text className={`${cssPrefix}-row-corner-big`}>{numeral(productSdk.getProductItemPrice(item)).format('0.00').split('.')[0]}</Text>
+                          <Text className={`${cssPrefix}-row-corner-price`}>{`.${numeral(productSdk.getProductItemPrice(item)).format('0.00').split('.')[1]}`}</Text>
+                        </View>
+                        {/* <Text className={`${cssPrefix}-row-corner-price`}>{`￥${numeral(productSdk.getProductItemPrice(item)).format('0.00')}`}</Text> */}
+                        {
+                          item.price !== productSdk.getProductItemPrice(item) && (
+                            <Text className={`${cssPrefix}-row-corner-origin`}>{`￥${item.price}`}</Text>
+                          )
+                        }
                       </View>
                     </View>
                   </View>
@@ -72,6 +95,29 @@ class ProductPayListView extends Taro.Component<Props> {
               );
             })
           }
+          {
+            payOrderDetail.deliveryType === 1 && (
+              <View className={`${cssPrefix}-row-totals`}>
+                <View className={`${cssPrefix}-row-content-item`}>
+                  <Text className={`${cssPrefix}-row-voucher`}>配送费</Text>
+                  <View>
+                    <Text
+                      className={
+                        `${cssPrefix}-row-content-price ${cssPrefix}-row-content-price-black`
+                      }
+                    >
+                      ￥{numeral(3.5).format('0.00')}
+                    </Text>
+                    {/* <Image
+                  className={`${cssPrefix}-card-products-header-next`}
+                  src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
+                /> */}
+                  </View>
+                </View>
+              </View>
+            )
+          }
+
           {this.renderTotal()}
         </View>
       </View>
@@ -79,19 +125,35 @@ class ProductPayListView extends Taro.Component<Props> {
   }
 
   private renderTotal = () => {
+    const { payOrderDetail } = this.props;
+    const price = numeral(productSdk.getProductTransPrice() + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)).format('0.00');
+    const discountPrice = numeral(numeral(productSdk.getProductsOriginPrice()).value() - numeral(productSdk.getProductTransPrice()).value()).format('0.00');
     return (
       <View className={`${cssPrefix}-row-totals`}>
         <View className={`${cssPrefix}-row-content-item`}>
           <View />
-          <Price
-            preText='已优惠￥0.00   合计：'
+          {/* <Price
+            preText={`已优惠￥ ${numeral(numeral(productSdk.getProductsOriginPrice()).value() - numeral(productSdk.getProductTransPrice()).value()).format('0.00')}  合计：`}
             priceColor='#333333'
-            price={numeral(productSdk.getProductTransPrice()).format('0.00')}
-          />
+            price={numeral(productSdk.getProductTransPrice() + 3.5).format('0.00')}
+          /> */}
+          <View className={`${cssPrefix}-row-tran`}>
+            <Text className={`${cssPrefix}-row-tran`}>{`已优惠￥ ${discountPrice}`}</Text>
+            <Text className={`${cssPrefix}-row-tran ${cssPrefix}-row-tran-margin`}>{`合计：`}</Text>
+            <Text className={`${cssPrefix}-row-tran-price`}>￥</Text>
+            <Text className={`${cssPrefix}-row-tran-price ${cssPrefix}-row-tran-big `}>{price.split('.')[0]}</Text>
+            <Text className={`${cssPrefix}-row-tran-price`}>{`.${price.split('.')[1]}`}</Text>
+          </View>
         </View>
       </View>
     )
   }
 }
 
-export default ProductPayListView;
+
+const select = (state: AppReducer.AppState) => {
+  return {
+    payOrderDetail: state.productSDK.payOrderDetail,
+  }
+}
+export default connect(select)(ProductPayListView);
