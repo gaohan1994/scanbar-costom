@@ -1,17 +1,17 @@
 import Taro from '@tarojs/taro'
-import { View, Text, Image  } from '@tarojs/components'
+import { View, Image  } from '@tarojs/components'
 import './index.less'
 import '../../../component/product/product.less'
-import classnames from 'classnames'
-import { ProductInterface, MerchantInterface } from '../../../constants'
+import { MerchantInterface } from '../../../constants'
 import { connect } from '@tarojs/redux'
 import { AppReducer } from '../../../reducers'
-import { getIndexAddress } from '../../../reducers/app.merchant'
+import { getIndexAddress, getCurrentMerchantDetail } from '../../../reducers/app.merchant'
 
 const prefix = 'index-component-address'
 
 type Props = {
   indexAddress: MerchantInterface.Address;
+  currentMerchantDetail: MerchantInterface.MerchantDetail;
 }
 
 type State = {
@@ -26,7 +26,7 @@ class Comp extends Taro.Component<Props, State> {
   }
 
   render () {
-    const { indexAddress } = this.props;
+    const { indexAddress, currentMerchantDetail } = this.props;
 
     const address = indexAddress && indexAddress.address 
       ? indexAddress.address.indexOf('市') !== -1
@@ -51,7 +51,9 @@ class Comp extends Taro.Component<Props, State> {
         <View className={`${prefix}-box`}>
           <View className={`${prefix}-merchant`}>
             <View className={`${prefix}-merchant-name`}>
-              商家：阳光便利店晋安店
+              {
+                currentMerchantDetail && currentMerchantDetail.name && currentMerchantDetail.name.length > 0 ? currentMerchantDetail.name : '未获取到店名'
+              }
             </View>
           </View>
         </View>
@@ -73,7 +75,8 @@ class Comp extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => {
   return {
-    indexAddress: getIndexAddress(state)
+    indexAddress: getIndexAddress(state),
+    currentMerchantDetail: getCurrentMerchantDetail(state),
   }
 }
 

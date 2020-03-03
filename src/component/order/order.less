@@ -1,4 +1,3 @@
-
 @import "../../styles/theme.less";
 
 @orderItemPrefix: component-order-item;
@@ -7,7 +6,7 @@
 .@{orderItemPrefix} {
   width: 100%;
   height: 100%;
-  
+
   &-card {
     position: relative;
     width: 690px;
@@ -50,7 +49,7 @@
 
       &-text {
         flex-direction: column;
-        margin-left: 10px;
+        margin-left: 18px;
 
         &-shop {
           color: #333333;
@@ -67,7 +66,7 @@
     &-center {
       display: flex;
       flex-direction: row;
-      margin-top: 46px;
+      margin-top: 31px;
       padding-left: 18px;
       padding-bottom: 33px;
       justify-content: space-between;
@@ -79,14 +78,20 @@
       }
 
       &-product {
-        width: 147px;
+        width: 150px;
         height: 170px;
         margin-left: 15px;
         flex-direction: column;
 
         &-pic {
-          width: 147px;
-          height: 128px;
+          width: 150px;
+          height: 150px;
+          background-repeat: no-repeat;
+          background-size: cover;
+          background-position: center center;
+          background-image: url(//net.huanmusic.com/scanbar-c/v1/pic_nopicture.png);
+          border-radius: 10px;
+          border: 1rpx solid #f9f9f9;
         }
 
         &-text {
@@ -99,6 +104,8 @@
           line-clamp: 1;
           -webkit-line-clamp: 1;
           -webkit-box-orient: vertical;
+          text-align: center;
+          margin-top: 10px;
         }
       }
 
@@ -128,13 +135,14 @@
         width: 163px;
         height: 52px;
         .flex(center, center, column);
-        font-size: 26px; 
+        font-size: 26px;
+        line-height: 26px;
         border-radius: 22.5px;
         margin-top: 24px;
         margin-right: 30px;
       }
 
-      &-again {       
+      &-again {
         border: #999999 solid 2px;
         color: #666666;
       }

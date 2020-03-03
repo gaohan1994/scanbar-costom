@@ -5,8 +5,8 @@ import requestHttp from "../common/request/request.http";
 
 class MerchantAction {
 
-  public merchantDetail = async () => {
-    const result = await MerchantService.merchantInfoDetail();
+  public merchantDetail = async (params: any) => {
+    const result = await MerchantService.merchantInfoDetail(params);
     if (result.code === ResponseCode.success) {
       store.dispatch({
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_DETAIL,
@@ -16,8 +16,20 @@ class MerchantAction {
     return result;
   }
 
-  public merchantInfoAdd = async (params: MerchantInterface.PayloadInterface.MerchantInfoAdd) => {
-    const result = await MerchantService.merchantInfoAdd(params);
+  public merchantList = async () => {
+    const result = await MerchantService.merchantList();
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_LIST,
+        payload: result.data.rows
+      });
+      if (result.data.rows && result.data.rows.length > 0) {
+        store.dispatch({
+          type: MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_LIST,
+          payload: result.data.rows[0]
+        });
+      }
+    }
     return result;
   }
 
@@ -28,17 +40,6 @@ class MerchantAction {
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_DISTANCE,
         payload: result.data
       })
-    }
-    return result;
-  }
-
-  public profileInfo = async () => {
-    const result = await MerchantService.profileInfo();
-    if (result.code === ResponseCode.success) {
-      store.dispatch({
-        type: MerchantInterfaceMap.reducerInterface.RECEIVE_PROFILE_INFO,
-        payload: result.data
-      });
     }
     return result;
   }

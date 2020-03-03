@@ -1,5 +1,5 @@
 
-import Taro from '@tarojs/taro'
+import Taro, { Config } from '@tarojs/taro'
 import { View  } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import './index.less'
@@ -11,11 +11,15 @@ import { ProductAction } from '../../actions'
 import ProductSwiper from './component/swiper';
 import ProductDetail from './component/detail';
 import ProductCart from './component/cart';
-import { AppReducer } from 'src/reducers'
+import { AppReducer } from '../../reducers'
 
 const cssPrefix = 'product';
 
 class Page extends Taro.Component<any> {
+
+  config: Config = {
+    navigationBarTitleText: '商品详情'
+  }
 
   defaultProps = {
     productDetail: {}
@@ -45,7 +49,7 @@ class Page extends Taro.Component<any> {
     return (
       <View className='container'>
         <ProductSwiper 
-          images={productDetail.pictures || []}
+          images={productDetail.pictures || ["//net.huanmusic.com/scanbar-c/v1/pic_default.png"]}
         />
         <ProductDetail
           product={productDetail}

@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-09 14:48:04
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-01 18:33:24
  * 
  * @todo [盘点相关的接口]
  * ```js
@@ -18,18 +18,13 @@ import MerchantInterfaceMap, { MerchantInterface } from "./merchant";
 
 class MerchantService {
 
-  public merchantInfoDetail = async (): Promise<HTTPInterface.ResponseResultBase<MerchantInterface.MerchantDetail>> => {
-    const result = await requestHttp.get(`${MerchantInterfaceMap.merchantInfoDetail}`);
+  public merchantInfoDetail = async (params): Promise<HTTPInterface.ResponseResultBase<MerchantInterface.MerchantDetail>> => {
+    const result = await requestHttp.get(`${MerchantInterfaceMap.merchantInfoDetail}/${jsonToQueryString(params)}`);
     return result;
   }
 
-  public merchantInfoAdd = async (params: MerchantInterface.PayloadInterface.MerchantInfoAdd): Promise<HTTPInterface.ResponseResultBase<any>> => {
-    const result = await requestHttp.post(MerchantInterfaceMap.merchantInfoAdd, params);
-    return result;
-  }
-
-  public profileInfo = async (): Promise<HTTPInterface.ResponseResultBase<MerchantInterface.ProfileInfo>> => {
-    const result = await requestHttp.get(MerchantInterfaceMap.profileInfo);
+  public merchantList = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`${MerchantInterfaceMap.merchantList}`);
     return result;
   }
 

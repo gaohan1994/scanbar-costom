@@ -1,9 +1,9 @@
 import Taro, { Config } from '@tarojs/taro';
-import { View, Button, Image, Text, ScrollView } from '@tarojs/components';
+import { View, Image, Text, ScrollView } from '@tarojs/components';
 import './index.less';
 import { AtButton } from 'taro-ui';
 import classnames from 'classnames';
-import { getOrderDetail } from '../../reducers/app.order';
+import { getOrderDetail, getOrderAllStatus } from '../../reducers/app.order';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
 import invariant from 'invariant';
@@ -12,19 +12,22 @@ import { ResponseCode, OrderInterface } from '../../constants';
 import "../../pages/style/product.less";
 import numeral from 'numeral';
 import dayjs from 'dayjs'
-import Price from '../../component/price';
 import productSdk from '../../common/sdk/product/product.sdk';
+import CostomModal from '../../component/login/modal';
+import merchantAction from '../../actions/merchant.action';
 
 const cssPrefix = 'order-detail';
 const productCssPrefix = 'product';
 
 interface Props {
   orderDetail: OrderInterface.OrderDetail;
+  orderAllStatus: any[];
 }
 
 interface State {
   timeStr: string;
   time: number;
+  callModal: boolean;
 }
 
 class OrderDetail extends Taro.Component<Props, State> {
@@ -32,6 +35,7 @@ class OrderDetail extends Taro.Component<Props, State> {
   state = {
     timeStr: '',
     time: 0,
+    callModal: false,
   }
 
   config: Config = {
@@ -45,6 +49,8 @@ class OrderDetail extends Taro.Component<Props, State> {
       const { params: { id } } = this.$router;
       invariant(!!id, '请传入订单id');
       this.init(id);
+      // OrderAction.orderList({ pageNum: 1, pageSize: 20 });
+      OrderAction.orderCount();
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -63,8 +69,8 @@ class OrderDetail extends Taro.Component<Props, State> {
     try {
       const result = await OrderAction.orderDetail({ orderNo: id });
       invariant(result.code === ResponseCode.success, result.msg || ' ');
-      const { orderDetail } = this.props;
-      const status = OrderAction.orderStatus(orderDetail);
+      const { orderDetail, orderAllStatus } = this.props;
+      const status = OrderAction.orderStatus(orderAllStatus, orderDetail);
       if (status.title === '待支付') {
         const second = dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).diff(dayjs(orderDetail.order.createTime), 'second');
         const expireMinute = orderDetail.order.expireMinute || 20;
@@ -118,6 +124,7 @@ class OrderDetail extends Taro.Component<Props, State> {
   }
 
   public orderCancle = async (order: OrderInterface.OrderInfo) => {
+    const { params: { id } } = this.$router;
     const { orderNo } = order;
     const payload = {
       orderNo: orderNo
@@ -129,6 +136,9 @@ class OrderDetail extends Taro.Component<Props, State> {
         title: '取消订单成功',
         icon: 'success'
       });
+      // OrderAction.orderList({ pageNum: 1, pageSize: 20 });
+      this.init(id);
+      OrderAction.orderCount();
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -150,6 +160,13 @@ class OrderDetail extends Taro.Component<Props, State> {
         icon: 'none'
       });
     }
+  }
+
+  public onCall = (phone: string) => {
+    Taro.makePhoneCall({
+      phoneNumber: phone
+    });
+
   }
 
   public renderPrice = (num: number) => {
@@ -180,23 +197,43 @@ class OrderDetail extends Taro.Component<Props, State> {
       for (let i = 0; i < orderDetailList.length; i++) {
         const res = await ProductAction.productInfoDetail({ id: orderDetailList[i].productId });
         if (res.code === ResponseCode.success) {
-          // for (let j = 0; j < orderDetailList[i].num; j++) {
-          //   productSdk.manage({
-          //     type: productSdk.productCartManageType.ADD,
-          //     product: res.data,
-          //   });
-          // }
           productSdk.manage({
             type: productSdk.productCartManageType.ADD,
             product: res.data,
             num: orderDetailList[i].num,
           });
+          setTimeout(() => {
+            Taro.navigateBack({ delta: 10 });
+            Taro.switchTab({
+              url: `/pages/cart/cart`
+            });
+          }, 1000);
         }
       }
     }
   }
 
+  onConfirm = async () => {
+    const { orderDetail } = this.props;
+    const { order } = orderDetail;
+    const parmas = {
+      merchantId: order.merchantId
+    };
+    const res = await merchantAction.merchantDetail(parmas);
+    if (res.code === ResponseCode.success) {
+      if (res.data && res.data.customerMallConfig && res.data.customerMallConfig.servicePhone) {
+        this.onCall(res.data.customerMallConfig.servicePhone);
+      }
+    } else {
+      Taro.showToast({
+        title: '获取售后电话失败',
+        icon: 'none'
+      });
+    }
+  }
+
   render() {
+    const { callModal } = this.state
     return (
       <View className={`container order`}>
         <View className={`${cssPrefix}-bg`} />
@@ -206,6 +243,12 @@ class OrderDetail extends Taro.Component<Props, State> {
           {this.renderProductList()}
           {this.renderOrderCard()}
         </ScrollView>
+        <CostomModal
+          isOpen={callModal}
+          onCancle={() => { this.setState({ callModal: false }) }}
+          onConfirm={this.onConfirm}
+          title="确定拨打商家电话？"
+        />
 
       </View>
     )
@@ -213,8 +256,8 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   private renderStatusCard() {
     const { time } = this.state;
-    const { orderDetail } = this.props;
-    const res = OrderAction.orderStatus(orderDetail, time);
+    const { orderDetail, orderAllStatus } = this.props;
+    const res = OrderAction.orderStatus(orderAllStatus, orderDetail, time);
     return (
       <View className={`${cssPrefix}-card ${cssPrefix}-card-status`}>
         {
@@ -364,16 +407,16 @@ class OrderDetail extends Taro.Component<Props, State> {
                 />
               )
           }
-          
+
 
           <View className={`${cssPrefix}-card-logistics-item-info`}>
-            <Text 
-            
-            className={classnames(
-              {
-                [`${cssPrefix}-card-logistics-item-info-content`]: order.deliveryType !== 0,
-                [`${cssPrefix}-card-logistics-item-info-title`]: order.deliveryType === 0,
-              })}
+            <Text
+
+              className={classnames(
+                {
+                  [`${cssPrefix}-card-logistics-item-info-content`]: order.deliveryType !== 0,
+                  [`${cssPrefix}-card-logistics-item-info-title`]: order.deliveryType === 0,
+                })}
             >
               {
                 order.deliveryType == 0
@@ -385,7 +428,7 @@ class OrderDetail extends Taro.Component<Props, State> {
                     : '未设置收货地址'
               }
             </Text>
-            <Text 
+            <Text
               className={classnames(
                 {
                   [`${cssPrefix}-card-logistics-item-info-content`]: order.deliveryType === 0,
@@ -394,8 +437,8 @@ class OrderDetail extends Taro.Component<Props, State> {
             >
               {
                 order.deliveryType == 0
-                  ? order.merhcantAddress && order.merhcantAddress.length > 0
-                    ? order.merhcantAddress
+                  ? order.merchantAddress && order.merchantAddress.length > 0
+                    ? order.merchantAddress
                     : '未获取到商店地址'
                   : (order.receiver && order.receiver.length > 0) || (order.receiverPhone && order.receiverPhone.length > 0)
                     ? `${order.receiver} ${order.receiverPhone}`
@@ -411,6 +454,8 @@ class OrderDetail extends Taro.Component<Props, State> {
   private renderProductList() {
     const { orderDetail } = this.props;
     const { orderDetailList, order } = orderDetail;
+    const price = numeral(orderDetail.order.transAmount).format('0.00');
+    const discountPrice = numeral(order.totalAmount - order.transAmount).format('0.00');
     return (
       <View className={`${cssPrefix}-card`}>
         <View className={`${cssPrefix}-card-products-header`}>
@@ -421,7 +466,7 @@ class OrderDetail extends Taro.Component<Props, State> {
               src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
             /> */}
           </View>
-          <View className={`${cssPrefix}-card-products-header-item`}>
+          <View className={`${cssPrefix}-card-products-header-item`} onClick={() => { this.setState({ callModal: true }) }}>
             <Image
               className={`${cssPrefix}-card-products-header-phone`}
               src={'//net.huanmusic.com/weapp/icon_order_phone.png'}
@@ -441,14 +486,18 @@ class OrderDetail extends Taro.Component<Props, State> {
                 <View className={`${productCssPrefix}-row-box`}>
                   <View
                     className={`${productCssPrefix}-row-cover`}
-                    style={`background-image: url(${item.picUrl || '//net.huanmusic.com/weapp/pic_default.png'})`}
+                    style={`background-image: url(${item.picUrl || '//net.huanmusic.com/scanbar-c/v1/pic_nopicture.png'})`}
                   />
                   <View className={`${productCssPrefix}-row-content ${productCssPrefix}-row-content-box`}>
                     <Text className={`${productCssPrefix}-row-name`}>{item.productName}</Text>
                     <Text className={`${productCssPrefix}-row-normal`}>{`x ${item.num}`}</Text>
                     <View className={`${productCssPrefix}-row-corner`}>
-                      <Text className={`${productCssPrefix}-row-corner-price`}>{this.renderPrice(item.transAmount)}</Text>
-                      <Text className={`${productCssPrefix}-row-corner-origin`}>{`￥${numeral(item.totalAmount).format('0.00')}`}</Text>
+                      <Text className={`${productCssPrefix}-price`}>{this.renderPrice(item.transAmount)}</Text>
+                      {
+                        item.totalAmount !== item.transAmount && (
+                          <Text className={`${productCssPrefix}-row-corner-origin`}>{`￥${numeral(item.totalAmount).format('0.00')}`}</Text>
+                        )
+                      }
                     </View>
                   </View>
                 </View>
@@ -468,7 +517,7 @@ class OrderDetail extends Taro.Component<Props, State> {
                       `${productCssPrefix}-row-content-price ${productCssPrefix}-row-content-price-black`
                     }
                   >
-                    ￥{numeral(order.deliveryFee || 0).format('0.00')}
+                    ￥{numeral(order.deliveryFee || 3.5).format('0.00')}
                   </Text>
                   <Image
                     className={`${cssPrefix}-card-products-header-next`}
@@ -534,11 +583,19 @@ class OrderDetail extends Taro.Component<Props, State> {
           <View className={`${productCssPrefix}-row-content-item`}>
             <View></View>
 
-            <Price
-              preText='已优惠￥0.00   合计：'
+            {/* <Price
+              preText={`已优惠￥${numeral(order.totalAmount - order.transAmount).format('0.00')}   合计：`}
               priceColor='#333333'
               price={numeral(orderDetail.order.transAmount).format('0.00')}
-            />
+            /> */}
+
+            <View className={`${productCssPrefix}-row-tran`}>
+              <Text className={`${productCssPrefix}-row-tran`}>{`已优惠￥ ${discountPrice}`}</Text>
+              <Text className={`${productCssPrefix}-row-tran ${productCssPrefix}-row-tran-margin`}>{`合计：`}</Text>
+              <Text className={`${productCssPrefix}-row-tran-price`}>￥</Text>
+              <Text className={`${productCssPrefix}-row-tran-price ${productCssPrefix}-row-tran-big `}>{price.split('.')[0]}</Text>
+              <Text className={`${productCssPrefix}-row-tran-price`}>{`.${price.split('.')[1]}`}</Text>
+            </View>
           </View>
         </View>
 
@@ -596,6 +653,7 @@ class OrderDetail extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => ({
   orderDetail: getOrderDetail(state),
+  orderAllStatus: getOrderAllStatus(state)
 });
 
 export default connect(select)(OrderDetail);

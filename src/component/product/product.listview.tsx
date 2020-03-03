@@ -19,6 +19,7 @@ type Props = {
   isRenderFooter?: boolean;
   bottomSpector?: boolean;
   sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
+  isHome?: boolean;
 };
 
 class ProductListView extends Taro.Component<Props> {
@@ -58,7 +59,7 @@ class ProductListView extends Taro.Component<Props> {
   }
 
   render () {
-    const { className, loading, productList, isRenderFooter, bottomSpector, sort } = this.props;
+    const { className, loading, productList, isRenderFooter, bottomSpector, sort, isHome } = this.props;
     return (
       <ScrollView 
         scrollY={true}
@@ -77,6 +78,7 @@ class ProductListView extends Taro.Component<Props> {
                   <ProductComponent
                     product={product}
                     sort={sort}
+                    isHome={isHome}
                   /> 
                 </View>
               );

@@ -1,5 +1,5 @@
 
-import Taro from '@tarojs/taro'
+import Taro, { Config } from '@tarojs/taro'
 import { View, Image } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
@@ -12,6 +12,9 @@ import ButtonFooter from '../../component/button/button.footer';
 import WeixinSdk from '../../common/sdk/weixin/weixin'
 import invariant from 'invariant'
 import './index.less'
+import GetUserinfoModal from '../../component/login/login.userinfo'
+import LoginModal from '../../component/login/login.modal'
+import { LoginManager } from '../../common/sdk'
 
 const prefix = 'address'
 
@@ -19,10 +22,23 @@ type Props = {
   addressList: MerchantInterface.Address[];
   currentPostion: MerchantInterface.Address;
 }
+type State = {
+  getUserinfoModal: boolean;
+  loginModal: boolean;
+}
 
-class Page extends Taro.Component<Props> {
+class Page extends Taro.Component<Props, State> {
 
-  componentDidShow () {
+  state = {
+    getUserinfoModal: false,
+    loginModal: false
+  }
+
+  config: Config = {
+    navigationBarTitleText: '选择收货地址'
+  }
+
+  componentDidShow() {
     merchantAction.addressList();
   }
 
@@ -34,22 +50,55 @@ class Page extends Taro.Component<Props> {
   public reCurrentPostion = async () => {
     try {
       Taro.showLoading();
-      const result = await WeixinSdk.getLocation();  
+      const result = await WeixinSdk.getLocation();
       Taro.hideLoading();
       invariant(!!result.success, result.msg || ' ')
     } catch (error) {
       Taro.showToast({
         title: error.message,
         icon: 'none'
-      }) 
+      })
     }
   }
 
-  render () {
+  public onAdd = async () => {
+    const result = await LoginManager.getUserInfo();
+    if (result.success) {
+      const userinfo = result.result;
+      if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
+        this.setState({ getUserinfoModal: true });
+        return;
+      }
+      if ((!userinfo.phone || userinfo.phone.length === 0)) {
+        this.setState({ loginModal: true });
+        return;
+      };
+    } else {
+      Taro.showToast({
+        title: '获取用户信息失败',
+        icon: 'none'
+      });
+    }
+
+    Taro.navigateTo({
+      url: '/pages/address/address.add'
+    });
+  }
+
+  getPhoneNumber = (userinfo: any) => {
+    if (userinfo.phone === undefined || userinfo.phone.length === 0) {
+      this.setState({
+        loginModal: true
+      });
+    }
+  }
+
+  render() {
     const { addressList, currentPostion } = this.props;
+    const { getUserinfoModal, loginModal } = this.state;
     return (
       <View className='container'>
-        <View 
+        <View
           className={`${prefix}-current`}
           onClick={() => this.reCurrentPostion()}
         >
@@ -61,31 +110,37 @@ class Page extends Taro.Component<Props> {
           </View>
         </View>
 
-        <View className={`${prefix}-list`}>
-          {addressList && addressList.length > 0 ? addressList.map((address, index) => {
-            return(
-              <AddressItem
-                key={`address${index}`}
-                address={address}
-                showEdit={false}
-                onClick={() => this.onAddressClick(address)}
-              />
-            )
-          }) : (
-            <View>asd</View>
-          )}
-        </View>
+        {
+          addressList && addressList.length > 0 && (
+            <View className={`${prefix}-list`}>
+              <View className={`${prefix}-current-title ${prefix}-list-title`}>收货地址</View>
+              {addressList.map((address, index) => {
+                return (
+                  <AddressItem
+                    key={`address${index}`}
+                    address={address}
+                    showEdit={false}
+                    onClick={() => this.onAddressClick(address)}
+                    isBorder={index !== addressList.length - 1}
+                  />
+                )
+              })
+              }
+            </View>
+          )
+        }
+
 
         <ButtonFooter
           buttons={[{
             title: '新增地址',
             onPress: () => {
-              Taro.navigateTo({
-                url: '/pages/address/address.add'
-              })
+              this.onAdd();
             }
           }]}
         />
+        <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
+        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} />
       </View>
     )
   }

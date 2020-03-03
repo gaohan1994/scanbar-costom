@@ -6,8 +6,8 @@ import classnames from 'classnames'
 import { ProductInterface } from '../../../constants'
 import { connect } from '@tarojs/redux'
 import productSdk from '../../../common/sdk/product/product.sdk';
-import { AppReducer } from 'src/reducers'
-import { ProductCartInterface } from 'src/common/sdk/product/product.sdk'
+import { AppReducer } from '../../../reducers'
+import { ProductCartInterface } from '../../../common/sdk/product/product.sdk'
 
 const cssPrefix = 'component-product';
 const prefix = 'product-detail-component'
@@ -31,7 +31,7 @@ class Cart extends Taro.Component<Props> {
 
   public renderStepper = () => {
     const { product, productInCart  } = this.props;
-    if (product && product.number === 0) {
+    if (product && product.saleNumber <= 0) {
       return (
         <View 
           className={`${prefix}-cart-right-button ${prefix}-cart-right-empty`}
@@ -71,7 +71,7 @@ class Cart extends Taro.Component<Props> {
     return (
       <View className={`${prefix}-cart`}>
         <View className={`${prefix}-cart-box`}>
-          <View className={`${prefix}-cart-left`}>
+          <View className={`${prefix}-cart-left ${prefix}-cart-left-detail`}>
             <View 
               className={`${prefix}-cart-left-icon`} 
               onClick={() => {

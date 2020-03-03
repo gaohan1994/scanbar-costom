@@ -1,7 +1,7 @@
 import { ReportInterface, ReportInterfaceMap, ReportService } from "../constants";
 import { ResponseCode } from '../constants/index';
 import { store } from '../app';
-import { ReportReducer } from "src/reducers/app.report";
+import { ReportReducer } from "../reducers/app.report";
 
 class MerchantAction {
   public reportList = async (params: ReportInterface.ReportListFetchField) => {

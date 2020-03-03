@@ -1,16 +1,17 @@
 import Taro from '@tarojs/taro';
 import { ScrollView, View } from '@tarojs/components';
 import "../../pages/style/product.less";
-import { ProductInterface } from '../../constants';
+import "../../pages/style/order.less";
+import { ProductInterface, OrderInterface } from '../../constants';
 import classnames from 'classnames';
 
 const cssPrefix = 'product';
 
 type Props = { 
   className?: string;
-  currentMenu: ProductInterface.ProductType;
-  menu: ProductInterface.ProductType[];
-  onClick: (menu: ProductInterface.ProductType) => void;
+  currentMenu: ProductInterface.ProductType | OrderInterface.DateItem;
+  menu: ProductInterface.ProductType[] | OrderInterface.DateItem[];
+  onClick: ((menu: ProductInterface.ProductType) => void) | ((menu: any) => void);
 };
 
 class ProductMenu extends Taro.Component<Props> {

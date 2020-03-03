@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-17 09:46:34
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-02 17:38:47
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -33,14 +33,14 @@ export declare namespace ProductCartInterface {
 
   interface ProductOrderPayload {
     address: string;
-		// addressDetail: string;
-		deliveryPhone: string;
+    // addressDetail: string;
+    deliveryPhone: string;
     delivery_time: string;
     deliveryType: number;
     receiver: string;
     receiverPhone: string;
     payType: number;
-		remark: string;
+    remark: string;
     discount: number;     // 优惠价格
     erase: number;        // 抹零金额
     merchantId: number;
@@ -135,7 +135,7 @@ export declare namespace ProductCartInterface {
   type RECEIVE_ORDER_PAY = string;
   type RECEIVE_ORDER_PAY_ADDRESS = string;
   type RECEIVE_ORDER_PAY_DETAIL = string;
-  
+
   type PAYLOAD_SORT = {
     PAYLOAD_ORDER: PAYLOAD_ORDER;
     PAYLOAD_REFUND: PAYLOAD_REFUND;
@@ -165,7 +165,7 @@ export declare namespace ProductCartInterface {
 
   type ProductCartAdd = string;
   type ProductCartReduce = string;
-  type ProductCartEmpty= string;
+  type ProductCartEmpty = string;
   type ProductCartManageType = {
     ADD: ProductCartAdd;
     REDUCE: ProductCartReduce;
@@ -184,7 +184,7 @@ export declare namespace ProductCartInterface {
 class ProductSDK {
 
   public nonBarcodeKey: string = 'WM';
-  
+
   public productCartManageType: ProductCartInterface.ProductCartManageType = {
     ADD: 'ADD',
     REDUCE: 'REDUCE',
@@ -215,7 +215,7 @@ class ProductSDK {
       PAYLOAD_STOCK: 'PAYLOAD_STOCK',
     }
   };
-  
+
   /**
    * @param {erase}
    * [抹零金额]
@@ -244,7 +244,7 @@ class ProductSDK {
    */
   private sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
 
-  constructor () {
+  constructor() {
     this.erase = undefined;
     this.member = undefined;
     this.sort = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER;
@@ -315,7 +315,7 @@ class ProductSDK {
         text: `${total}`
       });
     } else {
-      Taro.removeTabBarBadge({index: 2});
+      Taro.removeTabBarBadge({ index: 2 });
     }
   }
 
@@ -325,12 +325,12 @@ class ProductSDK {
    * @memberof ProductSDK
    */
   public getProductNumber = (
-    products?: ProductCartInterface.ProductCartInfo[], 
+    products?: ProductCartInterface.ProductCartInfo[],
     // sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
   ) => {
     const key = this.getSortDataKey();
-    const productList = products !== undefined 
-      ? products 
+    const productList = products !== undefined
+      ? products
       : store.getState().productSDK[key];
     const reduceCallback = this.sort !== this.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
       ? (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.sellNum
@@ -342,15 +342,41 @@ class ProductSDK {
   /**
    * @todo [拿到单个商品的价格，有改价返回改价，有会员价返回会员价，没有就原价]
    */
-  public getProductItemPrice = (product: ProductCartInterface.ProductCartInfo) => {
-    if (product.changePrice !== undefined) {
-      return product.changePrice;
+  public getProductItemPrice = (product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo) => {
+    // if (product.changePrice !== undefined) {
+    //   return product.changePrice;
+    // }
+    let discountPrice = product.price;
+    if (product.activityInfos && product.activityInfos.length > 0) {
+      for (let i = 0; i < product.activityInfos.length; i++) {
+        if (product.activityInfos[i].discountPrice < discountPrice) {
+          discountPrice = product.activityInfos[i].discountPrice;
+        }
+      }
     }
-    if (this.member !== undefined) {
-      return product.memberPrice || product.price;
-    }
-    return product.price;
+    // if (this.member !== undefined) {
+      if (product.memberPrice !== undefined && product.memberPrice < discountPrice) {
+        return product.memberPrice
+      }
+    // }
+    return discountPrice;
   }
+
+  /**
+   * @todo [拿到单个商品的价格，有改价返回改价，有会员价返回会员价，没有就原价]
+   */
+  public getProductItemDiscountPrice = (product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo) => {
+    let discountPrice = product.price;
+    if (product.activityInfos && product.activityInfos.length > 0) {
+      for (let i = 0; i < product.activityInfos.length; i++) {
+        if (product.activityInfos[i].discountPrice < discountPrice) {
+          discountPrice = product.activityInfos[i].discountPrice;
+        }
+      }
+    }
+    return discountPrice;
+  }
+
 
   public getProductsOriginPrice = (products?: ProductCartInterface.ProductCartInfo[]) => {
     const key = this.getSortDataKey();
@@ -377,7 +403,7 @@ class ProductSDK {
     const key = this.getSortDataKey();
     const productList = products !== undefined ? products : store.getState().productSDK[key];
     const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
-      const itemPrice = item.memberPrice || item.price;
+      const itemPrice = item.memberPrice !== undefined ? item.memberPrice : item.price;
       return prevTotal + (itemPrice * item.sellNum);
     };
     const total = productList.reduce(reduceCallback, 0);
@@ -399,7 +425,7 @@ class ProductSDK {
          * @todo 如果有改价价格，则计算改价价格
          */
         if (item.changePrice !== undefined) {
-          return prevTotal + (item.changePrice * item.sellNum); 
+          return prevTotal + (item.changePrice * item.sellNum);
         }
 
         return prevTotal + (item.memberPrice * item.sellNum);
@@ -408,6 +434,17 @@ class ProductSDK {
       return total;
     } else {
       return this.getProductPrice();
+    }
+  }
+
+  public getDiscountString = (activity: any) => {
+    switch (activity.type) {
+      case 1:
+        return `${activity.discountAmount}折${activity.limitNum && activity.limitNum > 0 ? ` 限${activity.limitNum}件` : ``}`;
+      case 2:
+          return `优惠${activity.discountAmount}元${activity.limitNum && activity.limitNum > 0 ? ` 限${activity.limitNum}件` : ``}`;
+      default:
+        return ``;
     }
   }
 
@@ -432,7 +469,7 @@ class ProductSDK {
     const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
     store.dispatch({
       type: this.reducerInterface.RECEIVE_ORDER_PAY,
-      payload: {productList}
+      payload: { productList }
     });
   }
 
@@ -455,12 +492,31 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public getProductTransPrice = () => {
-    // 计算如果有会员的话使用会员价格，如果没有会员则返回原价
-    let total: number = this.getProductMemberPrice();
-    // 抹零价格在会员价之后减去
-    total = total - this.getErase();
-    return total;
+  // public getProductTransPrice = () => {
+  //   // 计算如果有会员的话使用会员价格，如果没有会员则返回原价
+  //   let total: number = this.getProductMemberPrice();
+  //   // 抹零价格在会员价之后减去
+  //   total = total - this.getErase();
+  //   return total;
+  // }
+
+  /**
+   * @todo 获取商品交易价格
+   *
+   * @memberof ProductSDK
+   */
+  public getProductTransPrice = (products?: ProductCartInterface.ProductCartInfo[], force?: boolean): number => {
+    const hasMember = force ? force : this.member !== undefined;
+    // if (hasMember) {
+      const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+      let total = 0;
+      for (let i = 0; i < productList.length; i ++) {
+        total += this.getProductItemPrice(productList[i]) * productList[i].sellNum;
+      }
+      return total;
+    // } else {
+    //   return this.getProductPrice();
+    // }
   }
 
   /**
@@ -478,22 +534,24 @@ class ProductSDK {
    */
   public getProductInterfacePayload = (products?: ProductCartInterface.ProductCartInfo[], address?: MerchantInterface.Address, payOrderDetail?: any): ProductCartInterface.ProductPayPayload => {
     const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
 
     let order: Partial<ProductCartInterface.ProductOrderPayload> = {
       address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
       deliveryPhone: '',
-      delivery_time: payOrderDetail.delivery_time || '',
+      planDeliveryTime: payOrderDetail.planDeliveryTime || '',
       deliveryType: payOrderDetail.deliveryType || 0,
+      deliveryFee: payOrderDetail.deliveryType === 1 ? 3.5 : 0,
       remark: payOrderDetail.remark || "",
       payType: 8,
-      merchantId: 1,
+      merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1,
       discount: 0,
       erase: this.getErase(),
       memberId: this.member !== undefined ? this.member.id : -1,
       orderSource: 3,
-      totalAmount: this.getProductPrice(),
+      totalAmount: this.getProductsOriginPrice() + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
       totalNum: this.getProductNumber(),
-      transAmount: this.getProductTransPrice(),
+      transAmount: this.getProductTransPrice() + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
     }
 
     if (payOrderDetail.deliveryType === 1) {
@@ -510,7 +568,7 @@ class ProductSDK {
         /**
          * @todo [默认会员价，有就用会员价，没有就用普通价格]
          */
-        const itemPrice: number = item.memberPrice || item.price;
+        const itemPrice: number = item.memberPrice !== undefined ? item.memberPrice : item.price;
         return {
           productId: item.id,
           productName: item.name,
@@ -550,21 +608,21 @@ class ProductSDK {
     return result;
   }
 
-  public isWeighProduct (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): product is ProductCartInterface.ProductCartInfo {
+  public isWeighProduct(product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): product is ProductCartInterface.ProductCartInfo {
     return product.saleType === 1;
   }
 
-  public isCartProduct (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): product is ProductCartInterface.ProductCartInfo {
-    return product !== undefined && (<ProductCartInterface.ProductCartInfo> product).sellNum !== undefined;
+  public isCartProduct(product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): product is ProductCartInterface.ProductCartInfo {
+    return product !== undefined && (<ProductCartInterface.ProductCartInfo>product).sellNum !== undefined;
   }
 
-  public isNonBarcodeProduct (product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): boolean {
+  public isNonBarcodeProduct(product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): boolean {
     return String(product.id).startsWith(this.nonBarcodeKey);
   }
 
   public changeProduct = (
-    product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, 
-    sellNum?: number, 
+    product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo,
+    sellNum?: number,
     changePrice?: number,
     sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND,
   ) => {
@@ -586,12 +644,12 @@ class ProductSDK {
    * @memberof ProductSDK
    */
   public add = (
-    product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, 
-    sellNum?: number, 
+    product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo,
+    sellNum?: number,
     suspension?: number,
-    sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND | ProductCartInterface.PAYLOAD_PURCHASE 
+    sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND | ProductCartInterface.PAYLOAD_PURCHASE
       = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER,
-      num?: number,
+    num?: number,
   ) => {
     Taro.showToast({
       title: '加入购物车'
@@ -611,6 +669,77 @@ class ProductSDK {
       };
       store.dispatch(reducer);
     } else {
+      const state = store.getState();
+      const productCartList = state.productSDK.productCartList;
+      const index = productCartList.findIndex(p => p.id === product.id);
+      let limitNum = -1;
+      if (product.activityInfos) {
+        for (let i = 0; i < product.activityInfos.length; i++) {
+          if (product.activityInfos[i].limitNum) {
+            if (product.activityInfos[i].limitNum < limitNum || limitNum === -1) {
+              limitNum === product.activityInfos[i].limitNum;
+            }
+          }
+        }
+      }
+
+      if (num) {
+        if (index !== -1) {
+          if (limitNum !== -1 && (productCartList[index].sellNum + num) > limitNum) {
+            Taro.showToast({
+              title: `部分商品超过限购件数`,
+              icon: 'none'
+            });
+            num = (limitNum - productCartList[index].sellNum);
+          }
+
+          if ((productCartList[index].sellNum + num) > product.saleNumber) {
+            Taro.showToast({
+              title: `部分商品超过库存`,
+              icon: 'none'
+            });
+            num = product.saleNumber - productCartList[index].sellNum;
+          }
+        } else {
+          if (num > product.saleNumber) {
+            Taro.showToast({
+              title: `部分商品超过库存`,
+              icon: 'none'
+            });
+            num = product.saleNumber;
+          }
+        }
+      } else {
+        if (index !== -1) {
+          if (limitNum !== -1 && (productCartList[index].sellNum + 1) > limitNum) {
+            Taro.showToast({
+              title: `限购${product.limitNum}份，不可再增加`,
+              icon: 'none'
+            });
+            return;
+          }
+          if ((productCartList[index].sellNum + 1) > product.saleNumber) {
+            Taro.showToast({
+              title: `此商品仅剩${product.saleNumber}份，不可再增加`,
+              icon: 'none'
+            });
+            return;
+          }
+        } else {
+          if (product.saleNumber === 0) {
+            Taro.showToast({
+              title: `该商品没有库存了`,
+              icon: 'none'
+            });
+            return;
+          }
+        }
+      }
+
+      if (num === 0) {
+        return;
+      }
+
       const reducer: ProductSDKReducer.ProductManageCart = {
         type: this.reducerInterface.MANAGE_CART_PRODUCT,
         payload: {
@@ -632,9 +761,9 @@ class ProductSDK {
    * @memberof ProductSDK
    */
   public reduce = (
-    product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, 
-    sellNum?: number, 
-    suspension?: number, 
+    product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo,
+    sellNum?: number,
+    suspension?: number,
     sort: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER
   ) => {
     if (this.isWeighProduct(product)) {
@@ -729,25 +858,25 @@ class ProductSDK {
   public closeNonBarcodeModal = () => {
     store.dispatch({
       type: this.reducerInterface.CHANGE_NON_BARCODE_PRODUCT,
-      payload: {nonBarcodeProduct: {}}
+      payload: { nonBarcodeProduct: {} }
     });
   }
 
   public closeWeightModal = () => {
     store.dispatch({
       type: this.reducerInterface.CHANGE_WEIGHT_PRODUCT_MODAL,
-      payload: {product: {}}
+      payload: { product: {} }
     });
   }
 
   public changeProductVisible = (
-    visible: boolean, 
-    product?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, 
+    visible: boolean,
+    product?: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo,
     sort: string = this.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER,
   ) => {
     const reducer: ProductSDKReducer.Reducers.ChangeProductVisible = {
       type: this.reducerInterface.CHANGE_PRODUCT_VISIBLE,
-      payload: { 
+      payload: {
         visible,
         product,
         sort,
@@ -755,7 +884,7 @@ class ProductSDK {
     };
     store.dispatch(reducer);
   }
-  
+
   public cashierOrder = async (params: ProductCartInterface.ProductPayPayload) => {
     const result = await ProductService.cashierOrder(params);
     return result;
@@ -778,7 +907,7 @@ class ProductSDK {
     this.preparePayOrderDetail({} as any)
     console.log('result callback', result)
     const { order } = result;
-    Taro.navigateTo({
+    Taro.redirectTo({
       url: `/pages/order/order.detail?id=${order.orderNo}`
     })
   }
@@ -786,23 +915,23 @@ class ProductSDK {
   public scanProduct = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return new Promise((resolve) => {
       Taro
-      .scanCode()
-      .then(async (barcode) => {
-        Taro.showLoading();
-        const payload: ProductInterface.ProductInfoScanGetFetchFidle = {
-          barcode: barcode.result
-        };
-        const result = await productService.productInfoScan(payload);
-        Taro.hideLoading();
-        resolve({
-          ...result,
-          data: {
-            ...result.data || {},
+        .scanCode()
+        .then(async (barcode) => {
+          Taro.showLoading();
+          const payload: ProductInterface.ProductInfoScanGetFetchFidle = {
             barcode: barcode.result
-          }
-        });
-      })
-      .catch(error => resolve(error));
+          };
+          const result = await productService.productInfoScan(payload);
+          Taro.hideLoading();
+          resolve({
+            ...result,
+            data: {
+              ...result.data || {},
+              barcode: barcode.result
+            }
+          });
+        })
+        .catch(error => resolve(error));
     });
   }
 }
