@@ -15,9 +15,9 @@ import dayjs from 'dayjs'
 import productSdk from '../../common/sdk/product/product.sdk';
 import CostomModal from '../../component/login/modal';
 import merchantAction from '../../actions/merchant.action';
+import ProductPayListView from '../../component/product/product.pay.listview'
 
 const cssPrefix = 'order-detail';
-const productCssPrefix = 'product';
 
 interface Props {
   orderDetail: OrderInterface.OrderDetail;
@@ -208,6 +208,18 @@ class OrderDetail extends Taro.Component<Props, State> {
               url: `/pages/cart/cart`
             });
           }, 1000);
+        } else {
+          if (res.msg) {
+            Taro.showToast({
+              title: res.msg,
+              icon: 'none'
+            });
+          } else {
+            Taro.showToast({
+              title: '获取商品失败',
+              icon: 'none'
+            });
+          }
         }
       }
     }
@@ -371,11 +383,11 @@ class OrderDetail extends Taro.Component<Props, State> {
 
           <View className={`${cssPrefix}-card-logistics-item-info`}>
             <Text className={`${cssPrefix}-card-logistics-item-info-title`}>
-              {order.deliveryType == 0 ? '到店自提时间' : '配送时间'}
+              {order && order.deliveryType == 0 ? '到店自提时间' : '配送时间'}
             </Text>
             <Text className={`${cssPrefix}-card-logistics-item-info-content`}>
               {
-                order.deliveryType == 0
+                order && order.deliveryType == 0
                   ? (order.planDeliveryTime || '未设置')
                   : order.planDeliveryTime && order.planDeliveryTime.length > 0
                     ? order.planDeliveryTime
@@ -393,7 +405,7 @@ class OrderDetail extends Taro.Component<Props, State> {
             })}
         >
           {
-            order.deliveryType == 0
+            order && order.deliveryType == 0
               ? (
                 <Image
                   src='//net.huanmusic.com/weapp/icon_order_shop.png'
@@ -414,12 +426,12 @@ class OrderDetail extends Taro.Component<Props, State> {
 
               className={classnames(
                 {
-                  [`${cssPrefix}-card-logistics-item-info-content`]: order.deliveryType !== 0,
-                  [`${cssPrefix}-card-logistics-item-info-title`]: order.deliveryType === 0,
+                  [`${cssPrefix}-card-logistics-item-info-content`]: order && order.deliveryType !== 0,
+                  [`${cssPrefix}-card-logistics-item-info-title`]: order && order.deliveryType === 0,
                 })}
             >
               {
-                order.deliveryType == 0
+                order && order.deliveryType == 0
                   ? order.merchantName && order.merchantName.length
                     ? order.merchantName
                     : '未获取到商店名称'
@@ -431,12 +443,12 @@ class OrderDetail extends Taro.Component<Props, State> {
             <Text
               className={classnames(
                 {
-                  [`${cssPrefix}-card-logistics-item-info-content`]: order.deliveryType === 0,
-                  [`${cssPrefix}-card-logistics-item-info-title`]: order.deliveryType !== 0,
+                  [`${cssPrefix}-card-logistics-item-info-content`]: order && order.deliveryType === 0,
+                  [`${cssPrefix}-card-logistics-item-info-title`]: order && order.deliveryType !== 0,
                 })}
             >
               {
-                order.deliveryType == 0
+                order && order.deliveryType == 0
                   ? order.merchantAddress && order.merchantAddress.length > 0
                     ? order.merchantAddress
                     : '未获取到商店地址'
@@ -453,160 +465,21 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   private renderProductList() {
     const { orderDetail } = this.props;
-    const { orderDetailList, order } = orderDetail;
-    const price = numeral(orderDetail.order.transAmount).format('0.00');
-    const discountPrice = numeral(order.totalAmount - order.transAmount).format('0.00');
+    const { orderDetailList } = orderDetail;
     return (
-      <View className={`${cssPrefix}-card`}>
-        <View className={`${cssPrefix}-card-products-header`}>
-          <View className={`${cssPrefix}-card-products-header-item`}>
-            <Text className={`${cssPrefix}-card-products-header-shop`}>{order.merchantName || '未知商店'}</Text>
-            {/* <Image
-              className={`${cssPrefix}-card-products-header-next`}
-              src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
-            /> */}
-          </View>
-          <View className={`${cssPrefix}-card-products-header-item`} onClick={() => { this.setState({ callModal: true }) }}>
-            <Image
-              className={`${cssPrefix}-card-products-header-phone`}
-              src={'//net.huanmusic.com/weapp/icon_order_phone.png'}
-            />
-            <Text className={`${cssPrefix}-card-products-header-green`}>联系商家</Text>
-          </View>
-        </View>
-        {
-          orderDetailList && orderDetailList.length > 0 && orderDetailList.map((item, index) => {
-            return (
-              <View
-                key={index}
-                className={classnames(`${productCssPrefix}-row ${productCssPrefix}-row-content`, {
-                  // [`container-border`]: index !== (productList.length - 1)
-                })}
-              >
-                <View className={`${productCssPrefix}-row-box`}>
-                  <View
-                    className={`${productCssPrefix}-row-cover`}
-                    style={`background-image: url(${item.picUrl || '//net.huanmusic.com/scanbar-c/v1/pic_nopicture.png'})`}
-                  />
-                  <View className={`${productCssPrefix}-row-content ${productCssPrefix}-row-content-box`}>
-                    <Text className={`${productCssPrefix}-row-name`}>{item.productName}</Text>
-                    <Text className={`${productCssPrefix}-row-normal`}>{`x ${item.num}`}</Text>
-                    <View className={`${productCssPrefix}-row-corner`}>
-                      <Text className={`${productCssPrefix}-price`}>{this.renderPrice(item.transAmount)}</Text>
-                      {
-                        item.totalAmount !== item.transAmount && (
-                          <Text className={`${productCssPrefix}-row-corner-origin`}>{`￥${numeral(item.totalAmount).format('0.00')}`}</Text>
-                        )
-                      }
-                    </View>
-                  </View>
-                </View>
-              </View>
-            )
-          })
-        }
-
-        {
-          order.deliveryType !== 0 && (
-            <View className={`${productCssPrefix}-row-totals`}>
-              <View className={`${productCssPrefix}-row-content-item`}>
-                <Text className={`${productCssPrefix}-row-voucher`}>配送费</Text>
-                <View>
-                  <Text
-                    className={
-                      `${productCssPrefix}-row-content-price ${productCssPrefix}-row-content-price-black`
-                    }
-                  >
-                    ￥{numeral(order.deliveryFee || 3.5).format('0.00')}
-                  </Text>
-                  <Image
-                    className={`${cssPrefix}-card-products-header-next`}
-                    src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
-                  />
-                </View>
-              </View>
-            </View>
-          )
-        }
-        {/* <View className={`${productCssPrefix}-row-totals`}>
-          <View className={`${productCssPrefix}-row-content-item ${productCssPrefix}-row-content-column`}>
-            <View className={`${productCssPrefix}-row-content-column-item`}>
-              <View className={classnames(
-                `${productCssPrefix}-row-content-row`,
-                {
-                  [`${productCssPrefix}-row-content-row-top`]: true,
-                })}
-              >
-                <View
-                  className={classnames(
-                    `${productCssPrefix}-row-discount`,
-                    {
-                      [`${productCssPrefix}-row-discount-full`]: true,
-                      [`${productCssPrefix}-row-discount-first`]: false,
-                    })}
-                >满减</View>
-                <Text className={`${productCssPrefix}-row-discount-title`}>满500减20</Text>
-              </View>
-              <Text className={`${productCssPrefix}-row-content-price`}>-￥20</Text>
-            </View>
-            <View className={`${productCssPrefix}-row-content-column-item`}>
-              <View className={`${productCssPrefix}-row-content-row`}>
-                <View
-                  className={classnames(
-                    `${productCssPrefix}-row-discount`,
-                    {
-                      [`${productCssPrefix}-row-discount-full`]: false,
-                      [`${productCssPrefix}-row-discount-first`]: true,
-                    })}
-                >首单</View>
-                <Text className={`${productCssPrefix}-row-discount-title`}>首单立减10元</Text>
-              </View>
-              <Text className={`${productCssPrefix}-row-content-price`}>-￥20</Text>
-            </View>
-          </View>
-        </View>
-
-        <View className={`${productCssPrefix}-row-totals`}>
-          <View className={`${productCssPrefix}-row-content-item`}>
-            <Text className={`${productCssPrefix}-row-voucher`}>抵用券</Text>
-            <View>
-              <Text className={`${productCssPrefix}-row-content-price`}>-￥20</Text>
-              <Image
-                className={`${cssPrefix}-card-products-header-next`}
-                src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
-              />
-            </View>
-          </View>
-        </View> */}
-
-        <View className={`${productCssPrefix}-row-totals`}>
-          <View className={`${productCssPrefix}-row-content-item`}>
-            <View></View>
-
-            {/* <Price
-              preText={`已优惠￥${numeral(order.totalAmount - order.transAmount).format('0.00')}   合计：`}
-              priceColor='#333333'
-              price={numeral(orderDetail.order.transAmount).format('0.00')}
-            /> */}
-
-            <View className={`${productCssPrefix}-row-tran`}>
-              <Text className={`${productCssPrefix}-row-tran`}>{`已优惠￥ ${discountPrice}`}</Text>
-              <Text className={`${productCssPrefix}-row-tran ${productCssPrefix}-row-tran-margin`}>{`合计：`}</Text>
-              <Text className={`${productCssPrefix}-row-tran-price`}>￥</Text>
-              <Text className={`${productCssPrefix}-row-tran-price ${productCssPrefix}-row-tran-big `}>{price.split('.')[0]}</Text>
-              <Text className={`${productCssPrefix}-row-tran-price`}>{`.${price.split('.')[1]}`}</Text>
-            </View>
-          </View>
-        </View>
-
-      </View>
+      <ProductPayListView
+        productList={orderDetailList}
+        type={1}
+        padding={false}
+        showCallModal={() => {this.setState({ callModal: true })}}
+      />
     )
   }
 
   private renderOrderCard() {
     const { orderDetail } = this.props;
     const { order } = orderDetail;
-    const items: any[] = true && [
+    const items: any[] = order && [
       {
         title: '订单号码',
         extraText: `${order.orderNo}`,
@@ -628,7 +501,7 @@ class OrderDetail extends Taro.Component<Props, State> {
     return (
       <View className={`${cssPrefix}-card ${cssPrefix}-card-order`}>
         {
-          items.map((item: any) => {
+          items && items.length > 0 && items.map((item: any) => {
             return (
               <View
                 className={classnames(`${cssPrefix}-card-order-item`, {

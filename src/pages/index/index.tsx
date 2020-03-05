@@ -8,14 +8,12 @@ import ProductListView from '../../component/product/product.listview'
 import ProductMenu from '../../component/product/product.menu'
 import IndexAddress from './component/address'
 import invariant from 'invariant'
-import { ProductAction } from '../../actions'
+import { ProductAction, MerchantAction } from '../../actions'
 import { ResponseCode, ProductInterface } from '../../constants'
 import { LoginManager } from '../../common/sdk'
 import WeixinSdk from '../../common/sdk/weixin/weixin'
-import LoginModal from '../../component/login/login.modal'
 import productSdk from '../../common/sdk/product/product.sdk'
 import orderAction from '../../actions/order.action'
-import merchantAction from '../../actions/merchant.action'
 
 const cssPrefix = 'product';
 
@@ -52,7 +50,6 @@ class Index extends Component<any> {
         this.init();
         return;
       }
-      this.init();
       productSdk.refreshCartNumber();
     } catch (error) {
       Taro.showToast({
@@ -67,6 +64,7 @@ class Index extends Component<any> {
     // if (result.success && (!result.result.phone || result.result.phone.length === 0)) {
     //   this.setState({ isOpen: true });
     // }
+    this.init();
     orderAction.orderAllStatus();
   }
 
@@ -86,7 +84,7 @@ class Index extends Component<any> {
 
   public init = async (): Promise<void> => {
     try {
-      merchantAction.merchantList();
+      MerchantAction.merchantList();
       WeixinSdk.initAddress();
       const productTypeResult = await ProductAction.productInfoType();
       invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
@@ -112,7 +110,7 @@ class Index extends Component<any> {
 
   public fetchData = async (type: any) => {
     this.setState({ loading: true });
-    const result = await ProductAction.productOrderInfoList({ type: `${type.id}`, status: 0, saleType: 0 } as any);
+    const result = await ProductAction.productInfoList({ type: `${type.id}`, status: 0, saleType: 0 } as any);
     this.setState({ loading: false });
     return result;
   }
@@ -129,7 +127,7 @@ class Index extends Component<any> {
   }
 
   render() {
-    const { currentType, isOpen, loading } = this.state;
+    const { currentType, loading } = this.state;
     const { productList, productType } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>

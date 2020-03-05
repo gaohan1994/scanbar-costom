@@ -1,15 +1,14 @@
 import Taro, { Config } from '@tarojs/taro'
 import { View, Button, Image, Text } from '@tarojs/components'
-import LoginButton from '../../common/sdk/sign/login.button';
 import WeixinSDK from '../../common/sdk/weixin/weixin';
 import './index.less';
 import "../../component/card/form.card.less";
 import invariant from 'invariant';
 import { LoginManager } from '../../common/sdk';
-import merchantAction from '../../actions/merchant.action';
 import { ResponseCode } from '../../constants';
 import LoginModal from '../../component/login/login.modal';
 import GetUserinfoModal from '../../component/login/login.userinfo';
+import { UserAction } from '../../actions';
 
 
 const Rows = [
@@ -119,7 +118,7 @@ class User extends Taro.Component<Props, State> {
         nickname: result.result.nickName,
       }
       if (userinfo && userinfo.phone && userinfo.phone.length > 0) {
-        const saveResult: any = await merchantAction.wxUserInfoSave(newUserinfo);
+        const saveResult: any = await UserAction.userInfoSave(newUserinfo);
         invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
       }
 
@@ -192,7 +191,7 @@ class User extends Taro.Component<Props, State> {
                           // onGetUserInfo={() => this.getWxInfo(true)}
                           className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
                         >
-                          点击登录
+                          点击获取微信头像和昵称
                   </View>
                     }
                     <View className={`${cssPrefix}-user-phone`}>{userinfo.phone}</View>

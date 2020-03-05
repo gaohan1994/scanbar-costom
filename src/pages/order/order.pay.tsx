@@ -12,9 +12,8 @@ import numeral from 'numeral'
 import PickAddress from './component/address'
 import invariant from 'invariant'
 import dayJs from 'dayjs'
-import { MerchantInterface, ResponseCode, OrderInterface } from '../../constants'
+import { ResponseCode, OrderInterface, UserInterface } from '../../constants'
 import FormCard from '../../component/card/form.card'
-import LoginModal from '../../component/login/login.modal'
 import { AtFloatLayout } from 'taro-ui'
 import ProductMenu from '../../component/product/product.menu'
 import classnames from 'classnames';
@@ -25,12 +24,11 @@ const closeTime = 24;
 
 type Props = {
   payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
-  payOrderAddress: MerchantInterface.Address;
+  payOrderAddress: UserInterface.Address;
   payOrderDetail: any;
 }
 
 type State = {
-  isOpen: boolean;
   showTimeSelect: boolean;
   currentDate: any;
   selectDate: any;
@@ -221,9 +219,9 @@ class Page extends Taro.Component<Props, State> {
 
   render() {
     const { payOrderProductList, payOrderDetail } = this.props;
-    const { isOpen, showTimeSelect, currentDate, selectDate, selectTime, timeList, dateList } = this.state;
+    const { showTimeSelect, currentDate, selectDate, selectTime, timeList, dateList } = this.state;
     const price = payOrderProductList && payOrderProductList.length > 0
-      ? numeral(productSdk.getProductPrice(payOrderProductList)).format('0.00')
+      ? numeral(productSdk.getProductTransPrice(payOrderProductList)).format('0.00')
       : '0.00';
     const tarnsPrice = payOrderProductList && payOrderProductList.length > 0
       ? numeral(productSdk.getProductTransPrice(payOrderProductList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)).format('0.00')
@@ -299,22 +297,6 @@ class Page extends Taro.Component<Props, State> {
                 })
               }
             </ScrollView>
-            {/* <View className={`${cssPrefix}-modal-list`}>
-              {
-                timeList && timeList.length > 0 && timeList.map((time: string) => {
-                  return (
-                    <View
-                      onClick={() => { this.onTimeClick(time) }}
-                      className={classnames(`${cssPrefix}-modal-list-item `, {
-                        [`${cssPrefix}-modal-list-select`]: selectTime === time,
-                      })}
-                    >
-                      {time}
-                    </View>
-                  )
-                })
-              }
-            </View> */}
           </View>
         </AtFloatLayout>
       </View>

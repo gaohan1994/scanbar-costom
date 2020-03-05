@@ -4,14 +4,12 @@ import './product.less';
 import { ProductInterface } from '../../constants';
 import { connect } from '@tarojs/redux';
 import { AppReducer } from '../../reducers';
-import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
-import classnames from 'classnames';
+import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 
 const cssPrefix = 'component-product';
 interface Props { 
   product: ProductInterface.ProductInfo;
   productInCart?: ProductCartInterface.ProductCartInfo;
-  sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
 }
 
 class ProductManageComponent extends Taro.Component<Props> {
@@ -24,7 +22,7 @@ class ProductManageComponent extends Taro.Component<Props> {
   }
 
   render () {
-    const { product, sort } = this.props;
+    const { product } = this.props;
     return (
       <View 
         className={`${cssPrefix}-manage ${cssPrefix}-border`}
@@ -55,14 +53,7 @@ class ProductManageComponent extends Taro.Component<Props> {
   }
 
   private renderCorner = () => {
-    const { product, sort } = this.props;
-    if (sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE) {
-      return (
-        <View className={`${cssPrefix}-manage-corner`}>
-          stepper
-        </View>
-      );
-    }
+    const { product } = this.props;
 
     return (
       <View className={`${cssPrefix}-manage-corner`}>
@@ -73,9 +64,8 @@ class ProductManageComponent extends Taro.Component<Props> {
 }
 
 const select = (state: AppReducer.AppState, ownProps: Props) => {
-  const { product, sort } = ownProps;
-  const productKey = productSdk.getSortDataKey(sort);
-  const productList = state.productSDK[productKey];
+  const { product } = ownProps;
+  const productList = state.productSDK.productCartList;
   const productInCart = product !== undefined && productList.find(p => p.id === product.id);
   return {
     product,

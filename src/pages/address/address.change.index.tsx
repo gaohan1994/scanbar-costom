@@ -4,9 +4,8 @@ import { View, Image } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
 import { AppReducer } from '../../reducers'
-import merchantAction from '../../actions/merchant.action'
-import { getAddressList, getCurrentPostion } from '../../reducers/app.merchant'
-import { MerchantInterface } from '../../constants'
+import { getAddressList, getCurrentPostion } from '../../reducers/app.user'
+import { UserInterface } from '../../constants'
 import AddressItem from '../../component/address/item'
 import ButtonFooter from '../../component/button/button.footer';
 import WeixinSdk from '../../common/sdk/weixin/weixin'
@@ -15,12 +14,13 @@ import './index.less'
 import GetUserinfoModal from '../../component/login/login.userinfo'
 import LoginModal from '../../component/login/login.modal'
 import { LoginManager } from '../../common/sdk'
+import { UserAction } from '../../actions'
 
 const prefix = 'address'
 
 type Props = {
-  addressList: MerchantInterface.Address[];
-  currentPostion: MerchantInterface.Address;
+  addressList: UserInterface.Address[];
+  currentPostion: UserInterface.Address;
 }
 type State = {
   getUserinfoModal: boolean;
@@ -39,10 +39,10 @@ class Page extends Taro.Component<Props, State> {
   }
 
   componentDidShow() {
-    merchantAction.addressList();
+    UserAction.addressList();
   }
 
-  public onAddressClick = (address: MerchantInterface.Address) => {
+  public onAddressClick = (address: UserInterface.Address) => {
     WeixinSdk.changeCostomIndexAddress(address);
     Taro.navigateBack({})
   }

@@ -13,7 +13,6 @@ interface Props {
   product: ProductInterface.ProductInfo;
   direct?: boolean;
   productInCart?: ProductCartInterface.ProductCartInfo;
-  sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
   last?: boolean;
   isHome?: boolean;
 }
@@ -45,23 +44,12 @@ class ProductComponent extends Taro.Component<Props, State> {
     });
   }
 
-  /**
-   * @todo [新增商品点击改价]
-   *
-   * @memberof ProductComponent
-   */
-  public changePriceModal = () => {
-    const { productInCart, product, sort } = this.props;
-    const payloadProduct = productInCart !== undefined ? productInCart : product;
-    productSdk.changeProductVisible(true, payloadProduct, sort);
-  }
-
   public manageProduct = (type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce, e: any) => {
     if (e.stopPropagation) {
       e.stopPropagation();
     }
-    const { product, sort } = this.props;
-    productSdk.manage({ type, product, sort });
+    const { product } = this.props;
+    productSdk.manage({ type, product });
   }
 
   public onContentClick = () => {
@@ -93,15 +81,13 @@ class ProductComponent extends Taro.Component<Props, State> {
   }
 
   render() {
-    const { product, sort, last, isHome } = this.props;
-    const showManageDetailToken =
-      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
-      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE;
+    const { product, last, isHome } = this.props;
     return (
       <View
         className={classnames(`${cssPrefix}-border`, {
-          [`${cssPrefix} `]: !showManageDetailToken,
-          [`${cssPrefix}-manage`]: showManageDetailToken,
+          // [`${cssPrefix} `]: !showManageDetailToken,
+          // [`${cssPrefix}-manage`]: showManageDetailToken,
+          [`${cssPrefix}`]: true,
           [`${cssPrefix}-last`]: last,
           [`${cssPrefix}-full`]: isHome !== undefined && isHome === false,
         })}
@@ -134,10 +120,7 @@ class ProductComponent extends Taro.Component<Props, State> {
   }
 
   private renderDetail = () => {
-    const { product, sort } = this.props;
-    const showManageDetailToken =
-      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE ||
-      sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_MANAGE;
+    const { product } = this.props;
 
     return (
       <View className={classnames(`${cssPrefix}-content-detail`)}>
@@ -171,33 +154,8 @@ class ProductComponent extends Taro.Component<Props, State> {
             })
           }
         </View>
-        {showManageDetailToken
-          ? (
-            <View className={classnames(`${cssPrefix}-content-detail-box`)}>
-              <Text className={`${cssPrefix}-manage-font`}>进价: ￥{product.cost}</Text>
-              {sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_PURCHASE
-                ? (
-                  <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
-                    库存: {product.saleNumber}
-                  </Text>
-                )
-                : (
-                  <Text className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
-                    售价: ￥{product.price}
-                  </Text>
-                )}
-            </View>
-          )
-          : sort === productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_STOCK
-            ? (
-              <View className={classnames(`${cssPrefix}-content-detail-box`)}>
-                <Text className={`${cssPrefix}-manage-font`}>进价: ￥{numeral(product.cost).format('0.00')}</Text>
-                <View className={`${cssPrefix}-manage-font ${cssPrefix}-manage-font-theme`}>
-                  库存：{` ${product.saleNumber || 0}${product.unit || ''}`}
-                </View>
-              </View>
-            )
-            : this.renderPrice()
+        {
+          this.renderPrice()
         }
       </View>
     );
@@ -294,9 +252,8 @@ class ProductComponent extends Taro.Component<Props, State> {
 }
 
 const select = (state: AppReducer.AppState, ownProps: Props) => {
-  const { product, sort } = ownProps;
-  const productKey = productSdk.getSortDataKey(sort);
-  const productList = state.productSDK[productKey];
+  const { product } = ownProps;
+  const productList = state.productSDK.productCartList;
   const productInCart = product !== undefined && productList.find(p => p.id === product.id);
   return {
     product,

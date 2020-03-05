@@ -1,9 +1,17 @@
+/*
+ * @Author: centerm.gaozhiying 
+ * @Date: 2020-03-04 09:02:08 
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-04 09:02:58
+ * 
+ * @todo 商品列表
+ */
 import Taro from '@tarojs/taro';
 import { ScrollView, View } from '@tarojs/components';
 import ProductComponent from './product';
 import "../../pages/style/product.less";
 import { ProductInterface } from '../../constants';
-import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
+import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import { AtActivityIndicator } from 'taro-ui';
 import classnames from 'classnames';
 import merge from 'lodash.merge'
@@ -18,7 +26,6 @@ type Props = {
   productList: Array<ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo>;
   isRenderFooter?: boolean;
   bottomSpector?: boolean;
-  sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
   isHome?: boolean;
 };
 
@@ -38,7 +45,6 @@ class ProductListView extends Taro.Component<Props> {
     productList: [],
     isRenderFooter: true,
     bottomSpector: true,
-    sort: productSdk.reducerInterface.PAYLOAD_SORT.PAYLOAD_ORDER,
   };
 
   /**
@@ -59,7 +65,7 @@ class ProductListView extends Taro.Component<Props> {
   }
 
   render () {
-    const { className, loading, productList, isRenderFooter, bottomSpector, sort, isHome } = this.props;
+    const { className, loading, productList, isRenderFooter, bottomSpector, isHome } = this.props;
     return (
       <ScrollView 
         scrollY={true}
@@ -77,7 +83,6 @@ class ProductListView extends Taro.Component<Props> {
                 >
                   <ProductComponent
                     product={product}
-                    sort={sort}
                     isHome={isHome}
                   /> 
                 </View>

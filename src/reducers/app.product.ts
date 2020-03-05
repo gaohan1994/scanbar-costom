@@ -2,8 +2,8 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-13 10:26:45 
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-01-13 11:06:36
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-03 17:42:01
  */
 
 import { ProductInterface, ProductInterfaceMap } from "../constants";
@@ -94,14 +94,6 @@ export default function productReducer (state: ProductReducer.InitState = initSt
             title: type.name
           };
         })
-      };
-    }
-
-    case ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_SUPPLIER: {
-      const { payload } = action;
-      return { 
-        ...state,
-        productSupplier: payload
       };
     }
 

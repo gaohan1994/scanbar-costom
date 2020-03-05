@@ -1,10 +1,7 @@
 import Taro, { Config } from '@tarojs/taro'
-import { View, Button, Image, Text } from '@tarojs/components'
-import LoginButton from '../../common/sdk/sign/login.button';
-import WeixinSDK from '../../common/sdk/weixin/weixin';
+import { View, Image, Text } from '@tarojs/components'
 import './index.less';
 import "../../component/card/form.card.less";
-import { AtButton } from 'taro-ui';
 
 
 const Rows = [

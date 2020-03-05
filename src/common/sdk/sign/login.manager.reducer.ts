@@ -1,13 +1,10 @@
 /*
  * @Author: Ghan 
  * @Date: 2019-11-25 16:30:14 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-28 15:18:59
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-04 09:15:14
  */
 import LoginManager, { LoginInterface } from "./login.manager";
-import { AppReducer } from "../../../reducers";
-import { ProductInterface } from "../../../constants";
-import merge from 'lodash.merge';
 
 declare namespace LoginManagerReducer {
   interface State {

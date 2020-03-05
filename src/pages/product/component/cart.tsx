@@ -15,7 +15,6 @@ const prefix = 'product-detail-component'
 interface Props { 
   product: ProductInterface.ProductInfo;
   productInCart?: ProductCartInterface.ProductCartInfo;
-  sort?: ProductCartInterface.PAYLOAD_ORDER | ProductCartInterface.PAYLOAD_REFUND;
 }
 
 class Cart extends Taro.Component<Props> {
@@ -25,8 +24,8 @@ class Cart extends Taro.Component<Props> {
   }
 
   public manageProduct = (type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce) => {
-    const { product, sort } = this.props;
-    productSdk.manage({type, product, sort});
+    const { product } = this.props;
+    productSdk.manage({type, product });
   }
 
   public renderStepper = () => {
@@ -91,9 +90,8 @@ class Cart extends Taro.Component<Props> {
 
 
 const select = (state: AppReducer.AppState, ownProps: Props) => {
-  const { product, sort } = ownProps;
-  const productKey = productSdk.getSortDataKey(sort);
-  const productList = state.productSDK[productKey];
+  const { product } = ownProps;
+  const productList = state.productSDK.productCartList;
   const productInCart = product !== undefined && productList.find(p => p.id === product.id);
   return {
     product,
