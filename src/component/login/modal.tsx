@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro';
-import { View, Button, Text } from '@tarojs/components';
+import { View, Button } from '@tarojs/components';
 import './modal.less';
 import { AtModal, AtModalContent } from 'taro-ui';
 

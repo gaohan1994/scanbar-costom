@@ -1,8 +1,8 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn add src/component/button/button --silent --no-progress
+  /usr/local/bin/node /usr/local/bin/yarn add src/actions/order.action --silent --no-progress
 
 PATH: 
-  /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/tmp/yarn--1583198804210-0.6891520331235577:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/usr/local/share/.config/yarn/link/node_modules/.bin:/usr/local/libexec/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/bin/node_modules/npm/bin/node-gyp-bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3/bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3@global/bin:/Users/gaozhiying/.rvm/rubies/ruby-2.6.3/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Library/Apple/bin:.:/Users/gaozhiying/.rvm/bin:/Library/android-sdk-macosx/tools:/Library/android-sdk-macosx/platform-tools
+  /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/tmp/yarn--1583292518354-0.9237735329499472:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/usr/local/share/.config/yarn/link/node_modules/.bin:/usr/local/libexec/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/bin/node_modules/npm/bin/node-gyp-bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3/bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3@global/bin:/Users/gaozhiying/.rvm/rubies/ruby-2.6.3/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Library/Apple/bin:.:/Users/gaozhiying/.rvm/bin:/Library/android-sdk-macosx/tools:/Library/android-sdk-macosx/platform-tools
 
 Yarn version: 
   1.17.3
@@ -14,15 +14,15 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.npm.taobao.org/src%2fcomponent/button/button: [not_found] document not found
-      at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66830:18)
+  Error: https://registry.npm.taobao.org/src%2factions/order.action: Request "https://registry.npm.taobao.org/src%2factions/order.action" returned a 405
+      at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66839:18)
       at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140464:22)
       at Request.emit (events.js:209:13)
       at Request.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141436:10)
       at Request.emit (events.js:209:13)
-      at Gunzip.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141358:12)
+      at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141358:12)
       at Object.onceWrapper (events.js:298:28)
-      at Gunzip.emit (events.js:214:15)
+      at IncomingMessage.emit (events.js:214:15)
       at endReadableNT (_stream_readable.js:1178:12)
       at processTicksAndRejections (internal/process/task_queues.js:80:21)
 

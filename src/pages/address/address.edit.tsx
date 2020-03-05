@@ -1,17 +1,15 @@
 
 import Taro, { Config } from '@tarojs/taro'
-import { View, Text } from '@tarojs/components'
+import { View } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
-import { AtButton } from 'taro-ui'
 import { AppReducer } from '../../reducers'
-import merchantAction from '../../actions/merchant.action'
-import { MerchantInterface, ResponseCode } from '../../constants'
+import { ResponseCode, UserInterface } from '../../constants'
 import WeixinSdk from '../../common/sdk/weixin/weixin'
 import './index.less'
 import Row from '../../component/address/row'
 import invariant from 'invariant'
-import dayJs from 'dayjs'
+import { UserAction } from '../../actions'
 
 const prefix = 'address'
 
@@ -99,7 +97,7 @@ class Page extends Taro.Component<Props, State> {
             const payload = {
               id: this.state.id
             }
-            const result = await merchantAction.addressDelete(payload);
+            const result = await UserAction.addressDelete(payload);
             invariant(result.code === ResponseCode.success, result.msg || ' ')
             Taro.showToast({
               title: '删除成功',
@@ -140,7 +138,7 @@ class Page extends Taro.Component<Props, State> {
       invariant(!!contact, '请输入联系人');
       invariant(!!phone, '请输入手机号');
 
-      const payload: Partial<MerchantInterface.Address> = {
+      const payload: Partial<UserInterface.Address> = {
         address,
         contact,
         houseNumber,
@@ -153,7 +151,7 @@ class Page extends Taro.Component<Props, State> {
         id,
       }
       console.log('payload: ', payload)
-      const result = await merchantAction.addressEdit(payload);
+      const result = await UserAction.addressEdit(payload);
       console.log('result: ', result)
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       Taro.showToast({

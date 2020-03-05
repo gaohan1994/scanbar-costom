@@ -7,12 +7,14 @@ import { OrderAction, ProductAction } from '../../actions';
 import classnames from 'classnames'
 import invariant from 'invariant';
 import productSdk from '../../common/sdk/product/product.sdk';
+import orderAction from '../../actions/order.action';
 
 const cssPrefix = 'component-order-item';
 
 type Props = {
   data: OrderInterface.OrderDetail;
   orderAllStatus: any[];
+  currentType?: number;
 };
 type State = {};
 
@@ -38,6 +40,7 @@ class OrderItem extends Taro.Component<Props, State> {
   }
 
   public orderCancle = async (order: OrderInterface.OrderInfo) => {
+    const { currentType } = this.props;
     const { orderNo } = order;
     const payload = {
       orderNo: orderNo
@@ -49,7 +52,7 @@ class OrderItem extends Taro.Component<Props, State> {
         title: '取消订单成功',
         icon: 'success'
       });
-      OrderAction.orderList({ pageNum: 1, pageSize: 20 });
+      OrderAction.orderList({ pageNum: 1, pageSize: 20, ...orderAction.getFetchType(currentType) });
       OrderAction.orderCount();
     } catch (error) {
       Taro.showToast({
@@ -92,7 +95,18 @@ class OrderItem extends Taro.Component<Props, State> {
               url: `/pages/cart/cart`
             });
           }, 1000);
-
+        } else {
+          if (res.msg) {
+            Taro.showToast({
+              title: res.msg,
+              icon: 'none'
+            });
+          } else {
+            Taro.showToast({
+              title: '获取商品失败',
+              icon: 'none'
+            });
+          }
         }
       }
     }
@@ -172,7 +186,7 @@ class OrderItem extends Taro.Component<Props, State> {
           </View>
 
           <View className={`${cssPrefix}-card-center-info`}>
-            {this.renderPrice(order.transAmount)}
+            {order && order.transAmount !== undefined ? this.renderPrice(order.transAmount) : this.renderPrice(0)}
             <Text className={`${cssPrefix}-card-center-info-total`}>共{order.totalNum}件</Text>
           </View>
         </View>

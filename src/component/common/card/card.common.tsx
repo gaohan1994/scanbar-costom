@@ -1,8 +1,8 @@
 /*
  * @Author: Ghan 
  * @Date: 2019-11-01 14:06:03 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-20 14:37:47
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-04 10:47:36
  */
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
@@ -25,8 +25,6 @@ export class Card extends Taro.Component<CardProps> {
   };
 
   render () {
-    const { shadow } = this.props;
-
     const CardViewProps: any = merge({}, this.props);
     delete CardViewProps.shadow;
     return (

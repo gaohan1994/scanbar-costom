@@ -4,16 +4,16 @@ import { View } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
 import { AppReducer } from '../../reducers'
-import merchantAction from '../../actions/merchant.action'
-import { getAddressList } from '../../reducers/app.merchant'
-import { MerchantInterface } from '../../constants'
+import { getAddressList } from '../../reducers/app.user'
+import { UserInterface } from '../../constants'
 import AddressItem from '../../component/address/item'
 import ButtonFooter from '../../component/button/button.footer'
 import productSdk from '../../common/sdk/product/product.sdk'
 import Empty from '../../component/empty'
+import { UserAction } from '../../actions'
 
 type Props = {
-  addressList: MerchantInterface.Address[];
+  addressList: UserInterface.Address[];
 }
 
 type State = {
@@ -38,10 +38,10 @@ class Page extends Taro.Component<Props, State> {
   }
 
   componentDidShow () {
-    merchantAction.addressList();
+    UserAction.addressList();
   }
 
-  public onAddressClick = (address: MerchantInterface.Address) => {
+  public onAddressClick = (address: UserInterface.Address) => {
     const { entry } = this.state;
 
     if (entry === 'order.pay') {

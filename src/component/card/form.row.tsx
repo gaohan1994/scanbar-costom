@@ -1,17 +1,17 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-05 14:41:35 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-27 10:59:16
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-04 10:42:32
  * 
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
 import Taro from '@tarojs/taro';
-import { View, Image, Text } from '@tarojs/components';
+import { View, Image } from '@tarojs/components';
 import classnames from 'classnames';
 import './style.sass';
 import './form.card.less';
-import { AtButton, AtInput } from 'taro-ui';
+import { AtInput } from 'taro-ui';
 
 interface ListRowButton {
   onPress: () => void;

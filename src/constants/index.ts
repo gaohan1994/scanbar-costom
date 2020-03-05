@@ -1,14 +1,11 @@
 /**
  * @Author: Ghan 
  * @Date: 2019-11-11 10:00:37 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-11-14 14:49:01
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-03 17:12:18
  * 
  * @todo [类型定义库]
  */
-
-export { default as MemberService } from './member/member.service';
-export { MemberInterface, default as MemberInterfaceMap } from './member/member';
 
 export { default as ProductService } from './product/product.service';
 export { ProductInterface, default as ProductInterfaceMap } from './product/product';
@@ -16,14 +13,12 @@ export { ProductInterface, default as ProductInterfaceMap } from './product/prod
 export { default as OrderService } from './order/order.service';
 export { OrderInterface, default as OrderInterfaceMap } from './order/order';
 
-export { default as InventoryService } from './inventory/inventory.service';
-export { InventoryInterface, default as InventoryInterfaceMap } from './inventory/inventory';
 
 export { default as MerchantService } from './merchant/merchant.service';
 export { MerchantInterface, default as MerchantInterfaceMap } from './merchant/merchant';
 
-export { default as ReportService } from './report/report.service';
-export { ReportInterface, default as ReportInterfaceMap } from './report/report';
+export { default as UserService } from './user/user.service';
+export { UserInterface, default as UserInterfaceMap } from './user/user';
 
 export const ResponseCode = {
   success: 'response.success',
