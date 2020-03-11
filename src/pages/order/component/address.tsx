@@ -3,7 +3,7 @@ import { View, Image } from '@tarojs/components'
 import './index.less'
 import '../../../component/product/product.less'
 import classnames from 'classnames'
-import { MerchantInterface } from '../../../constants'
+import { MerchantInterface, UserInterface } from '../../../constants'
 import { connect } from '@tarojs/redux'
 import productSdk from '../../../common/sdk/product/product.sdk';
 import { AppReducer } from '../../../reducers'
@@ -11,7 +11,8 @@ import numeral from 'numeral'
 import AddressItem from '../../../component/address/item'
 import { getPayOrderAddress } from '../../../common/sdk/product/product.sdk.reducer'
 import merchantAction from '../../../actions/merchant.action'
-import { getMerchantDistance, getCurrentPostion, getCurrentMerchantDetail } from '../../../reducers/app.merchant'
+import { getMerchantDistance, getCurrentMerchantDetail } from '../../../reducers/app.merchant'
+import { getCurrentPostion } from '../../../reducers/app.user'
 
 const tabs = [
   {
@@ -27,7 +28,7 @@ const tabs = [
 const prefix = 'order-component-address'
 
 type Props = {
-  payOrderAddress: MerchantInterface.Address;
+  payOrderAddress: UserInterface.Address;
   merchantDistance: MerchantInterface.Distance;
   currentMerchantDetail: MerchantInterface.MerchantDetail;
   currentPostion: any;

@@ -1,3 +1,9 @@
+/*
+ * @Author: centerm.gaozhiying 
+ * @Date: 2020-03-03 17:44:36 
+ * @Last Modified by:   centerm.gaozhiying 
+ * @Last Modified time: 2020-03-03 17:44:36 
+ */
 import { ResponseCode, ProductInterfaceMap, ProductInterface, ProductService } from '../constants/index';
 import { store } from '../app';
 import Taro from '@tarojs/taro';
@@ -6,20 +12,12 @@ const CentermProductSearchKey = 'CentermProductSearchKeyC';
 
 class ProductAction {
 
+  /**
+   * @todo 获取商品列表
+   *
+   * @memberof ProductAction
+   */
   public productInfoList = async (params?: ProductInterface.ProductInfoListFetchFidle) => {
-    const result = await ProductService.productInfoList(params);
-    if (result.code === ResponseCode.success) {
-      store.dispatch({
-        type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_MANAGE_LIST,
-        payload: result.data
-      });
-      return { success: true, result: result.data };
-    } else {
-      return { success: false, result: result.msg };
-    }
-  }
-
-  public productOrderInfoList = async (params?: ProductInterface.ProductInfoListFetchFidle) => {
     const result = await ProductService.productInfoList(params);
     if (result.code === ResponseCode.success) {
       store.dispatch({
@@ -30,20 +28,11 @@ class ProductAction {
     return result;
   }
 
-
-  public productInfoGetList = async (params?: any) => {
-    const result = await ProductService.productInfoGetList();
-    if (result.code === ResponseCode.success) {
-      store.dispatch({
-        type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_LIST,
-        payload: result.data
-      });
-      return { success: true, result: result.data };
-    } else {
-      return { success: false, result: result.msg };
-    }
-  }
-
+  /**
+   * @todo 获取搜素商品列表列表
+   *
+   * @memberof ProductAction
+   */
   public productInfoSearchList = async (params: ProductInterface.ProductInfoListFetchFidle) => {
     const result = await ProductService.productInfoList(params);
     if (result.code === ResponseCode.success) {
@@ -57,6 +46,11 @@ class ProductAction {
     }
   }
 
+  /**
+   * @todo 清空搜索商品列表
+   *
+   * @memberof ProductAction
+   */
   public productInfoEmptySearchList = async () => {
     store.dispatch({
       type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_SEARCH_LIST,
@@ -64,6 +58,11 @@ class ProductAction {
     });
   }
 
+  /**
+   * @todo 获取商品类型列表
+   *
+   * @memberof ProductAction
+   */
   public productInfoType = async () => {
     const result = await ProductService.productInfoType();
     if (result.code === ResponseCode.success) {
@@ -77,19 +76,11 @@ class ProductAction {
     }
   }
 
-  public productInfoSupplier = async () => {
-    const result = await ProductService.productInfoSupplier();
-    if (result.code === ResponseCode.success) {
-      store.dispatch({
-        type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_SUPPLIER,
-        payload: result.data
-      });
-      return result;
-    } else {
-      return result;
-    }
-  }
-
+  /**
+   * @todo 获取商品详情
+   *
+   * @memberof ProductAction
+   */
   public productInfoDetail = async (params: ProductInterface.ProductDetailFetchFidle) => {
     const result = await ProductService.productInfoDetail(params);
     if (result.code === ResponseCode.success) {
@@ -103,14 +94,11 @@ class ProductAction {
     }
   }
 
-  public productInfoEdit = async (params: Partial<ProductInterface.ProductInfo>) => {
-    return ProductService.productInfoEdit(params);
-  }
-
-  public productRefund = async (params: ProductInterface.CashierRefund) => {
-    return ProductService.cashierRefund(params);
-  }
-
+  /**
+   * @todo 设置搜索记录列表
+   *
+   * @memberof ProductAction
+   */
   public setSearchRecord = (list: string[]) => {
     return new Promise((resolve) => {
       Taro
@@ -122,6 +110,11 @@ class ProductAction {
     });
   }
 
+  /**
+   * @todo 获取搜索记录列表
+   *
+   * @memberof ProductAction
+   */
   public getSearchRecord = (): Promise<any> => {
     return new Promise((resolve) => {
       Taro

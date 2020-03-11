@@ -1,8 +1,8 @@
 /*
  * @Author: Ghan 
  * @Date: 2019-11-05 10:33:07 
- * @Last Modified by: Ghan
- * @Last Modified time: 2019-12-18 13:48:36
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-04 10:42:21
  */
 import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
@@ -24,7 +24,7 @@ class FormCard extends Taro.Component<Props> {
   };
 
   render () {
-    const { items = [], shadow } = this.props;
+    const { items = [] } = this.props;
     return (
       <View 
         className={classnames('component-form', {

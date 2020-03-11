@@ -1,13 +1,11 @@
 
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Input, Image } from '@tarojs/components'
+import { View } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import './index.less'
 import '../style/product.less'
 import ProductListView from '../../component/product/product.listview'
-import invariant from 'invariant'
 import { ProductAction } from '../../actions'
-import { ResponseCode, ProductInterface } from '../../constants'
 import productAction from '../../actions/product.action'
 import { getProductSearchList } from '../../reducers/app.product'
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer'
@@ -37,7 +35,7 @@ class Index extends Component<any> {
     navigationBarTitleText: '商品搜索'
   }
 
-  async componentDidShow() {
+  async componentDidMount() {
     this.setState({ value: '' })
     productAction.productInfoEmptySearchList();
     const res = await productAction.getSearchRecord();
@@ -66,7 +64,7 @@ class Index extends Component<any> {
     this.fetchData();
     let newList: any[] = [];
     newList.push(value);
-    const index = searchRecordList.length > 10 ? 10 : searchRecordList.length;
+    const index = searchRecordList.length > 9 ? 9 : searchRecordList.length;
     for (let i = 0; i < index; i++) {
       if (searchRecordList[i] !== value) {
         newList.push(searchRecordList[i]);

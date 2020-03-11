@@ -37,7 +37,7 @@ class Footer extends Taro.Component<Props> {
   render () {
     const { productCartList } = this.props;
     const price = productCartList && productCartList.length > 0 
-      ? numeral(productSdk.getProductPrice(productCartList)).format('0.00')
+      ? numeral(productSdk.getProductTransPrice(productCartList)).format('0.00')
       : '0.00';
     const tarnsPrice = productCartList && productCartList.length > 0 
       ? numeral(productSdk.getProductTransPrice(productCartList)).format('0.00')

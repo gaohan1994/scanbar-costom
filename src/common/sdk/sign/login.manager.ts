@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 17:10:29 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-28 15:40:52
+ * @Last Modified time: 2020-03-03 17:50:57
  */
 
 import Taro from '@tarojs/taro';
@@ -152,7 +152,7 @@ class LoginManager {
   }
 
   /**
-   * @todo [获取用户token]
+   * @todo 获取用户信息
    *
    * @memberof LoginManager
    */
@@ -173,6 +173,11 @@ class LoginManager {
     });
   }
 
+  /**
+   * todo 获取用户token
+   *
+   * @memberof LoginManager
+   */
   public getUserToken = (): ActionsInterface.ActionBase<string> => {
     const userinfo = Taro.getStorageSync(CentermOAuthKey);
     if (userinfo) {
@@ -182,6 +187,11 @@ class LoginManager {
     }
   }
 
+  /**
+   * @todo 存储用户信息
+   *
+   * @memberof LoginManager
+   */
   public setUserInfo = (userInfo: LoginInterface.OAuthToken) => {
     return new Promise((resolve) => {
       Taro
@@ -191,25 +201,6 @@ class LoginManager {
         })
         .catch(error => resolve({success: false, result: {} as any, msg: error.message || '保存用户信息失败'}));
     });
-  }
-
-  /**
-   * @todo [获取用户权限]
-   *
-   * @memberof LoginManager
-   */
-  public getUserPermissions = async (): Promise<Array<any>> => {
-    return [];
-  }
-
-  /**
-   * @todo [校验用户是否开放权限]
-   *
-   * @memberof LoginManager
-   */
-  public checkUserPermissions = async (permissions: Array<string>): Promise<LoginInterface.CheckPermissionsResult> => {
-    // console.log('permissions: ', permissions);
-    return { success: true, grantedPermissions: [], declinedPermissions: [] };
   }
 }
 
