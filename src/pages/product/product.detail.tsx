@@ -13,8 +13,6 @@ import ProductDetail from './component/detail';
 import ProductCart from './component/cart';
 import { AppReducer } from '../../reducers'
 
-const cssPrefix = 'product';
-
 class Page extends Taro.Component<any> {
 
   config: Config = {

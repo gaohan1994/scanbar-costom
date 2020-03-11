@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-28 16:37:04
+ * @Last Modified time: 2020-03-03 17:31:56
  * 
  * @todo [商品相关的类型定义]
  */
@@ -70,6 +70,17 @@ export declare namespace OrderInterface {
   interface OrderDetail {
     order: OrderInfo;
     orderDetailList?: Array<OrderDetailItem>;
+    orderNo: number;
+    orderActivityInfoList: Array<OrderActivityInfoItem>;
+  }
+
+  interface OrderActivityInfoItem {
+    activityId: number;
+    activityName: string;
+    activityType: number;
+    createTime: string;
+    discountAmount: number;
+    merchantId: number;
   }
 
   interface OrderListFetchFidle extends HTTPInterface.FetchField {
@@ -96,6 +107,11 @@ export declare namespace OrderInterface {
     inTransNum: number;
     initNum: number;
     waitForReceiptNum: number;
+  }
+
+  interface OrderAllStatus {
+    dictValue: string;
+    dictLabel: string;
   }
 
   interface DateItem {

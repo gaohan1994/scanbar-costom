@@ -5,13 +5,13 @@ import { connect } from '@tarojs/redux'
 import '../style/product.less'
 import { AtButton } from 'taro-ui'
 import { AppReducer } from '../../reducers'
-import merchantAction from '../../actions/merchant.action'
-import { MerchantInterface, ResponseCode } from '../../constants'
+import { ResponseCode, UserInterface } from '../../constants'
 import WeixinSdk from '../../common/sdk/weixin/weixin'
 import './index.less'
 import Row from '../../component/address/row'
 import invariant from 'invariant'
 import dayJs from 'dayjs'
+import { UserAction } from '../../actions'
 
 const prefix = 'address'
 
@@ -86,7 +86,7 @@ class Page extends Taro.Component<Props, State> {
       invariant(!!contact, '请输入联系人');
       invariant(!!phone, '请输入手机号');
 
-      const payload: Partial<MerchantInterface.Address> = {
+      const payload: Partial<UserInterface.Address> = {
         address: address,
         contact: contact,
         createTime: dayJs().format('YYYY-MM-DD HH:mm:ss'),
@@ -99,7 +99,7 @@ class Page extends Taro.Component<Props, State> {
         userId: 1,
       }
       console.log('payload: ', payload)
-      const result = await merchantAction.addressAdd(payload);
+      const result = await UserAction.addressAdd(payload);
       console.log('result: ', result)
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       Taro.showToast({

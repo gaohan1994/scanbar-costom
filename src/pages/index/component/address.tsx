@@ -2,15 +2,16 @@ import Taro from '@tarojs/taro'
 import { View, Image  } from '@tarojs/components'
 import './index.less'
 import '../../../component/product/product.less'
-import { MerchantInterface } from '../../../constants'
+import { MerchantInterface, UserInterface } from '../../../constants'
 import { connect } from '@tarojs/redux'
 import { AppReducer } from '../../../reducers'
-import { getIndexAddress, getCurrentMerchantDetail } from '../../../reducers/app.merchant'
+import { getCurrentMerchantDetail } from '../../../reducers/app.merchant'
+import { getIndexAddress } from '../../../reducers/app.user'
 
 const prefix = 'index-component-address'
 
 type Props = {
-  indexAddress: MerchantInterface.Address;
+  indexAddress: UserInterface.Address;
   currentMerchantDetail: MerchantInterface.MerchantDetail;
 }
 

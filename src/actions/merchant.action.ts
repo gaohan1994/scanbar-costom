@@ -1,11 +1,25 @@
-import { MerchantService, MerchantInterface, MerchantInterfaceMap, jsonToQueryString } from "../constants";
+/*
+ * @Author: centerm.gaozhiying 
+ * @Date: 2020-03-03 17:19:06 
+ * @Last Modified by:   centerm.gaozhiying 
+ * @Last Modified time: 2020-03-03 17:19:06 
+ */
+import { 
+  MerchantService, 
+  MerchantInterface, 
+  MerchantInterfaceMap, 
+} from "../constants";
 import { ResponseCode } from '../constants/index';
 import { store } from '../app';
-import requestHttp from "../common/request/request.http";
 
 class MerchantAction {
 
-  public merchantDetail = async (params: any) => {
+  /**
+   * @todo 根据商户id获取商户详情
+   *
+   * @memberof MerchantAction
+   */
+  public merchantDetail = async (params: MerchantInterface.merchantDetailFetchField) => {
     const result = await MerchantService.merchantInfoDetail(params);
     if (result.code === ResponseCode.success) {
       store.dispatch({
@@ -16,6 +30,11 @@ class MerchantAction {
     return result;
   }
 
+  /**
+   * @todo 获取门店列表
+   *
+   * @memberof MerchantAction
+   */
   public merchantList = async () => {
     const result = await MerchantService.merchantList();
     if (result.code === ResponseCode.success) {
@@ -25,7 +44,7 @@ class MerchantAction {
       });
       if (result.data.rows && result.data.rows.length > 0) {
         store.dispatch({
-          type: MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_LIST,
+          type: MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL,
           payload: result.data.rows[0]
         });
       }
@@ -33,45 +52,19 @@ class MerchantAction {
     return result;
   }
 
-  public merchantDistance = async (params: any) => {
-    const result = await requestHttp.get(`/api/merchantInfo/distance${jsonToQueryString(params)}`)
+  /**
+   * @todo 获取商户距离
+   *
+   * @memberof MerchantAction
+   */
+  public merchantDistance = async (params: MerchantInterface.merchantDistanceFetchField) => {
+    const result = await MerchantService.merchantDistance(params);
     if (result.code === ResponseCode.success) {
       store.dispatch({
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_DISTANCE,
         payload: result.data
       })
     }
-    return result;
-  }
-
-  public addressDelete = async (params: any) => {
-    const result = await requestHttp.delete(`/api/address/remove/${params.id}`, '');
-    return result;
-  }
-
-  public addressList = async () => {
-    const result = await MerchantService.addressList();
-    if (result.code === ResponseCode.success) {
-      store.dispatch({
-        type: MerchantInterfaceMap.reducerInterface.RECEIVE_ADDRESS_LIST,
-        payload: result.data
-      });
-    }
-    return result;
-  }
-
-  public addressEdit = async (params: any) => {
-    const result = await MerchantService.addressEdit(params);
-    return result;
-  }
-
-  public addressAdd = async (params: any) => {
-    const result = await MerchantService.addressAdd(params);
-    return result;
-  }
-
-  public wxUserInfoSave = async (params: Partial<MerchantInterface.WxUserInfo>) => {
-    const result = await MerchantService.wxUserInfoSave(params);
     return result;
   }
 }

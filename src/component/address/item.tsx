@@ -1,14 +1,14 @@
 import Taro from '@tarojs/taro'
 import { View, Image, Text } from '@tarojs/components'
 import classNames from 'classnames'
-import { MerchantInterface } from '../../constants';
+import { UserInterface } from '../../constants';
 import './index.less'
 import { ITouchEvent } from '@tarojs/components/types/common';
 
 const prefix = 'address-component-item'
 
 type Props = {
-  address: MerchantInterface.Address;
+  address: UserInterface.Address;
   isBorder?: boolean;
   pre?: boolean;
   showEdit?: boolean;
@@ -26,8 +26,8 @@ class Item extends Taro.Component<Props> {
   }
 
   render() {
-    const { address, pre = false, onClick = undefined, isBorder = true, showEdit = true, showArrow = false, onEditClick } = this.props;
-    const showFlag = address.flag === 0 || address.flag === 1 || address.flag === 2;
+    const { address, pre = false, onClick = undefined, isBorder = true, showEdit = true, showArrow = false } = this.props;
+    const showFlag = address && address.flag ? (address.flag === 0 || address.flag === 1 || address.flag === 2) : false;
     return (
       <View
         className={classNames(`${prefix}`, {

@@ -13,6 +13,7 @@ import Empty from '../../component/empty';
 import GetUserinfoModal from '../../component/login/login.userinfo';
 import LoginModal from '../../component/login/login.modal';
 import { LoginManager } from '../../common/sdk';
+import orderAction from '../../actions/order.action';
 
 const cssPrefix = 'order';
 
@@ -45,7 +46,6 @@ class Order extends Taro.Component<Props, State> {
   }
 
   async componentDidShow() {
-    const { orderAllStatus } = this.props;
     const result = await LoginManager.getUserInfo();
     if (result.success) {
       const userinfo = result.result;
@@ -81,39 +81,19 @@ class Order extends Taro.Component<Props, State> {
   }
 
   public init = async () => {
+    const { currentType } = this.state;
     pageNum = 1;
-    OrderAction.orderList({ pageNum: pageNum++, pageSize, ...this.getFetchType() });
+    OrderAction.orderList({ pageNum: pageNum++, pageSize, ...orderAction.getFetchType(currentType) });
     OrderAction.orderCount();
   }
 
-  public getFetchType = () => {
-    const { currentType } = this.state;
-    switch (currentType) {
-      case 0:
-        return {};
-      case 1:
-        return {
-          transFlags: 0
-        }
-      case 2:
-        return {
-          transFlags: '10,12,3,4'
-        }
-      case 3:
-        return {
-          transFlags: 11
-        }
-      default:
-        return {};
-    }
-  }
-
   public fetchOrder = async (page?: number) => {
+    const { currentType } = this.state;
     try {
       let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === 'number' ? page : pageNum,
         pageSize: 20,
-        ...this.getFetchType()
+        ...orderAction.getFetchType(currentType)
       };
 
       const result = await OrderAction.orderList(payload);
@@ -142,7 +122,7 @@ class Order extends Taro.Component<Props, State> {
   render() {
     const { orderList, orderListTotal, orderAllStatus} = this.props;
     const hasMore = orderList.length < orderListTotal;
-    const { getUserinfoModal, loginModal } = this.state;
+    const { getUserinfoModal, loginModal, currentType } = this.state;
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-tabs`}>
@@ -164,7 +144,7 @@ class Order extends Taro.Component<Props, State> {
                   orderList.map((item: any) => {
                     return (
                       <View className={`${cssPrefix}-scrollview-item`} key={item.orderNo}>
-                        <OrderItem data={item} orderAllStatus={orderAllStatus}/>
+                        <OrderItem data={item} orderAllStatus={orderAllStatus} currentType={currentType}/>
                       </View>
                     )
                   })

@@ -6,7 +6,7 @@ import requestHttp from '../../common/request/request.http';
 import { LoginManager } from '../../common/sdk';
 import invariant from 'invariant';
 import { ResponseCode } from '../../constants';
-import merchantAction from '../../actions/merchant.action';
+import { UserAction } from '../../actions';
 
 const cssPrefix = 'login-modal';
 
@@ -44,7 +44,7 @@ class LoginModal extends Taro.Component<Props, State> {
           ...userinfo,
           phone: JSON.parse(result.data).phoneNumber,
         };
-        const saveResult: any = await merchantAction.wxUserInfoSave(newUserinfo);
+        const saveResult: any = await UserAction.userInfoSave(newUserinfo);
         invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
         const setResult: any = await LoginManager.setUserInfo(newUserinfo);
         invariant(setResult.success, setResult.msg || '存储用户信息失败');

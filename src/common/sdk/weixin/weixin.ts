@@ -1,8 +1,8 @@
 import Taro from '@tarojs/taro';
 import MapSdk from '../../qqmap-wx-jssdk'
-import { MerchantInterface } from '../../../constants';
+import { UserInterface } from '../../../constants';
 import { store } from '../../../app';
-import { getIndexAddress } from '../../../reducers/app.merchant';
+import { getIndexAddress } from '../../../reducers/app.user';
 import invariant from 'invariant'
 
 /**
@@ -107,7 +107,7 @@ class WeixinSDK {
     })
   }
 
-  public changeCostomIndexAddress = (address: MerchantInterface.Address) => {
+  public changeCostomIndexAddress = (address: UserInterface.Address) => {
     store.dispatch({
       type: this.reducerInterface.CHANGE_COSTOM_INDEX_ADDRESS,
       payload: {

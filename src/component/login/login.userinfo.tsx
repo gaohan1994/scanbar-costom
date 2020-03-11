@@ -5,8 +5,8 @@ import { AtModal, AtModalContent } from 'taro-ui';
 import { LoginManager } from '../../common/sdk';
 import invariant from 'invariant';
 import { ResponseCode } from '../../constants';
-import merchantAction from '../../actions/merchant.action';
 import WeixinSDK from '../../common/sdk/weixin/weixin';
+import { UserAction } from '../../actions';
 
 const cssPrefix = 'login-modal';
 
@@ -50,7 +50,7 @@ class GetUserinfoModal extends Taro.Component<Props, State> {
       }
 
       if (userinfo && userinfo.phone && userinfo.phone.length > 0) {
-        const saveResult: any = await merchantAction.wxUserInfoSave(newUserinfo);
+        const saveResult: any = await UserAction.userInfoSave(newUserinfo);
         invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
       }
       const setResult: any = await LoginManager.setUserInfo(newUserinfo);
