@@ -14,7 +14,7 @@ class LoginButton extends Taro.Component {
         encryptedData: detail.encryptedData,
 	      ivStr: detail.iv
       };
-      const result = await requestHttp.post('/api/decrypt', payload)
+      const result = await requestHttp.post('/customer/decrypt', payload)
       console.log('result: ', result);
 
       return new Promise((resolve) => {

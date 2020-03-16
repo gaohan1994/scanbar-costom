@@ -1,19 +1,23 @@
 
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text } from '@tarojs/components'
+import { View, Text, ScrollView } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import './index.less'
 import '../style/product.less'
 import ProductListView from '../../component/product/product.listview'
 import ProductMenu from '../../component/product/product.menu'
 import IndexAddress from './component/address'
+import DiscountInfo from './component/discountInfo'
+import Banner from './component/banner'
 import invariant from 'invariant'
 import { ProductAction, MerchantAction } from '../../actions'
 import { ResponseCode, ProductInterface } from '../../constants'
-import { LoginManager } from '../../common/sdk'
 import WeixinSdk from '../../common/sdk/weixin/weixin'
-import productSdk from '../../common/sdk/product/product.sdk'
 import orderAction from '../../actions/order.action'
+import TabsChoose from '../../component/tabs/tabs.choose'
+import { getMerchantAdvertisement } from '../../reducers/app.merchant'
+import { LoginManager } from '../../common/sdk'
+import CouponModal from '../../component/coupon/coupon.modal'
 
 const cssPrefix = 'product';
 
@@ -23,10 +27,13 @@ class Index extends Component<any> {
     currentType: {
       name: '',
       id: 0,
-      createTime: ''
+      createTime: '',
+      subCategory: [],
     },
     loading: false,
     isOpen: false,
+    showActivity: true,
+    couponModalShow: false,
   };
 
   /**
@@ -40,32 +47,17 @@ class Index extends Component<any> {
     navigationBarTitleText: '首页'
   }
 
-  async componentDidShow() {
+  async componentDidMount() {
     try {
-      const result = await LoginManager.getUserInfo();
-      console.log('userinfo: ', result);
-      if (!result.success) {
-        const { success, msg } = await LoginManager.wxLogin();
-        invariant(!!success, msg || '登陆失败');
-        this.init();
-        return;
-      }
-      productSdk.refreshCartNumber();
+      this.init();
+      orderAction.orderAllStatus();
     } catch (error) {
       Taro.showToast({
         title: error.message,
         icon: 'none'
       })
     }
-  }
-
-  async componentDidMount() {
-    // const result = await LoginManager.getUserInfo();
-    // if (result.success && (!result.result.phone || result.result.phone.length === 0)) {
-    //   this.setState({ isOpen: true });
-    // }
-    this.init();
-    orderAction.orderAllStatus();
+    this.setState({ couponModalShow: true })
   }
 
   public changeCurrentType = (typeInfo: any, fetchProduct: boolean = true) => {
@@ -85,6 +77,7 @@ class Index extends Component<any> {
   public init = async (): Promise<void> => {
     try {
       MerchantAction.merchantList();
+      LoginManager.getUserInfo();
       WeixinSdk.initAddress();
       const productTypeResult = await ProductAction.productInfoType();
       invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
@@ -118,7 +111,7 @@ class Index extends Component<any> {
   public onScrollToLower = async () => {
     const { currentType } = this.state;
     const { productType } = this.props;
-    for (let i = 0; i < productType.length; i ++) {
+    for (let i = 0; i < productType.length; i++) {
       if (currentType.id === productType[i].id && (i !== productType.length - 1)) {
         this.onTypeClick(productType[i + 1]);
         break;
@@ -126,33 +119,82 @@ class Index extends Component<any> {
     }
   }
 
+  public getTabs = (tabs: any[]) => {
+    const { currentType } = this.state;
+    let newTabs = [...tabs];
+    newTabs.unshift({ id: currentType.id, name: '全部' });
+    return newTabs;
+  }
+
+  public onScroll = (event: any) => {
+    const { detail } = event;
+    const { scrollTop } = detail;
+    if (Number(scrollTop) >= 200) {
+      if (this.state.showActivity === true) {
+        this.setState({ showActivity: false });
+      }
+    } else {
+      if (Number(scrollTop) <= 50) {
+        this.setState({ showActivity: true });
+      }
+    }
+  }
+
   render() {
-    const { currentType, loading } = this.state;
-    const { productList, productType } = this.props;
+    const { currentType, loading, showActivity, couponModalShow } = this.state;
+    const { productList, productType, advertisement } = this.props;
+
     return (
       <View className={`container ${cssPrefix}`}>
         <IndexAddress />
+        {/* <ScrollView scrollY={true}> */}
+        {
+          showActivity && (
+            <View className={`${cssPrefix}-activity`}>
+              <DiscountInfo />
+              {
+                advertisement && advertisement.length > 0 && (
+                  <Banner advertisement={advertisement}/>
+                )
+              }
+            </View>
+          )
+        }
         <View className={`${cssPrefix}-list-container-costom`}>
           <ProductMenu
             menu={productType}
             currentMenu={currentType}
             onClick={(type) => this.onTypeClick(type)}
           />
-          <View className={`${cssPrefix}-list-right`}>
-            <View className={`${cssPrefix}-list-right-header product-component-section-header-height`}>
-              <View className={`${cssPrefix}-list-right-header-bge`} />
-              <Text className={`${cssPrefix}-list-right-header-text`}>{currentType.name}</Text>
+          <View className={`${cssPrefix}-list-right`} >
+            <View className={`${cssPrefix}-list-right-types`}>
+              {
+                currentType && currentType.subCategory && currentType.subCategory.length > 0 ? (
+                  <View className={`${cssPrefix}-list-right-types-secondary`}>
+                    <TabsChoose
+                      tabs={this.getTabs(currentType.subCategory)}
+                      onChange={(type) => { this.fetchData(type) }}
+                    />
+                  </View>
+                ) : (
+                    <View className={`${cssPrefix}-list-right-header product-component-section-header-height`}>
+                      <View className={`${cssPrefix}-list-right-header-bge`} />
+                      <Text className={`${cssPrefix}-list-right-header-text`}>{currentType.name}</Text>
+                    </View>
+                  )
+              }
             </View>
             <ProductListView
               loading={loading}
               productList={productList}
               className={`${cssPrefix}-list-right-container`}
-              // onScrollToLower={this.onScrollToLower}
+              onScroll={this.onScroll}
+            // onScrollToLower={this.onScrollToLower}
             />
           </View>
         </View>
-        {/* <Cart /> */}
-        {/* <LoginModal isOpen={isOpen} onCancle={() => { this.setState({ isOpen: false }) }} /> */}
+        {/* </ScrollView> */}
+        <CouponModal isOpen={couponModalShow} onClose={() => { this.setState({ couponModalShow: false }); }}/>
       </View>
     )
   }
@@ -169,6 +211,7 @@ const select = (state) => {
   return {
     productType: state.product.productType,
     productList: state.product.productList,
+    advertisement: getMerchantAdvertisement(state),
   }
 }
 

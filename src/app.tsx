@@ -29,20 +29,59 @@ class App extends Component {
   config: Config = {
     pages: [
       'pages/index/index',
-      'pages/order/order',
-      'pages/order/order.pay',
-      'pages/order/order.pay.remark',
-      'pages/order/order.detail',
+      'pages/orderList/order',
+      // 'pages/order/order.pay',
+      // 'pages/order/order.pay.remark',
+      // 'pages/order/order.detail',
+      // 'pages/order/order.cancel',
+      // 'pages/order/order.refund',
       'pages/user/user',
       'pages/user/user.set',
+      'pages/user/user.coupon',
       'pages/test/test',
       'pages/cart/cart',
       'pages/product/product.detail',
       'pages/product/product.search',
-      'pages/address/address.list',
-      'pages/address/address.add',
-      'pages/address/address.edit',
-      'pages/address/address.change.index'
+      // 'pages/address/address.list',
+      // 'pages/address/address.add',
+      // 'pages/address/address.edit',
+      // 'pages/address/address.change.index'
+    ],
+    subPackages: [
+      {
+        root: 'pages/order/',
+        pages: [
+          'order.pay',
+          'order.pay.remark',
+          'order.pay.coupon',
+          'order.detail',
+          'order.cancel',
+          'order.refund',
+          'order.refund.schedule',
+        ]
+      },
+      // {
+      //   root: 'pages/user/',
+      //   pages: [
+      //     'user.set',
+      //   ]
+      // },
+      {
+        root: 'pages/address/',
+        pages: [
+          'address.list',
+          'address.add',
+          'address.edit',
+          'address.change.index'
+        ]
+      },
+      {
+        root: 'pages/login/',
+        pages: [
+          'login',
+          'login.userinfo',
+        ]
+      },
     ],
     window: {
       backgroundTextStyle: 'light',
@@ -61,7 +100,7 @@ class App extends Component {
         selectedIconPath: "./assets/tab-bar/icon_nav_home_selected.png",
         text: "首页"
       }, {
-        pagePath: "pages/order/order",
+        pagePath: "pages/orderList/order",
         iconPath: "./assets/tab-bar/icon_nav_order.png",
         selectedIconPath: "./assets/tab-bar/icon_nav_order_selected.png",
         text: "订单"
@@ -85,7 +124,7 @@ class App extends Component {
   }
   // 在 App 类中的 render() 函数没有实际作用
   // 请勿修改此函数
-  render () {
+  render() {
     return (
       <Provider store={store}>
         {/* <Index /> */}

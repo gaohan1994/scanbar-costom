@@ -15,6 +15,7 @@ interface Props {
   productInCart?: ProductCartInterface.ProductCartInfo;
   last?: boolean;
   isHome?: boolean;
+  isCart?: boolean;
 }
 
 interface State {
@@ -106,9 +107,9 @@ class ProductComponent extends Taro.Component<Props, State> {
                 style={`background-image: url(${product.pictures[0]})`}
               />
             ) : (
-                <Image 
-                  src="//net.huanmusic.com/scanbar-c/v1/pic_nopicture.png" 
-                  className={`${cssPrefix}-content-cover-image`} 
+                <Image
+                  src="//net.huanmusic.com/scanbar-c/v1/pic_nopicture.png"
+                  className={`${cssPrefix}-content-cover-image`}
                 />
               )}
           </View>
@@ -129,7 +130,7 @@ class ProductComponent extends Taro.Component<Props, State> {
             {product.name}
           </View>
           <View className={`${cssPrefix}-tips`} >
-            {product.description && product.description.length > 0 ? product.description : product.name }
+            {product.description && product.description.length > 0 ? product.description : product.name}
           </View>
         </View>
         <View className={`${cssPrefix}-activity`}>
@@ -163,11 +164,21 @@ class ProductComponent extends Taro.Component<Props, State> {
 
   private renderStepper = () => {
     // direct 黑魔法code 不加这段代码 购物车页面减少时有渲染bug
-    const { product, productInCart, direct } = this.props;
+    const { product, productInCart, direct, isCart } = this.props;
     if (direct === true) {
       return (
         <View className={`${cssPrefix}-stepper`}>
-          {product !== undefined ? (
+          {(product as any).saleNumber <= 0 ? (
+            isCart === true ? (<View 
+              className={`${cssPrefix}-stepper-empty ${cssPrefix}-stepper-delete`} 
+              onClick={this.manageProduct.bind(this, productSdk.productCartManageType.REDUCE)}
+            >
+              删除
+            </View>)
+            : (<View className={`${cssPrefix}-stepper-empty`}>
+              售罄
+            </View>)
+          ) : product !== undefined ? (
             <View className={`${cssPrefix}-stepper-container`}>
               <View
                 className={`${cssPrefix}-stepper-touch`}
@@ -188,10 +199,6 @@ class ProductComponent extends Taro.Component<Props, State> {
               </View>
 
             </View>
-          ) : (product as any).saleNumber <= 0 ? (
-            <View className={`${cssPrefix}-stepper-empty`}>
-              售罄
-            </View>
           ) : (
                 <View className={`${cssPrefix}-stepper-container`}>
                   <View
@@ -210,7 +217,11 @@ class ProductComponent extends Taro.Component<Props, State> {
     }
     return (
       <View className={`${cssPrefix}-stepper`}>
-        {productInCart !== undefined ? (
+        {product.saleNumber <= 0 ? (
+          <View className={`${cssPrefix}-stepper-empty`}>
+            售罄
+          </View>
+        ) : productInCart !== undefined ?  (
           <View className={`${cssPrefix}-stepper-container`}>
             <View
               className={`${cssPrefix}-stepper-touch`}
@@ -229,10 +240,6 @@ class ProductComponent extends Taro.Component<Props, State> {
                 className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
               />
             </View>
-          </View>
-        ) : product.saleNumber <= 0 ? (
-          <View className={`${cssPrefix}-stepper-empty`}>
-            售罄
           </View>
         ) : (
               <View className={`${cssPrefix}-stepper-container`}>

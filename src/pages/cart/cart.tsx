@@ -1,19 +1,20 @@
 
 import Taro, { Config } from '@tarojs/taro'
-import { View, Text } from '@tarojs/components'
+import { View } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
 import ProductComponent from '../../component/product/product'
 import Footer from './component/footer'
 import { AppReducer } from '../../reducers'
-import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk'
+import { ProductCartInterface } from '../../common/sdk/product/product.sdk'
 import Empty from '../../component/empty'
-import { LoginManager } from '../../common/sdk'
-import GetUserinfoModal from '../../component/login/login.userinfo'
-import LoginModal from '../../component/login/login.modal'
+import { store } from '../../app'
+import { getUserinfo } from '../../reducers/app.user';
+import { UserInterface } from '../../constants';
 
 type Props = {
-  productCartList: ProductCartInterface.ProductCartInfo[]
+  productCartList: ProductCartInterface.ProductCartInfo[],
+  userinfo: UserInterface.UserInfo;
 }
 
 type State = {
@@ -30,60 +31,57 @@ class Page extends Taro.Component<Props, State> {
     loginModal: false as any
   }
 
-  async componentDidShow() {
-    productSdk.refreshCartNumber();
-    const result = await LoginManager.getUserInfo();
-    if (result.success) {
-      const userinfo = result.result;
-      if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
-        this.setState({ getUserinfoModal: true });
-        return;
-      }
-      if ((!userinfo.phone || userinfo.phone.length === 0)) {
-        this.setState({ loginModal: true });
-        return;
-      };
-    } else {
-      Taro.showToast({
-        title: '获取用户信息失败',
-        icon: 'none'
-      });
-    }
+  async componentDidMount() {
+    // this.loginCheck();
   }
 
-  getPhoneNumber = (userinfo: any) => {
-    if (userinfo.phone === undefined || userinfo.phone.length === 0) {
-      this.setState({
-        loginModal: true
-      });
-    }
+  async componentDidShow() {
+    // this.loginCheck();
+    store.dispatch({
+      type: 'MANAGE_CART_BADGE',
+      payload: {}
+    })
   }
+
+  public loginCheck() {
+    const { userinfo } = this.props;
+    if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
+      // this.setState({ getUserinfoModal: true });
+      Taro.navigateTo({ url: '/pages/login/login.userinfo' })
+      return;
+    }
+    if ((userinfo.phone === undefined || userinfo.phone.length === 0)) {
+      Taro.navigateTo({ url: '/pages/login/login' })
+      return;
+    };
+  }
+
+  // getPhoneNumber = (userinfo: any) => {
+  //   if (userinfo.phone === undefined || userinfo.phone.length === 0) {
+  //     this.setState({
+  //       loginModal: true
+  //     });
+  //   }
+  // }
 
   public beforeSubmit = async () => {
-    const result = await LoginManager.getUserInfo();
-    if (result.success) {
-      const userinfo = result.result;
-      if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
-        this.setState({ getUserinfoModal: true });
-        return false;
-      }
-      if ((!userinfo.phone || userinfo.phone.length === 0)) {
-        this.setState({ loginModal: true });
-        return false;
-      };
-    } else {
-      Taro.showToast({
-        title: '获取用户信息失败',
-        icon: 'none'
-      });
+    const { userinfo } = this.props;
+    if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
+      // this.setState({ getUserinfoModal: true });
+      Taro.navigateTo({ url: '/pages/login/login.userinfo' });
       return false;
     }
+    if (userinfo.phone === undefined || userinfo.phone.length === 0) {
+      // this.setState({ loginModal: true });
+      Taro.navigateTo({ url: '/pages/login/login' });
+      return false;
+    };
     return true;
   }
 
   render() {
-    const { productCartList } = this.props;
-    const { getUserinfoModal, loginModal } = this.state;
+    const { productCartList, userinfo } = this.props;
+    // const { getUserinfoModal, loginModal } = this.state;
     return (
       <View className='container'>
         {productCartList && productCartList.length > 0
@@ -95,28 +93,41 @@ class Page extends Taro.Component<Props, State> {
                 product={item}
                 last={index === (productCartList.length - 1)}
                 isHome={false}
+                isCart={true}
               />
             )
           })
           : (
-            <Empty
-              img='//net.huanmusic.com/scanbar-c/v1/img_cart.png'
-              text='还没有商品，快去选购吧'
-              button={{
-                title: '去选购',
-                onClick: () => {
-                  Taro.switchTab({
-                    url: `/pages/index/index`
-                  })
-                }
-              }}
-            />
+            userinfo.nickname === undefined || userinfo.nickname.length === 0 || 
+            userinfo.phone === undefined || userinfo.phone.length === 0 ? (
+              <Empty
+                img='//net.huanmusic.com/scanbar-c/v1/img_cart.png'
+                text='完成登录后可享受更多会员服务'
+                button={{
+                  title: '去登录',
+                  onClick: () => this.loginCheck()
+                }}
+              />
+            ) : (
+                < Empty
+                  img='//net.huanmusic.com/scanbar-c/v1/img_cart.png'
+                  text='还没有商品，快去选购吧'
+                  button={{
+                    title: '去选购',
+                    onClick: () => {
+                      Taro.switchTab({
+                        url: `/pages/index/index`
+                      })
+                    }
+                  }}
+                />
+              )
           )}
         {productCartList && productCartList.length > 0 && (
           <Footer beforeSubmit={this.beforeSubmit} />
         )}
-        <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
-        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} />
+        {/* <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
+        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} /> */}
       </View>
     )
   }
@@ -124,7 +135,8 @@ class Page extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => {
   return {
-    productCartList: state.productSDK.productCartList
+    productCartList: state.productSDK.productCartList,
+    userinfo: getUserinfo(state)
   }
 }
 export default connect(select)(Page);

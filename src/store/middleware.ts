@@ -10,6 +10,18 @@ export default store => next => action => {
   const state = store.getState();
   const total = productSdk.getProductNumber(state.productSDK.productCartList);
   const { type, payload } = action;
+
+  if (type === 'MANAGE_CART_BADGE') {
+    if (total === 0) {
+      Taro.removeTabBarBadge({ index: tabIndex });
+    } else {
+      Taro.setTabBarBadge({
+        index: tabIndex,
+        text: `${total}`
+      });
+    }
+  }
+
   if (type === "MANAGE_CART_PRODUCT") {
     if (payload.type === 'ADD') {
       Taro.setTabBarBadge({
@@ -17,9 +29,8 @@ export default store => next => action => {
         text: `${total + (payload.num || 1)}`
       });
     } else {
-      
       if (total - 1 <= 0) {
-        Taro.removeTabBarBadge({index: tabIndex});
+        Taro.removeTabBarBadge({ index: tabIndex });
       } else {
         Taro.setTabBarBadge({
           index: tabIndex,
@@ -28,5 +39,6 @@ export default store => next => action => {
       }
     }
   }
+
   return next(action)
 }

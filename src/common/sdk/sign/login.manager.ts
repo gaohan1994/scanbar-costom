@@ -2,13 +2,14 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 17:10:29 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-03 17:50:57
+ * @Last Modified time: 2020-03-16 11:00:37
  */
 
 import Taro from '@tarojs/taro';
 import md5 from 'blueimp-md5';
 import requestHttp from '../../request/request.http';
-import { ResponseCode, ActionsInterface } from '../../../constants/index';
+import { ResponseCode, ActionsInterface, UserInterfaceMap, UserInterface } from '../../../constants/index';
+import { store } from '../../../app';
 
 export const CentermOAuthKey: string = 'CentermOAuthTokenCostom';
 
@@ -48,7 +49,7 @@ export declare namespace LoginInterface {
 
   interface LoginManagerConfig {
     oatuhToken: string;
-    wxAuthToken: string;
+    login: string;
   }
 
   type RECEIVE_AUTH = string;
@@ -65,43 +66,15 @@ class LoginManager {
 
   public LoginManagerConfig: LoginInterface.LoginManagerConfig = {
     oatuhToken: '/oauth/token',
-    wxAuthToken: '/login'
+    login: '/customer/login'
   };
 
-  public autoToken = async (params: LoginInterface.OAuthTokenParams): Promise<any> => {
-    const result = await requestHttp.post(this.LoginManagerConfig.oatuhToken, params);
+  public autoToken = async (params: any): Promise<any> => {
+    const result = await requestHttp.post(`${this.LoginManagerConfig.login}`, params);
     if (result.code === ResponseCode.success) {
       return { success: true, result: result.data };
     } else {
       return { success: false, result: result.msg };
-    }
-  }
-
-  public wxAuthToken = async (): Promise<any> => {
-    return new Promise((resolve) => {
-      Taro.login({
-        success: async (res) => {
-          const {code} = res;
-          const result = await requestHttp.post(`${this.LoginManagerConfig.wxAuthToken}/${code}`, {});
-          console.log('result', result)
-          resolve(result)
-        }
-      })
-    })
-    
-  }
-
-  public wxLogin = async (): Promise<any> => {
-    const result = await this.wxAuthToken();
-    if (result.code === ResponseCode.success) {
-      return new Promise((resolve) => {
-        Taro
-          .setStorage({ key: CentermOAuthKey, data: JSON.stringify(result.data) })
-          .then(() => {
-            resolve({success: true, result: result.data, msg: ''});
-          })
-          .catch(error => resolve({success: false, result: {} as any, msg: error.message || '登录失败'}));
-      });
     }
   }
 
@@ -110,10 +83,9 @@ class LoginManager {
    *
    * @memberof LoginManager
    */
-  public login = async (params: LoginInterface.OAuthTokenParams): Promise<LoginInterface.LoginMangerInfo<LoginInterface.OAuthToken>> => {
+  public login = async (params: any): Promise<LoginInterface.LoginMangerInfo<LoginInterface.OAuthToken>> => {
     const payload: LoginInterface.OAuthTokenParams = {
       ...params,
-      password: md5(params.password)
     };
     const { success, result } = await this.autoToken(payload);
 
@@ -163,8 +135,14 @@ class LoginManager {
         .then(data => {
           if (data.data !== '') {
             resolve({success: true, result: JSON.parse(data.data), msg: ''});
+            store.dispatch({
+              type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
+              payload: {
+                userinfo: JSON.parse(data.data),
+              }
+            });
           } else {
-            resolve({success: false, result: {} as any, msg: '请先登录'});
+            resolve({success: true, result: {} as any, msg: ''});
           }
         })
         .catch(error => {
@@ -192,7 +170,13 @@ class LoginManager {
    *
    * @memberof LoginManager
    */
-  public setUserInfo = (userInfo: LoginInterface.OAuthToken) => {
+  public setUserInfo = (userInfo: UserInterface.UserInfo) => {
+    store.dispatch({
+      type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
+      payload: {
+        userinfo: userInfo,
+      }
+    });
     return new Promise((resolve) => {
       Taro
         .setStorage({ key: CentermOAuthKey, data: JSON.stringify(userInfo) })

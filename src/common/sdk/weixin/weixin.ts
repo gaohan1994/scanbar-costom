@@ -9,7 +9,7 @@ import invariant from 'invariant'
  * @todo 腾讯地图key
  */
 const mapKey = 'DLFBZ-7AXKW-TWYRV-OLVUQ-FA527-2CBQG'
-const mapSdk = new MapSdk({key: mapKey})
+const mapSdk = new MapSdk({ key: mapKey })
 
 class WeixinSDK {
 
@@ -18,19 +18,19 @@ class WeixinSDK {
     CHANGE_COSTOM_INDEX_ADDRESS: 'CHANGE_COSTOM_INDEX_ADDRESS'
   }
 
-  public checkAuth = (auth: string): Promise<{success: boolean, result?: any}> => {
+  public checkAuth = (auth: string): Promise<{ success: boolean, result?: any }> => {
     const key = `scope.${auth}`;
     return new Promise((resolve) => {
       Taro.getSetting({
         success: (setting) => {
           console.log(setting);
           if (setting.authSetting && !!setting.authSetting[key]) {
-            resolve({success: true})
+            resolve({ success: true })
           }
-          resolve({success: false})
+          resolve({ success: false })
         },
         fail: (res) => {
-          resolve({success: false, result: res})
+          resolve({ success: false, result: res })
         }
       });
     });
@@ -39,20 +39,33 @@ class WeixinSDK {
   public authorize = async (auth: string): Promise<any> => {
     const key = `scope.${auth}`;
     const result = await Taro.authorize({ scope: key });
-    console.log('result aaa', result);
     return result;
   }
 
-  public chooseAddress = async (): Promise<{success: boolean, result: any}> => {
+  public chooseAddress = async (): Promise<{ success: boolean, result: any }> => {
     return new Promise((resolve) => {
       Taro.chooseLocation({
         success: (result) => {
-          resolve({success: true, result})
+          resolve({ success: true, result })
         },
         fail: (result) => {
-          resolve({success: false, result})
+          resolve({ success: false, result })
         }
       });
+    })
+  }
+
+  public getWeixinCode = async (): Promise<any> => {
+    return new Promise((resolve) => {
+      Taro.login({
+        success: async (res) => {
+          const { code } = res;
+          resolve({success: true, result: code, msg: ''});
+        },
+        fail: (error: any) => {
+          resolve({ success: false, result: undefined, msg: error.errMsg });
+        }
+      })
     })
   }
 
@@ -74,7 +87,7 @@ class WeixinSDK {
     }
   }
 
-  public getLocation = async (): Promise<{success: boolean, result: any, msg: string}> => {
+  public getLocation = async (): Promise<{ success: boolean, result: any, msg: string }> => {
     const that = this;
     return new Promise((resolve) => {
       Taro.getLocation({
@@ -93,15 +106,15 @@ class WeixinSDK {
                   longitude: result.result.location.lng,
                 }
               })
-              resolve({success: true, result: result.result, msg: ''})
+              resolve({ success: true, result: result.result, msg: '' })
             },
             fail: (error) => {
-              resolve({success: false, result: undefined, msg: error.message})
+              resolve({ success: false, result: undefined, msg: error.message })
             }
           })
         },
         fail: (error) => {
-          resolve({success: false, result: undefined, msg: error.message})
+          resolve({ success: false, result: undefined, msg: error.message })
         }
       })
     })

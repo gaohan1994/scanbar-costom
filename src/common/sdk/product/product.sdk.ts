@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-04 13:51:10
+ * @Last Modified time: 2020-03-05 10:42:41
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -506,9 +506,9 @@ class ProductSDK {
       }
     }
 
-    if (num === 0) {
-      return;
-    }
+    // if (num && num <= 0) {
+    //   return;
+    // }
 
     const reducer: ProductSDKReducer.ProductManageCart = {
       type: this.reducerInterface.MANAGE_CART_PRODUCT,
@@ -566,8 +566,8 @@ class ProductSDK {
     } else {
       this.reduce(product);
     }
+    this.storageProductCartList();
 
-    
   }
 
   /**
@@ -604,6 +604,11 @@ class ProductSDK {
     Taro.redirectTo({
       url: `/pages/order/order.detail?id=${order.orderNo}`
     })
+  }
+
+  public storageProductCartList = () => {
+    const productCartList = store.getState().productSDK.productCartList;
+    console.log('test aaa', productCartList);
   }
 }
 

@@ -1,30 +1,31 @@
-import Taro from '@tarojs/taro';
-import { View, Button } from '@tarojs/components';
-import './modal.less';
-import { AtModal, AtModalContent } from 'taro-ui';
-import requestHttp from '../../common/request/request.http';
+import Taro, { Config } from '@tarojs/taro';
+import { View, Button, Image } from '@tarojs/components';
+import './index.less';
 import { LoginManager } from '../../common/sdk';
 import invariant from 'invariant';
 import { ResponseCode } from '../../constants';
-import { UserAction } from '../../actions';
 import WeixinSDK from '../../common/sdk/weixin/weixin';
+import { UserAction } from '../../actions';
+import requestHttp from '../../common/request/request.http';
 
-const cssPrefix = 'login-modal';
+const cssPrefix = 'login';
 
 interface Props {
-  isOpen: boolean;
-  onCancle: () => void;
-  callback?: (userinfo: any) => void;
+
 }
 
 interface State {
 
 }
 
-class LoginModal extends Taro.Component<Props, State> {
+class GetUserinfo extends Taro.Component<Props, State> {
+  
+  config: Config = {
+    navigationBarTitleText: '登录'
+  }
 
   public onGetPhoneNumber = async (params) => {
-    const { onCancle, callback } = this.props;
+    // const { onCancle, callback } = this.props;
     console.log('params: ', params);
     const { detail } = params;
     if (detail.errMsg === "getPhoneNumber:ok") {
@@ -37,7 +38,7 @@ class LoginModal extends Taro.Component<Props, State> {
       };
 
       try {
-        onCancle();
+        // onCancle();
         const result = await requestHttp.post('/customer/decrypt', payload);
         console.log('result: ', result);
         invariant(result.code === ResponseCode.success, result.msg || '获取手机号失败');
@@ -60,9 +61,10 @@ class LoginModal extends Taro.Component<Props, State> {
         }
         const setResult: any = await LoginManager.setUserInfo(localUserinfo);
         invariant(setResult.success, setResult.msg || '存储用户信息失败');
-        if (callback) {
-          callback(newUserinfo);
-        }
+        // if (callback) {
+        //   callback(newUserinfo);
+        // }
+        Taro.navigateBack();
       } catch (error) {
         Taro.showToast({
           title: error.message,
@@ -73,35 +75,22 @@ class LoginModal extends Taro.Component<Props, State> {
   }
 
   render() {
-    const { isOpen, onCancle } = this.props
     return (
-      <AtModal isOpened={isOpen} className={`${cssPrefix}-modal`}>
-        <AtModalContent>
-          <View className={`${cssPrefix}-content`}>
-            部分功能需要登录才能使用
-          </View>
-        </AtModalContent>
-        <View className={`${cssPrefix}-buttons`}>
-          <Button
-            className={`${cssPrefix}-button`}
-            onClick={onCancle}
-          >
-            取消
+      <View className={`${cssPrefix}`}>
+        <Image 
+          className={`${cssPrefix}-img`}
+          src={"//net.huanmusic.com/scanbar-c/v2/img_login.png"}
+        />
+        <Button 
+          className={`${cssPrefix}-button`}
+          openType='getPhoneNumber'
+          onGetPhoneNumber={this.onGetPhoneNumber}
+        >
+          微信手机号快捷登录
         </Button>
-          <Button
-            className={`${cssPrefix}-button ${cssPrefix}-blue`}
-            openType='getPhoneNumber'
-            onGetPhoneNumber={this.onGetPhoneNumber}
-          // onClick={onCancle}
-          >
-            确定
-        </Button>
-        </View>
-      </AtModal>
+      </View>
     )
   }
-
-
 }
 
-export default LoginModal;
+export default GetUserinfo;
