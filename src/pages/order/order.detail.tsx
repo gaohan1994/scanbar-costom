@@ -3,7 +3,7 @@ import { View, Image, Text, ScrollView } from '@tarojs/components';
 import './index.less';
 import { AtButton } from 'taro-ui';
 import classnames from 'classnames';
-import { getOrderDetail, getOrderAllStatus } from '../../reducers/app.order';
+import { getOrderDetail, getOrderAllStatus, getCurrentType } from '../../reducers/app.order';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
 import invariant from 'invariant';
@@ -16,12 +16,14 @@ import productSdk from '../../common/sdk/product/product.sdk';
 import CostomModal from '../../component/login/modal';
 import merchantAction from '../../actions/merchant.action';
 import ProductPayListView from '../../component/product/product.pay.listview'
+import OrderButtons from '../../component/order/order.buttons';
 
 const cssPrefix = 'order-detail';
 
 interface Props {
   orderDetail: OrderInterface.OrderDetail;
   orderAllStatus: any[];
+  currentType: number;
 }
 
 interface State {
@@ -245,12 +247,17 @@ class OrderDetail extends Taro.Component<Props, State> {
   }
 
   render() {
-    const { callModal } = this.state
+    const { callModal } = this.state;
+    const { orderDetail } = this.props;
     return (
       <View className={`container order`}>
         <View className={`${cssPrefix}-bg`} />
         <ScrollView className={`${cssPrefix}-container`} scrollY={true}>
           {this.renderStatusCard()}
+          {
+            orderDetail && orderDetail.refundOrderList && orderDetail.refundOrderList.length > 0 &&
+            this.renderRefundSchedule()
+          }
           {this.renderLogisticsCard()}
           {this.renderProductList()}
           {this.renderOrderCard()}
@@ -268,26 +275,26 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   private renderStatusCard() {
     const { time } = this.state;
-    const { orderDetail, orderAllStatus } = this.props;
+    const { orderDetail, orderAllStatus, currentType } = this.props;
     const res = OrderAction.orderStatus(orderAllStatus, orderDetail, time);
     return (
       <View className={`${cssPrefix}-card ${cssPrefix}-card-status`}>
         {
-          res.title === '待支付'
+          res.title === '待支付' || res.title === '待发货' || res.title === '等待商家处理'
             ? (
               <Image
                 className={`${cssPrefix}-card-status-img2`}
                 src='//net.huanmusic.com/weapp/customer/img_payment.png'
               />
             )
-            : res.title === '待自提' || res.title === '待收货'
+            : res.title === '待自提' || res.title === '待收货' || res.title === '商家同意退货'
               ? (
                 <Image
                   className={`${cssPrefix}-card-status-img1`}
                   src='//net.huanmusic.com/weapp/customer/img_waitting.png'
                 />
               )
-              : res.title === '已取消'
+              : res.title === '已取消' || res.title === '商家拒绝了退货申请' || res.title === '您撤销了退货申请'
                 ? (
                   <Image
                     className={`${cssPrefix}-card-status-img1`}
@@ -324,46 +331,21 @@ class OrderDetail extends Taro.Component<Props, State> {
         }
 
         <View className={`${cssPrefix}-card-status-button`}>
-          {
-            res.title === '待支付' && (
-              <AtButton
-                className={`${cssPrefix}-card-status-button-common ${cssPrefix}-card-status-button-cancle`}
-                type='secondary'
-                size='small'
-                full={false}
-                onClick={() => { this.orderCancle(orderDetail.order); }}
-              >
-                取消订单
-              </AtButton>
-            )
-          }
-          {
-            res.title === '待支付' && (
-              <AtButton
-                className={`${cssPrefix}-card-status-button-common ${cssPrefix}-card-status-button-again`}
-                type='secondary'
-                size='small'
-                full={false}
-                onClick={() => { this.onPay(orderDetail.order); }}
-              >
-                去支付
-              </AtButton>
-            )
-          }
-          {
-            res.title !== '待支付' && (
-              <AtButton
-                className={`${cssPrefix}-card-status-button-common ${cssPrefix}-card-status-button-again`}
-                type='secondary'
-                size='small'
-                full={false}
-                onClick={() => { this.orderOneMore(orderDetail); }}
-              >
-                再来一单
-              </AtButton>
-            )
-          }
+          <OrderButtons data={orderDetail} orderAllStatus={orderAllStatus} currentType={currentType} />
+        </View>
+      </View>
+    )
+  }
 
+  private renderRefundSchedule = () => {
+    return (
+      <View className={`${cssPrefix}-card ${cssPrefix}-card-refund`}>
+        <View className={`${cssPrefix}-card-refund-container`} onClick={() => {Taro.navigateTo({ url: '/pages/order/order.refund.schedule' })}}>
+          <Text className={`${cssPrefix}-card-refund-container-text`}>退货进度</Text>
+          <Image 
+            className={`${cssPrefix}-card-refund-container-icon`}
+            src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png'
+          />
         </View>
       </View>
     )
@@ -471,7 +453,7 @@ class OrderDetail extends Taro.Component<Props, State> {
         productList={orderDetailList}
         type={1}
         padding={false}
-        showCallModal={() => {this.setState({ callModal: true })}}
+        showCallModal={() => { this.setState({ callModal: true }) }}
       />
     )
   }
@@ -526,7 +508,8 @@ class OrderDetail extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => ({
   orderDetail: getOrderDetail(state),
-  orderAllStatus: getOrderAllStatus(state)
+  orderAllStatus: getOrderAllStatus(state),
+  currentType: getCurrentType(state),
 });
 
 export default connect(select)(OrderDetail);

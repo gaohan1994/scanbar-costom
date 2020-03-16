@@ -2,7 +2,7 @@
  * @Author: centerm.gaozhiying 
  * @Date: 2020-03-03 17:13:16 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-03 17:44:23
+ * @Last Modified time: 2020-03-16 14:15:05
  */
 import requestHttp from "../common/request/request.http";
 import { ResponseCode, UserService, UserInterfaceMap } from "../constants";
@@ -46,11 +46,11 @@ class UserAction {
     return result;
   }
 
-   /**
-   * @todo 删除收货地址
-   *
-   * @memberof UserAction
-   */
+  /**
+  * @todo 删除收货地址
+  *
+  * @memberof UserAction
+  */
   public addressDelete = async (params: any) => {
     const result = await requestHttp.delete(`/api/address/remove/${params.id}`, '');
     return result;
@@ -65,6 +65,35 @@ class UserAction {
     const result = await UserService.userInfoSave(params);
     return result;
   }
+
+  /**
+   * @todo 获取优惠券列表
+   *
+   * @memberof UserAction
+   */
+  public getAllCoupon = async () => {
+    const result = await UserService.getAllCoupon();
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
+        payload: result.data
+      });
+    }
+    return result;
+  }
+
+  public getMemberCoupons = async (params: any) => {
+    const result = await UserService.getMemberCoupons(params);
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
+        payload: result.data
+      });
+    }
+    return result;
+  }
+
+
 }
 
 export default new UserAction();

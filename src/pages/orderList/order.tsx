@@ -1,42 +1,40 @@
 import Taro, { Config } from '@tarojs/taro'
 import { View, ScrollView } from '@tarojs/components'
 import TabsSwitch from '../../component/tabs/tabs.switch';
-import './index.less'
-import { OrderInterface, ResponseCode } from '../../constants';
+import '../order/index.less'
+import { OrderInterface, ResponseCode, UserInterface } from '../../constants';
 import { OrderAction } from '../../actions';
 import invariant from 'invariant';
-import { getOrderList, getOrderListTotal, getOrderCount, getOrderAllStatus } from '../../reducers/app.order';
+import { getOrderList, getOrderListTotal, getOrderCount, getOrderAllStatus, getCurrentType } from '../../reducers/app.order';
 import { connect } from '@tarojs/redux';
 import OrderItem from '../../component/order/order';
 import "../style/product.less";
 import Empty from '../../component/empty';
-import GetUserinfoModal from '../../component/login/login.userinfo';
-import LoginModal from '../../component/login/login.modal';
-import { LoginManager } from '../../common/sdk';
 import orderAction from '../../actions/order.action';
+import { store } from '../../app';
+import { getUserinfo } from '../../reducers/app.user';
 
 const cssPrefix = 'order';
 
 let pageNum: number = 1;
 const pageSize: number = 20;
 
-
-
 interface Props {
   orderList: OrderInterface.OrderDetail[];
   orderListTotal: number;
   orderCount: OrderInterface.OrderCount;
   orderAllStatus: any[];
+  currentType: number;
+  userinfo: UserInterface.UserInfo;
 }
 
 interface State {
-  currentType: number;
   getUserinfoModal: boolean;
   loginModal: boolean;
 }
+
 class Order extends Taro.Component<Props, State> {
   state = {
-    currentType: 0,
     getUserinfoModal: false,
     loginModal: false
   }
@@ -45,50 +43,55 @@ class Order extends Taro.Component<Props, State> {
     navigationBarTitleText: '订单',
   }
 
-  async componentDidShow() {
-    const result = await LoginManager.getUserInfo();
-    if (result.success) {
-      const userinfo = result.result;
-      if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
-        this.setState({ getUserinfoModal: true });
-        return;
-      }
-      if ((!userinfo.phone || userinfo.phone.length === 0)) {
-        this.setState({ loginModal: true });
-        return;
-      };
-    } else {
-      Taro.showToast({
-        title: '获取用户信息失败',
-        icon: 'none'
-      });
-    }
+  async componentDidMount() {
+    // this.loginCheck();
+  }
 
+  async componentDidShow() {
+    const { userinfo } = this.props;
+    if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
+      return;
+    }
+    if ((userinfo.phone === undefined || userinfo.phone.length === 0)) {
+      return;
+    };
     this.init();
   }
 
-  // componentDidMount() {
-  //   this.init();
-  // }
+  public loginCheck() {
+    const { userinfo } = this.props;
+    if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
+      // this.setState({ getUserinfoModal: true });
+      Taro.navigateTo({ url: '/pages/login/login.userinfo' })
+      return false;
+    }
+    if ((userinfo.phone === undefined || userinfo.phone.length === 0)) {
+      Taro.navigateTo({ url: '/pages/login/login' })
+      return false;
+    };
+    return true;
+  }
 
-  public onChangeTab = (tabNum: number) => {
-    this.setState({
-      currentType: tabNum
-    }, () => {
-      this.fetchOrder(1);
-      OrderAction.orderCount();
+  public onChangeTab = async (tabNum: number) => {
+    await store.dispatch({
+      type: 'CHANGR_CURRENT_TYPE',
+      payload: {
+        currentType: tabNum
+      }
     });
+    this.fetchOrder(1);
+    OrderAction.orderCount();
   }
 
   public init = async () => {
-    const { currentType } = this.state;
+    const { currentType } = this.props;
     pageNum = 1;
     OrderAction.orderList({ pageNum: pageNum++, pageSize, ...orderAction.getFetchType(currentType) });
     OrderAction.orderCount();
   }
 
   public fetchOrder = async (page?: number) => {
-    const { currentType } = this.state;
+    const { currentType } = this.props;
     try {
       let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === 'number' ? page : pageNum,
@@ -111,18 +114,18 @@ class Order extends Taro.Component<Props, State> {
     }
   }
 
-  getPhoneNumber = (userinfo: any) => {
-    if (userinfo.phone === undefined || userinfo.phone.length === 0) {
-      this.setState({
-        loginModal: true
-      });
-    }
-  }
+  // getPhoneNumber = (userinfo: any) => {
+  //   if (userinfo.phone === undefined || userinfo.phone.length === 0) {
+  //     this.setState({
+  //       loginModal: true
+  //     });
+  //   }
+  // }
 
   render() {
-    const { orderList, orderListTotal, orderAllStatus} = this.props;
+    const { orderList, orderListTotal, orderAllStatus, currentType, userinfo } = this.props;
     const hasMore = orderList.length < orderListTotal;
-    const { getUserinfoModal, loginModal, currentType } = this.state;
+    // const { getUserinfoModal, loginModal } = this.state;
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-tabs`}>
@@ -144,7 +147,7 @@ class Order extends Taro.Component<Props, State> {
                   orderList.map((item: any) => {
                     return (
                       <View className={`${cssPrefix}-scrollview-item`} key={item.orderNo}>
-                        <OrderItem data={item} orderAllStatus={orderAllStatus} currentType={currentType}/>
+                        <OrderItem data={item} orderAllStatus={orderAllStatus} currentType={currentType} />
                       </View>
                     )
                   })
@@ -156,31 +159,41 @@ class Order extends Taro.Component<Props, State> {
               </ScrollView>
             )
             : (
-              <Empty
-                img='//net.huanmusic.com/img_order_empty.png'
-                text='还没有订单，快去选购吧'
-                button={{
-                  title: '去选购',
-                  onClick: () => {
-                    Taro.switchTab({
-                      url: `/pages/index/index`
-                    })
-                  }
-                }}
-              />
-            )
-        }
+              userinfo.nickname === undefined || userinfo.nickname.length === 0 ||
+                userinfo.phone === undefined || userinfo.phone.length === 0 ? (
+                  <Empty
+                    img='//net.huanmusic.com/scanbar-c/v1/img_cart.png'
+                    text='完成登录后可享受更多会员服务'
+                    button={{
+                      title: '去登录',
+                      onClick: () => this.loginCheck()
+                    }}
+                  />
+                ) : (
+                  < Empty
+                    img='//net.huanmusic.com/scanbar-c/v1/img_cart.png'
+                    text='还没有订单，快去选购吧'
+                    button={{
+                      title: '去选购',
+                      onClick: () => {
+                        Taro.switchTab({
+                          url: `/pages/index/index`
+                        })
+                      }
+                    }}
+                  />
+                )
+            )}
 
-        <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
-        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} />
+        {/* <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
+        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} /> */}
 
       </View>
     )
   }
 
   private renderTabs = () => {
-    const { currentType } = this.state;
-    const { orderCount } = this.props;
+    const { orderCount, currentType } = this.props;
     const orderTypes = [
       {
         title: '全部'
@@ -188,6 +201,10 @@ class Order extends Taro.Component<Props, State> {
       {
         title: '待支付',
         num: orderCount.initNum || 0,
+      },
+      {
+        title: '待发货',
+        num: orderCount.waitForSend || 0,
       },
       {
         title: '待收货',
@@ -205,7 +222,6 @@ class Order extends Taro.Component<Props, State> {
         onChangeTab={this.onChangeTab}
       />
     )
-
   }
 }
 
@@ -213,7 +229,9 @@ const select = (state: any) => ({
   orderList: getOrderList(state),
   orderListTotal: getOrderListTotal(state),
   orderCount: getOrderCount(state),
-  orderAllStatus: getOrderAllStatus(state)
+  orderAllStatus: getOrderAllStatus(state),
+  currentType: getCurrentType(state),
+  userinfo: getUserinfo(state)
 });
 
 export default connect(select)(Order);

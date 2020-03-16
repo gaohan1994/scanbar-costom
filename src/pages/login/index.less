@@ -1,0 +1,28 @@
+@import "../../styles/theme.less";
+
+@login-prefix: login;
+
+.@{login-prefix} {
+  background-color: #fff;
+  .flex(center, flex-start, column);
+  width: 100%;
+  height: 100%;
+
+  &-img {
+    width: 604px;
+    height: 444px;
+    margin-top: 251px;
+  }
+
+  &-button {
+    width: 670px;
+    height: 80px;
+    margin-top: 104px;
+    background-color: #2A86FC;
+    border-radius: 40px;
+    color: #fff;
+    font-size: 32px;
+    line-height: 32px;
+    .flex(center, center);
+  }
+}
