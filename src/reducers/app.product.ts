@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:26:45 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-03 17:42:01
+ * @Last Modified time: 2020-03-09 14:05:37
  */
 
 import { ProductInterface, ProductInterfaceMap } from "../constants";
@@ -28,9 +28,7 @@ export declare namespace ProductReducer {
       ProductInterface.RECEIVE_PRODUCT_LIST
       | ProductInterface.RECEIVE_PRODUCT_SEARCH_LIST
       | ProductInterface.RECEIVE_PRODUCT_TYPE
-      | ProductInterface.RECEIVE_PRODUCT_SUPPLIER
       | ProductInterface.RECEIVE_PRODUCT_DETAIL
-      | ProductInterface.SET_SELECT_PRODUCT;
     payload: any;
   }
 }
@@ -50,23 +48,6 @@ export const initState: ProductReducer.InitState = {
 
 export default function productReducer (state: ProductReducer.InitState = initState, action: ProductReducer.Action): ProductReducer.InitState {
   switch (action.type) {
-    case ProductInterfaceMap.reducerInterfaces.SET_SELECT_PRODUCT: {
-      const { payload: { selectProduct } } = action;
-      return {
-        ...state,
-        selectProduct
-      };
-    }
-    case ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_MANAGE_LIST: {
-      const { payload: { rows, total } } = action;
-      return {
-        ...state,
-        productManageList: {
-          data: rows,
-          total: total,
-        }
-      };
-    }
 
     case ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_LIST: {
       const { payload: { rows } } = action;
@@ -140,12 +121,7 @@ export const getProductList = (state: AppReducer.AppState) => state.product.prod
 
 export const getProductSearchList = (state: AppReducer.AppState) => state.product.productSearchList;
 
-export const getProductManageList = (state: AppReducer.AppState) => state.product.productManageList.data;
-
 export const getProductType = (state: AppReducer.AppState) => state.product.productType;
 
-export const getProductSupplier = (state: AppReducer.AppState) => state.product.productSupplier;
 
 export const getProductDetail = (state: AppReducer.AppState) => state.product.productDetail;
-
-export const getSelectProduct = (state: AppReducer.AppState) => state.product.selectProduct;

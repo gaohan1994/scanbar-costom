@@ -56,7 +56,7 @@ class ProductPayListView extends Taro.Component<Props> {
                 <View className={`${cssPrefix}-row-header-item`}>
                   <Text className={`${cssPrefix}-row-header-shop`}>{order.merchantName || '未知商店'}</Text>
                 </View>
-                <View className={`${cssPrefix}-row-header-item`} onClick={() => { showCallModal ? showCallModal() : () => {} }}>
+                <View className={`${cssPrefix}-row-header-item`} onClick={() => { showCallModal ? showCallModal() : () => { } }}>
                   <Image
                     className={`${cssPrefix}-row-header-phone`}
                     src={'//net.huanmusic.com/weapp/icon_order_phone.png'}
@@ -76,7 +76,7 @@ class ProductPayListView extends Taro.Component<Props> {
               })
           }
           {
-            ((payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1) 
+            ((payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1)
               || (order && order.deliveryType !== undefined && order.deliveryType === 1)) && (
               <View className={`${cssPrefix}-row-totals`}>
                 <View className={`${cssPrefix}-row-content-item`}>
@@ -98,7 +98,7 @@ class ProductPayListView extends Taro.Component<Props> {
               </View>
             )
           }
-          {/*this.renderDisount()*/}
+          {this.renderDisount()}
           {this.renderTotal()}
         </View>
       </View>
@@ -138,11 +138,11 @@ class ProductPayListView extends Taro.Component<Props> {
               <View className={`${cssPrefix}-row-corner`}>
                 <View>
                   <Text className={`${cssPrefix}-row-corner-price`}>￥</Text>
-                  <Text className={`${cssPrefix}-row-corner-big`}>{numeral(item.transAmount).format('0.00').split('.')[0]}</Text>
-                  <Text className={`${cssPrefix}-row-corner-price`}>{`.${numeral(item.transAmount).format('0.00').split('.')[1]}`}</Text>
+                  <Text className={`${cssPrefix}-row-corner-big`}>{numeral(item.viewPrice * item.num).format('0.00').split('.')[0]}</Text>
+                  <Text className={`${cssPrefix}-row-corner-price`}>{`.${numeral(item.viewPrice * item.num).format('0.00').split('.')[1]}`}</Text>
                 </View>
                 {
-                  item.totalAmount !== item.transAmount && (
+                  item.totalAmount !== (item.viewPrice * item.num) && (
                     <Text className={`${cssPrefix}-row-corner-origin`}>{`￥${item.totalAmount}`}</Text>
                   )
                 }
@@ -183,12 +183,12 @@ class ProductPayListView extends Taro.Component<Props> {
             <View className={`${cssPrefix}-row-corner`}>
               <View>
                 <Text className={`${cssPrefix}-row-corner-price`}>￥</Text>
-                <Text className={`${cssPrefix}-row-corner-big`}>{numeral(productSdk.getProductItemPrice(item)).format('0.00').split('.')[0]}</Text>
-                <Text className={`${cssPrefix}-row-corner-price`}>{`.${numeral(productSdk.getProductItemPrice(item)).format('0.00').split('.')[1]}`}</Text>
+                <Text className={`${cssPrefix}-row-corner-big`}>{numeral(productSdk.getProductItemPrice(item) * item.sellNum).format('0.00').split('.')[0]}</Text>
+                <Text className={`${cssPrefix}-row-corner-price`}>{`.${numeral(productSdk.getProductItemPrice(item) * item.sellNum).format('0.00').split('.')[1]}`}</Text>
               </View>
               {
-                item.price !== productSdk.getProductItemPrice(item) && (
-                  <Text className={`${cssPrefix}-row-corner-origin`}>{`￥${item.price}`}</Text>
+                (item.price * item.sellNum) !== (productSdk.getProductItemPrice(item) * item.sellNum) && (
+                  <Text className={`${cssPrefix}-row-corner-origin`}>{`￥${item.price * item.sellNum}`}</Text>
                 )
               }
             </View>
@@ -199,6 +199,7 @@ class ProductPayListView extends Taro.Component<Props> {
   }
 
   private renderDisount = () => {
+    const { payOrderDetail } = this.props;
     return (
       <View>
         <View className={`${cssPrefix}-row-totals`}>
@@ -224,7 +225,7 @@ class ProductPayListView extends Taro.Component<Props> {
               </View>
               <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
             </View>
-            <View className={`${cssPrefix}-row-content-column-item`}>
+            {/* <View className={`${cssPrefix}-row-content-column-item`}>
               <View className={`${cssPrefix}-row-content-row`}>
                 <View
                   className={classnames(
@@ -239,11 +240,11 @@ class ProductPayListView extends Taro.Component<Props> {
                 <Text className={`${cssPrefix}-row-discount-title`}>首单立减10元</Text>
               </View>
               <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
-            </View>
+            </View> */}
           </View>
         </View>
 
-        <View className={`${cssPrefix}-row-totals`}>
+        <View className={`${cssPrefix}-row-totals`} onClick={() => { Taro.navigateTo({ url: '/pages/order/order.pay.coupon' }) }}>
           <View className={`${cssPrefix}-row-content-item`}>
             <Text className={`${cssPrefix}-row-voucher`}>抵用券</Text>
             <View>
@@ -262,7 +263,7 @@ class ProductPayListView extends Taro.Component<Props> {
   private renderTotal = () => {
     const { payOrderDetail, type, orderDetail } = this.props;
     const { order } = orderDetail;
-    let price = numeral(productSdk.getProductTransPrice() + 
+    let price = numeral(productSdk.getProductTransPrice() +
       (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? 3.5 : 0)).format('0.00');
     let discountPrice = numeral(numeral(productSdk.getProductsOriginPrice()).value() - numeral(productSdk.getProductTransPrice()).value()).format('0.00');
     if (type && type === 1) {

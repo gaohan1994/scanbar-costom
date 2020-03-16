@@ -2,7 +2,7 @@
  * @Author: centerm.gaozhiying 
  * @Date: 2020-03-04 09:02:08 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-04 09:02:58
+ * @Last Modified time: 2020-03-10 15:32:33
  * 
  * @todo 商品列表
  */
@@ -16,6 +16,7 @@ import { AtActivityIndicator } from 'taro-ui';
 import classnames from 'classnames';
 import merge from 'lodash.merge'
 import Empty from '../empty';
+import {  CommonEventFunction } from '@tarojs/components/types/common';
 
 const cssPrefix = 'product';
 
@@ -27,6 +28,7 @@ type Props = {
   isRenderFooter?: boolean;
   bottomSpector?: boolean;
   isHome?: boolean;
+  onScroll?: (e: any) => any;
 };
 
 class ProductListView extends Taro.Component<Props> {
@@ -47,6 +49,11 @@ class ProductListView extends Taro.Component<Props> {
     bottomSpector: true,
   };
 
+  public onScroll = (event: CommonEventFunction) => {
+    const { detail } = event;
+    console.log('detail: ', detail);
+  }
+
   /**
    * @todo [切换类别滑动到顶端code]
    * @param nextProps 
@@ -56,21 +63,22 @@ class ProductListView extends Taro.Component<Props> {
     const currentList: any = merge([], this.props.productList);
     if (nextList.length > 0 && currentList.length > 0) { 
       if (nextList.length !== currentList.length || nextList !== currentList) {
-        
         this.setState({
           scrollIntoView: `product${nextList[0].id}`
         })
       }
     }
   }
+  
 
   render () {
-    const { className, loading, productList, isRenderFooter, bottomSpector, isHome } = this.props;
+    const { className, loading, productList, isRenderFooter, bottomSpector, isHome, onScroll } = this.props;
     return (
       <ScrollView 
         scrollY={true}
         scrollIntoView={this.state.scrollIntoView}
         className={classnames(`${cssPrefix}-list-right`, className)}
+        onScroll={onScroll}
       >
         {
           !loading 

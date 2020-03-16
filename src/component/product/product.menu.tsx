@@ -12,6 +12,7 @@ type Props = {
   currentMenu: ProductInterface.ProductType | OrderInterface.DateItem;
   menu: ProductInterface.ProductType[] | OrderInterface.DateItem[];
   onClick: ((menu: ProductInterface.ProductType) => void) | ((menu: any) => void);
+  onTouchMove?: (e: any) => any;
 };
 
 class ProductMenu extends Taro.Component<Props> {
@@ -26,11 +27,12 @@ class ProductMenu extends Taro.Component<Props> {
   };
 
   render () {
-    const { className, menu, currentMenu, onClick } = this.props;
+    const { className, menu, currentMenu, onClick, onTouchMove } = this.props;
     return (
       <ScrollView 
         scrollY={true}
         className={classnames(`${cssPrefix}-list-left`, className)}
+        onTouchMove={onTouchMove}
       > 
         {this.props.children}
         {

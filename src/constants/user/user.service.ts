@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-03 17:18:46
+ * @Last Modified time: 2020-03-16 13:54:13
  * 
  * @todo [用户相关的接口]
  * ```js
@@ -13,7 +13,7 @@
  */
 
 import requestHttp from "../../common/request/request.http";
-import { HTTPInterface } from '../index';
+import { HTTPInterface, jsonToQueryString } from '../index';
 import { UserInterface } from "./user";
 
 class UserService {
@@ -34,7 +34,27 @@ class UserService {
   }
 
   public userInfoSave = async (params: UserInterface.UserInfo): Promise<HTTPInterface.ResponseResultBase<any>> => {
-    const result = await requestHttp.post('/api/save', params);
+    const result = await requestHttp.post('/api/customer/save', params);
+    return result;
+  }
+
+  public getAllCoupon = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get('api/coupon/getAllCoupon');
+    return result;
+  }
+
+  public getAbleToUseCoupon = async (params: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.post('api/coupon/getAbleToUseCoupon', params);
+    return result;
+  }
+
+  public getMemberCoupons = async (params: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`api/coupon/getMemberCoupons/${jsonToQueryString(params)}`);
+    return result;
+  }
+
+  public getMemberExpiredCoupons = async (params: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`api/coupon/getMemberCoupons/${jsonToQueryString(params)}`);
     return result;
   }
 }

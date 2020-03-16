@@ -22,7 +22,7 @@ class HttpRequest {
     };
 
     // console.log('token', result)
-    if (result !== '') {
+    if (!!result) {
       option.header.Authorization = result;
     }
     // console.log('option: ', option);

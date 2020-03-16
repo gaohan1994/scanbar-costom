@@ -8,6 +8,7 @@ import classnames from 'classnames'
 import invariant from 'invariant';
 import productSdk from '../../common/sdk/product/product.sdk';
 import orderAction from '../../actions/order.action';
+import OrderButtons from './order.buttons';
 
 const cssPrefix = 'component-order-item';
 
@@ -112,8 +113,55 @@ class OrderItem extends Taro.Component<Props, State> {
     }
   }
 
+  public getOrderButtons = (params: OrderInterface.OrderDetail, time?: number) => {
+    if (time && time === -1) {
+      return [
+        { title: '再来一单', function: this.orderOneMore },
+      ];
+    }
+
+    const { order } = params;
+
+    if (order && order.transFlag !== undefined) {
+      switch (order.transFlag) {
+        case 0:
+          return [
+            { title: '去支付', function: this.onPay },
+            { title: '再来一单', function: this.orderOneMore },
+          ];
+        case 1:
+          return {
+            title: '已完成',
+            detail: '订单已完成，感谢您的信任'
+          }
+        case 2:
+          return {
+            title: '已取消',
+            detail: '超时未支付或您已取消，订单已取消'
+          }
+        case 10:
+          return {
+            title: '待发货',
+            detail: '商品待商家配送，请耐心等待'
+          }
+        case 12:
+          return {
+            title: '待收货',
+            detail: '商品待商家配送，请耐心等待'
+          }
+        case 11:
+          return {
+            title: '待自提',
+            detail: '请去门店自提商品'
+          }
+        default:
+          return ['再来一单']
+      }
+    }
+  }
+
   render() {
-    const { data, orderAllStatus } = this.props;
+    const { data, orderAllStatus, currentType } = this.props;
     const { order, orderDetailList } = data;
     const res = OrderAction.orderStatus(orderAllStatus, data);
     let products: any[] = [];
@@ -190,7 +238,9 @@ class OrderItem extends Taro.Component<Props, State> {
             <Text className={`${cssPrefix}-card-center-info-total`}>共{order.totalNum}件</Text>
           </View>
         </View>
-        {
+        <View className={`${cssPrefix}-card-button`}>
+          {/* <OrderButtons data={data} orderAllStatus={orderAllStatus} currentType={currentType}/> */}
+          {
           res.title === '待支付'
             ? (
               <View className={`${cssPrefix}-card-button`}>
@@ -219,6 +269,8 @@ class OrderItem extends Taro.Component<Props, State> {
               </View>
             )
         }
+        </View>
+
       </View>
     );
 

@@ -1,0 +1,165 @@
+@import "../../styles/theme.less";
+
+@coupon-modal: coupon-modal;
+
+.@{coupon-modal} {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  .flex(center, center, column);
+  background-color: rgba(0, 0, 0, .6);
+
+  &-container {
+    width: 668px;
+    height: 889px;
+    position: relative;
+    .bg;
+    background-image: url(//net.huanmusic.com/scanbar-c/v2/popup_coupon_n.png);
+
+    &-list {
+      position: absolute;
+      top: 295px;
+      left: 32px;
+      width: 605px;
+      height: 439px;
+      padding-left: 17px;
+    }
+  }
+
+  &-footer {
+    position: absolute;
+    top: 734px;
+    left: 32px;
+    width: 605px;
+    height: 140px;
+    .flex(center, center);
+  }
+
+  &-button {
+    background-image: linear-gradient(#FFCF3D, #FABD2A);
+    width: 577px;
+    height: 77px;
+    .flex(center, center);
+    color: #F75959;
+    font-size: 35px;
+    line-height: 35px;
+    // position: absolute;
+    // bottom: 36px;
+    // left: 30px;
+    border-radius: 84px;
+  }
+
+  &-close {
+    width: 100px;
+    height: 100px;
+    .flex(center, center);
+    margin-top: 10px;
+
+    &-img {
+      width: 57px;
+      height: 57px;
+    }
+  }
+
+  &-item {
+    margin-top: 13px;
+    &-text-grey {
+      color: #CCCCCC !important;
+    }
+
+    &-border-grey {
+      border-color: #CCCCCC !important;
+    }
+
+    &-top {
+      position: relative;
+      .flex(center, center, row);
+      width: 571px;
+      height: 151px;
+      z-index: 2;
+      .bg;
+      background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_coupon.png);
+
+      &-grey {
+        background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_coupon_grey.png);
+      }
+
+      &-left {
+        .flex(center, center, column);
+        width: 175px;
+        height: 100%;
+        color: #fff;
+
+        &-price {
+          font-size: 66px;
+          line-height: 66px;
+          font-weight: bold;
+          position: relative;
+        }
+
+        &-sign {
+          font-size: 20px;
+          line-height: 20px;
+          font-weight: bold;
+          position: absolute;
+          right: -15px;
+          top: 10px;
+        }
+
+        &-info {
+          font-size: 21px;
+          line-height: 21px;
+          margin-top: 20px;
+        }
+      }
+
+      &-right {
+        .flex(flex-start, center, column);
+        width: 396px;
+        height: 100%;
+        margin-left: 46px;
+
+        &-row {
+          .flex(center, center, row);
+          margin-top: 25px;
+        }
+
+        &-info {
+          font-size: 25px;
+          line-height: 25px;
+          color: #333333;
+          font-weight: bold;
+        }
+
+        &-time {
+          font-size: 18px;
+          line-height: 18px;
+          color: #666666;
+        }
+      }
+
+      &-button {
+        position: absolute;
+        right: 30px;
+        top: 65px;
+        .flex(center, center);
+        width: 109px;
+        height: 41px;
+        color: #FF893B;
+        font-size: 23px;
+        text-align: center;
+        border: #FF893B solid 2px;
+        border-radius: 20px;
+      }
+    }
+  }
+}
+
+.at-modal__container {
+  background-color: transparent !important;
+}

@@ -5,10 +5,12 @@ import './index.less';
 import "../../component/card/form.card.less";
 import invariant from 'invariant';
 import { LoginManager } from '../../common/sdk';
-import { ResponseCode } from '../../constants';
+import { ResponseCode, UserInterface } from '../../constants';
 import LoginModal from '../../component/login/login.modal';
 import GetUserinfoModal from '../../component/login/login.userinfo';
 import { UserAction } from '../../actions';
+import { getUserinfo } from '../../reducers/app.user';
+import { connect } from '@tarojs/redux';
 
 
 const Rows = [
@@ -27,17 +29,17 @@ const Rows = [
 const cssPrefix = 'user';
 
 interface Props {
-
+  userinfo: UserInterface.UserInfo;
 }
 interface State {
-  userinfo: any;
+  // userinfo: any;
   getUserinfoModal: boolean;
   loginModal: boolean;
 }
 class User extends Taro.Component<Props, State> {
 
   state = {
-    userinfo: {} as any,
+    // userinfo: {} as any,
     getUserinfoModal: false as any,
     loginModal: false as any
   }
@@ -46,21 +48,6 @@ class User extends Taro.Component<Props, State> {
     navigationBarTitleText: '我的'
   }
 
-  async componentDidShow() {
-    const result = await LoginManager.getUserInfo();
-    if (result.success) {
-      this.setState({
-        userinfo: result.result,
-      }, () => {
-        this.getWxInfo(false);
-      })
-    } else {
-      Taro.showToast({
-        title: '请先登录',
-        icon: 'none'
-      });
-    }
-  }
 
   public address = async () => {
     const result = await WeixinSDK.chooseAddress();
@@ -69,13 +56,15 @@ class User extends Taro.Component<Props, State> {
 
   public onRowClick = (row: any) => {
     if (row.title === '我的地址') {
-      const { userinfo } = this.state;
+      const { userinfo } = this.props;
       if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
-        this.setState({ getUserinfoModal: true });
+        // this.setState({ getUserinfoModal: true });
+        Taro.navigateTo({ url: '/pages/login/login.userinfo' })
         return;
       }
-      if ((!userinfo.phone || userinfo.phone.length === 0)) {
-        this.setState({ loginModal: true });
+      if ((userinfo.phone === undefined || userinfo.phone.length === 0)) {
+        // this.setState({ loginModal: true });
+        Taro.navigateTo({ url: '/pages/login/login' })
         return;
       };
     }
@@ -87,13 +76,15 @@ class User extends Taro.Component<Props, State> {
 
   public getWxInfo = async (show?: boolean) => {
     try {
-      const { userinfo } = this.state;
+      const { userinfo } = this.props;
       if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
-        this.setState({ getUserinfoModal: true });
+        // this.setState({ getUserinfoModal: true });
+        Taro.navigateTo({ url: '/pages/login/login.userinfo' })
         return;
       }
-      if ((!userinfo.phone || userinfo.phone.length === 0)) {
-        this.setState({ loginModal: true });
+      if ((userinfo.phone === undefined || userinfo.phone.length === 0)) {
+        // this.setState({ loginModal: true });
+        Taro.navigateTo({ url: '/pages/login/login' })
         return;
       };
       this.getWxUserInfo(show);
@@ -109,7 +100,7 @@ class User extends Taro.Component<Props, State> {
 
   public getWxUserInfo = async (show?: boolean) => {
     try {
-      const { userinfo } = this.state;
+      const { userinfo } = this.props;
       const result: any = await WeixinSDK.getWeixinUserinfo();
       invariant(result.success, result.msg || '获取用户昵称和头像失败');
       const newUserinfo = {
@@ -122,9 +113,6 @@ class User extends Taro.Component<Props, State> {
         invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
       }
 
-      this.setState({
-        userinfo: newUserinfo
-      })
       const setResult: any = await LoginManager.setUserInfo(newUserinfo);
       invariant(setResult.success, setResult.msg || '存储用户信息失败');
     } catch (error) {
@@ -137,26 +125,21 @@ class User extends Taro.Component<Props, State> {
     }
   }
 
-  getPhoneNumber = (userinfo: any) => {
-    this.setState({ userinfo })
-    if (userinfo.phone === undefined || userinfo.phone.length === 0) {
-      this.setState({
-        loginModal: true
-      });
-    }
-  }
+  // getPhoneNumber = (userinfo: any) => {
+  //   this.setState({ userinfo });
+  //   if (userinfo.phone === undefined || userinfo.phone.length === 0) {
+  //     this.setState({
+  //       loginModal: true
+  //     });
+  //   }
+  // }
 
   render() {
-    // const { userinfo } = this.props;
-    const { userinfo, loginModal, getUserinfoModal } = this.state;
+    const { userinfo } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-bg`} />
         <View className={`${cssPrefix}-container`}>
-          {/* <View
-            className={`${cssPrefix}-user`}
-            onClick={() => this.getWxInfo(true)}
-          > */}
           {
             userinfo && userinfo.phone && userinfo.phone.length > 0
               ? (
@@ -185,6 +168,7 @@ class User extends Taro.Component<Props, State> {
                       userinfo && userinfo.nickname && userinfo.nickname.length > 0
                         ? <View className={`${cssPrefix}-user-name`}>
                           {userinfo.nickname}
+                          <View className={`${cssPrefix}-user-member`}>普通会员</View>
                         </View>
                         : <View
                           // openType='getUserInfo'
@@ -192,7 +176,7 @@ class User extends Taro.Component<Props, State> {
                           className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
                         >
                           点击获取微信头像和昵称
-                  </View>
+                        </View>
                     }
                     <View className={`${cssPrefix}-user-phone`}>{userinfo.phone}</View>
                   </View>
@@ -222,8 +206,8 @@ class User extends Taro.Component<Props, State> {
                       className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
                       onClick={() => {
                         userinfo && userinfo.nickname && userinfo.nickname.length > 0
-                          ? this.setState({ loginModal: true })
-                          : this.setState({ getUserinfoModal: true })
+                          ? Taro.navigateTo({ url: '/pages/login/login' })
+                          : Taro.navigateTo({ url: '/pages/login/login.userinfo' })
                       }}
                     >
                       点击登录
@@ -232,6 +216,25 @@ class User extends Taro.Component<Props, State> {
                 </View>
               )
           }
+          <View className={`${cssPrefix}-code`}> </View>
+          <View className={`${cssPrefix}-member`}>
+            <View className={`${cssPrefix}-member-item`}>
+              <Text className={`${cssPrefix}-member-item-number`}>￥0.00</Text>
+              <Text>储值余额</Text>
+            </View>
+            <View className={`${cssPrefix}-member-item`}>
+              <Text className={`${cssPrefix}-member-item-number`}>20000</Text>
+              <Text>积分</Text>
+            </View>
+            <View 
+              className={`${cssPrefix}-member-item ${cssPrefix}-member-item-discount`}
+              onClick={() => { Taro.navigateTo({url: '/pages/user/user.coupon'}) }}
+            >
+              <Text className={`${cssPrefix}-member-item-number`}>5</Text>
+              <View className={`${cssPrefix}-member-item-pop`}>4张可领</View>
+              <Text>优惠券</Text>
+            </View>
+          </View>
 
           <View className={`${cssPrefix}-rows`}>
             {
@@ -258,11 +261,15 @@ class User extends Taro.Component<Props, State> {
             }
           </View>
         </View>
-        <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
-        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} callback={(userinfo: any) => this.setState({ userinfo })} />
+        {/* <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
+        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} callback={(userinfo: any) => this.setState({ userinfo })} /> */}
       </View>
     );
   }
 }
 
-export default User
+const select = (state: any) => ({
+  userinfo: getUserinfo(state)
+});
+
+export default connect(select)(User);
