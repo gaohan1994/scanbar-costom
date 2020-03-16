@@ -1,26 +1,27 @@
-import Taro from '@tarojs/taro';
-import { View, Button } from '@tarojs/components';
-import './modal.less';
-import { AtModal, AtModalContent } from 'taro-ui';
+import Taro, { Config } from '@tarojs/taro';
+import { View, Button, Image } from '@tarojs/components';
+import './index.less';
 import { LoginManager } from '../../common/sdk';
 import invariant from 'invariant';
 import { ResponseCode } from '../../constants';
 import WeixinSDK from '../../common/sdk/weixin/weixin';
 import { UserAction } from '../../actions';
 
-const cssPrefix = 'login-modal';
+const cssPrefix = 'login';
 
 interface Props {
-  isOpen: boolean;
-  onCancle: () => void;
-  callback?: (userinfo: any) => void;
+
 }
 
 interface State {
 
 }
 
-class GetUserinfoModal extends Taro.Component<Props, State> {
+class GetUserinfo extends Taro.Component<Props, State> {
+  
+  config: Config = {
+    navigationBarTitleText: '登录'
+  }
 
   public getWxInfo = async (show?: boolean) => {
     try {
@@ -46,7 +47,7 @@ class GetUserinfoModal extends Taro.Component<Props, State> {
   public getWxUserInfo = async (userinfo: any, show?: boolean, ) => {
     try {
       
-      const { callback, onCancle } = this.props;
+      // const { callback, onCancle } = this.props;
       const result: any = await WeixinSDK.getWeixinUserinfo();
       invariant(result.success, result.msg || '获取用户昵称和头像失败');
       const newUserinfo = {
@@ -61,9 +62,14 @@ class GetUserinfoModal extends Taro.Component<Props, State> {
       }
       const setResult: any = await LoginManager.setUserInfo(newUserinfo);
       invariant(setResult.success, setResult.msg || '存储用户信息失败');
-      onCancle();
-      if (callback) {
-        callback(newUserinfo);
+      // onCancle();
+      // if (callback) {
+      //   callback(newUserinfo);
+      // }
+      if (userinfo.phone === undefined || userinfo.phone.length === 0) {
+        Taro.redirectTo({ url: '/pages/login/login' });
+      } else {
+        Taro.navigateBack();
       }
     } catch (error) {
       if (show != false) {
@@ -76,34 +82,22 @@ class GetUserinfoModal extends Taro.Component<Props, State> {
   }
 
   render() {
-    const { isOpen, onCancle } = this.props
     return (
-      <AtModal isOpened={isOpen} className={`${cssPrefix}-modal`}>
-        <AtModalContent>
-          <View className={`${cssPrefix}-content`}>
-            小程序需要获取您的微信头像和昵称
-          </View>
-        </AtModalContent>
-        <View className={`${cssPrefix}-buttons`}>
-          <Button
-            className={`${cssPrefix}-button`}
-            onClick={onCancle}
-          >
-            取消
-          </Button>
-          <Button
-            openType='getUserInfo'
-            onGetUserInfo={() => this.getWxInfo(true)}
-            className={`${cssPrefix}-button ${cssPrefix}-blue`}
-          >
-            确定
-          </Button>
-        </View>
-      </AtModal>
+      <View className={`${cssPrefix}`}>
+        <Image 
+          className={`${cssPrefix}-img`}
+          src={"//net.huanmusic.com/scanbar-c/v2/img_login.png"}
+        />
+        <Button 
+          openType='getUserInfo'
+          className={`${cssPrefix}-button`}
+          onGetUserInfo={() => this.getWxInfo(true)}
+        >
+          立即登录
+        </Button>
+      </View>
     )
   }
-
-
 }
 
-export default GetUserinfoModal;
+export default GetUserinfo;

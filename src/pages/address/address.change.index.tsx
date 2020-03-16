@@ -66,11 +66,13 @@ class Page extends Taro.Component<Props, State> {
     if (result.success) {
       const userinfo = result.result;
       if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
-        this.setState({ getUserinfoModal: true });
+        // this.setState({ getUserinfoModal: true });
+        Taro.navigateTo({ url: '/pages/login/login.userinfo' })
         return;
       }
       if ((!userinfo.phone || userinfo.phone.length === 0)) {
-        this.setState({ loginModal: true });
+        // this.setState({ loginModal: true });
+        Taro.navigateTo({ url: '/pages/login/login' })
         return;
       };
     } else {
@@ -85,17 +87,17 @@ class Page extends Taro.Component<Props, State> {
     });
   }
 
-  getPhoneNumber = (userinfo: any) => {
-    if (userinfo.phone === undefined || userinfo.phone.length === 0) {
-      this.setState({
-        loginModal: true
-      });
-    }
-  }
+  // getPhoneNumber = (userinfo: any) => {
+  //   if (userinfo.phone === undefined || userinfo.phone.length === 0) {
+  //     this.setState({
+  //       loginModal: true
+  //     });
+  //   }
+  // }
 
   render() {
     const { addressList, currentPostion } = this.props;
-    const { getUserinfoModal, loginModal } = this.state;
+    // const { getUserinfoModal, loginModal } = this.state;
     return (
       <View className='container'>
         <View
@@ -139,8 +141,8 @@ class Page extends Taro.Component<Props, State> {
             }
           }]}
         />
-        <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
-        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} />
+        {/* <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
+        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} /> */}
       </View>
     )
   }

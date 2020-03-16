@@ -1,8 +1,8 @@
 /*
  * @Author: centerm.gaozhiying 
  * @Date: 2020-03-03 17:19:06 
- * @Last Modified by:   centerm.gaozhiying 
- * @Last Modified time: 2020-03-03 17:19:06 
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-16 09:52:08
  */
 import { 
   MerchantService, 
@@ -47,6 +47,7 @@ class MerchantAction {
           type: MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL,
           payload: result.data.rows[0]
         });
+        this.advertisement({merchantId: result.data.rows[0].id});
       }
     }
     return result;
@@ -64,6 +65,17 @@ class MerchantAction {
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_DISTANCE,
         payload: result.data
       })
+    }
+    return result;
+  }
+
+  public advertisement = async(params: MerchantInterface.merchantDetailFetchField) => {
+    const result = await MerchantService.advertisement(params);
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ADVERTISEMENT,
+        payload: result.data.rows
+      });
     }
     return result;
   }

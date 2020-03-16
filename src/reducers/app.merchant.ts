@@ -21,15 +21,16 @@ export declare namespace MerchantReducer {
       }
     }
   }
-  
+
   interface State {
     merchantDetail: MerchantInterface.MerchantDetail;
     merchantList: MerchantInterface.MerchantDetail[];
     currentMerchantDetail: MerchantInterface.MerchantDetail;
     merchantDistance: MerchantInterface.Distance;
+    advertisement: any[];
   }
 
-  type Action = 
+  type Action =
     Reducers.ReceiveMerchantDetail | Reducers.ChangeCostomIndexAddress;
 }
 
@@ -38,9 +39,10 @@ export const initState: MerchantReducer.State = {
   merchantList: [],
   currentMerchantDetail: {} as any,
   merchantDistance: {} as any,
+  advertisement: [],
 };
 
-export default function merchant (state: MerchantReducer.State = initState, action: MerchantReducer.Action): MerchantReducer.State {
+export default function merchant(state: MerchantReducer.State = initState, action: MerchantReducer.Action): MerchantReducer.State {
   switch (action.type) {
 
     case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_DISTANCE: {
@@ -73,6 +75,13 @@ export default function merchant (state: MerchantReducer.State = initState, acti
         currentMerchantDetail: payload
       };
     }
+    case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ADVERTISEMENT: {
+      const { payload } = action as any
+      return {
+        ...state,
+        advertisement: payload
+      };
+    }
 
     default: {
       return {
@@ -89,3 +98,5 @@ export const getMerchantList = (state: AppReducer.AppState) => state.merchant.me
 export const getCurrentMerchantDetail = (state: AppReducer.AppState) => state.merchant.currentMerchantDetail;
 
 export const getMerchantDistance = (state: AppReducer.AppState) => state.merchant.merchantDistance;
+
+export const getMerchantAdvertisement = (state: AppReducer.AppState) => state.merchant.advertisement;

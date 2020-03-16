@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-12-09 13:51:19 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-28 16:49:39
+ * @Last Modified time: 2020-03-13 09:56:05
  */
 
 import merge from 'lodash.merge';
@@ -12,6 +12,13 @@ import { AppReducer } from '.';
 export declare namespace OrderReducer {
 
   namespace Reducers {
+
+    interface OrderCurrentTypeReducer {
+      type: OrderInterface.CHANGR_CURRENT_TYPE;
+      payload: {
+        currentType: number;
+      };
+    }
     interface OrderListReducer {
       type: OrderInterface.RECEIVE_ORDER_LIST;
       payload: {
@@ -41,7 +48,7 @@ export declare namespace OrderReducer {
         orderAllStatus: any[];
       };
     }
-  } 
+  }
 
   interface State {
     orderList: Array<OrderInterface.OrderDetail>;
@@ -49,10 +56,12 @@ export declare namespace OrderReducer {
     orderDetail: OrderInterface.OrderDetail;
     orderCount: OrderInterface.OrderCount;
     orderAllStatus: any[];
+    currentType: number;
   }
 
-  type Action = 
-    Reducers.OrderListReducer
+  type Action =
+    Reducers.OrderCurrentTypeReducer
+    | Reducers.OrderListReducer
     | Reducers.OrderDetailReducer
     | Reducers.OrderCountReducer
     | Reducers.OrderAllStatusReducer;
@@ -64,14 +73,24 @@ const initState: OrderReducer.State = {
   orderDetail: {} as any,
   orderCount: {} as any,
   orderAllStatus: [],
+  currentType: 0,
 };
 
-export default function orderReducer (
-  state: OrderReducer.State = initState, 
+export default function orderReducer(
+  state: OrderReducer.State = initState,
   action: OrderReducer.Action
 ): OrderReducer.State {
 
   switch (action.type) {
+
+    case OrderInterfaceMap.reducerInterfaces.CHANGR_CURRENT_TYPE: {
+      const { payload } = action as OrderReducer.Reducers.OrderCurrentTypeReducer;
+      const { currentType } = payload;
+      return {
+        ...state,
+        currentType: currentType
+      };
+    }
 
     case OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_DETAIL: {
       const { payload } = action as OrderReducer.Reducers.OrderDetailReducer;
@@ -123,6 +142,8 @@ export default function orderReducer (
     }
   }
 }
+
+export const getCurrentType = (state: AppReducer.AppState) => state.order.currentType;
 
 export const getOrderList = (state: AppReducer.AppState) => state.order.orderList;
 

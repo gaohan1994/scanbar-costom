@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-02 11:30:32
+ * @Last Modified time: 2020-03-09 14:05:36
  * 
  * @todo [商品相关的类型定义]
  */
@@ -184,41 +184,26 @@ export declare namespace ProductInterface {
 
   type RECEIVE_PRODUCT_LIST = string;
   type RECEIVE_PRODUCT_SEARCH_LIST = string;
-  type RECEIVE_PRODUCT_MANAGE_LIST = string;
   type RECEIVE_PRODUCT_TYPE = string;
-  type RECEIVE_PRODUCT_SUPPLIER = string;
   type RECEIVE_PRODUCT_DETAIL = string;
   type RECEIVE_PAY_DETAIL = string;
-  type SET_SELECT_PRODUCT = string;
 
   interface ReducerInterface {
     RECEIVE_PRODUCT_LIST: RECEIVE_PRODUCT_LIST;
     RECEIVE_PRODUCT_SEARCH_LIST: RECEIVE_PRODUCT_SEARCH_LIST;
-    RECEIVE_PRODUCT_MANAGE_LIST: RECEIVE_PRODUCT_MANAGE_LIST;
     RECEIVE_PRODUCT_TYPE: RECEIVE_PRODUCT_TYPE;
-    RECEIVE_PRODUCT_SUPPLIER: RECEIVE_PRODUCT_SUPPLIER;
     RECEIVE_PRODUCT_DETAIL: RECEIVE_PRODUCT_DETAIL;
     RECEIVE_PAY_DETAIL: RECEIVE_PAY_DETAIL;
-    SET_SELECT_PRODUCT: SET_SELECT_PRODUCT;
-    RECEIVE_SEARCH_PRODUCT_LIST: string;
   }
 }
 
 interface ProductInterfaceMap {
   reducerInterfaces: ProductInterface.ReducerInterface;
   productInfoType: string;
-  productInfoSupplier: string;
-  productInfoEdit: string;
-  productInfoGetBarcode: string;
-  productInfoAdd: string;
   cashierPay: string;
-  cashierRefund: string;
   cashierQueryStatus (params: ProductInterface.ProductCashierQueryStatus): string;
-  productInfoGetList (params?: ProductInterface.ProductInfoGetListFetchFidle): string;
   productInfoList (params?: ProductInterface.ProductInfoListFetchFidle): string;
   productInfoDetail (params: ProductInterface.ProductDetailFetchFidle): string;
-  productInfoScanGet (params: ProductInterface.ProductInfoScanGetFetchFidle): string;
-  productInfoScan (params: ProductInterface.ProductInfoScanGetFetchFidle): string;
 }
 
 class ProductInterfaceMap {
@@ -226,46 +211,25 @@ class ProductInterfaceMap {
   public reducerInterfaces = {
     RECEIVE_PRODUCT_LIST: 'RECEIVE_PRODUCT_LIST',
     RECEIVE_PRODUCT_SEARCH_LIST: 'RECEIVE_PRODUCT_SEARCH_LIST',
-    RECEIVE_PRODUCT_MANAGE_LIST: 'RECEIVE_PRODUCT_MANAGE_LIST',
     RECEIVE_PRODUCT_TYPE: 'RECEIVE_PRODUCT_TYPE',
-    RECEIVE_PRODUCT_SUPPLIER: 'RECEIVE_PRODUCT_SUPPLIER',
     RECEIVE_PRODUCT_DETAIL: 'RECEIVE_PRODUCT_DETAIL',
     RECEIVE_PAY_DETAIL: 'RECEIVE_PAY_DETAIL',
-    SET_SELECT_PRODUCT: 'SET_SELECT_PRODUCT',
-    RECEIVE_SEARCH_PRODUCT_LIST: 'RECEIVE_SEARCH_PRODUCT_LIST'
   };
 
-  public productInfoType = '/product/type';
-  public productInfoSupplier = '/product/productInfo/supplier';
-  public productInfoEdit = '/product/productInfo/edit';
-  public productInfoGetBarcode = '/product/productInfo/genBarcode';
-  public productInfoAdd = '/product/productInfo/add';
+  public productInfoType = '/customer/product/type';
   public cashierPay = '/cashier/pay';
   public cashierOrder = '/api/cashier/order';
-  public cashierRefund = '/cashier/refund';
 
   public cashierQueryStatus = (params: ProductInterface.ProductCashierQueryStatus) => {
     return `/cashier/queryStatus/${params.orderNo}`;
   }
 
-  public productInfoGetList = (params?: ProductInterface.ProductInfoGetListFetchFidle) => {
-    return `/product/productInfo/getList${params ? jsonToQueryString(params) : ''}`;
-  }
-
   public productInfoList = (params?: ProductInterface.ProductInfoListFetchFidle) => {
-    return `/product/list${params ? jsonToQueryString(params) : ''}`;
+    return `/customer/product/list${params ? jsonToQueryString(params) : ''}`;
   }
 
   public productInfoDetail = (params: ProductInterface.ProductDetailFetchFidle) => {
-    return `/product/detail/${params.id}`;
-  }
-
-  public productInfoScanGet = (params: ProductInterface.ProductInfoScanGetFetchFidle) => {
-    return `/product/productInfo/scan/get${jsonToQueryString(params)}`;
-  }
-
-  public productInfoScan = (params: ProductInterface.ProductInfoScanGetFetchFidle) => {
-    return `/product/productInfo/scan/${params.barcode}`;
+    return `/customer/product/detail/${params.id}`;
   }
 }
 

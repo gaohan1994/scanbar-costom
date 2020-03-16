@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-03 17:31:56
+ * @Last Modified time: 2020-03-16 14:39:18
  * 
  * @todo [商品相关的类型定义]
  */
@@ -14,6 +14,7 @@ import { HTTPInterface } from '..';
 export declare namespace OrderInterface {
 
   interface OrderDetailItem {
+    id: number;
     costAmount: number;
     discountAmount: number;
     discountType: number;
@@ -65,13 +66,41 @@ export declare namespace OrderInterface {
     receiver: string;
     receiverPhone: string;
     merchantAddress: string;
+    lastRefundStatus: number;
+    ableRefund: boolean;
+  }
+
+  interface RefundOrderItem {
+    couponDiscount: number;
+    createTime: string;
+    discount: number;
+    memberDiscount: number;
+    memberId: number;
+    merchantId: number;
+    numDiscount: number;
+    orderNo: string;
+    orderPhone: string;
+    orderSource: number;
+    originOrderNo: string;
+    payType: number;
+    reduceDiscount: number;
+    remark: string;
+    cancelRemark: string;
+    totalAmount: number;
+    totalNum: number;
+    transAmount: number;
+    transFlag: number;
+    transTime: string;
+    transType: number;
   }
 
   interface OrderDetail {
     order: OrderInfo;
     orderDetailList?: Array<OrderDetailItem>;
-    orderNo: number;
+    orderNo: string;
     orderActivityInfoList: Array<OrderActivityInfoItem>;
+    refundOrderList: Array<RefundOrderItem>;
+    orderRefundIndices: Array<RefundIndices>;
   }
 
   interface OrderActivityInfoItem {
@@ -81,6 +110,14 @@ export declare namespace OrderInterface {
     createTime: string;
     discountAmount: number;
     merchantId: number;
+  }
+
+  interface RefundIndices {
+    id: string;
+    createTime: string;
+    clinchTime: string;
+    refundingTime: string;
+    transFlag: number;
   }
 
   interface OrderListFetchFidle extends HTTPInterface.FetchField {
@@ -99,14 +136,15 @@ export declare namespace OrderInterface {
     endTime?: string;
   }
 
-  interface OrderDetailFetchField { 
+  interface OrderDetailFetchField {
     orderNo: string;
   }
 
   interface OrderCount {
-    inTransNum: number;
-    initNum: number;
-    waitForReceiptNum: number;
+    inTransNum: number;         // 待收货/配送中数量
+    initNum: number;            // 待付款数量
+    waitForReceiptNum: number;  // 待自提
+    waitForSend: number;        // 待发货
   }
 
   interface OrderAllStatus {
@@ -119,12 +157,30 @@ export declare namespace OrderInterface {
     name: string;
   }
 
+  interface RefundOrderParams {
+    order: {
+      orderNo: string;
+      orderSource: number;
+      refundByPreOrder: boolean;
+      transAmount: number;
+      remark: string;
+    },
+    productInfoList: RefundOrderProductItem[],
+  }
+
+  interface RefundOrderProductItem {
+    orderDetailId: number;
+    changeNumber: number;
+  }
+
+  type CHANGR_CURRENT_TYPE = string;
   type RECEIVE_ORDER_DETAIL = string;
   type RECEIVE_ORDER_LIST = string;
   type RECEIVE_ORDER_COUNT = string;
   type RECEIVE_ORDER_ALL_STATUS = string;
 
   type ReducerInterface = {
+    CHANGR_CURRENT_TYPE: CHANGR_CURRENT_TYPE;
     RECEIVE_ORDER_LIST: RECEIVE_ORDER_LIST;
     RECEIVE_ORDER_DETAIL: RECEIVE_ORDER_DETAIL;
     RECEIVE_ORDER_COUNT: RECEIVE_ORDER_COUNT;
@@ -135,12 +191,13 @@ export declare namespace OrderInterface {
     reducerInterfaces: ReducerInterface;
     orderList: (params: OrderListFetchFidle) => string;
     orderDetail: (params: OrderDetailFetchField) => string;
-  }  
+  }
 }
 
 class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
 
   public reducerInterfaces = {
+    CHANGR_CURRENT_TYPE: 'CHANGR_CURRENT_TYPE',
     RECEIVE_ORDER_LIST: 'RECEIVE_ORDER_LIST',
     RECEIVE_ORDER_DETAIL: 'RECEIVE_ORDER_DETAIL',
     RECEIVE_ORDER_COUNT: 'RECEIVE_ORDER_COUNT',
@@ -157,7 +214,7 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
 
   public orderCount = () => {
     return `/order/count`;
-  } 
+  }
 
   public orderClose = (params: OrderInterface.OrderDetailFetchField) => {
     return `/order/closeOrder/${params.orderNo}`;
@@ -165,6 +222,14 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
 
   public orderAllStatus = () => {
     return `/order/getAllOrderStatus`;
+  }
+
+  public orderRefund = () => {
+    return `/cashier/refundByOrder`;
+  }
+
+  public orderRefundCancel = (params: OrderInterface.OrderDetailFetchField) => {
+    return `/order/cancelRefund/${params.orderNo}`;
   }
 }
 

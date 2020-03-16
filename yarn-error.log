@@ -1,8 +1,8 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn add src/actions/order.action --silent --no-progress
+  /usr/local/bin/node /usr/local/bin/yarn add src/reducers/app.user --silent --no-progress
 
 PATH: 
-  /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/tmp/yarn--1583292518354-0.9237735329499472:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/usr/local/share/.config/yarn/link/node_modules/.bin:/usr/local/libexec/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/bin/node_modules/npm/bin/node-gyp-bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3/bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3@global/bin:/Users/gaozhiying/.rvm/rubies/ruby-2.6.3/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Library/Apple/bin:.:/Users/gaozhiying/.rvm/bin:/Library/android-sdk-macosx/tools:/Library/android-sdk-macosx/platform-tools
+  /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/tmp/yarn--1584320867757-0.5730886327441944:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/usr/local/share/.config/yarn/link/node_modules/.bin:/usr/local/libexec/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/bin/node_modules/npm/bin/node-gyp-bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3/bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3@global/bin:/Users/gaozhiying/.rvm/rubies/ruby-2.6.3/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Library/Apple/bin:.:/Users/gaozhiying/.rvm/bin:/Library/android-sdk-macosx/tools:/Library/android-sdk-macosx/platform-tools
 
 Yarn version: 
   1.17.3
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.npm.taobao.org/src%2factions/order.action: Request "https://registry.npm.taobao.org/src%2factions/order.action" returned a 405
+  Error: https://registry.npm.taobao.org/src%2freducers/app.user: Request "https://registry.npm.taobao.org/src%2freducers/app.user" returned a 405
       at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66839:18)
       at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140464:22)
       at Request.emit (events.js:209:13)

@@ -2,6 +2,8 @@ import Taro, { Config } from '@tarojs/taro'
 import { View, Image, Text } from '@tarojs/components'
 import './index.less';
 import "../../component/card/form.card.less";
+import { AtButton } from 'taro-ui';
+import { LoginManager } from '../../common/sdk';
 
 
 const Rows = [
@@ -34,8 +36,21 @@ class Page extends Taro.Component {
     });
   }
 
-  public logout = () => {
-
+  public logout = async () => {
+    const res = await LoginManager.logout();
+    if (res.success) {
+      Taro.showToast({
+        title: '退出登录成功'
+      });
+      setTimeout(() => {
+        Taro.navigateBack();
+      }, 1000);
+    } else {
+      Taro.showToast({
+        title: '退出登录失败',
+        icon: 'fail'
+      });
+    }
   }
 
   render() {
@@ -65,14 +80,14 @@ class Page extends Taro.Component {
               })
             }
           </View>
-          {/* <View className={`${cssPrefix}-set-button`}>
+          <View className={`${cssPrefix}-set-button`}>
             <AtButton
               className="theme-button"
               onClick={this.logout}
             >
               <Text className="theme-button-text" >退出登录</Text>
             </AtButton>
-          </View> */}
+          </View>
 
         </View>
       </View>

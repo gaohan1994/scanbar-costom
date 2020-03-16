@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:16:32 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-02-28 16:35:26
+ * @Last Modified time: 2020-03-13 09:27:25
  */
 import requestHttp from "../../common/request/request.http";
 import { OrderInterfaceMap, OrderInterface, HTTPInterface } from '..';
@@ -27,6 +27,15 @@ class OrderService {
   public orderAllStatus = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.get(OrderInterfaceMap.orderAllStatus());
   }
+
+  public orderRefund = async (params: OrderInterface.RefundOrderParams): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.post(OrderInterfaceMap.orderRefund(), params)
+  }
+
+  public orderRefundCancel = async (params: OrderInterface.OrderDetailFetchField): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.post(OrderInterfaceMap.orderRefundCancel(params), params);
+  }
+
 
 }
 
