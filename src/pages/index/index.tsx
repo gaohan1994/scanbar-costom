@@ -1,6 +1,6 @@
 
 import Taro, { Component, Config } from '@tarojs/taro'
-import { View, Text, ScrollView } from '@tarojs/components'
+import { View, Text } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import './index.less'
 import '../style/product.less'
@@ -10,7 +10,7 @@ import IndexAddress from './component/address'
 import DiscountInfo from './component/discountInfo'
 import Banner from './component/banner'
 import invariant from 'invariant'
-import { ProductAction, MerchantAction } from '../../actions'
+import { ProductAction, MerchantAction, UserAction } from '../../actions'
 import { ResponseCode, ProductInterface } from '../../constants'
 import WeixinSdk from '../../common/sdk/weixin/weixin'
 import orderAction from '../../actions/order.action'
@@ -18,6 +18,7 @@ import TabsChoose from '../../component/tabs/tabs.choose'
 import { getMerchantAdvertisement } from '../../reducers/app.merchant'
 import { LoginManager } from '../../common/sdk'
 import CouponModal from '../../component/coupon/coupon.modal'
+import { getUserinfo } from '../../reducers/app.user'
 
 const cssPrefix = 'product';
 
@@ -34,6 +35,7 @@ class Index extends Component<any> {
     isOpen: false,
     showActivity: true,
     couponModalShow: false,
+    obtainCouponList: []
   };
 
   /**
@@ -49,7 +51,7 @@ class Index extends Component<any> {
 
   async componentDidMount() {
     try {
-      this.init();
+      this.init(true);
       orderAction.orderAllStatus();
     } catch (error) {
       Taro.showToast({
@@ -58,6 +60,18 @@ class Index extends Component<any> {
       })
     }
     this.setState({ couponModalShow: true })
+  }
+
+  async componentDidShow() {
+    // const { userinfo } = this.props;
+    // if (userinfo.phone && userinfo.phone.length > 0) {
+    //   UserAction.getMemberInfo();
+    //   const res = await UserAction.obtainCoupon();
+    //   if (res.code == ResponseCode.success) {
+    //     this.setState({ obtainCouponList: res.data.rows })
+    //   }
+    // }
+    this.init();
   }
 
   public changeCurrentType = (typeInfo: any, fetchProduct: boolean = true) => {
@@ -74,16 +88,26 @@ class Index extends Component<any> {
      */
   }
 
-  public init = async (): Promise<void> => {
+  public init = async (firstTime?: boolean): Promise<void> => {
     try {
       MerchantAction.merchantList();
-      LoginManager.getUserInfo();
+      await LoginManager.getUserInfo();
       WeixinSdk.initAddress();
+      const { userinfo } = this.props;
+      if (userinfo.phone && userinfo.phone.length > 0) {
+        UserAction.getMemberInfo();
+        const res = await UserAction.obtainCoupon();
+        if (res.code == ResponseCode.success) {
+          this.setState({ obtainCouponList: res.data.rows })
+        }
+      }
       const productTypeResult = await ProductAction.productInfoType();
       invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
       const { data } = productTypeResult;
       const firstType = data[0] || {};
-      this.changeCurrentType(firstType);
+      if (firstTime) {
+        this.changeCurrentType(firstType);
+      }
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -141,8 +165,8 @@ class Index extends Component<any> {
   }
 
   render() {
-    const { currentType, loading, showActivity, couponModalShow } = this.state;
-    const { productList, productType, advertisement } = this.props;
+    const { currentType, loading, showActivity, obtainCouponList } = this.state;
+    const { productList, productType, advertisement, userinfo } = this.props;
 
     return (
       <View className={`container ${cssPrefix}`}>
@@ -151,10 +175,12 @@ class Index extends Component<any> {
         {
           showActivity && (
             <View className={`${cssPrefix}-activity`}>
-              <DiscountInfo />
+              {userinfo && userinfo.phone && userinfo.phone.length > 0 &&
+                <DiscountInfo />
+              }
               {
                 advertisement && advertisement.length > 0 && (
-                  <Banner advertisement={advertisement}/>
+                  <Banner advertisement={advertisement} />
                 )
               }
             </View>
@@ -174,6 +200,7 @@ class Index extends Component<any> {
                     <TabsChoose
                       tabs={this.getTabs(currentType.subCategory)}
                       onChange={(type) => { this.fetchData(type) }}
+                      currentType={currentType}
                     />
                   </View>
                 ) : (
@@ -194,7 +221,11 @@ class Index extends Component<any> {
           </View>
         </View>
         {/* </ScrollView> */}
-        <CouponModal isOpen={couponModalShow} onClose={() => { this.setState({ couponModalShow: false }); }}/>
+        <CouponModal
+          isOpen={obtainCouponList.length > 0}
+          onClose={() => { this.setState({ obtainCouponList: [] }); }}
+          couponList={obtainCouponList}
+        />
       </View>
     )
   }
@@ -212,6 +243,7 @@ const select = (state) => {
     productType: state.product.productType,
     productList: state.product.productList,
     advertisement: getMerchantAdvertisement(state),
+    userinfo: getUserinfo(state)
   }
 }
 

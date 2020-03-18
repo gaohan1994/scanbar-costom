@@ -17,6 +17,7 @@ import FormCard from '../../component/card/form.card'
 import { AtFloatLayout } from 'taro-ui'
 import ProductMenu from '../../component/product/product.menu'
 import classnames from 'classnames';
+import orderAction from '../../actions/order.action'
 
 const cssPrefix = 'order';
 const openTime = 8;
@@ -55,6 +56,16 @@ class Page extends Taro.Component<Props, State> {
 
   componentDidMount() {
     this.getDateList();
+    const { payOrderProductList } = this.props;
+    let productIds: any[] = [];
+    for (let i = 0; i < payOrderProductList.length; i ++) {
+      productIds.push(payOrderProductList[i].id)
+    }
+    const params = {
+      productIds: productIds,
+      amount: productSdk.getProductTransPrice()
+    };
+    orderAction.getAbleToUseCoupon(params);
   }
 
   public onSubmit = async () => {
@@ -96,7 +107,7 @@ class Page extends Taro.Component<Props, State> {
       const payment = await productSdk.requestPayment(result.data.order.orderNo)
       console.log('payment: ', payment)
       productSdk.cashierOrderCallback(result.data)
-      productSdk.preparePayOrderDetail({ remark: '' })
+      productSdk.preparePayOrderDetail({ remark: '', selectedCoupon: {} })
     } catch (error) {
       Taro.hideLoading();
       Taro.showToast({
@@ -224,7 +235,11 @@ class Page extends Taro.Component<Props, State> {
       ? numeral(productSdk.getProductTransPrice(payOrderProductList)).format('0.00')
       : '0.00';
     const tarnsPrice = payOrderProductList && payOrderProductList.length > 0
-      ? numeral(productSdk.getProductTransPrice(payOrderProductList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)).format('0.00')
+      ? numeral(
+          productSdk.getProductTransPrice(payOrderProductList) + 
+          (payOrderDetail.deliveryType === 1 ? 3.5 : 0) - 
+          (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
+        ).format('0.00')
       : '0.00';
     const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
     return (

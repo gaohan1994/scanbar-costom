@@ -213,4 +213,4 @@ const select = (state: AppReducer.AppState) => {
   }
 }
 
-export default connect(select)(Comp);
+export default connect(select)(Comp as any);

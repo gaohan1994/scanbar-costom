@@ -1,12 +1,15 @@
 import Taro from '@tarojs/taro';
 import { View, Image, ScrollView, Text, Button } from '@tarojs/components';
 import './index.less';
-import { AtModal } from 'taro-ui';
 import classnames from 'classnames';
+import { UserInterface } from '../../constants';
+import dayJs from 'dayjs';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  couponList: UserInterface.CouponsItem[];
+  isNew?: boolean;
 }
 interface State {
 
@@ -22,21 +25,25 @@ class CouponModal extends Taro.Component<Props, State> {
   }
 
   render() {
-    const { isOpen, onClose } = this.props;
+    const { isOpen, onClose, isNew, couponList } = this.props;
     if (isOpen === true) {
       return (
         <View className={`${cssPrefix}`} onClick={onClose}>
           <View
             className={`${cssPrefix}-container`}
             onClick={this.onClick}
-            // style={{ backgroundImage: 'url(//net.huanmusic.com/scanbar-c/v2/popup_coupon_newcomer.png)' }}
+            style={{ 
+              backgroundImage: isNew ? 
+                'url(//net.huanmusic.com/scanbar-c/v2/popup_coupon_newcomer.png)' 
+                : 'url(//net.huanmusic.com/scanbar-c/v2/popup_coupon_n.png)'
+            }}
           >
             <ScrollView className={`${cssPrefix}-container-list`} scrollY={true}>
-              {this.renderItem()}
-              {this.renderItem()}
-              {this.renderItem()}
-              {this.renderItem()}
-              {this.renderItem()}
+              {
+                couponList && couponList.length > 0 && couponList.map((item) => {
+                  return this.renderItem(item);
+                })
+              }
             </ScrollView>
             <View className={`${cssPrefix}-footer`}>
               <Button
@@ -56,15 +63,16 @@ class CouponModal extends Taro.Component<Props, State> {
           </View>
         </View>
       )
-    } 
-      
+    }
+
     return null;
-    
+
 
   }
 
-  private renderItem = () => {
+  private renderItem = (item: UserInterface.CouponsItem) => {
     const { onClose } = this.props;
+    const { couponVO } = item;
     return (
       <View className={`${cssPrefix}-item`}>
         <View
@@ -73,10 +81,10 @@ class CouponModal extends Taro.Component<Props, State> {
           })}>
           <View className={`${cssPrefix}-item-top-left`}>
             <Text className={`${cssPrefix}-item-top-left-price`}>
-              9
+              {couponVO.discount}
               <Text className={`${cssPrefix}-item-top-left-sign`}>¥</Text>
             </Text>
-            <Text className={`${cssPrefix}-item-top-left-info`}>满50可用</Text>
+            <Text className={`${cssPrefix}-item-top-left-info`}>满{couponVO.threshold}可用</Text>
           </View>
           <View className={`${cssPrefix}-item-top-right`}>
             <Text className={classnames(`${cssPrefix}-item-top-right-info`, {
@@ -86,7 +94,7 @@ class CouponModal extends Taro.Component<Props, State> {
               <Text className={classnames(`${cssPrefix}-item-top-right-time`, {
                 [`${cssPrefix}-item-text-grey`]: false,
               })}>
-                01/01~03/31
+                {dayJs(item.effectiveTime).format('MM/DD')}~{dayJs(item.invalidTime).format('MM/DD')}
               </Text>
             </View>
           </View>

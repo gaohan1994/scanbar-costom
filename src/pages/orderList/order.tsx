@@ -204,7 +204,7 @@ class Order extends Taro.Component<Props, State> {
       },
       {
         title: '待发货',
-        num: orderCount.waitForSend || 0,
+        num: orderCount.waitForDelivery || 0,
       },
       {
         title: '待收货',

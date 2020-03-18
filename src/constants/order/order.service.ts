@@ -36,6 +36,10 @@ class OrderService {
     return requestHttp.post(OrderInterfaceMap.orderRefundCancel(params), params);
   }
 
+  public getAbleToUseCoupon = async (params: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.post('/api/coupon/getAbleToUseCoupon', params);
+    return result;
+  }
 
 }
 

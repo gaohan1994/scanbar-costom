@@ -6,12 +6,10 @@ import "../../component/card/form.card.less";
 import invariant from 'invariant';
 import { LoginManager } from '../../common/sdk';
 import { ResponseCode, UserInterface } from '../../constants';
-import LoginModal from '../../component/login/login.modal';
-import GetUserinfoModal from '../../component/login/login.userinfo';
 import { UserAction } from '../../actions';
-import { getUserinfo } from '../../reducers/app.user';
+import { getUserinfo, getMemberInfo } from '../../reducers/app.user';
 import { connect } from '@tarojs/redux';
-
+import numeral from 'numeral';
 
 const Rows = [
   {
@@ -30,24 +28,29 @@ const cssPrefix = 'user';
 
 interface Props {
   userinfo: UserInterface.UserInfo;
+  memberInfo: UserInterface.MemberInfo;
 }
 interface State {
-  // userinfo: any;
   getUserinfoModal: boolean;
   loginModal: boolean;
 }
 class User extends Taro.Component<Props, State> {
 
   state = {
-    // userinfo: {} as any,
     getUserinfoModal: false as any,
-    loginModal: false as any
+    loginModal: false as any,
   }
 
   config: Config = {
     navigationBarTitleText: '我的'
   }
 
+  async componentDidShow() {
+    const { userinfo } = this.props;
+    if (userinfo.phone && userinfo.phone.length > 0) {
+      UserAction.getMemberInfo();
+    }
+  }
 
   public address = async () => {
     const result = await WeixinSDK.chooseAddress();
@@ -58,12 +61,10 @@ class User extends Taro.Component<Props, State> {
     if (row.title === '我的地址') {
       const { userinfo } = this.props;
       if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
-        // this.setState({ getUserinfoModal: true });
         Taro.navigateTo({ url: '/pages/login/login.userinfo' })
         return;
       }
       if ((userinfo.phone === undefined || userinfo.phone.length === 0)) {
-        // this.setState({ loginModal: true });
         Taro.navigateTo({ url: '/pages/login/login' })
         return;
       };
@@ -125,17 +126,23 @@ class User extends Taro.Component<Props, State> {
     }
   }
 
-  // getPhoneNumber = (userinfo: any) => {
-  //   this.setState({ userinfo });
-  //   if (userinfo.phone === undefined || userinfo.phone.length === 0) {
-  //     this.setState({
-  //       loginModal: true
-  //     });
-  //   }
-  // }
+  public navTo = (url: string, needLogin: boolean) => {
+    if (needLogin) {
+      const { userinfo } = this.props;
+      if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
+        Taro.navigateTo({ url: '/pages/login/login.userinfo' })
+        return;
+      }
+      if ((userinfo.phone === undefined || userinfo.phone.length === 0)) {
+        Taro.navigateTo({ url: '/pages/login/login' })
+        return;
+      };
+    }
+    Taro.navigateTo({ url: url })
+  }
 
   render() {
-    const { userinfo } = this.props;
+    const { userinfo, memberInfo } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-bg`} />
@@ -168,11 +175,13 @@ class User extends Taro.Component<Props, State> {
                       userinfo && userinfo.nickname && userinfo.nickname.length > 0
                         ? <View className={`${cssPrefix}-user-name`}>
                           {userinfo.nickname}
-                          <View className={`${cssPrefix}-user-member`}>普通会员</View>
+                          {
+                            memberInfo && memberInfo.levelName && memberInfo.levelName.length > 0 && (
+                              <View className={`${cssPrefix}-user-member`}>{memberInfo.levelName}</View>
+                            )
+                          }
                         </View>
                         : <View
-                          // openType='getUserInfo'
-                          // onGetUserInfo={() => this.getWxInfo(true)}
                           className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
                         >
                           点击获取微信头像和昵称
@@ -219,19 +228,19 @@ class User extends Taro.Component<Props, State> {
           <View className={`${cssPrefix}-code`}> </View>
           <View className={`${cssPrefix}-member`}>
             <View className={`${cssPrefix}-member-item`}>
-              <Text className={`${cssPrefix}-member-item-number`}>￥0.00</Text>
+              <Text className={`${cssPrefix}-member-item-number`}>￥{numeral(memberInfo.overage || 0).format('0.00')}</Text>
               <Text>储值余额</Text>
             </View>
             <View className={`${cssPrefix}-member-item`}>
-              <Text className={`${cssPrefix}-member-item-number`}>20000</Text>
+              <Text className={`${cssPrefix}-member-item-number`}>{memberInfo.points || 0}</Text>
               <Text>积分</Text>
             </View>
-            <View 
+            <View
               className={`${cssPrefix}-member-item ${cssPrefix}-member-item-discount`}
-              onClick={() => { Taro.navigateTo({url: '/pages/user/user.coupon'}) }}
+              onClick={() => { this.navTo('/pages/user/user.coupon', true) }}
             >
-              <Text className={`${cssPrefix}-member-item-number`}>5</Text>
-              <View className={`${cssPrefix}-member-item-pop`}>4张可领</View>
+              <Text className={`${cssPrefix}-member-item-number`}>{memberInfo.couponNum || 0}</Text>
+              {/* <View className={`${cssPrefix}-member-item-pop`}>4张可领</View> */}
               <Text>优惠券</Text>
             </View>
           </View>
@@ -261,15 +270,14 @@ class User extends Taro.Component<Props, State> {
             }
           </View>
         </View>
-        {/* <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
-        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} callback={(userinfo: any) => this.setState({ userinfo })} /> */}
       </View>
     );
   }
 }
 
 const select = (state: any) => ({
-  userinfo: getUserinfo(state)
+  userinfo: getUserinfo(state),
+  memberInfo: getMemberInfo(state)
 });
 
 export default connect(select)(User);

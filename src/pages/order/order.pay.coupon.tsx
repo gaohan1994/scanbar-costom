@@ -1,15 +1,26 @@
 import Taro, { Config } from '@tarojs/taro'
-import { View, Image, Text } from '@tarojs/components'
+import { View, Image, Text, ScrollView } from '@tarojs/components'
 import '../user/index.less';
 import "../../component/card/form.card.less";
-import TabsSwitch from '../../component/tabs/tabs.switch';
 import classnames from 'classnames';
+import { getAbleToUseCouponList } from '../../reducers/app.order';
+import { UserInterface } from '../../constants';
+import Empty from '../../component/empty';
+import { connect } from '@tarojs/redux';
+import dayJs from 'dayjs';
+import productSdk from '../../common/sdk/product/product.sdk';
+import CouponItem from '../../component/coupon/coupon.item';
 
 interface Props {
-
+  couponList: UserInterface.CouponsItem[];
+  payOrderDetail: any;
 }
 interface State {
   currentType: number;
+  selectedNum: number;
+  ableCouponList: UserInterface.CouponsItem[];
+  unableCounponList: UserInterface.CouponsItem[];
+  openList: any[];
 }
 
 const cssPrefix = 'user-coupon';
@@ -21,87 +32,148 @@ class Page extends Taro.Component<Props, State> {
 
   state = {
     currentType: 0,
+    selectedNum: 0,
+    ableCouponList: [],
+    unableCounponList: [],
+    openList: [] as any,
   };
 
-  public onChangeTab = (tabNum: number) => {
-    this.setState({
-      currentType: tabNum
-    }, () => {
-      // this.fetchOrder(1);
-    });
+  componentDidMount() {
+    const { couponList } = this.props;
+    let ableCouponList: any[] = [];
+    let unableCounponList: any[] = [];
+    for (let i = 0; i < couponList.length; i++) {
+      if (couponList[i].ableToUse) {
+        ableCouponList.push(couponList[i]);
+      } else {
+        unableCounponList.push(couponList[i]);
+      }
+    }
+    this.setState({ ableCouponList, unableCounponList });
   }
 
+  /**
+   * @todo 改变优惠券的打开合起状态
+   *
+   * @memberof Page
+   */
+  public onChangeCouponOpen = (item: UserInterface.CouponsItem, e: any) => {
+    if (e.stopPropagation) {
+      e.stopPropagation();
+    }
+    const openList = this.state.openList;
+    for (let i = 0; i < openList.length; i++) {
+      if (openList[i] === item.id) {
+        let newOpenList = openList.slice(0, i).concat(openList.slice(i + 1, 0));
+        this.setState({ openList: newOpenList });
+        return;
+      }
+    }
+    const newOpenList = [...openList];
+    newOpenList.push(item.id);
+    this.setState({ openList: newOpenList });
+  }
+
+  /**
+   * @todo 判断优惠券是否是打开状态
+   *
+   * @memberof Page
+   */
+  public isOpen = (item: UserInterface.CouponsItem) => {
+    const { openList } = this.state;
+    for (let i = 0; i < openList.length; i++) {
+      if (openList[i] === item.id) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
+   * @todo 选取优惠券
+   *
+   * @memberof Page
+   */
+  public couponSelect = (item: UserInterface.CouponsItem) => {
+    const { payOrderDetail } = this.props;
+    if (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id && payOrderDetail.selectedCoupon.id === item.id) {
+      productSdk.preparePayOrderDetail({ selectedCoupon: {} });
+    } else {
+      if (item.ableToUse) {
+        productSdk.preparePayOrderDetail({ selectedCoupon: item });
+        Taro.navigateBack();
+      }
+    }
+
+  }
 
   render() {
-    // const { userinfo } = this.props;
+    const { couponList, payOrderDetail } = this.props;
+    const { ableCouponList, unableCounponList } = this.state;
     return (
       <View className={`container user`} >
-        {this.renderItem()}
+        {
+          couponList && couponList.length > 0
+            ? (
+              <ScrollView
+                scrollY={true}
+                className={`${cssPrefix}-scrollview ${cssPrefix}-scrollview-full`}
+              >
+                {
+                  ableCouponList && ableCouponList.length > 0 && ableCouponList.map((item: any) => {
+                    return (
+                      <View className={`${cssPrefix}-scrollview-item`} key={item.id}>
+                        <CouponItem
+                          data={item}
+                          isOpen={this.isOpen(item)}
+                          onChangeCouponOpen={this.onChangeCouponOpen}
+                          unableToUse={false}
+                          selected={(payOrderDetail && payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id === item.id) ? true : false}
+                          onSelected={this.couponSelect}
+                        />
+                      </View>
+                    )
+                  })
+                }
+                {
+                  unableCounponList && unableCounponList.length > 0 && (
+                    <View className={`${cssPrefix}-scrollview-unable`}>
+                      <Text className={`${cssPrefix}-grey`}>以下优惠券不可用</Text>
+                      {
+                        unableCounponList.map((item: any) => {
+                          return (
+                            <View className={`${cssPrefix}-scrollview-item`} key={item.id}>
+                              <CouponItem
+                                data={item}
+                                isOpen={this.isOpen(item)}
+                                onChangeCouponOpen={this.onChangeCouponOpen}
+                                unableToUse={true}
+                                selected={false}
+                              />
+                            </View>
+                          )
+                        })
+                      }
+                    </View>
+                  )
+                }
+                <View className={`${cssPrefix}-scrollview-bottom`}>已经到底了</View>
+              </ScrollView>
+            )
+            : (
+              <Empty
+                img='//net.huanmusic.com/scanbar-c/v2/img_coupon.png'
+                text='还没有优惠券'
+              />
+            )}
       </View>
     );
   }
-
-  private renderItem = () => {
-    return (
-      <View className={`${cssPrefix}-item`}>
-        <View
-          className={classnames(`${cssPrefix}-item-top`, {
-            [`${cssPrefix}-item-top-grey`]: false
-          })}>
-          <View className={`${cssPrefix}-item-top-left`}>
-            <Text className={`${cssPrefix}-item-top-left-price`}>
-              9
-              <Text className={`${cssPrefix}-item-top-left-sign`}>¥</Text>
-            </Text>
-            <Text className={`${cssPrefix}-item-top-left-info`}>满50可用</Text>
-          </View>
-          <View className={`${cssPrefix}-item-top-right`}>
-            <Text className={classnames(`${cssPrefix}-item-top-right-info`, {
-              [`${cssPrefix}-item-text-grey`]: false,
-            })}>全品类可用</Text>
-            <View className={`${cssPrefix}-item-top-right-row`}>
-              <Text className={classnames(`${cssPrefix}-item-top-right-time`, {
-                [`${cssPrefix}-item-text-grey`]: false,
-              })}>
-                01/01~03/31
-              </Text>
-              <Image
-                className={classnames(`${cssPrefix}-item-top-right-pop`, {
-                  [`${cssPrefix}-item-top-right-pop-down`]: false
-                })}
-                src='//net.huanmusic.com/weapp/icon_packup_gray.png'
-              />
-            </View>
-          </View>
-          <Image
-            className={`${cssPrefix}-item-top-radio`}
-            src='//net.huanmusic.com/scanbar-c/v2/bt_coupon_selected.png'
-          />
-        </View>
-        <View className={`${cssPrefix}-item-bottom`}>
-          <View className={`${cssPrefix}-item-bottom-prompt`}>
-            <Image
-              src='//net.huanmusic.com/scanbar-c/v2/icon_prompt.png'
-              className={`${cssPrefix}-item-bottom-prompt-icon`}
-            />
-            <Text className={`${cssPrefix}-item-bottom-info`}>
-              未达满减条件
-            </Text>
-          </View>
-          <Text className={`${cssPrefix}-item-bottom-info`}>
-            1.优惠券满50元减9元，全品类可用（优惠商品除外）；
-          </Text>
-          <Text className={`${cssPrefix}-item-bottom-info`}>
-            2.一个订单只能使用一张优惠券；
-          </Text>
-          <Text className={`${cssPrefix}-item-bottom-info`}>
-            3.优惠券只能抵扣商品费用，不抵扣配
-          </Text>
-        </View>
-      </View>
-    )
-  }
 }
 
+const select = (state: any) => ({
+  couponList: getAbleToUseCouponList(state),
+  payOrderDetail: state.productSDK.payOrderDetail,
+});
 
-export default Page;
+export default connect(select)(Page);

@@ -1,7 +1,6 @@
 import Taro, { Config } from '@tarojs/taro';
 import { View, Image, Text, ScrollView } from '@tarojs/components';
 import './index.less';
-import { AtButton } from 'taro-ui';
 import classnames from 'classnames';
 import { getOrderDetail, getOrderAllStatus, getCurrentType } from '../../reducers/app.order';
 import { AppReducer } from '../../reducers';
@@ -246,6 +245,20 @@ class OrderDetail extends Taro.Component<Props, State> {
     }
   }
 
+  public onCopy = async () => {
+    try {
+      const { orderDetail } = this.props;
+      invariant(orderDetail && orderDetail.orderNo, '请选择要复制的数据');
+      await Taro.setClipboardData({ data: orderDetail.orderNo });
+      Taro.showToast({ title: '已复制订单号' });
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: 'none'
+      });
+    }
+  }
+
   render() {
     const { callModal } = this.state;
     const { orderDetail } = this.props;
@@ -340,9 +353,9 @@ class OrderDetail extends Taro.Component<Props, State> {
   private renderRefundSchedule = () => {
     return (
       <View className={`${cssPrefix}-card ${cssPrefix}-card-refund`}>
-        <View className={`${cssPrefix}-card-refund-container`} onClick={() => {Taro.navigateTo({ url: '/pages/order/order.refund.schedule' })}}>
+        <View className={`${cssPrefix}-card-refund-container`} onClick={() => { Taro.navigateTo({ url: '/pages/order/order.refund.schedule' }) }}>
           <Text className={`${cssPrefix}-card-refund-container-text`}>退货进度</Text>
-          <Image 
+          <Image
             className={`${cssPrefix}-card-refund-container-icon`}
             src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png'
           />
@@ -447,15 +460,18 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   private renderProductList() {
     const { orderDetail } = this.props;
-    const { orderDetailList } = orderDetail;
-    return (
-      <ProductPayListView
-        productList={orderDetailList}
-        type={1}
-        padding={false}
-        showCallModal={() => { this.setState({ callModal: true }) }}
-      />
-    )
+    if (orderDetail && orderDetail.orderDetailList && orderDetail.orderDetailList.length > 0) {
+      const { orderDetailList } = orderDetail;
+      return (
+        <ProductPayListView
+          productList={orderDetailList}
+          type={1}
+          padding={false}
+          showCallModal={() => { this.setState({ callModal: true }) }}
+        />
+      )
+    }
+    return <View />
   }
 
   private renderOrderCard() {
@@ -493,9 +509,26 @@ class OrderDetail extends Taro.Component<Props, State> {
                 <Text className={`${cssPrefix}-card-order-item-title`}>
                   {item.title}
                 </Text>
-                <Text className={`${cssPrefix}-card-order-item-content`}>
-                  {item.extraText}
-                </Text>
+                {
+                  item.title === '订单号码'
+                    ? (
+                      <View className={`${cssPrefix}-card-order-item-box`} onClick={this.onCopy}>
+                        <Text className={`${cssPrefix}-card-order-item-content`}>
+                          {item.extraText}
+                        </Text>
+                        <Image
+                          src="//net.huanmusic.com/scanbar-c/v2/icon_copy_grey.png"
+                          className={`${cssPrefix}-card-order-item-copy`}
+                        />
+                      </View>
+                    )
+                    : (
+                      <Text className={`${cssPrefix}-card-order-item-content`}>
+                        {item.extraText}
+                      </Text>
+                    )
+                }
+
               </View>
             )
           })

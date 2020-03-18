@@ -2,10 +2,10 @@
  * @Author: centerm.gaozhiying 
  * @Date: 2020-03-03 17:13:16 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-16 14:15:05
+ * @Last Modified time: 2020-03-18 16:57:04
  */
 import requestHttp from "../common/request/request.http";
-import { ResponseCode, UserService, UserInterfaceMap } from "../constants";
+import { ResponseCode, UserService, UserInterfaceMap, UserInterface } from "../constants";
 import { store } from "../app";
 
 class UserAction {
@@ -67,32 +67,68 @@ class UserAction {
   }
 
   /**
-   * @todo 获取优惠券列表
+   * @todo 获取用户的优惠券 0-未使用 1-已使用
    *
    * @memberof UserAction
    */
-  public getAllCoupon = async () => {
-    const result = await UserService.getAllCoupon();
-    if (result.code === ResponseCode.success) {
-      store.dispatch({
-        type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
-        payload: result.data
-      });
-    }
-    return result;
-  }
-
-  public getMemberCoupons = async (params: any) => {
+  public getMemberCoupons = async (params?: UserInterface.FetchMemberCoupons) => {
     const result = await UserService.getMemberCoupons(params);
     if (result.code === ResponseCode.success) {
       store.dispatch({
-        type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
-        payload: result.data
+        type: UserInterfaceMap.reducerInterface.RECEIVE_COUPONS,
+        payload: {
+          couponList: result.data.rows
+        }
       });
     }
     return result;
   }
 
+  /**
+   * @todo 获取用户已过期的优惠券 0-未使用 1-已使用
+   *
+   * @memberof UserAction
+   */
+  public getMemberExpiredCoupons = async (params?: UserInterface.FetchMemberCoupons) => {
+    const result = await UserService.getMemberExpiredCoupons(params);
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_COUPONS,
+        payload: {
+          couponList: result.data.rows
+        }
+      });
+    }
+    return result;
+  }
+
+  /**
+   * @todo 领取优惠券
+   *
+   * @memberof UserAction
+   */
+  public obtainCoupon = async () => {
+    const result = await UserService.obtainCoupon();
+    return result;
+  }
+
+  /**
+   * @todo 获取会员等级信息
+   *
+   * @memberof UserAction
+   */
+  public getMemberInfo = async () => {
+    const result = await UserService.getMemberInfo();
+    if (result.code === ResponseCode.success) {
+      store.dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_MEMBER_INFO,
+        payload: {
+          memberInfo: result.data
+        }
+      });
+    }
+    return result;
+  }
 
 }
 
