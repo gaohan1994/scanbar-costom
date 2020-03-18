@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:01:17 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-16 09:45:17
+ * @Last Modified time: 2020-03-18 14:51:03
  * 
  * @todo [商户相关的接口]
  * ```js
@@ -35,7 +35,6 @@ class MerchantService {
 
   public advertisement = async(params: MerchantInterface.merchantDetailFetchField): Promise<HTTPInterface.ResponseResultBase<any>> => {
     const result = await requestHttp.get(`${MerchantInterfaceMap.advertisement}/${params.merchantId}`);
-    console.log('test aaa', result);
     return result;
   }
 }

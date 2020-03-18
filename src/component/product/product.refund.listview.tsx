@@ -27,7 +27,6 @@ class ProductRefundListView extends Taro.Component<Props> {
 
   render() {
     const { currentRefundOrder } = this.props;
-    const { orderDetailList: productList } = currentRefundOrder;
     return (
       <View>
         <View
@@ -37,7 +36,10 @@ class ProductRefundListView extends Taro.Component<Props> {
           })}
         >
 
-          {productList && productList.length > 0 && productList.map((item) => {
+          {currentRefundOrder 
+          && currentRefundOrder.orderDetailList 
+          && currentRefundOrder.orderDetailList.length > 0 
+          && currentRefundOrder.orderDetailList.map((item) => {
             return this.renderProductItem(item)
           })
           }
@@ -89,8 +91,11 @@ class ProductRefundListView extends Taro.Component<Props> {
 
   private renderTotal = () => {
     const { currentRefundOrder } = this.props;
-    const { order } = currentRefundOrder;
-  
+    let transAmount = 0;
+    if (currentRefundOrder && currentRefundOrder.order && currentRefundOrder.order.transAmount) {
+      transAmount = currentRefundOrder.order.transAmount;
+    }
+    
     return (
       <View className={`${cssPrefix}-row-totals`}>
         <View className={`${cssPrefix}-row-content-item`}>
@@ -98,8 +103,8 @@ class ProductRefundListView extends Taro.Component<Props> {
           <View className={`${cssPrefix}-row-tran`}>
             <Text className={`${cssPrefix}-row-tran ${cssPrefix}-row-tran-margin`}>{`合计：`}</Text>
             <Text className={`${cssPrefix}-row-tran-price`}>￥</Text>
-            <Text className={`${cssPrefix}-row-tran-price ${cssPrefix}-row-tran-big `}>{numeral(order.transAmount).format('0.00').split('.')[0]}</Text>
-            <Text className={`${cssPrefix}-row-tran-price`}>{`.${numeral(order.transAmount).format('0.00').split('.')[1]}`}</Text>
+            <Text className={`${cssPrefix}-row-tran-price ${cssPrefix}-row-tran-big `}>{numeral(transAmount).format('0.00').split('.')[0]}</Text>
+            <Text className={`${cssPrefix}-row-tran-price`}>{`.${numeral(transAmount).format('0.00').split('.')[1]}`}</Text>
           </View>
         </View>
       </View>

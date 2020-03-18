@@ -42,13 +42,20 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
     let tabs: any[] = [];
     const index = refundOrderList.length <= 3 ? refundOrderList.length : 3;
     for (let i = 0; i < index; i++) {
-      const title = i === 0 ? '第一次' : i === 1 ? '第二次' : '第三次';
+      // const title = i === 0 ? '第一次' : i === 1 ? '第二次' : '第三次';
+      let title = '第一次';
+      if (index === 3) {
+        title = i === 0 ? '第三次' : i === 1 ? '第二次' : '第一次';
+      } else if (index === 2) {
+        title = i === 1 ? '第一次' : '第二次';
+      }
       tabs.push({
         title: title,
-      })
+        orderNo: refundOrderList[i].orderNo
+      });
     }
 
-    const res = await orderAction.orderRefundDetail({ orderNo: refundOrderList[currentTab].orderNo });
+    const res = await orderAction.orderRefundDetail({ orderNo: tabs[currentTab].orderNo });
     if (res.code === ResponseCode.success) {
       const newTab = { ...tabs[currentTab], refundOrder: res.data };
       tabs[currentTab] = newTab;
@@ -87,32 +94,35 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
     const { currentTab } = this.state;
     const { orderDetail } = this.props;
     const { orderRefundIndices } = orderDetail;
-    
+
+    if (orderRefundIndices === undefined || orderRefundIndices.length === 0) {
+      return [];
+    }
     const orderRefundIndicesItem = orderRefundIndices[currentTab];
     let items: any[] = [];
     if (orderRefundIndicesItem.clinchTime && orderRefundIndicesItem.clinchTime.length > 0) {
-      const title = orderRefundIndicesItem.transFlag === 6 
-        ? '商家拒绝您的退货申请' 
+      const title = orderRefundIndicesItem.transFlag === 6
+        ? '商家拒绝您的退货申请'
         : orderRefundIndicesItem.transFlag === 9
           ? '您撤销了退货申请'
           : '成功退货';
       items.push({
-        title: title, 
-        content: [orderRefundIndicesItem.clinchTime], 
+        title: title,
+        content: [orderRefundIndicesItem.clinchTime],
         icon: 'check-circle'
       })
     }
     if (orderRefundIndicesItem.refundingTime && orderRefundIndicesItem.refundingTime.length > 0) {
       items.push({
-        title: '商家同意退货，请尽快将商品退回', 
-        content: [orderRefundIndicesItem.refundingTime], 
+        title: '商家同意退货，请尽快将商品退回',
+        content: [orderRefundIndicesItem.refundingTime],
         icon: 'check-circle'
       })
     }
     if (orderRefundIndicesItem.createTime && orderRefundIndicesItem.createTime.length > 0) {
       items.push({
-        title: '等待商家处理', 
-        content: [orderRefundIndicesItem.createTime], 
+        title: '等待商家处理',
+        content: [orderRefundIndicesItem.createTime],
         icon: 'check-circle'
       })
     }
@@ -120,16 +130,26 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
   }
 
   render() {
+    const { tabs } = this.state;
     return (
       <View className={`container order`}>
-        <View className={`${detailCssPrefix}-bg`} />
-        {/* <View className={`${cssPrefix}-tabs`}>
-          {this.renderTabs()}
-        </View> */}
-        <ScrollView className={`${detailCssPrefix}-container`} scrollY={true}>
+        {/* <View className={`${detailCssPrefix}-bg`} /> */}
+        {
+          tabs && tabs.length > 1 && (
+            <View className={`order-tabs`}>
+              {this.renderTabs()}
+            </View>
+          )
+        }
+        <ScrollView
+          className={`${detailCssPrefix}-container ${cssPrefix}-container`}
+          scrollY={true}
+        >
           {this.renderSchedule()}
           {this.renderInfo()}
-          {this.renderRefundProductList()}
+          <View style={{ marginBottom: '40px' }}>
+            {this.renderRefundProductList()}
+          </View>
         </ScrollView>
 
       </View>
@@ -138,18 +158,7 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
 
   private renderTabs = () => {
     const { currentTab, tabs } = this.state;
-    
-    // const orderTypes = [
-    //   {
-    //     title: '第一次'
-    //   },
-    //   {
-    //     title: '第二次',
-    //   },
-    //   {
-    //     title: '第三次',
-    //   },
-    // ];
+
     return (
       <TabsSwitch
         current={currentTab}
@@ -176,6 +185,9 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
     const { currentTab } = this.state;
     const { orderDetail } = this.props;
     const { refundOrderList } = orderDetail;
+    if (refundOrderList === undefined || refundOrderList.length === 0) {
+      return <View />;
+    }
     return (
       <View className={`${detailCssPrefix}-card ${detailCssPrefix}-card-logistics`}>
         <View className={`${detailCssPrefix}-card-logistics-item`}>
@@ -220,11 +232,16 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
 
   private renderRefundProductList = () => {
     const { tabs, currentTab } = this.state;
-    return (
-      <ProductRefundListView
-        currentRefundOrder={tabs[currentTab].refundOrder}
-      />
-    )
+    if (tabs && tabs.length > 0 && tabs[currentTab].refundOrder) {
+      return (
+        <ProductRefundListView
+          currentRefundOrder={tabs[currentTab].refundOrder}
+        />
+      )
+    }
+    return <View />;
+
+
   }
 }
 
