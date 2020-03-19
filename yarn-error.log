@@ -1,8 +1,8 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn add src/reducers/app.user --silent --no-progress
+  /usr/local/bin/node /usr/local/bin/yarn dev:weapp
 
 PATH: 
-  /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/tmp/yarn--1584320867757-0.5730886327441944:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/usr/local/share/.config/yarn/link/node_modules/.bin:/usr/local/libexec/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/bin/node_modules/npm/bin/node-gyp-bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3/bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3@global/bin:/Users/gaozhiying/.rvm/rubies/ruby-2.6.3/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Library/Apple/bin:.:/Users/gaozhiying/.rvm/bin:/Library/android-sdk-macosx/tools:/Library/android-sdk-macosx/platform-tools
+  /Users/gaozhiying/.rvm/gems/ruby-2.6.3/bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3@global/bin:/Users/gaozhiying/.rvm/rubies/ruby-2.6.3/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Library/Apple/bin:.:/Users/gaozhiying/.rvm/bin:/Library/android-sdk-macosx/tools:/Library/android-sdk-macosx/platform-tools
 
 Yarn version: 
   1.17.3
@@ -14,17 +14,17 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.npm.taobao.org/src%2freducers/app.user: Request "https://registry.npm.taobao.org/src%2freducers/app.user" returned a 405
-      at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66839:18)
-      at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140464:22)
-      at Request.emit (events.js:209:13)
-      at Request.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141436:10)
-      at Request.emit (events.js:209:13)
-      at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141358:12)
-      at Object.onceWrapper (events.js:298:28)
-      at IncomingMessage.emit (events.js:214:15)
-      at endReadableNT (_stream_readable.js:1178:12)
-      at processTicksAndRejections (internal/process/task_queues.js:80:21)
+  Error: write EIO
+      at afterWriteDispatched (internal/stream_base_commons.js:150:25)
+      at writeGeneric (internal/stream_base_commons.js:141:3)
+      at WriteStream.Socket._writeGeneric (net.js:768:11)
+      at WriteStream.Socket._write (net.js:780:8)
+      at doWrite (_stream_writable.js:428:12)
+      at writeOrBuffer (_stream_writable.js:412:5)
+      at WriteStream.Writable.write (_stream_writable.js:302:11)
+      at Object.clearLine (readline.js:1270:17)
+      at clearLine (/usr/local/lib/node_modules/yarn/lib/cli.js:49621:12)
+      at ConsoleReporter._log (/usr/local/lib/node_modules/yarn/lib/cli.js:96496:43)
 
 npm manifest: 
   {
@@ -85,6 +85,7 @@ npm manifest:
       "redux": "^4.0.0",
       "redux-logger": "^3.0.6",
       "redux-thunk": "^2.3.0",
+      "taro-code": "^2.1.0",
       "taro-ui": "^2.2.4"
     },
     "devDependencies": {
@@ -9691,6 +9692,11 @@ Lockfile:
       block-stream "*"
       fstream "^1.0.12"
       inherits "2"
+  
+  taro-code@^2.1.0:
+    version "2.1.0"
+    resolved "https://registry.npm.taobao.org/taro-code/download/taro-code-2.1.0.tgz#c483b44f8c14696c08d5c7444b7506658c007f86"
+    integrity sha1-xIO0T4wUaWwI1cdES3UGZYwAf4Y=
   
   taro-ui@^2.2.4:
     version "2.2.4"

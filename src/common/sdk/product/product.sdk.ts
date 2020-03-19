@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-22 11:12:09 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-05 10:42:41
+ * @Last Modified time: 2020-03-18 17:15:02
  * 
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -48,6 +48,7 @@ export declare namespace ProductCartInterface {
     transAmount: number;  // 实付金额
     planDeliveryTime: string;
     deliveryFee: number;
+    couponList: UserInterface.CouponsItem[];
   }
 
   interface ProductOrderActivity {
@@ -263,11 +264,11 @@ class ProductSDK {
     return total;
   }
 
-    /**
-   * @todo 获取商品交易价格
-   *
-   * @memberof ProductSDK
-   */
+  /**
+ * @todo 获取商品交易价格
+ *
+ * @memberof ProductSDK
+ */
   public getProductTransPrice = (products?: ProductCartInterface.ProductCartInfo[]): number => {
     const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
     let total = 0;
@@ -350,7 +351,7 @@ class ProductSDK {
   public getProductInterfacePayload = (products?: ProductCartInterface.ProductCartInfo[], address?: UserInterface.Address, payOrderDetail?: any): ProductCartInterface.ProductPayPayload => {
     const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
     const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
-
+    
     let order: Partial<ProductCartInterface.ProductOrderPayload> = {
       address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
       deliveryPhone: '',
@@ -364,7 +365,7 @@ class ProductSDK {
       orderSource: 3,
       totalAmount: this.getProductsOriginPrice() + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
       totalNum: this.getProductNumber(),
-      transAmount: this.getProductTransPrice() + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
+      transAmount: this.getProductTransPrice() + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)
     }
 
     if (payOrderDetail.deliveryType === 1) {
@@ -372,6 +373,17 @@ class ProductSDK {
         ...order,
         receiver: address && address.contact || "",
         receiverPhone: address && address.phone || '',
+      }
+    }
+
+    if (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id) {
+      const transAmount = this.getProductTransPrice() +
+      (payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
+      (payOrderDetail.selectedCoupon.couponVO.discount || 0);
+      order = {
+        ...order,
+        transAmount: transAmount,
+        couponList: [payOrderDetail.selectedCoupon.couponCode]
       }
     }
 
@@ -594,21 +606,23 @@ class ProductSDK {
    * @todo [清空购物车]
    * @todo [清空下单信息]
    */
-  public cashierOrderCallback = (result: OrderInterface.OrderDetail) => {
+  public cashierOrderCallback = async (result: OrderInterface.OrderDetail) => {
     this.empty();
     this.preparePayOrder([])
     this.preparePayOrderAddress({} as any)
     this.preparePayOrderDetail({} as any)
     console.log('result callback', result)
     const { order } = result;
+    Taro.showLoading();
+    await ProductService.cashierQueryStatus({ orderNo: order.orderNo });
+    Taro.hideLoading();
     Taro.redirectTo({
       url: `/pages/order/order.detail?id=${order.orderNo}`
-    })
+    });
   }
 
   public storageProductCartList = () => {
     const productCartList = store.getState().productSDK.productCartList;
-    console.log('test aaa', productCartList);
   }
 }
 

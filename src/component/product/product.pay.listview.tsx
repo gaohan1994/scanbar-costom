@@ -9,8 +9,8 @@ import classnames from 'classnames';
 import numeral from 'numeral';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
-import { getOrderDetail } from '../../reducers/app.order';
-import { OrderInterface } from '../../constants';
+import { getOrderDetail, getAbleToUseCouponList } from '../../reducers/app.order';
+import { OrderInterface, UserInterface } from '../../constants';
 
 const cssPrefix = 'product';
 
@@ -22,9 +22,14 @@ type Props = {
   payOrderDetail: any;
   orderDetail: OrderInterface.OrderDetail;
   showCallModal?: () => void;
+  couponList: UserInterface.CouponsItem[];
 };
 
-class ProductPayListView extends Taro.Component<Props> {
+type State = {
+
+}
+
+class ProductPayListView extends Taro.Component<Props, State> {
 
   static options = {
     addGlobalClass: true
@@ -34,6 +39,17 @@ class ProductPayListView extends Taro.Component<Props> {
     padding: true,
     payOrderDetail: {} as any,
   };
+
+  getAbleToUseCouponsNum = () => {
+    const { couponList } = this.props;
+    let num = 0;
+    for (let i = 0; i < couponList.length; i++) {
+      if (couponList[i].ableToUse) {
+        num += 1;
+      }
+    }
+    return num;
+  }
 
   render() {
     const { productList, className, padding, payOrderDetail, type, orderDetail, showCallModal } = this.props;
@@ -176,7 +192,6 @@ class ProductPayListView extends Taro.Component<Props> {
                 />
               )
           }
-
           <View className={`${cssPrefix}-row-content ${cssPrefix}-row-content-box`}>
             <Text className={`${cssPrefix}-row-name`}>{item.name}</Text>
             <Text className={`${cssPrefix}-row-normal`}>{`x ${item.sellNum}`}</Text>
@@ -199,10 +214,12 @@ class ProductPayListView extends Taro.Component<Props> {
   }
 
   private renderDisount = () => {
-    const { payOrderDetail } = this.props;
+    const { payOrderDetail, type, orderDetail } = this.props;
+    const { order } = orderDetail;
+    const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
     return (
       <View>
-        <View className={`${cssPrefix}-row-totals`}>
+        {/* <View className={`${cssPrefix}-row-totals`}>
           <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-column`}>
             <View className={`${cssPrefix}-row-content-column-item`}>
               <View className={classnames(
@@ -225,7 +242,7 @@ class ProductPayListView extends Taro.Component<Props> {
               </View>
               <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
             </View>
-            {/* <View className={`${cssPrefix}-row-content-column-item`}>
+            <View className={`${cssPrefix}-row-content-column-item`}>
               <View className={`${cssPrefix}-row-content-row`}>
                 <View
                   className={classnames(
@@ -240,22 +257,62 @@ class ProductPayListView extends Taro.Component<Props> {
                 <Text className={`${cssPrefix}-row-discount-title`}>首单立减10元</Text>
               </View>
               <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
-            </View> */}
-          </View>
-        </View>
-
-        <View className={`${cssPrefix}-row-totals`} onClick={() => { Taro.navigateTo({ url: '/pages/order/order.pay.coupon' }) }}>
-          <View className={`${cssPrefix}-row-content-item`}>
-            <Text className={`${cssPrefix}-row-voucher`}>抵用券</Text>
-            <View>
-              <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
-              <Image
-                className={`${cssPrefix}-row-header-next`}
-                src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
-              />
             </View>
           </View>
-        </View>
+        </View> */}
+
+        {
+          type && type === 1 
+            ? order.couponDiscount && order.couponDiscount > 0 && (
+              <View className={`${cssPrefix}-row-totals`} >
+                <View className={`${cssPrefix}-row-content-item`}>
+                  <Text className={`${cssPrefix}-row-voucher`}>优惠券</Text>
+                  <View className={`${cssPrefix}-row-content-row`}>
+                    <Text className={`${cssPrefix}-row-content-price`}>
+                      -¥{order.couponDiscount}
+                    </Text>
+                    <Image
+                      className={`${cssPrefix}-row-header-next`}
+                      src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
+                    />
+                  </View>
+                </View>
+              </View>
+            )
+            : (
+              <View className={`${cssPrefix}-row-totals`} onClick={() => { Taro.navigateTo({ url: '/pages/order/order.pay.coupon' }) }}>
+                <View className={`${cssPrefix}-row-content-item`}>
+                  <Text className={`${cssPrefix}-row-voucher`}>优惠券</Text>
+                  <View className={`${cssPrefix}-row-content-row`}>
+                    {
+                      payOrderDetail && payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id
+                        ? (
+                          <Text className={`${cssPrefix}-row-content-price`}>
+                            -¥{payOrderDetail.selectedCoupon.couponVO.discount || 0}
+                          </Text>
+                        )
+                        : (
+                          ableToUseCouponsNum > 0
+                            ? (
+                              <View className={`${cssPrefix}-row-content-box-coupon`}>
+                                {ableToUseCouponsNum}张可用
+                        </View>
+                            )
+                            : (
+                              <Text className={`${cssPrefix}-row-content-grey`}>无可用优惠券</Text>
+                            )
+                        )
+                    }
+                    <Image
+                      className={`${cssPrefix}-row-header-next`}
+                      src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
+                    />
+                  </View>
+                </View>
+              </View>
+            )
+        }
+
       </View>
     )
   }
@@ -263,12 +320,26 @@ class ProductPayListView extends Taro.Component<Props> {
   private renderTotal = () => {
     const { payOrderDetail, type, orderDetail } = this.props;
     const { order } = orderDetail;
-    let price = numeral(productSdk.getProductTransPrice() +
-      (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? 3.5 : 0)).format('0.00');
-    let discountPrice = numeral(numeral(productSdk.getProductsOriginPrice()).value() - numeral(productSdk.getProductTransPrice()).value()).format('0.00');
+    let price =
+      numeral(
+        productSdk.getProductTransPrice() +
+        (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
+        (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
+      ).format('0.00');
+    let discountPrice =
+      numeral(
+        productSdk.getProductsOriginPrice() -
+        productSdk.getProductTransPrice() +
+        (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
+      ).format('0.00');
     if (type && type === 1) {
-      price = numeral(orderDetail.order.transAmount).format('0.00');
-      discountPrice = numeral(order.totalAmount - order.transAmount).format('0.00');
+      if (orderDetail && orderDetail.order) {
+        price = numeral(orderDetail.order.transAmount).format('0.00');
+        discountPrice = numeral(order.totalAmount - order.transAmount).format('0.00');
+      } else {
+        price = numeral(0).format('0.00');
+        discountPrice = numeral(0).format('0.00');
+      }
     }
     return (
       <View className={`${cssPrefix}-row-totals`}>
@@ -292,6 +363,7 @@ const select = (state: AppReducer.AppState) => {
   return {
     payOrderDetail: state.productSDK.payOrderDetail,
     orderDetail: getOrderDetail(state),
+    couponList: getAbleToUseCouponList(state),
   }
 }
-export default connect(select)(ProductPayListView);
+export default connect(select)(ProductPayListView as any);

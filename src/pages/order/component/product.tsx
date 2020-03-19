@@ -50,10 +50,10 @@ class OrderProduct extends Taro.Component<Props> {
         <View className={`${cssPrefix}-detail-box`}>
           <Text className={`${cssPrefix}-detail-price`}>
             <Text>￥</Text>
-            <Text className={`${cssPrefix}-detail-price-integer`}>{numeral(product.unitPrice).format('0.00').split('.')[0]}</Text>
-            <Text>{`.${numeral(product.unitPrice).format('0.00').split('.')[1]}`}</Text>
+            <Text className={`${cssPrefix}-detail-price-integer`}>{numeral(product && product.unitPrice ? product.unitPrice : 0).format('0.00').split('.')[0]}</Text>
+            <Text>{`.${numeral(product && product.unitPrice ? product.unitPrice : 0).format('0.00').split('.')[1]}`}</Text>
           </Text>
-          <View className={`${cssPrefix}-detail-tip`}>可退x{product.num}</View>
+          <View className={`${cssPrefix}-detail-tip`}>可退x{product.ableRefundNum}</View>
         </View>
       </View>
     );
@@ -63,7 +63,7 @@ class OrderProduct extends Taro.Component<Props> {
     const { refundProduct } = this.props;
     return (
       <View className={`${cssPrefix}-stepper`}>
-        {!!refundProduct.id ? (
+        {refundProduct && refundProduct.id ? (
           <View className={`${cssPrefix}-stepper-container`}>
             <View className={`${cssPrefix}-stepper-touch`}>
               <View

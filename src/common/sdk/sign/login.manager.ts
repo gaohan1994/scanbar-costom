@@ -2,7 +2,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 17:10:29 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-16 11:00:37
+ * @Last Modified time: 2020-03-16 16:33:41
  */
 
 import Taro from '@tarojs/taro';
@@ -90,6 +90,12 @@ class LoginManager {
     const { success, result } = await this.autoToken(payload);
 
     if (success === true) {
+      store.dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
+        payload: {
+          userinfo: result,
+        }
+      });
       return new Promise((resolve) => {
         Taro
           .setStorage({ key: CentermOAuthKey, data: JSON.stringify(result) })
@@ -111,6 +117,12 @@ class LoginManager {
    * @memberof LoginManager
    */
   public logout = async (): Promise<ActionsInterface.ActionBase<string>> => {
+    store.dispatch({
+      type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
+      payload: {
+        userinfo: {},
+      }
+    });
     return new Promise((resolve, reject) => {
       Taro
         .setStorage({ key: CentermOAuthKey, data: '' })
