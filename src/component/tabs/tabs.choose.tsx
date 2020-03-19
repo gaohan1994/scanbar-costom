@@ -10,6 +10,7 @@ type Props = {
   position?: string;
   onChange?: (tab: any) => void;
   onClose?: () => void;
+  currentType: any;
 };
 
 type State = {
@@ -33,8 +34,10 @@ class TabsChoose extends Taro.Component<Props, State> {
     current: 0,
   };
 
-  componentWillReceiveProps() {
-    this.setState({ current: 0, visible: false });
+  componentWillReceiveProps(nextProps: Props) {
+    if (nextProps.currentType.id !== this.props.currentType.id) {
+      this.setState({ current: 0, visible: false });
+    }
   }
 
   public onClickHandle = (value) => {

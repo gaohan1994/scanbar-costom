@@ -6,7 +6,7 @@
  */
 
 import merge from 'lodash.merge';
-import { OrderInterface, OrderInterfaceMap } from '../constants/index';
+import { OrderInterface, OrderInterfaceMap, UserInterface } from '../constants/index';
 import { AppReducer } from '.';
 
 export declare namespace OrderReducer {
@@ -48,6 +48,13 @@ export declare namespace OrderReducer {
         orderAllStatus: any[];
       };
     }
+
+    interface AbleToUseCouponsReducer {
+      type: OrderInterface.RECEIVE_ABLE_TO_USE_COUPONS
+      payload: {
+        ableToUseCouponList: UserInterface.CouponsItem[]
+      }
+    }
   }
 
   interface State {
@@ -57,6 +64,7 @@ export declare namespace OrderReducer {
     orderCount: OrderInterface.OrderCount;
     orderAllStatus: any[];
     currentType: number;
+    ableToUseCouponList: UserInterface.CouponsItem[];
   }
 
   type Action =
@@ -64,7 +72,8 @@ export declare namespace OrderReducer {
     | Reducers.OrderListReducer
     | Reducers.OrderDetailReducer
     | Reducers.OrderCountReducer
-    | Reducers.OrderAllStatusReducer;
+    | Reducers.OrderAllStatusReducer
+    | Reducers.AbleToUseCouponsReducer;
 }
 
 const initState: OrderReducer.State = {
@@ -74,6 +83,7 @@ const initState: OrderReducer.State = {
   orderCount: {} as any,
   orderAllStatus: [],
   currentType: 0,
+  ableToUseCouponList: [],
 };
 
 export default function orderReducer(
@@ -134,7 +144,13 @@ export default function orderReducer(
         orderAllStatus: orderAllStatus
       };
     }
-
+    case OrderInterfaceMap.reducerInterfaces.RECEIVE_ABLE_TO_USE_COUPONS: {
+      const { payload } = action as OrderReducer.Reducers.AbleToUseCouponsReducer;
+      return {
+        ...state,
+        ableToUseCouponList: payload.ableToUseCouponList
+      };
+    }
     default: {
       return {
         ...state
@@ -154,3 +170,5 @@ export const getOrderDetail = (state: AppReducer.AppState) => state.order.orderD
 export const getOrderCount = (state: AppReducer.AppState) => state.order.orderCount;
 
 export const getOrderAllStatus = (state: AppReducer.AppState) => state.order.orderAllStatus;
+
+export const getAbleToUseCouponList = (state: AppReducer.AppState) => state.order.ableToUseCouponList;

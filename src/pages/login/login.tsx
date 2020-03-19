@@ -3,15 +3,18 @@ import { View, Button, Image } from '@tarojs/components';
 import './index.less';
 import { LoginManager } from '../../common/sdk';
 import invariant from 'invariant';
-import { ResponseCode } from '../../constants';
+import { ResponseCode, MerchantInterface } from '../../constants';
 import WeixinSDK from '../../common/sdk/weixin/weixin';
 import { UserAction } from '../../actions';
 import requestHttp from '../../common/request/request.http';
+import { connect } from '@tarojs/redux';
+import { AppReducer } from '../../reducers';
+import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 
 const cssPrefix = 'login';
 
 interface Props {
-
+  currentMerchantDetail: MerchantInterface.MerchantDetail;
 }
 
 interface State {
@@ -26,6 +29,7 @@ class GetUserinfo extends Taro.Component<Props, State> {
 
   public onGetPhoneNumber = async (params) => {
     // const { onCancle, callback } = this.props;
+    const { currentMerchantDetail } = this.props;
     console.log('params: ', params);
     const { detail } = params;
     if (detail.errMsg === "getPhoneNumber:ok") {
@@ -46,7 +50,11 @@ class GetUserinfo extends Taro.Component<Props, State> {
         invariant(getResult.success, getResult.msg || '获取用户信息失败');
         const userinfo = getResult.result;
         const newCodeRes = await WeixinSDK.getWeixinCode();
-        const loginRes = await LoginManager.login({ phone: JSON.parse(result.data).phoneNumber, code: newCodeRes.result});
+        const loginRes = await LoginManager.login({ 
+          phone: JSON.parse(result.data).phoneNumber, 
+          code: newCodeRes.result, 
+          merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1
+        });
         invariant(loginRes.success, loginRes.msg || '登录失败');
         const newUserinfo = {
           ...userinfo,
@@ -61,9 +69,6 @@ class GetUserinfo extends Taro.Component<Props, State> {
         }
         const setResult: any = await LoginManager.setUserInfo(localUserinfo);
         invariant(setResult.success, setResult.msg || '存储用户信息失败');
-        // if (callback) {
-        //   callback(newUserinfo);
-        // }
         Taro.navigateBack();
       } catch (error) {
         Taro.showToast({
@@ -93,4 +98,10 @@ class GetUserinfo extends Taro.Component<Props, State> {
   }
 }
 
-export default GetUserinfo;
+const select = (state: AppReducer.AppState) => {
+  return {
+    currentMerchantDetail: getCurrentMerchantDetail(state),
+  }
+}
+
+export default connect(select)(GetUserinfo);

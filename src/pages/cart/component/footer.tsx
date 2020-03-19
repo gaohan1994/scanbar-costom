@@ -29,6 +29,7 @@ class Footer extends Taro.Component<Props> {
        }
     }
     productSdk.preparePayOrder(productCartList);
+    productSdk.preparePayOrderDetail({ selectedCoupon: {} });
     Taro.navigateTo({
       url: `/pages/order/order.pay`
     })

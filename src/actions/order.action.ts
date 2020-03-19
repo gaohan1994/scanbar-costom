@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-08 10:28:21 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-16 14:20:38
+ * @Last Modified time: 2020-03-17 16:43:55
  */
 import { ResponseCode, OrderService, OrderInterface, OrderInterfaceMap } from '../constants/index';
 import { store } from '../app';
@@ -113,6 +113,25 @@ class OrderAction {
   }
 
   /**
+   * @todo 获取可用优惠券
+   *
+   * @memberof OrderAction
+   */
+  public getAbleToUseCoupon  = async (params: any) => {
+    const result = await OrderService.getAbleToUseCoupon(params);
+    if (result.code === ResponseCode.success) {
+      const reducer: OrderReducer.Reducers.AbleToUseCouponsReducer = {
+        type: OrderInterfaceMap.reducerInterfaces.RECEIVE_ABLE_TO_USE_COUPONS,
+        payload: {
+          ableToUseCouponList: result.data.rows
+        }
+      };
+      store.dispatch(reducer);
+    }
+    return result;
+  }
+
+  /**
    * @todo 获取订单状态map
    *
    * @memberof OrderAction
@@ -216,9 +235,16 @@ class OrderAction {
               detail: '商家同意退货，请您将商品退回'
             }
           case 6:
-            return {
-              title: '商家拒绝了退货申请',
-              detail: '商家拒绝了您的退货申请'
+            if (order.transFlag !== 10) {
+              return {
+                title: '商家拒绝退货',
+                detail: '商家拒绝了您的退货申请'
+              }
+            } else {
+              return {
+                title: '待发货',
+                detail: '商品待商家配送，请耐心等待'
+              }
             }
           case 7:
             return {
@@ -233,7 +259,7 @@ class OrderAction {
           case 9:
             return {
               title: '您已撤销退货申请',
-              detail: '商家同意退货，请您将商品退回'
+              detail: '您已撤销退货申请'
             }
           case 13:
             return {
@@ -241,10 +267,10 @@ class OrderAction {
               detail: '取消订单申请已提交，等待商家处理'
             }
           case 14:
-            return {
-              title: '商家拒绝了取消订单',
-              detail: '商家拒绝了您的取消订单申请'
-            }
+            // return {
+            //   title: '您已撤销取消订单申请',
+            //   detail: '商家拒绝了您的取消订单申请'
+            // }
           default:
             () => { }
         }
@@ -295,6 +321,10 @@ class OrderAction {
             title: '商家拒绝了取消订单',
             detail: '商家拒绝了您的取消订单申请'
           }
+          // return {
+          //   title: '待自提',
+          //   detail: '请去门店自提商品'
+          // }
         default:
           for (let i = 0; i < orderAllStatus.length; i++) {
             if (order.transFlag === Number(orderAllStatus[i].dictValue)) {

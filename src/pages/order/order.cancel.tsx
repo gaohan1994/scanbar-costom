@@ -31,7 +31,7 @@ class OrderCancel extends Taro.Component<Props, State> {
   state = {
     remark: '',
     isOpen: false,
-    selectedNum: 0,
+    selectedNum: -1,
   }
 
   public orderCancel = async () => {
@@ -39,6 +39,7 @@ class OrderCancel extends Taro.Component<Props, State> {
     if (remark.length === 0) {
       return;
     }
+    Taro.showLoading();
     const { orderDetail, currentType } = this.props;
     const { order, orderDetailList } = orderDetail;
     let productInfoList: OrderInterface.RefundOrderProductItem[] = [];
