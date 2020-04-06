@@ -66,12 +66,10 @@ class Page extends Taro.Component<Props, State> {
     if (result.success) {
       const userinfo = result.result;
       if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
-        // this.setState({ getUserinfoModal: true });
         Taro.navigateTo({ url: '/pages/login/login.userinfo' })
         return;
       }
       if ((!userinfo.phone || userinfo.phone.length === 0)) {
-        // this.setState({ loginModal: true });
         Taro.navigateTo({ url: '/pages/login/login' })
         return;
       };
@@ -86,14 +84,6 @@ class Page extends Taro.Component<Props, State> {
       url: '/pages/address/address.add'
     });
   }
-
-  // getPhoneNumber = (userinfo: any) => {
-  //   if (userinfo.phone === undefined || userinfo.phone.length === 0) {
-  //     this.setState({
-  //       loginModal: true
-  //     });
-  //   }
-  // }
 
   render() {
     const { addressList, currentPostion } = this.props;
@@ -141,8 +131,6 @@ class Page extends Taro.Component<Props, State> {
             }
           }]}
         />
-        {/* <GetUserinfoModal isOpen={getUserinfoModal} onCancle={() => { this.setState({ getUserinfoModal: false }) }} callback={(userinfo: any) => this.getPhoneNumber(userinfo)} />
-        <LoginModal isOpen={loginModal} onCancle={() => { this.setState({ loginModal: false }) }} /> */}
       </View>
     )
   }

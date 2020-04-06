@@ -33,7 +33,7 @@ class OrderRefund extends Taro.Component<Props, State> {
   state = {
     remark: '',
     isOpen: false,
-    selectedNum: 0,
+    selectedNum: -1,
     refundProductList: [] as any,
   }
 
@@ -42,6 +42,7 @@ class OrderRefund extends Taro.Component<Props, State> {
     if (remark.length === 0 && refundProductList === 0) {
       return;
     }
+    Taro.showLoading();
     const { orderDetail, currentType } = this.props;
     const { order } = orderDetail;
     let productInfoList: OrderInterface.RefundOrderProductItem[] = [];
@@ -256,6 +257,7 @@ class OrderRefund extends Taro.Component<Props, State> {
             <Text>{`.${numeral(this.getTotalAmount()).format('0.00').split('.')[1]}`}</Text>
           </Text>
           <AtButton
+              disabled={remark.length === 0 || refundProductList.length === 0}
             className={classnames(`${cssPrefix}-footer-button-little`, {
               [`theme-button`]: true,
               [`theme-button-cancel`]: remark.length === 0 || refundProductList.length === 0,
@@ -349,16 +351,20 @@ class OrderRefund extends Taro.Component<Props, State> {
         {
           orderDetailList && orderDetailList.length > 0 && orderDetailList.map((product, index) => {
             const refundProduct = this.getRefundProduct(product);
-            console.log('test ccc', orderDetailList);
+
             return (
-              <ProductComponent
-                key={product.productId}
-                product={product}
-                onContentClick={() => { }}
-                border={index !== (orderDetailList.length - 1)}
-                refundProduct={refundProduct}
-                manageRefundProductList={this.manageRefundProductList}
-              />
+              product.ableRefundNum > 0
+                ? (
+                  <ProductComponent
+                    key={product.productId}
+                    product={product}
+                    onContentClick={() => { }}
+                    border={index !== (orderDetailList.length - 1)}
+                    refundProduct={refundProduct}
+                    manageRefundProductList={this.manageRefundProductList}
+                  />
+                )
+                : (<View />)
             )
           })
         }

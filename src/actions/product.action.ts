@@ -1,8 +1,8 @@
 /*
  * @Author: centerm.gaozhiying 
  * @Date: 2020-03-03 17:44:36 
- * @Last Modified by:   centerm.gaozhiying 
- * @Last Modified time: 2020-03-03 17:44:36 
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-18 17:04:23
  */
 import { ResponseCode, ProductInterfaceMap, ProductInterface, ProductService } from '../constants/index';
 import { store } from '../app';
@@ -54,7 +54,7 @@ class ProductAction {
   public productInfoEmptySearchList = async () => {
     store.dispatch({
       type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_SEARCH_LIST,
-      payload: {rows: []}
+      payload: { rows: [] }
     });
   }
 
@@ -63,8 +63,8 @@ class ProductAction {
    *
    * @memberof ProductAction
    */
-  public productInfoType = async () => {
-    const result = await ProductService.productInfoType();
+  public productInfoType = async (params: ProductInterface.ProductInfoTypeFetchFidle) => {
+    const result = await ProductService.productInfoType(params);
     if (result.code === ResponseCode.success) {
       store.dispatch({
         type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_TYPE,
@@ -104,9 +104,9 @@ class ProductAction {
       Taro
         .setStorage({ key: CentermProductSearchKey, data: JSON.stringify(list) })
         .then(() => {
-          resolve({success: true, list, msg: ''});
+          resolve({ success: true, list, msg: '' });
         })
-        .catch(error => resolve({success: false, result: {} as any, msg: error.message || '保存搜索记录失败失败'}));
+        .catch(error => resolve({ success: false, result: {} as any, msg: error.message || '保存搜索记录失败失败' }));
     });
   }
 
@@ -130,6 +130,11 @@ class ProductAction {
           resolve({ success: false, result: {} as any, msg: error.message });
         });
     });
+  }
+
+  public cashierQueryStatus = async (params: any) => {
+    const result = await ProductService.cashierQueryStatus(params);
+    return result;
   }
 }
 

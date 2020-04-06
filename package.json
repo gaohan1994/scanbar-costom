@@ -52,10 +52,12 @@
     "lodash.merge": "^4.6.2",
     "nerv-devtools": "^1.5.5",
     "nervjs": "^1.5.5",
+    "node-sass": "^4.13.1",
     "numeral": "^2.0.6",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
+    "taro-code": "^2.2.0",
     "taro-ui": "^2.2.4"
   },
   "devDependencies": {

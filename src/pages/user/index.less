@@ -64,8 +64,7 @@
     }
 
     &-member {
-      width: 96px;
-      height: 34px;
+      padding: 9px 13px;
       .flex(center, center);
       font-size: 18px;
       line-height: 18px;
@@ -194,140 +193,145 @@
       margin: 25px 0px 5px 0px;
     }
 
-    &-item {
-      margin-top: 20px;
-      &-text-grey {
-        color: #CCCCCC !important;
-      }
-
-      &-border-grey {
-        border-color: #CCCCCC !important;
-      }
-
-      &-top {
-        position: relative;
-        .flex(center, center, row);
-        width: 690px;
-        height: 181px;
-        z-index: 2;
-        .bg;
-        background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_coupon.png);
-
-        &-grey {
-          background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_coupon_grey.png);
-        }
-
-        &-left {
-          .flex(center, center, column);
-          width: 212px;
-          height: 100%;
-          color: #fff;
-
-          &-price {
-            font-size: 80px;
-            line-height: 80px;
-            font-weight: bold;
-            position: relative;
-          }
-
-          &-sign {
-            font-size: 24px;
-            line-height: 24px;
-            font-weight: bold;
-            position: absolute;
-            right: -15px;
-            top: 10px;
-          }
-
-          &-info {
-            font-size: 26px;
-            line-height: 26px;
-            margin-top: 25px;
-          }
-        }
-
-        &-right {
-          .flex(flex-start, center, column);
-          width: 478px;
-          height: 100%;
-          margin-left: 58px;
-
-          &-row {
-            .flex(center, center, row);
-            margin-top: 30px;
-          }
-
-          &-info {
-            font-size: 30px;
-            line-height: 30px;
-            color: #333333;
-            font-weight: bold;
-          }
-
-          &-time {
-            font-size: 22px;
-            line-height: 22px;
-            color: #666666;
-          }
-
-          &-pop {
-            width: 18px;
-            height: 10px;
-            margin-left: 25px;
-            transform: rotate(180deg);
-            &-down {
-              transform: rotate(0deg);
-            }
-          }
-        }
-        &-button {
-          position: absolute;
-          right: 30px;
-          top: 65px;
-          .flex(center, center);
-          width: 132px;
-          height: 50px;
-          color: #FF893B;
-          font-size: 28px;
-          text-align: center;
-          border: #FF893B solid 2px;
-          border-radius: 25px;
-        }
-
-        &-radio {
-          position: absolute;
-          right: 40px;
-          top: 73px;
-          width: 36px;
-          height: 36px;
-        }
+    &-scrollview {
+      display: flex;
+      background-color: #F2F2F2;
+      height: calc(100% - 90px);
+      
+      &-full {
+        height: 100% !important;
       }
 
       &-bottom {
-        z-index: 1;
-        width: 690px;
-        padding: 46px 27px 33px 27px;
-        margin-top: -19px;
-        border-radius: 10px;
-        .flex(flex-start, center, column);
+        width: 100%;
+        .padding(50px, tb);
+        .flex(center, center, row);
+        font-size: 26px;
+        color: #999999;
+      }
+
+      &-item {
+        display: flex;
+        justify-content: center;
+      }
+
+      &-unable {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    &-grey {
+      color: #666666;
+      font-size: 26px;
+      margin-top: 44px;
+      margin-left: 32px;
+    }
+  }
+
+  &-code-page {
+    background-color: #f2f2f2;
+    &-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 235px;
+      width: 100%;
+      .background-image('//net.huanmusic.com/weapp/bg_order.png');
+      z-index: 0;
+    }
+    &-container {
+      padding: 25px 30px 0;
+      z-index: 1;
+      position: absolute;
+      width: 100%;
+      &-inner {
+        position: relative;
+        width: 100%;
+        padding-top: 75px;
+      }
+
+    }
+    &-user-image {
+      width: 100%;
+      height: 100%;
+      border-radius: 100%;
+      &-cont {
         background-color: #fff;
-
-        &-prompt {
-          .flex(center, center, row);
-
-          &-icon {
-            width: 22px;
-            height: 22px;
-            margin-right: 8px;
-          }
-        }
-
-        &-info {
-          font-size: 22px;
-          line-height: 35px;
-          color: #666666;
+        width: 150px;
+        height: 150px;
+        margin: 0 auto;
+        border-radius: 100%;
+        padding: 5px;
+        &-outter {
+          width: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
         }
       }
+    }
+    &-user-box {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 93px 0 63px;
+      text-align: center;
+      margin-bottom: 74px;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+    &-user-name {
+      font-size: 36px;
+      line-height: 1em;
+      position: relative;
+      display: inline-block;
+      &-user-name-outter {
+        display: flex;
+        justify-content: center;
+      }
+    }
+    &-user-member {
+      position: absolute;
+      left: calc(~'100% + 10px');
+      top: 2px;
+      height: 32px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border:1px solid rgba(216,174,109,1);
+      border-radius:10px;
+      padding: 0 10px;
+      font-size:18px;
+      font-weight:500;
+      color:rgba(216,174,109,1);
+    }
+    &-user-phone {
+      font-size:30px;
+      color:rgba(102,102,102,1);
+    }
+    &-bar-code {
+      margin: 60px 0;
+      image {
+        width: 530px !important;
+        height: 153px !important;
+      }
+    }
+    &-qr-code {
+      image {
+        width: 350px !important;
+        height: 350px !important;
+      }
+    }
+    .theme-button {
+      background-color: #2BA725 !important;
+      border-color: #2BA725 !important;
+    }
+    .wechat-icon {
+      .background-image('//net.huanmusic.com/scanbar-c/wechat_icon.png');
+      width: 28px;
+      height: 28px;
+      margin-right: 16px;
     }
   }
 

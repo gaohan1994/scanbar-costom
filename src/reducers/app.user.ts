@@ -26,20 +26,29 @@ export declare namespace UserReducer {
         userinfo: any
       }
     }
+
+    interface ReceiveMemberInfo {
+      type: string;
+      payload: {
+        memberInfo: any;
+      }
+    }
   }
   
   interface State {
     indexAddress: UserInterface.Address;
     addressList: UserInterface.Address[];
     currentPostion: UserInterface.Address;
-    couponList: UserInterface.CouponInfo[];
+    couponList: UserInterface.CouponsItem[];
     userinfo: UserInterface.UserInfo;
+    memberInfo: UserInterface.MemberInfo;
   }
 
   type Action = 
     Reducers.ChangeCostomIndexAddress |
     Reducers.ReceiveCoupons |
-    Reducers.ReceiveUserinfo;
+    Reducers.ReceiveUserinfo |
+    Reducers.ReceiveMemberInfo;
 }
 
 export const initState: UserReducer.State = {
@@ -48,6 +57,7 @@ export const initState: UserReducer.State = {
   currentPostion: {} as any,
   couponList: [],
   userinfo: {} as any,
+  memberInfo: {} as any,
 };
 
 export default function merchant (state: UserReducer.State = initState, action: UserReducer.Action): UserReducer.State {
@@ -91,6 +101,13 @@ export default function merchant (state: UserReducer.State = initState, action: 
         userinfo: payload.userinfo
       }
     }
+    case UserInterfaceMap.reducerInterface.RECEIVE_MEMBER_INFO: {
+      const { payload } = action as UserReducer.Reducers.ReceiveMemberInfo;
+      return {
+        ...state,
+        memberInfo: payload.memberInfo
+      }
+    }
 
     default: {
       return {
@@ -109,3 +126,5 @@ export const getCurrentPostion = (state: AppReducer.AppState) => state.user.curr
 export const getCouponList = (state: AppReducer.AppState) => state.user.couponList;
 
 export const getUserinfo = (state: AppReducer.AppState) => state.user.userinfo;
+
+export const getMemberInfo = (state: AppReducer.AppState) => state.user.memberInfo;

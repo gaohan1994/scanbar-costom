@@ -10,6 +10,7 @@ import {
   MerchantInterfaceMap, 
 } from "../constants";
 import { ResponseCode } from '../constants/index';
+import { BASE_PARAM } from '../common/util/config';
 import { store } from '../app';
 
 class MerchantAction {
@@ -45,9 +46,9 @@ class MerchantAction {
       if (result.data.rows && result.data.rows.length > 0) {
         store.dispatch({
           type: MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL,
-          payload: result.data.rows[0]
+          payload: result.data.rows.filter(val => val.id ===  BASE_PARAM.MCHID)[0] || {merchantId: BASE_PARAM.MCHID}
         });
-        this.advertisement({merchantId: result.data.rows[0].id});
+        this.advertisement({merchantId: BASE_PARAM.MCHID});
       }
     }
     return result;

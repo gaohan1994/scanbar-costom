@@ -136,8 +136,8 @@ class OrderItem extends Taro.Component<Props, State> {
           }
         case 2:
           return {
-            title: '已取消',
-            detail: '超时未支付或您已取消，订单已取消'
+            title: '交易关闭',
+            detail: '超时未支付或您已取消，订单已关闭'
           }
         case 10:
           return {

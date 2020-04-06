@@ -172,7 +172,7 @@
       display: flex;
       flex-direction: column;
       flex: 1;
-      overflow: scroll;
+      overflow: hidden;
 
       &-container {
         margin-top: 94px;
@@ -196,7 +196,7 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        position: fixed;
+        position: absolute;
         background-color: #fff;
         width: 100%;
         z-index: 1;
@@ -873,6 +873,14 @@
         justify-content: space-between;
         .margin(20px, l);
         position: relative;
+
+        &-coupon {
+          padding: 6px 19px;
+          color: #fff;
+          font-size: 26px;
+          background-color: #FC4E44;
+          border-radius: 10px;
+        }
       }
 
       &-item {
@@ -889,6 +897,11 @@
         &-black {
           color: #333333;
         }
+      }
+
+      &-grey {
+        color: #CCCCCC;
+        font-size: 30px;
       }
 
       &-column {
