@@ -3,7 +3,7 @@
  * @Author: Ghan 
  * @Date: 2019-11-13 10:10:53 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-16 14:39:18
+ * @Last Modified time: 2020-03-17 17:45:58
  * 
  * @todo [商品相关的类型定义]
  */
@@ -20,6 +20,7 @@ export declare namespace OrderInterface {
     discountType: number;
     merchantId: number;
     num: number;
+    ableRefundNum: number;
     productId: number;
     profit: number;
     totalAmount: number;
@@ -68,6 +69,7 @@ export declare namespace OrderInterface {
     merchantAddress: string;
     lastRefundStatus: number;
     ableRefund: boolean;
+    couponDiscount: number;
   }
 
   interface RefundOrderItem {
@@ -144,7 +146,8 @@ export declare namespace OrderInterface {
     inTransNum: number;         // 待收货/配送中数量
     initNum: number;            // 待付款数量
     waitForReceiptNum: number;  // 待自提
-    waitForSend: number;        // 待发货
+    waitForDelivery: number;    // 待发货
+    // waitForSend: number;
   }
 
   interface OrderAllStatus {
@@ -178,6 +181,7 @@ export declare namespace OrderInterface {
   type RECEIVE_ORDER_LIST = string;
   type RECEIVE_ORDER_COUNT = string;
   type RECEIVE_ORDER_ALL_STATUS = string;
+  type RECEIVE_ABLE_TO_USE_COUPONS = string;
 
   type ReducerInterface = {
     CHANGR_CURRENT_TYPE: CHANGR_CURRENT_TYPE;
@@ -185,6 +189,7 @@ export declare namespace OrderInterface {
     RECEIVE_ORDER_DETAIL: RECEIVE_ORDER_DETAIL;
     RECEIVE_ORDER_COUNT: RECEIVE_ORDER_COUNT;
     RECEIVE_ORDER_ALL_STATUS: RECEIVE_ORDER_ALL_STATUS;
+    RECEIVE_ABLE_TO_USE_COUPONS: RECEIVE_ABLE_TO_USE_COUPONS;
   };
 
   interface OrderInterfaceMapImp {
@@ -202,6 +207,7 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
     RECEIVE_ORDER_DETAIL: 'RECEIVE_ORDER_DETAIL',
     RECEIVE_ORDER_COUNT: 'RECEIVE_ORDER_COUNT',
     RECEIVE_ORDER_ALL_STATUS: 'RECEIVE_ORDER_ALL_STATUS',
+    RECEIVE_ABLE_TO_USE_COUPONS: 'RECEIVE_ABLE_TO_USE_COUPONS',
   };
 
   public orderList = (params?: OrderInterface.OrderListFetchFidle) => {

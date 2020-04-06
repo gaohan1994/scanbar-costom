@@ -29,12 +29,12 @@ export default store => next => action => {
         text: `${total + (payload.num || 1)}`
       });
     } else {
-      if (total - 1 <= 0) {
+      if (total - (payload.num || 1) <= 0) {
         Taro.removeTabBarBadge({ index: tabIndex });
       } else {
         Taro.setTabBarBadge({
           index: tabIndex,
-          text: `${total - 1}`
+          text: `${total - (payload.num || 1)}`
         });
       }
     }

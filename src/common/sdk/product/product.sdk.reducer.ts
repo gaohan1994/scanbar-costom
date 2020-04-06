@@ -160,14 +160,15 @@ export default function productSDKReducer(
         if (index !== -1) {
           let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], productCartList);
           const currentItem = newProductCartList[index];
-          if (currentItem.sellNum === 1) {
+          const reduceNum = num || 1;
+          if (currentItem.sellNum === reduceNum) {
             newProductCartList.splice(index, 1);
             return {
               ...state,
               productCartList: newProductCartList,
             };
           } else {
-            newProductCartList[index].sellNum -= 1;
+            newProductCartList[index].sellNum -= reduceNum;
             return {
               ...state,
               productCartList: newProductCartList
@@ -177,6 +178,9 @@ export default function productSDKReducer(
           return { ...state };
         }
       }
+    }
+    case productSdk.reducerInterface.MANAGE_CART_PRODUCT_REMOVE: {
+
     }
     default: {
       return {

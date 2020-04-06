@@ -12,6 +12,7 @@ import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer
 import productSdk from '../../common/sdk/product/product.sdk'
 import HeaderInput from '../../component/header/header.input'
 import ButtonCostom from '../../component/button/button'
+import {getCurrentMerchantDetail} from '../../reducers/app.merchant'
 
 const cssPrefix = 'product';
 const prefix = 'page-search'
@@ -76,6 +77,7 @@ class Index extends Component<any> {
 
   public fetchData = async () => {
     const { value } = this.state;
+      const {currentMerchantDetail} = this.props;
     if (!value) {
       Taro.showToast({
         title: '请输入要搜索的商品',
@@ -84,7 +86,12 @@ class Index extends Component<any> {
       return
     }
     this.setState({ loading: true });
-    const result = await ProductAction.productInfoSearchList({ status: 0, words: value, saleType: 0 } as any);
+    const result = await ProductAction.productInfoSearchList({
+        status: 0,
+        words: value,
+        saleType: 0,
+        merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1
+    } as any);
     this.setState({ loading: false });
     return result;
   }
@@ -198,7 +205,8 @@ class Index extends Component<any> {
 const select = (state) => {
   return {
     productList: getProductSearchList(state),
-    productCartList: getProductCartList(state)
+    productCartList: getProductCartList(state),
+      currentMerchantDetail: getCurrentMerchantDetail(state),
   }
 }
 

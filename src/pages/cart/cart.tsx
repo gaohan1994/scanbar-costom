@@ -6,11 +6,14 @@ import '../style/product.less'
 import ProductComponent from '../../component/product/product'
 import Footer from './component/footer'
 import { AppReducer } from '../../reducers'
-import { ProductCartInterface } from '../../common/sdk/product/product.sdk'
+import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk'
 import Empty from '../../component/empty'
+import SwiperAction from '../../component/swiperAction'
 import { store } from '../../app'
 import { getUserinfo } from '../../reducers/app.user';
 import { UserInterface } from '../../constants';
+import './index.less'
+import {ProductInterface} from "../../constants/product/product";
 
 type Props = {
   productCartList: ProductCartInterface.ProductCartInfo[],
@@ -79,24 +82,38 @@ class Page extends Taro.Component<Props, State> {
     return true;
   }
 
+    public handleRemove = (product: ProductInterface.ProductInfo, type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce) => {
+        productSdk.manage({type, product, num: product.sellNum });
+    }
+
   render() {
     const { productCartList, userinfo } = this.props;
     // const { getUserinfoModal, loginModal } = this.state;
     return (
       <View className='container'>
         {productCartList && productCartList.length > 0
-          ? productCartList.map((item, index) => {
-            return (
-              <ProductComponent
-                direct={true}
-                key={item.id}
-                product={item}
-                last={index === (productCartList.length - 1)}
-                isHome={false}
-                isCart={true}
-              />
-            )
-          })
+          ? (<View className="cart-list-info-cont">
+                {
+                    productCartList.map((item, index) => {
+                        return (
+                            <View className="cart-list-info">
+                                <SwiperAction onRemove={() => {
+                                    this.handleRemove(item, productSdk.productCartManageType.REDUCE);
+                                }}>
+                                    <ProductComponent
+                                        direct={true}
+                                        key={item.id}
+                                        product={item}
+                                        last={index === (productCartList.length - 1)}
+                                        isHome={false}
+                                        isCart={true}
+                                    />
+                                </SwiperAction>
+                            </View>
+                        )
+                    })
+                }
+            </View>)
           : (
             userinfo.nickname === undefined || userinfo.nickname.length === 0 || 
             userinfo.phone === undefined || userinfo.phone.length === 0 ? (
