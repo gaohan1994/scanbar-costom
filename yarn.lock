@@ -9562,6 +9562,11 @@ tar@^2.0.0:
     fstream "^1.0.12"
     inherits "2"
 
+taro-code@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.npm.taobao.org/taro-code/download/taro-code-2.1.0.tgz#c483b44f8c14696c08d5c7444b7506658c007f86"
+  integrity sha1-xIO0T4wUaWwI1cdES3UGZYwAf4Y=
+
 taro-ui@^2.2.4:
   version "2.2.4"
   resolved "https://registry.npm.taobao.org/taro-ui/download/taro-ui-2.2.4.tgz#96a486432e86d6d0d1eda70383c47c3284f5e8e6"
