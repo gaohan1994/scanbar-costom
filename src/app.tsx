@@ -16,6 +16,7 @@ import 'taro-ui/dist/style/index.scss' // 引入组件样式 - 方式一
 
 export const store = configStore()
 
+
 class App extends Component {
 
   /**
@@ -38,6 +39,7 @@ class App extends Component {
       'pages/user/user',
       'pages/user/user.set',
       'pages/user/user.coupon',
+        'pages/user/user.code',
       'pages/test/test',
       'pages/cart/cart',
       'pages/product/product.detail',

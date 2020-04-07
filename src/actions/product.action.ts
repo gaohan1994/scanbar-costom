@@ -63,8 +63,8 @@ class ProductAction {
    *
    * @memberof ProductAction
    */
-  public productInfoType = async () => {
-    const result = await ProductService.productInfoType();
+  public productInfoType = async (params: ProductInterface.ProductInfoTypeFetchFidle) => {
+    const result = await ProductService.productInfoType(params);
     if (result.code === ResponseCode.success) {
       store.dispatch({
         type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_TYPE,
