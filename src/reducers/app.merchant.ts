@@ -1,6 +1,7 @@
 import MerchantInterfaceMap, { MerchantInterface } from '../constants/merchant/merchant';
 // import merge from 'lodash.merge';
 import { AppReducer } from './';
+import { BASE_PARAM } from '../common/util/config';
 
 export declare namespace MerchantReducer {
   namespace Reducers {
@@ -37,7 +38,9 @@ export declare namespace MerchantReducer {
 export const initState: MerchantReducer.State = {
   merchantDetail: {} as any,
   merchantList: [],
-  currentMerchantDetail: {} as any,
+  currentMerchantDetail: {
+    id: BASE_PARAM.MCHID
+  } as any,
   merchantDistance: {} as any,
   advertisement: [],
 };

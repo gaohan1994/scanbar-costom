@@ -33,7 +33,7 @@ class LoginModal extends Taro.Component<Props, State> {
       const payload = {
         encryptedData: detail.encryptedData,
         ivStr: detail.iv,
-        code: codeRes.result
+        code: codeRes.result,
       };
 
       try {

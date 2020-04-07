@@ -19,8 +19,8 @@ class ProductService {
     return requestHttp.get(ProductInterfaceMap.productInfoList(params));
   }
 
-  public productInfoType = async (): Promise<HTTPInterface.ResponseResultBase<ProductInterface.ProductTypeInfo[]>> => {
-    return requestHttp.get(ProductInterfaceMap.productInfoType);
+  public productInfoType = async (params?: ProductInterface.ProductInfoTypeFetchFidle): Promise<HTTPInterface.ResponseResultBase<ProductInterface.ProductTypeInfo[]>> => {
+    return requestHttp.get(ProductInterfaceMap.productInfoType(params));
   }
 
   /**

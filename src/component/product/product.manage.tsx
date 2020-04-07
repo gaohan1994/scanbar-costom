@@ -57,7 +57,7 @@ class ProductManageComponent extends Taro.Component<Props> {
 
     return (
       <View className={`${cssPrefix}-manage-corner`}>
-        <Text className={`${cssPrefix}-manage-font`}>库存: {product.number}{product.unit}</Text>
+        <Text className={`${cssPrefix}-manage-font`}>库存: {product.saleNumber}{product.unit}</Text>
       </View>
     );
   }

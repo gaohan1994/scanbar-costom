@@ -6,6 +6,7 @@
  */
 import requestHttp from "../../common/request/request.http";
 import { OrderInterfaceMap, OrderInterface, HTTPInterface } from '..';
+import { BASE_PARAM } from '../../common/util/config'
 
 class OrderService {
   public orderList = async (params?: OrderInterface.OrderListFetchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
@@ -37,7 +38,10 @@ class OrderService {
   }
 
   public getAbleToUseCoupon = async (params: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
-    const result = await requestHttp.post('/api/coupon/getAbleToUseCoupon', params);
+  const result = await requestHttp.post('/api/coupon/getAbleToUseCoupon', {
+        merchantId: BASE_PARAM.MCHID,
+        ...params,
+    });
     return result;
   }
 

@@ -164,8 +164,21 @@
     }
   }
 
+  &-batchDiscount {
+    .item(rgba(255,235,235,1), #FC4E44);
+    margin-right: 12px;
+    &-text {
+      .item-text;
+    }
+  }
+
   &-inventory {
-    .item(rgba(255, 235, 235, 1), #FC4E44);
+    position: absolute;
+    right: 0;
+    bottom: 13px;
+    .item(rgba(255,240,226,1), #FF893B);
+    margin: 0;
+    border-radius: 13px 0 0 13px;
     &-text {
       .item-text;
     }
@@ -318,5 +331,11 @@
         .background-image('//net.huanmusic.com/scanbar-c/bt_increase_l.png');
       }
     }
+  }
+}
+
+.cart-list-info {
+  .component-product-last {
+    margin-bottom: 0;
   }
 }

@@ -229,4 +229,110 @@
     }
   }
 
+  &-code-page {
+    background-color: #f2f2f2;
+    &-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 235px;
+      width: 100%;
+      .background-image('//net.huanmusic.com/weapp/bg_order.png');
+      z-index: 0;
+    }
+    &-container {
+      padding: 25px 30px 0;
+      z-index: 1;
+      position: absolute;
+      width: 100%;
+      &-inner {
+        position: relative;
+        width: 100%;
+        padding-top: 75px;
+      }
+
+    }
+    &-user-image {
+      width: 100%;
+      height: 100%;
+      border-radius: 100%;
+      &-cont {
+        background-color: #fff;
+        width: 150px;
+        height: 150px;
+        margin: 0 auto;
+        border-radius: 100%;
+        padding: 5px;
+        &-outter {
+          width: 100%;
+          position: absolute;
+          top: 0;
+          left: 0;
+        }
+      }
+    }
+    &-user-box {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 93px 0 63px;
+      text-align: center;
+      margin-bottom: 74px;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+    &-user-name {
+      font-size: 36px;
+      line-height: 1em;
+      position: relative;
+      display: inline-block;
+      &-user-name-outter {
+        display: flex;
+        justify-content: center;
+      }
+    }
+    &-user-member {
+      position: absolute;
+      left: calc(~'100% + 10px');
+      top: 2px;
+      height: 32px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border:1px solid rgba(216,174,109,1);
+      border-radius:10px;
+      padding: 0 10px;
+      font-size:18px;
+      font-weight:500;
+      color:rgba(216,174,109,1);
+    }
+    &-user-phone {
+      font-size:30px;
+      color:rgba(102,102,102,1);
+    }
+    &-bar-code {
+      margin: 60px 0;
+      image {
+        width: 530px !important;
+        height: 153px !important;
+      }
+    }
+    &-qr-code {
+      image {
+        width: 350px !important;
+        height: 350px !important;
+      }
+    }
+    .theme-button {
+      background-color: #2BA725 !important;
+      border-color: #2BA725 !important;
+    }
+    .wechat-icon {
+      .background-image('//net.huanmusic.com/scanbar-c/wechat_icon.png');
+      width: 28px;
+      height: 28px;
+      margin-right: 16px;
+    }
+  }
+
 }
