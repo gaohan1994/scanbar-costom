@@ -217,50 +217,60 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const { payOrderDetail, type, orderDetail } = this.props;
     const { order } = orderDetail;
     const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
+    const activityToken = productSdk.checkActivity(productSdk.getProductMemberPrice());
+    let rule: any;
+    console.log('activityToken: ', activityToken);
+    if (!!activityToken) {
+      rule = productSdk.setMaxActivityRule(productSdk.getProductMemberPrice(), activityToken);
+    }
+    console.log('rule: ', rule);
     return (
       <View>
-        {/* <View className={`${cssPrefix}-row-totals`}>
-          <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-column`}>
-            <View className={`${cssPrefix}-row-content-column-item`}>
-              <View className={classnames(
-                `${cssPrefix}-row-content-row`,
-                {
-                  [`${cssPrefix}-row-content-row-top`]: true,
-                })}
-              >
-                <View
-                  className={classnames(
-                    `${cssPrefix}-row-discount`,
-                    {
-                      [`${cssPrefix}-row-discount-full`]: true,
-                      [`${cssPrefix}-row-discount-first`]: false,
-                    })}
+        {!!activityToken && (
+          <View className={`${cssPrefix}-row-totals`}>
+            <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-column`}>
+              <View className={`${cssPrefix}-row-content-column-item`}>
+                <View className={classnames(
+                  `${cssPrefix}-row-content-row`,
+                  {
+                    [`${cssPrefix}-row-content-row-top`]: false
+                  })}
                 >
-                  满减
-                  </View>
-                <Text className={`${cssPrefix}-row-discount-title`}>满500减20</Text>
+                  <View
+                    className={classnames(
+                      `${cssPrefix}-row-discount`,
+                      {
+                        [`${cssPrefix}-row-discount-full`]: true,
+                        [`${cssPrefix}-row-discount-first`]: false,
+                      })}
+                  >
+                    满减
+                    </View>
+                  <Text className={`${cssPrefix}-row-discount-title`}>
+                    满{rule.threshold}减{rule.discount}
+                  </Text>
+                </View>
+                <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
               </View>
-              <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
-            </View>
-            <View className={`${cssPrefix}-row-content-column-item`}>
-              <View className={`${cssPrefix}-row-content-row`}>
-                <View
-                  className={classnames(
-                    `${cssPrefix}-row-discount`,
-                    {
-                      [`${cssPrefix}-row-discount-full`]: false,
-                      [`${cssPrefix}-row-discount-first`]: true,
-                    })}
-                >
-                  首单
-                  </View>
-                <Text className={`${cssPrefix}-row-discount-title`}>首单立减10元</Text>
-              </View>
-              <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
+              {/* <View className={`${cssPrefix}-row-content-column-item`}>
+                <View className={`${cssPrefix}-row-content-row`}>
+                  <View
+                    className={classnames(
+                      `${cssPrefix}-row-discount`,
+                      {
+                        [`${cssPrefix}-row-discount-full`]: false,
+                        [`${cssPrefix}-row-discount-first`]: true,
+                      })}
+                  >
+                    首单
+                    </View>
+                  <Text className={`${cssPrefix}-row-discount-title`}>首单立减10元</Text>
+                </View>
+                <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
+              </View> */}
             </View>
           </View>
-        </View> */}
-
+        )}
         {
           type && type === 1 
             ? order.couponDiscount && order.couponDiscount > 0 && (

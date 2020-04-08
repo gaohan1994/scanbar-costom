@@ -17,6 +17,7 @@ import {AtFloatLayout} from 'taro-ui'
 import ProductMenu from '../../component/product/product.menu'
 import classnames from 'classnames';
 import orderAction from '../../actions/order.action'
+import merchantAction from '../../actions/merchant.action';
 
 const cssPrefix = 'order';
 const openTime = 8;
@@ -54,6 +55,7 @@ class Page extends Taro.Component<Props, State> {
     }
 
     componentDidMount() {
+        merchantAction.activityInfoList();
         this.getDateList();
         const {payOrderProductList} = this.props;
         let productIds: any[] = [];

@@ -1,8 +1,8 @@
 /*
  * @Author: centerm.gaozhiying 
  * @Date: 2020-03-03 17:19:06 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-16 09:52:08
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-04-07 18:11:45
  */
 import { 
   MerchantService, 
@@ -14,6 +14,31 @@ import { BASE_PARAM } from '../common/util/config';
 import { store } from '../app';
 
 class MerchantAction {
+
+  public activityInfoList = async () => {
+    const merchantId = store.getState().merchant.currentMerchantDetail.id;
+    const result = await MerchantService.activityInfoList(merchantId);
+    if (result.code === ResponseCode.success) {
+
+      let data: any[] = [];
+
+      if (result.data.rows.length > 0) {
+        result.data.rows.map((item) => {
+          const row = {
+            ...item,
+            rule: !!item.rule && item.rule.length > 0 ? JSON.parse(item.rule) : item.rule,
+          };
+          data.push(row);
+        });
+      }
+      
+      store.dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ACTIVITYLIST,
+        payload: data
+      })
+    }
+    return result;
+  }
 
   /**
    * @todo 根据商户id获取商户详情

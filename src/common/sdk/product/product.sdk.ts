@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-18 17:15:02
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-04-08 10:53:32
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -18,11 +18,13 @@
  * ```
  */
 import Taro from '@tarojs/taro';
-import {ProductInterface, ProductService, OrderInterface, ResponseCode, UserInterface} from '../../../constants';
+import {ProductInterface, ProductService, OrderInterface, ResponseCode, UserInterface, MerchantInterface} from '../../../constants';
 import {store} from '../../../app';
 import {ProductSDKReducer, getProductCartList} from './product.sdk.reducer';
 import {getMemberInfo} from '../../../reducers/app.user';
 import requestHttp from '../../../common/request/request.http';
+import merge from 'lodash.merge';
+import numeral from 'numeral';
 
 export declare namespace ProductCartInterface {
     interface ProductCartInfo extends ProductInterface.ProductInfo {
@@ -267,13 +269,99 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public getProductsMemberPrice = (products?: ProductCartInterface.ProductCartInfo[]): number => {
+    public getProductMemberPrice = (products?: ProductCartInterface.ProductCartInfo[]): number => {
         const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
         const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
-            return prevTotal + (item.memberPrice * item.sellNum);
+          const itemPrice = this.getProductItemPrice(item);
+    
+          return prevTotal + (itemPrice * item.sellNum);
         };
         const total = productList.reduce(reduceCallback, 0);
         return total;
+    }
+
+
+    /**
+     * @todo 校验满减
+     * @todo [如果部分满减满足条件则使用部分满减，如果没有满足或者没有部分满减则使用全部满减]
+     */
+    public checkActivity = (price: number) => {
+        const activitys = store.getState().merchant.activityList;
+        let activity: MerchantInterface.Activity;
+
+        if (!!activitys) {
+            activitys.map((item) => {
+                if (item.type === 3) {
+                    activity = item;
+                }
+            });
+        }
+        /**
+         * @todo 如果有满减活动则计算满减活动
+         */
+        if (!!activity) {
+            
+            /**
+             * @todo 如果有满减金额
+             */
+            if (activity.rule && activity.rule.length > 0) {
+
+                /**
+                 * @todo 如果阈值小于价格则使用满减
+                 */
+                if (activity.rule[0].threshold < price) {
+                    return activity;
+                }
+                return undefined;
+            }
+            return undefined;
+        }
+        return undefined;
+    }
+
+    public setMaxActivityRule = (price: number, activity: MerchantInterface.Activity) => {
+        const rule = merge({}, activity.rule);
+        
+        if (!!rule && rule.length > 0) {
+            const discountArray = rule.map((item) => item.discount);
+
+            const maxDiscount = Math.max(...discountArray);
+            const maxDiscountIndex = rule.findIndex((r) => r.discount === maxDiscount);
+            const maxDiscountItem = rule.find((r) => r.discount === maxDiscount);
+
+            while (discountArray.length > 0) {
+                if (maxDiscountItem && price < maxDiscountItem.threshold) {
+                    return maxDiscountItem;
+                } else {
+                    discountArray.splice(maxDiscountIndex, 1);
+                }
+            }
+            return {};
+        }
+        return {};
+    }
+
+    public getProductActivityPrice = (price: number, activity?: MerchantInterface.Activity) => {
+
+        /**
+         * @todo 如果有满减活动则计算满减活动
+         * @todo 如果有满减金额
+         */
+        if (!!activity && activity.id && activity.rule && activity.rule.length > 0) {
+            /**
+             * @todo 如果只有一个规则且阈值小于价格则使用满减
+             */
+            if (activity.rule.length === 1) {
+                return activity.rule[0].threshold < price ? numeral(price - activity.rule[0].discount).value() : price;
+            }
+            /**
+             * @todo 如果有多个规则找出最优惠规则并使用该规则
+             */
+            const rule: any = this.setMaxActivityRule(price, activity);
+            console.log('rule: ', rule);
+            return !!rule ? numeral(price - rule.discount).value() : price;
+        }
+        return price;
     }
 
     /**
@@ -287,6 +375,8 @@ class ProductSDK {
         for (let i = 0; i < productList.length; i++) {
             total += this.getProductItemPrice(productList[i]) * productList[i].sellNum;
         }
+
+        total = this.getProductActivityPrice(total, this.checkActivity(total));
         return total;
     }
 
@@ -642,7 +732,6 @@ class ProductSDK {
         this.preparePayOrder([])
         this.preparePayOrderAddress({} as any)
         this.preparePayOrderDetail({} as any)
-        console.log('result callback', result)
         const {order} = result;
         Taro.showLoading();
         await ProductService.cashierQueryStatus({orderNo: order.orderNo});
