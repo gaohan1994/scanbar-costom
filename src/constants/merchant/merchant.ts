@@ -1,6 +1,41 @@
 
 export declare namespace MerchantInterface {
 
+  interface Activity {
+    activityDetailVOList?: Array<{
+      giftFlag: boolean;
+      identity: string;
+      name: string;
+      pic: string;
+      activityId: number;
+      id: number;
+      price: number;
+    }>;
+    auditorName: string;
+    createTime: string;
+    cycleRule: string;
+    docMakerName: string;
+    endDetailTime: string;
+    endTime: string;
+    merchantIds: string;
+    merchantName: string;
+    name: string;
+    startDetailTime: string;
+    startTime: string;
+    updateTime: string;
+    filterType: number;
+    id: number;
+    isDeleted: number;
+    type: number;
+    updateBy: number;
+    rule: {
+      discount: number;
+      threshold: number;
+    }[];
+    status: boolean;
+    auditStatus: boolean;
+  }
+
   interface MerchantItem {
     address: string;
     contactName: string;
@@ -73,6 +108,7 @@ export declare namespace MerchantInterface {
     type RECEIVE_CURRENT_MERCHANT_DETAIL = string;
     type RECEIVE_MERCHANT_DISTANCE = string;
     type RECEIVE_MERCHANT_ADVERTISEMENT = string;
+    type RECEIVE_MERCHANT_ACTIVITYLIST = string;
   }
 
   interface MerchantInterfaceMap {
@@ -82,6 +118,7 @@ export declare namespace MerchantInterface {
       RECEIVE_CURRENT_MERCHANT_DETAIL: ReducerTypes.RECEIVE_CURRENT_MERCHANT_DETAIL;
       RECEIVE_MERCHANT_DISTANCE: ReducerTypes.RECEIVE_MERCHANT_DISTANCE;
       RECEIVE_MERCHANT_ADVERTISEMENT: ReducerTypes.RECEIVE_MERCHANT_ADVERTISEMENT;
+      RECEIVE_MERCHANT_ACTIVITYLIST: ReducerTypes.RECEIVE_MERCHANT_ACTIVITYLIST;
     };
 
     merchantInfoDetail: string;
@@ -95,6 +132,7 @@ class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
     RECEIVE_CURRENT_MERCHANT_DETAIL: 'RECEIVE_CURRENT_MERCHANT_DETAIL',
     RECEIVE_MERCHANT_DISTANCE: 'RECEIVE_MERCHANT_DISTANCE',
     RECEIVE_MERCHANT_ADVERTISEMENT: 'RECEIVE_MERCHANT_ADVERTISEMENT',
+    RECEIVE_MERCHANT_ACTIVITYLIST: 'RECEIVE_MERCHANT_ACTIVITYLIST',
   };
   public merchantInfoDetail = '/customer/merchantInfo/detail';
   public merchantList = '/customer/merchantInfo/merchantList';
