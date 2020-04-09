@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-08 10:53:32
+ * @Last Modified time: 2020-04-09 10:19:50
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -388,6 +388,8 @@ class ProductSDK {
     public getDiscountString = (activityList: any, product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo) => {
         const memberInfo = store.getState().user.memberInfo;
         const { enableMemberPrice } = memberInfo;
+        console.log('memberInfo: ', memberInfo);
+        console.log('activityList:', activityList);
         if (!Array.isArray(activityList) || !activityList.length) {
             if (!enableMemberPrice || product.memberPrice === product.price) return '';
             return '会员专享';
