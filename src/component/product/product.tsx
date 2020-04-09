@@ -142,7 +142,6 @@ class ProductComponent extends Taro.Component<Props, State> {
         const singleActiveList = activeList.filter(val => val.type === 1 || val.type === 2);
         const batchActiveList = activeList.filter(val => val.type === 3 || val.type === 4);
         const singleActiveStr = productSdk.getDiscountString(singleActiveList, product);
-
         return (
             <View className={classnames(`${cssPrefix}-content-detail`)}>
                 <View>
@@ -164,7 +163,11 @@ class ProductComponent extends Taro.Component<Props, State> {
                         )
                     }
                     {
-                        batchActiveList.length && productSdk.getDiscountString(batchActiveList[0]) && (
+                        /**
+                         * @time 0409
+                         * @todo [去掉batchActiveList.length的限制]
+                         */
+                        productSdk.getDiscountString(batchActiveList[0], product) && (
                             <View className={`${cssPrefix}-batchDiscount`}>
                                 <Text className={`${cssPrefix}-batchDiscount-text`}>
                                     {`${productSdk.getDiscountString(batchActiveList[0], product)}`}

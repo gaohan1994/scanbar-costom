@@ -23,12 +23,19 @@ class Page extends Taro.Component<any> {
     productDetail: {}
   }
 
+  onLoad (option) {
+    console.log(option.query)
+    if (option.query && option.query.id) {
+      this.init(option.query.id);
+    }
+  }
+
   componentWillMount () {
     try {
       const { id } = this.$router.params;
-      invariant(!!id, '请传入商品id')
+      invariant(!!id, '请传入商品id');
 
-      this.init(Number(id));
+      this.init(id);
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -37,7 +44,7 @@ class Page extends Taro.Component<any> {
     }
   }
 
-  public init = async (id: number) => {
+  public init = async (id) => {
     ProductAction.productInfoDetail({id});
   }
 

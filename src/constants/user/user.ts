@@ -1,8 +1,8 @@
 /*
  * @Author: centerm.gaozhiying 
  * @Date: 2020-03-03 17:10:08 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-17 15:42:07
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-04-09 10:20:21
  */
 
 export declare namespace UserInterface {
@@ -108,6 +108,7 @@ export declare namespace UserInterface {
 
   interface MemberInfo {
     avatar: string;
+    enableMemberPrice: boolean;
     birthDate: string;
     cardNo: string;
     createTime: string;
