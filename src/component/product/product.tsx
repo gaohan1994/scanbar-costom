@@ -141,7 +141,6 @@ class ProductComponent extends Taro.Component<Props, State> {
         const activeList = product && Array.isArray(product.activityInfos) ? product.activityInfos : [];
         const singleActiveList = activeList.filter(val => val.type === 1 || val.type === 2);
         const batchActiveList = activeList.filter(val => val.type === 3 || val.type === 4);
-        const singleActiveStr = productSdk.getDiscountString(singleActiveList, product);
         return (
             <View className={classnames(`${cssPrefix}-content-detail`)}>
                 <View>
@@ -154,10 +153,10 @@ class ProductComponent extends Taro.Component<Props, State> {
                 </View>
                 <View className={`${cssPrefix}-activity`}>
                     {
-                        singleActiveList.length && (
+                        singleActiveList.length && productSdk.getDiscountString(activeList, product) !== '会员专享' && (
                             <View className={`${cssPrefix}-discount`}>
                                 <Text className={`${cssPrefix}-discount-text`}>
-                                    {`${productSdk.getDiscountString(singleActiveList[0], product)}`}
+                                    {`${productSdk.getDiscountString(activeList, product)}`}
                                 </Text>
                             </View>
                         )
@@ -167,10 +166,20 @@ class ProductComponent extends Taro.Component<Props, State> {
                          * @time 0409
                          * @todo [去掉batchActiveList.length的限制]
                          */
-                        productSdk.getDiscountString(batchActiveList[0], product) && (
-                            <View className={`${cssPrefix}-batchDiscount`}>
-                                <Text className={`${cssPrefix}-batchDiscount-text`}>
-                                    {`${productSdk.getDiscountString(batchActiveList[0], product)}`}
+                        productSdk.getDiscountString(batchActiveList, product) && (
+                            <View 
+                                className={classnames({
+                                    [`${cssPrefix}-discount`]: productSdk.getDiscountString(batchActiveList, product) === '会员专享',
+                                    [`${cssPrefix}-batchDiscount`]: productSdk.getDiscountString(batchActiveList, product) !== '会员专享',
+                                })}
+                            >
+                                <Text 
+                                    className={classnames({
+                                        [`${cssPrefix}-discount-text`]: productSdk.getDiscountString(batchActiveList, product) === '会员专享',
+                                        [`${cssPrefix}-batchDiscount-text`]: productSdk.getDiscountString(batchActiveList, product) !== '会员专享',
+                                    })}
+                                >
+                                    {`${productSdk.getDiscountString(batchActiveList, product)}`}
                                 </Text>
                             </View>
                         )

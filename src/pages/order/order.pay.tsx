@@ -115,7 +115,7 @@ class Page extends Taro.Component<Props, State> {
                 }).catch((error) => {
                     console.log(error)
                     /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
-                    wx.switchTab({url: '/pages/orderList/order'})
+                    Taro.switchTab({url: '/pages/orderList/order'})
                 })
                 return;
             }
