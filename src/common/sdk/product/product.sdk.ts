@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-09 10:19:50
+ * @Last Modified time: 2020-04-09 14:51:07
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -25,6 +25,13 @@ import {getMemberInfo} from '../../../reducers/app.user';
 import requestHttp from '../../../common/request/request.http';
 import merge from 'lodash.merge';
 import numeral from 'numeral';
+
+export const NonActivityName = 'NonActivityName';
+
+interface FilterProductList {
+    activity?: MerchantInterface.Activity;
+    productList: ProductCartInterface.ProductCartInfo[]; 
+}
 
 export declare namespace ProductCartInterface {
     interface ProductCartInfo extends ProductInterface.ProductInfo {
@@ -330,7 +337,7 @@ class ProductSDK {
             const maxDiscountItem = rule.find((r) => r.discount === maxDiscount);
 
             while (discountArray.length > 0) {
-                if (maxDiscountItem && price < maxDiscountItem.threshold) {
+                if (maxDiscountItem && price <= maxDiscountItem.threshold) {
                     return maxDiscountItem;
                 } else {
                     discountArray.splice(maxDiscountIndex, 1);
@@ -352,16 +359,39 @@ class ProductSDK {
              * @todo 如果只有一个规则且阈值小于价格则使用满减
              */
             if (activity.rule.length === 1) {
-                return activity.rule[0].threshold < price ? numeral(price - activity.rule[0].discount).value() : price;
+                return activity.rule[0].threshold <= price ? numeral(price - activity.rule[0].discount).value() : price;
             }
             /**
              * @todo 如果有多个规则找出最优惠规则并使用该规则
              */
             const rule: any = this.setMaxActivityRule(price, activity);
-            console.log('rule: ', rule);
+            // console.log('rule: ', rule);
             return !!rule ? numeral(price - rule.discount).value() : price;
         }
         return price;
+    }
+
+    /**
+     * @todo 商家满减活动
+     */
+    public getProductTotalActivityPrice = (productList?: ProductCartInterface.ProductCartInfo[]): number => {
+        const products = productList !== undefined ? productList : store.getState().productSDK.productCartList;
+        const activityList = store.getState().merchant.activityList;    
+        const filterProductList = this.filterByActivity(products, activityList);
+        let activityMoney: number = 0;
+        
+        filterProductList.forEach((activityItem) => {
+            const { activity, productList } = activityItem;
+            let subTotal: number = 0;
+            productList.forEach((product) => {
+                subTotal += this.getProductItemPrice(product) * product.sellNum;
+            })
+            const subActivityMoney = this.getProductActivityPrice(subTotal, activity);
+            if (subTotal !== subActivityMoney) {
+                activityMoney = subTotal - subActivityMoney;
+            }
+        })
+        return activityMoney;
     }
 
     /**
@@ -375,8 +405,8 @@ class ProductSDK {
         for (let i = 0; i < productList.length; i++) {
             total += this.getProductItemPrice(productList[i]) * productList[i].sellNum;
         }
-
-        total = this.getProductActivityPrice(total, this.checkActivity(total));
+        total -= this.getProductTotalActivityPrice(productList);
+        // total = this.getProductActivityPrice(total, this.checkActivity(total));
         return total;
     }
 
@@ -388,17 +418,17 @@ class ProductSDK {
     public getDiscountString = (activityList: any, product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo) => {
         const memberInfo = store.getState().user.memberInfo;
         const { enableMemberPrice } = memberInfo;
-        console.log('memberInfo: ', memberInfo);
-        console.log('activityList:', activityList);
         if (!Array.isArray(activityList) || !activityList.length) {
             if (!enableMemberPrice || product.memberPrice === product.price) return '';
             return '会员专享';
         }
         const activity = activityList[0];
-        const memberFlag = enableMemberPrice && activity.discountPrice > product.memberPrice;
+        const memberFlag = !!enableMemberPrice && activity.discountPrice > product.memberPrice;
         switch (activity.type) {
             case 1:
-                return memberFlag ? '会员专享' : `${activity.discountAmount}折${activity.limitNum && activity.limitNum > 0 ? ` 限${activity.limitNum}件` : ``}`;
+                return memberFlag 
+                    ? '会员专享' 
+                    : `${activity.discountAmount}折${activity.limitNum && activity.limitNum > 0 ? ` 限${activity.limitNum}件` : ``}`;
             case 2:
                 return memberFlag ? '会员专享' : `优惠${activity.discountAmount}元${activity.limitNum && activity.limitNum > 0 ? ` 限${activity.limitNum}件` : ``}`;
             case 3:
@@ -541,7 +571,6 @@ class ProductSDK {
         if (result.code === ResponseCode.success) {
             return new Promise((resolve) => {
                 const payload = JSON.parse(result.data.param);
-                console.log('payload: ', payload)
                 delete payload.appId;
                 const paymentPayload = {
                     ...payload,
@@ -745,6 +774,74 @@ class ProductSDK {
 
     public storageProductCartList = () => {
         const productCartList = store.getState().productSDK.productCartList;
+    }
+
+
+
+    /**
+     * @time 0410
+     * @todo [根据店家的活动把商品进行分类显示]
+     */
+    public filterByActivity = (
+        productList: ProductCartInterface.ProductCartInfo[], 
+        activityList?: MerchantInterface.Activity[]
+    ): Array<FilterProductList> => {
+        if (!!activityList && activityList.length > 0) {
+            let nextProductList: FilterProductList[] = [];
+
+            if (activityList.length === 1 && !activityList[0].activityDetailVOList) {
+            /**
+             * @todo [说明是全部满减]
+             */
+                return [{productList, activity: {name: NonActivityName} as any}];
+            }
+
+            /**
+             * @todo [先把活动和非活动预设好]
+             * @todo [全部满减和非满减只能存在一个]
+             */
+            activityList.forEach((activity) => {
+                if (!!activity.activityDetailVOList) {
+                    nextProductList.push({
+                        activity,
+                        productList: [],
+                    });
+                }
+            });
+
+            nextProductList.push({
+                activity: activityList.find((a) => !a.activityDetailVOList) || {name: NonActivityName} as any,
+                productList: [],
+            });
+
+            for (let i = 0; i < productList.length; i++) {
+                let execd = false;
+                const currentProduct = productList[i];
+
+                nextProductList.forEach((nextProductListItem, nextProductListItemIndex) => {
+                    /**
+                     * @todo [如果该分类是部分满减分类]
+                     */
+                    if (!execd && !!nextProductListItem.activity && !!nextProductListItem.activity.activityDetailVOList) {
+                        const token = nextProductListItem.activity.activityDetailVOList.some((activityItem) => activityItem.identity === currentProduct.barcode);
+                        if (!!token) {
+                            execd = true;
+                            nextProductList[nextProductListItemIndex].productList.push(currentProduct);
+                        } else {
+                            /**
+                             * @todo [如果没有满足条件的满减分类则插入到全部满减/非满减中]
+                             */
+                            if (!nextProductList[nextProductList.length - 1].productList.some((p) => p.barcode === currentProduct.barcode)) {
+                                execd = true;
+                                nextProductList[nextProductList.length - 1].productList.push(currentProduct);
+                            }
+                        }
+                    }
+                })
+            }
+            return nextProductList;
+        }
+        return [{productList, activity: {name: NonActivityName} as any}];
     }
 }
 

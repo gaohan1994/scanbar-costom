@@ -6,18 +6,20 @@ import '../style/product.less'
 import ProductComponent from '../../component/product/product'
 import Footer from './component/footer'
 import { AppReducer } from '../../reducers'
-import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk'
+import productSdk, { ProductCartInterface, NonActivityName } from '../../common/sdk/product/product.sdk'
 import Empty from '../../component/empty'
 import SwiperAction from '../../component/swiperAction'
 import { store } from '../../app'
 import { getUserinfo } from '../../reducers/app.user';
-import { UserInterface } from '../../constants';
+import { UserInterface, MerchantInterface } from '../../constants';
 import './index.less'
 import {ProductInterface} from "../../constants/product/product";
+import merchantAction from '../../actions/merchant.action';
 
 type Props = {
   productCartList: ProductCartInterface.ProductCartInfo[],
   userinfo: UserInterface.UserInfo;
+  activityList: MerchantInterface.Activity[];
 }
 
 type State = {
@@ -40,6 +42,7 @@ class Page extends Taro.Component<Props, State> {
 
   async componentDidShow() {
     // this.loginCheck();
+    merchantAction.activityInfoList();
     store.dispatch({
       type: 'MANAGE_CART_BADGE',
       payload: {}
@@ -87,13 +90,63 @@ class Page extends Taro.Component<Props, State> {
     }
 
   render() {
-    const { productCartList, userinfo } = this.props;
+    const { productCartList, userinfo, activityList } = this.props;
     // const { getUserinfoModal, loginModal } = this.state;
+    const productFilterCartList = productSdk.filterByActivity(productCartList, activityList);
+    console.log('productFilterCartList: ', productFilterCartList)
     return (
       <View className='container'>
         {productCartList && productCartList.length > 0
           ? (<View className="cart-list-info-cont">
-                {
+
+              {
+                productFilterCartList && productFilterCartList.length > 0 && productFilterCartList.map((filterList) => {
+                  const { productList, activity } = filterList;
+
+                  let subTotalPrice: number = 0;
+                  productList.forEach((product) => {
+                    const itemTotal = productSdk.getProductItemPrice(product) * product.sellNum;
+                    subTotalPrice += itemTotal;
+                  })
+                  return (
+                    <View className="cart-list-info">
+                      {productList && productList.length > 0 && (
+                        <View>
+                          {activity && activity.name !== NonActivityName && (
+                            <View>
+                              {activity.name}
+                              {`满${activity.rule[0].threshold}减${activity.rule[0].discount}`}
+                              {subTotalPrice < activity.rule[0].threshold ? `再买${activity.rule[0].threshold - subTotalPrice}元立享优惠` : ''}
+                            </View>
+                          )}
+                          {productList.map((item, index) => {
+                            return (
+                              <View className="cart-list-info">
+                                <SwiperAction 
+                                  onRemove={() => {
+                                    this.handleRemove(item, productSdk.productCartManageType.REDUCE);
+                                  }}
+                                >
+                                  <ProductComponent
+                                    direct={true}
+                                    key={item.id}
+                                    product={item}
+                                    last={index === (productCartList.length - 1)}
+                                    isHome={false}
+                                    isCart={true}
+                                  />
+                                </SwiperAction>
+                            </View>
+                            )
+                          })}
+                        </View>
+                      )}
+                    </View>
+                  )
+                })
+              }
+              
+                {/* {
                     productCartList.map((item, index) => {
                         return (
                             <View className="cart-list-info">
@@ -112,7 +165,7 @@ class Page extends Taro.Component<Props, State> {
                             </View>
                         )
                     })
-                }
+                } */}
             </View>)
           : (
             userinfo.nickname === undefined || userinfo.nickname.length === 0 || 
@@ -152,6 +205,7 @@ class Page extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => {
   return {
+    activityList: state.merchant.activityList,
     productCartList: state.productSDK.productCartList,
     userinfo: getUserinfo(state)
   }

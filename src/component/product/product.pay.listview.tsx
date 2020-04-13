@@ -219,14 +219,10 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
     const activityToken = productSdk.checkActivity(productSdk.getProductMemberPrice());
     let rule: any;
-    console.log('activityToken: ', activityToken);
-    if (!!activityToken) {
-      rule = productSdk.setMaxActivityRule(productSdk.getProductMemberPrice(), activityToken);
-    }
-    console.log('rule: ', rule);
+    const totalActivityMoney = productSdk.getProductTotalActivityPrice();
     return (
       <View>
-        {!!activityToken && (
+        {totalActivityMoney !== 0 && (
           <View className={`${cssPrefix}-row-totals`}>
             <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-column`}>
               <View className={`${cssPrefix}-row-content-column-item`}>
@@ -246,11 +242,11 @@ class ProductPayListView extends Taro.Component<Props, State> {
                   >
                     满减
                     </View>
-                  <Text className={`${cssPrefix}-row-discount-title`}>
+                  {/* <Text className={`${cssPrefix}-row-discount-title`}>
                     满{rule.threshold}减{rule.discount}
-                  </Text>
+                  </Text> */}
                 </View>
-                <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
+                <Text className={`${cssPrefix}-row-content-price`}>-￥{numeral(totalActivityMoney).format('0.00')}</Text>
               </View>
               {/* <View className={`${cssPrefix}-row-content-column-item`}>
                 <View className={`${cssPrefix}-row-content-row`}>
