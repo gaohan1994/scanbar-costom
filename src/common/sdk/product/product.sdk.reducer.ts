@@ -6,14 +6,15 @@ import merge from 'lodash.merge';
 /**
  * @Author: Ghan 
  * @Date: 2019-11-22 14:20:31 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-03 21:25:12
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-04-14 09:51:03
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
 
   interface State {
     productCartList: Array<ProductCartInterface.ProductCartInfo>;
+    productCartSelectedIndex: Array<number>;
     payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
     payOrderDetail: any;
     payOrderAddress: UserInterface.Address;
@@ -24,6 +25,7 @@ export declare namespace ProductSDKReducer {
     type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce;
     num?: number;
   }
+
 
   /**
    * @todo 添加/减少 普通商品
@@ -37,6 +39,14 @@ export declare namespace ProductSDKReducer {
   }
 
   namespace Reducers {
+    interface CartSelectedIndex {
+      type: string;
+      payload: {
+        type: string;
+        product: ProductCartInterface.ProductCartInfo;
+        products?: ProductCartInterface.ProductCartInfo[];
+      }
+    }
     interface ReceivePayOrderReducer {
       type: string;
       payload: {
@@ -60,10 +70,12 @@ export declare namespace ProductSDKReducer {
     ProductManageCart
     | Reducers.ManageCartList
     | Reducers.ReceivePayOrderReducer
+    | Reducers.CartSelectedIndex;
 }
 
 const initState: ProductSDKReducer.State = {
   productCartList: [],
+  productCartSelectedIndex: [],
   payOrderProductList: [],
   payOrderDetail: {
     deliveryType: 0,
@@ -77,6 +89,55 @@ export default function productSDKReducer(
   action: ProductSDKReducer.Action
 ): ProductSDKReducer.State {
   switch (action.type) {
+
+    case productSdk.reducerInterface.SELECT_INDEX: {
+      const { payload } = action as ProductSDKReducer.Reducers.CartSelectedIndex;
+      const { productCartList } = state;
+      const { product, products, type = 'normal' } = payload;
+      
+      if (type === 'empty') {
+        let nextProductCartSelectedIndex = merge([], state.productCartSelectedIndex);
+        nextProductCartSelectedIndex = nextProductCartSelectedIndex.filter((index) => {
+          return products && products.some((p) => p !== index);
+        });
+        return {
+          ...state,
+          productCartSelectedIndex: !products
+            ? []
+            : nextProductCartSelectedIndex
+        };
+      }
+
+      /**
+       * @todo [如果是全选/取消全选]
+       */
+      if (type === 'all') {
+        return {
+          ...state,
+          productCartSelectedIndex: productCartList.length === 0 
+            ? []
+              : state.productCartSelectedIndex.length > 0 
+                ? [] 
+                : productCartList.map((item) => item.id)
+        }
+      }
+
+      /**
+       * @todo [选择/取消选择商品]
+       */
+      const nextProductCartSelectedIndex: number[] = merge([], state.productCartSelectedIndex);
+      const index = nextProductCartSelectedIndex.findIndex((i) => i === product.id);
+      if (index !== -1) {
+        nextProductCartSelectedIndex.splice(index, 1);
+      } else {
+        nextProductCartSelectedIndex.push(product.id);
+      }
+      
+      return {
+        ...state,
+        productCartSelectedIndex: nextProductCartSelectedIndex
+      };
+    }
 
     case productSdk.reducerInterface.RECEIVE_ORDER_PAY_DETAIL: {
       const { payload } = action as any;

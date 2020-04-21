@@ -18,6 +18,8 @@ interface Props {
     last?: boolean;
     isHome?: boolean;
     isCart?: boolean;
+    selectedIndex?: number[];
+    selectClick?: () => void;
 }
 
 interface State {
@@ -89,17 +91,39 @@ class ProductComponent extends Taro.Component<Props, State> {
     }
 
     render() {
-        const {product, last, isHome} = this.props;
+        const {selectedIndex, selectClick, product, last, isHome} = this.props;
+        const isCart = Array.isArray(selectedIndex);
+        const token = !!isCart && selectedIndex && selectedIndex.some((i) => i === product.id);
         return (
             <View
                 className={classnames(`${cssPrefix}-border`, {
                     // [`${cssPrefix} `]: !showManageDetailToken,
                     // [`${cssPrefix}-manage`]: showManageDetailToken,
                     [`${cssPrefix}`]: true,
+                    [`${cssPrefix}-cart`]: !!isCart,
                     [`${cssPrefix}-last`]: last,
                     [`${cssPrefix}-full`]: isHome !== undefined && isHome === false,
                 })}
             >
+                {isCart && (
+                    <View 
+                        className={`${cssPrefix}-select`}
+                        onClick={() => {
+                            if (!!selectClick) {
+                                selectClick();
+                                return;
+                            } 
+                            productSdk.selectProduct('normal', product as any);
+                        }}
+                    >
+                        <View 
+                            className={classnames(`${cssPrefix}-select-item`, {
+                                [`${cssPrefix}-select-normal`]: !token, 
+                                [`${cssPrefix}-select-active`]: !!token,
+                            })}
+                        />
+                    </View>
+                )}
                 <View
                     className={`${cssPrefix}-content`}
                     onClick={this.onContentClick.bind(this)}

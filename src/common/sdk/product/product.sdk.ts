@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-09 14:51:07
+ * @Last Modified time: 2020-04-14 15:58:29
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -136,6 +136,7 @@ export declare namespace ProductCartInterface {
 
 
     type ReducerInterface = {
+        SELECT_INDEX: string;
         MANAGE_CART: MANAGE_CART;
         MANAGE_EMPTY_CART: MANAGE_EMPTY_CART;
         MANAGE_CART_PRODUCT: MANAGE_CART_PRODUCT;
@@ -172,6 +173,7 @@ class ProductSDK {
     };
 
     public reducerInterface: ProductCartInterface.ReducerInterface = {
+        SELECT_INDEX: 'SELECT_INDEX',
         MANAGE_CART: 'MANAGE_CART',
         MANAGE_EMPTY_CART: 'MANAGE_EMPTY_CART',
         MANAGE_CART_PRODUCT: 'MANAGE_CART_PRODUCT',
@@ -287,47 +289,8 @@ class ProductSDK {
         return total;
     }
 
-
-    /**
-     * @todo 校验满减
-     * @todo [如果部分满减满足条件则使用部分满减，如果没有满足或者没有部分满减则使用全部满减]
-     */
-    public checkActivity = (price: number) => {
-        const activitys = store.getState().merchant.activityList;
-        let activity: MerchantInterface.Activity;
-
-        if (!!activitys) {
-            activitys.map((item) => {
-                if (item.type === 3) {
-                    activity = item;
-                }
-            });
-        }
-        /**
-         * @todo 如果有满减活动则计算满减活动
-         */
-        if (!!activity) {
-            
-            /**
-             * @todo 如果有满减金额
-             */
-            if (activity.rule && activity.rule.length > 0) {
-
-                /**
-                 * @todo 如果阈值小于价格则使用满减
-                 */
-                if (activity.rule[0].threshold < price) {
-                    return activity;
-                }
-                return undefined;
-            }
-            return undefined;
-        }
-        return undefined;
-    }
-
     public setMaxActivityRule = (price: number, activity: MerchantInterface.Activity) => {
-        const rule = merge({}, activity.rule);
+        const rule: {discount: number; threshold: number}[] = merge([], activity.rule);
         
         if (!!rule && rule.length > 0) {
             const discountArray = rule.map((item) => item.discount);
@@ -519,9 +482,9 @@ class ProductSDK {
             merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1,
             discount: 0,
             orderSource: 3,
-            totalAmount: this.getProductsOriginPrice() + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
-            totalNum: this.getProductNumber(),
-            transAmount: this.getProductTransPrice() + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)
+            totalAmount: this.getProductsOriginPrice(productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
+            totalNum: this.getProductNumber(productList),
+            transAmount: this.getProductTransPrice(productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)
         }
 
         if (payOrderDetail.deliveryType === 1) {
@@ -671,10 +634,6 @@ class ProductSDK {
             }
         }
 
-        // if (num && num <= 0) {
-        //   return;
-        // }
-
         const reducer: ProductSDKReducer.ProductManageCart = {
             type: this.reducerInterface.MANAGE_CART_PRODUCT,
             payload: {
@@ -684,6 +643,21 @@ class ProductSDK {
             }
         };
         store.dispatch(reducer);
+        /**
+         * @todo [新增的商品则默认选中状态]
+         */
+        const { productCartSelectedIndex } = state.productSDK;
+        const token = index !== -1 
+            ? productCartSelectedIndex.some((i) => i === product.id) 
+            : false;
+        if (!token) {
+            store.dispatch({
+                type: this.reducerInterface.SELECT_INDEX,
+                payload: {
+                    product,
+                }
+            })
+        }
     }
 
     /**
@@ -701,6 +675,22 @@ class ProductSDK {
             }
         };
         store.dispatch(reducer);
+
+        /**
+         * @todo [减少商品时，如果商品存在购物车且是选中状态，那么从购物车中删除时要删掉这个商品]
+         */
+        const reduceNumber = num || 1;
+        const { productCartSelectedIndex } = store.getState().productSDK;
+        const token = productCartSelectedIndex.some((i) => i === product.id);
+        if (!!token && reduceNumber >= (product as any).sellNum) {
+            store.dispatch({
+                type: this.reducerInterface.SELECT_INDEX,
+                payload: {
+                    type: 'normal',
+                    product,
+                }
+            })
+        }
     }
 
 
@@ -709,11 +699,19 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public empty = (sort?: string) => {
+    public empty = (sort?: string, products?: ProductInterface.ProductInfo[]) => {
         store.dispatch({
             type: this.reducerInterface.MANAGE_EMPTY_CART,
             payload: {sort}
         });
+
+        store.dispatch({
+            type: this.reducerInterface.SELECT_INDEX,
+            payload: {
+                type: 'empty',
+                products,
+            }
+        })
     }
 
     /**
@@ -759,7 +757,7 @@ class ProductSDK {
      * @todo [清空下单信息]
      */
     public cashierOrderCallback = async (result: OrderInterface.OrderDetail) => {
-        this.empty();
+        this.empty(undefined, result.orderDetailList as any);
         this.preparePayOrder([])
         this.preparePayOrderAddress({} as any)
         this.preparePayOrderDetail({} as any)
@@ -842,6 +840,13 @@ class ProductSDK {
             return nextProductList;
         }
         return [{productList, activity: {name: NonActivityName} as any}];
+    }
+
+    public selectProduct = (type: string = 'normal', product?: ProductCartInterface.ProductCartInfo) => {
+        store.dispatch({
+            type: this.reducerInterface.SELECT_INDEX,
+            payload: { type, product }
+        });
     }
 }
 
