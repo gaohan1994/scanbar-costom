@@ -36,6 +36,10 @@
 .@{product-prefix} {
   width: 100%;
   .padding(@product-padding);
+  &-cart {
+    display: flex;
+    flex-direction: row;
+  }
   
   &-full {
     .padding(30px, l);
@@ -49,10 +53,31 @@
     margin-bottom: 200px;
   }
 
+  &-select {
+    width: 60px;
+    position: relative;
+    // .padding(30px, r);
+    &-item {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width:34px;
+      height:34px;
+      .bg;
+    }
+    &-normal {
+      background-image: url('//net.huanmusic.com/scanbar-c/bt_unavailable.png');
+    }
+    &-active {
+      background-image: url('//net.huanmusic.com/scanbar-c/bt_cart_selected.png');
+    }
+  }
+
   &-content {
     position: relative;
     .flex(center, flex-start, row);
     .padding(10px, tb);
+    flex: 1;
 
     &-cover {
       position: relative;

@@ -64,7 +64,7 @@ class Page extends Taro.Component<Props, State> {
         }
         const params = {
             productIds: productIds,
-            amount: productSdk.getProductTransPrice()
+            amount: productSdk.getProductTransPrice(payOrderProductList)
         };
         orderAction.getAbleToUseCoupon(params);
     }

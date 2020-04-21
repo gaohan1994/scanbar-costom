@@ -20,6 +20,7 @@ type Props = {
   productCartList: ProductCartInterface.ProductCartInfo[],
   userinfo: UserInterface.UserInfo;
   activityList: MerchantInterface.Activity[];
+  productCartSelectedIndex: number[];
 }
 
 type State = {
@@ -62,14 +63,6 @@ class Page extends Taro.Component<Props, State> {
     };
   }
 
-  // getPhoneNumber = (userinfo: any) => {
-  //   if (userinfo.phone === undefined || userinfo.phone.length === 0) {
-  //     this.setState({
-  //       loginModal: true
-  //     });
-  //   }
-  // }
-
   public beforeSubmit = async () => {
     const { userinfo } = this.props;
     if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
@@ -90,10 +83,8 @@ class Page extends Taro.Component<Props, State> {
     }
 
   render() {
-    const { productCartList, userinfo, activityList } = this.props;
-    // const { getUserinfoModal, loginModal } = this.state;
+    const { productCartList, userinfo, activityList, productCartSelectedIndex } = this.props;
     const productFilterCartList = productSdk.filterByActivity(productCartList, activityList);
-    console.log('productFilterCartList: ', productFilterCartList)
     return (
       <View className='container'>
         {productCartList && productCartList.length > 0
@@ -129,6 +120,7 @@ class Page extends Taro.Component<Props, State> {
                                 >
                                   <ProductComponent
                                     direct={true}
+                                    selectedIndex={productCartSelectedIndex}
                                     key={item.id}
                                     product={item}
                                     last={index === (productCartList.length - 1)}
@@ -145,27 +137,6 @@ class Page extends Taro.Component<Props, State> {
                   )
                 })
               }
-              
-                {/* {
-                    productCartList.map((item, index) => {
-                        return (
-                            <View className="cart-list-info">
-                                <SwiperAction onRemove={() => {
-                                    this.handleRemove(item, productSdk.productCartManageType.REDUCE);
-                                }}>
-                                    <ProductComponent
-                                        direct={true}
-                                        key={item.id}
-                                        product={item}
-                                        last={index === (productCartList.length - 1)}
-                                        isHome={false}
-                                        isCart={true}
-                                    />
-                                </SwiperAction>
-                            </View>
-                        )
-                    })
-                } */}
             </View>)
           : (
             userinfo.nickname === undefined || userinfo.nickname.length === 0 || 
@@ -207,7 +178,8 @@ const select = (state: AppReducer.AppState) => {
   return {
     activityList: state.merchant.activityList,
     productCartList: state.productSDK.productCartList,
-    userinfo: getUserinfo(state)
+    userinfo: getUserinfo(state),
+    productCartSelectedIndex: state.productSDK.productCartSelectedIndex,
   }
 }
 export default connect(select)(Page);

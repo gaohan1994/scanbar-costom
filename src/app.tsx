@@ -1,12 +1,12 @@
-import '@tarojs/async-await'
-import Taro, { Component, Config } from '@tarojs/taro'
-import { Provider } from '@tarojs/redux'
-import { View } from '@tarojs/components'
+import "@tarojs/async-await";
+import Taro, { Component, Config } from "@tarojs/taro";
+import { Provider } from "@tarojs/redux";
+import { View } from "@tarojs/components";
 
 // import Index from './pages/index'
 import "./styles/reset.less";
-import configStore from './store'
-import 'taro-ui/dist/style/index.scss' // 引入组件样式 - 方式一
+import configStore from "./store";
+import "taro-ui/dist/style/index.scss"; // 引入组件样式 - 方式一
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -14,11 +14,9 @@ import 'taro-ui/dist/style/index.scss' // 引入组件样式 - 方式一
 //   require('nerv-devtools')
 // }
 
-export const store = configStore()
-
+export const store = configStore();
 
 class App extends Component {
-
   /**
    * 指定config的类型声明为: Taro.Config
    * 回退版本
@@ -29,21 +27,21 @@ class App extends Component {
    */
   config: Config = {
     pages: [
-      'pages/index/index',
-      'pages/orderList/order',
+      "pages/index/index",
+      "pages/orderList/order",
       // 'pages/order/order.pay',
       // 'pages/order/order.pay.remark',
       // 'pages/order/order.detail',
       // 'pages/order/order.cancel',
       // 'pages/order/order.refund',
-      'pages/user/user',
-      'pages/user/user.set',
-      'pages/user/user.coupon',
-        'pages/user/user.code',
-      'pages/test/test',
-      'pages/cart/cart',
-      'pages/product/product.detail',
-      'pages/product/product.search',
+      "pages/user/user",
+      "pages/user/user.set",
+      "pages/user/user.coupon",
+      "pages/user/user.code",
+      "pages/test/test",
+      "pages/cart/cart",
+      "pages/product/product.detail",
+      "pages/product/product.search"
       // 'pages/address/address.list',
       // 'pages/address/address.add',
       // 'pages/address/address.edit',
@@ -51,15 +49,15 @@ class App extends Component {
     ],
     subPackages: [
       {
-        root: 'pages/order/',
+        root: "pages/order/",
         pages: [
-          'order.pay',
-          'order.pay.remark',
-          'order.pay.coupon',
-          'order.detail',
-          'order.cancel',
-          'order.refund',
-          'order.refund.schedule',
+          "order.pay",
+          "order.pay.remark",
+          "order.pay.coupon",
+          "order.detail",
+          "order.cancel",
+          "order.refund",
+          "order.refund.schedule"
         ]
       },
       // {
@@ -69,61 +67,63 @@ class App extends Component {
       //   ]
       // },
       {
-        root: 'pages/address/',
+        root: "pages/address/",
         pages: [
-          'address.list',
-          'address.add',
-          'address.edit',
-          'address.change.index'
+          "address.list",
+          "address.add",
+          "address.edit",
+          "address.change.index"
         ]
       },
       {
-        root: 'pages/login/',
-        pages: [
-          'login',
-          'login.userinfo',
-        ]
-      },
+        root: "pages/login/",
+        pages: ["login", "login.userinfo"]
+      }
     ],
     window: {
-      backgroundTextStyle: 'light',
-      navigationBarBackgroundColor: '#2a86fc',
-      navigationBarTitleText: 'WeChat',
-      navigationBarTextStyle: 'white',
+      backgroundTextStyle: "light",
+      navigationBarBackgroundColor: "#2a86fc",
+      navigationBarTitleText: "WeChat",
+      navigationBarTextStyle: "white"
     },
     tabBar: {
       color: "#ACACAC",
       selectedColor: "#2EAAF8",
       backgroundColor: "#ffffff",
-      borderStyle: 'black',
-      list: [{
-        pagePath: "pages/index/index",
-        iconPath: "./assets/tab-bar/icon_nav_home.png",
-        selectedIconPath: "./assets/tab-bar/icon_nav_home_selected.png",
-        text: "首页"
-      }, {
-        pagePath: "pages/orderList/order",
-        iconPath: "./assets/tab-bar/icon_nav_order.png",
-        selectedIconPath: "./assets/tab-bar/icon_nav_order_selected.png",
-        text: "订单"
-      }, {
-        pagePath: "pages/cart/cart",
-        iconPath: "./assets/tab-bar/icon_nav_cart.png",
-        selectedIconPath: "./assets/tab-bar/icon_nav_cart_selected.png",
-        text: "购物车"
-      }, {
-        pagePath: "pages/user/user",
-        iconPath: "./assets/tab-bar/icon_nav_mine.png",
-        selectedIconPath: "./assets/tab-bar/icon_nav_mine_selected.png",
-        text: "我的"
-      }]
+      borderStyle: "black",
+      list: [
+        {
+          pagePath: "pages/index/index",
+          iconPath: "./assets/tab-bar/icon_nav_home.png",
+          selectedIconPath: "./assets/tab-bar/icon_nav_home_selected.png",
+          text: "首页"
+        },
+        {
+          pagePath: "pages/orderList/order",
+          iconPath: "./assets/tab-bar/icon_nav_order.png",
+          selectedIconPath: "./assets/tab-bar/icon_nav_order_selected.png",
+          text: "订单"
+        },
+        {
+          pagePath: "pages/cart/cart",
+          iconPath: "./assets/tab-bar/icon_nav_cart.png",
+          selectedIconPath: "./assets/tab-bar/icon_nav_cart_selected.png",
+          text: "购物车"
+        },
+        {
+          pagePath: "pages/user/user",
+          iconPath: "./assets/tab-bar/icon_nav_mine.png",
+          selectedIconPath: "./assets/tab-bar/icon_nav_mine_selected.png",
+          text: "我的"
+        }
+      ]
     },
     permission: {
       "scope.userLocation": {
-        "desc": "你的位置信息将用于小程序位置接口的效果展示" // 高速公路行驶持续后台定位
+        desc: "你的位置信息将用于小程序位置接口的效果展示" // 高速公路行驶持续后台定位
       }
     }
-  }
+  };
   // 在 App 类中的 render() 函数没有实际作用
   // 请勿修改此函数
   render() {
@@ -132,8 +132,8 @@ class App extends Component {
         {/* <Index /> */}
         <View>asd</View>
       </Provider>
-    )
+    );
   }
 }
 
-Taro.render(<App />, document.getElementById('app'))
+Taro.render(<App />, document.getElementById("app"));
