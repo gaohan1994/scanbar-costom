@@ -400,14 +400,14 @@ class ProductSDK {
                 if (!Array.isArray(rules) || !rules.length || !rules[0].threshold || !rules[0].threshold) {
                     return '';
                 }
-                return `满${rules[0].threshold}元减${rules[0].threshold}元`;
+                return `满${rules[0].threshold}元减${rules[0].discount}元`;
             case 4:
                 if (!activity.rule) return '';
                 const ruleList = JSON.parse(activity.rule);
                 if (!Array.isArray(ruleList) || !ruleList.length || !ruleList[0].threshold || !ruleList[0].threshold) {
                     return '';
                 }
-                return `满${ruleList[0].threshold}件打${ruleList[0].threshold}折`;
+                return `满${ruleList[0].threshold}件打${ruleList[0].discount}折`;
             default:
                 return ``;
         }
