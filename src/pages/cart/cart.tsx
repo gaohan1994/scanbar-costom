@@ -12,14 +12,19 @@ import productSdk, {
 } from "../../common/sdk/product/product.sdk";
 import Empty from "../../component/empty";
 import SwiperAction from "../../component/swiperAction";
-import { store } from "../../app";
-import { getUserinfo } from "../../reducers/app.user";
+import { getUserinfo, getMemberInfo } from '../../reducers/app.user';
 import { UserInterface, MerchantInterface } from "../../constants";
 import "./index.less";
 import { ProductInterface } from "../../constants/product/product";
 import merchantAction from "../../actions/merchant.action";
+import { Dispatch } from 'redux';
+import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 
 type Props = {
+  dispatch: Dispatch;
+  currentMerchantDetail: any;
+  productSDKObj: any;
+  memberInfo: any;
   productCartList: ProductCartInterface.ProductCartInfo[];
   userinfo: UserInterface.UserInfo;
   activityList: MerchantInterface.Activity[];
@@ -46,8 +51,9 @@ class Page extends Taro.Component<Props, State> {
 
   async componentDidShow() {
     // this.loginCheck();
-    merchantAction.activityInfoList();
-    store.dispatch({
+    const {dispatch, currentMerchantDetail} = this.props;
+    merchantAction.activityInfoList(dispatch, currentMerchantDetail.id);
+    dispatch({
       type: "MANAGE_CART_BADGE",
       payload: {}
     });
@@ -87,7 +93,8 @@ class Page extends Taro.Component<Props, State> {
       | ProductCartInterface.ProductCartAdd
       | ProductCartInterface.ProductCartReduce
   ) => {
-    productSdk.manage({ type, product, num: product.sellNum });
+    const {dispatch, productSDKObj} = this.props;
+    productSdk.manage(dispatch, productSDKObj, { type, product, num: product.sellNum });
   };
 
   render() {
@@ -95,7 +102,8 @@ class Page extends Taro.Component<Props, State> {
       productCartList,
       userinfo,
       activityList,
-      productCartSelectedIndex
+      productCartSelectedIndex,
+      memberInfo
     } = this.props;
     const productFilterCartList = productSdk.filterByActivity(
       productCartList,
@@ -117,7 +125,7 @@ class Page extends Taro.Component<Props, State> {
                 productList.forEach(product => {
                   if (productCartSelectedIndex.some(id => product.id === id)) {
                     const itemTotal =
-                      productSdk.getProductItemPrice(product) * product.sellNum;
+                      productSdk.getProductItemPrice(product, memberInfo) * product.sellNum;
                     subTotalPrice += itemTotal;
                   }
                 });
@@ -216,7 +224,10 @@ class Page extends Taro.Component<Props, State> {
 const select = (state: AppReducer.AppState) => {
   return {
     activityList: state.merchant.activityList,
+    currentMerchantDetail: getCurrentMerchantDetail(state),
     productCartList: state.productSDK.productCartList,
+    productSDKObj: state.productSDK,
+    memberInfo: getMemberInfo(state),
     userinfo: getUserinfo(state),
     productCartSelectedIndex: state.productSDK.productCartSelectedIndex
   };

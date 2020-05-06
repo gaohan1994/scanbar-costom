@@ -10,6 +10,7 @@ import { UserAction } from '../../actions';
 import { getUserinfo, getMemberInfo } from '../../reducers/app.user';
 import { connect } from '@tarojs/redux';
 import numeral from 'numeral';
+import { Dispatch } from 'redux';
 
 const Rows = [
     {
@@ -27,6 +28,7 @@ const Rows = [
 const cssPrefix = 'user';
 
 interface Props {
+    dispatch: Dispatch;
     userinfo: UserInterface.UserInfo;
     memberInfo: UserInterface.MemberInfo;
 }
@@ -48,7 +50,7 @@ class User extends Taro.Component<Props, State> {
     async componentDidShow() {
         const { userinfo } = this.props;
         if (userinfo.phone && userinfo.phone.length > 0) {
-            UserAction.getMemberInfo();
+            UserAction.getMemberInfo(this.props.dispatch);
         }
     }
 
@@ -101,7 +103,7 @@ class User extends Taro.Component<Props, State> {
 
     public getWxUserInfo = async (show?: boolean) => {
         try {
-            const { userinfo } = this.props;
+            const { userinfo, dispatch } = this.props;
             const result: any = await WeixinSDK.getWeixinUserinfo();
             invariant(result.success, result.msg || '获取用户昵称和头像失败');
             const newUserinfo = {
@@ -114,7 +116,7 @@ class User extends Taro.Component<Props, State> {
                 invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
             }
 
-            const setResult: any = await LoginManager.setUserInfo(newUserinfo);
+            const setResult: any = await LoginManager.setUserInfo(newUserinfo, dispatch);
             invariant(setResult.success, setResult.msg || '存储用户信息失败');
         } catch (error) {
             if (show != false) {

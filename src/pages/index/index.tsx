@@ -17,7 +17,7 @@ import TabsChoose from '../../component/tabs/tabs.choose'
 import {getMerchantAdvertisement, getCurrentMerchantDetail} from '../../reducers/app.merchant'
 import {LoginManager} from '../../common/sdk'
 import CouponModal from '../../component/coupon/coupon.modal'
-import {getUserinfo, getMemberInfo} from '../../reducers/app.user'
+import { getUserinfo, getMemberInfo, getIndexAddress } from '../../reducers/app.user';
 import {BASE_PARAM} from '../../common/util/config'
 
 const cssPrefix = 'product';
@@ -58,7 +58,7 @@ class Index extends Component<any> {
     async componentDidMount() {
         try {
             this.init(true);
-            orderAction.orderAllStatus();
+            orderAction.orderAllStatus(this.props.dispatch);
         } catch (error) {
             Taro.showToast({
                 title: error.message,
@@ -95,19 +95,20 @@ class Index extends Component<any> {
     }
 
     public init = async (firstTime?: boolean): Promise<void> => {
+        const {dispatch, address} = this.props;
         try {
-            MerchantAction.merchantList();
-            await LoginManager.getUserInfo();
-            WeixinSdk.initAddress();
+            MerchantAction.merchantList(dispatch);
+            await LoginManager.getUserInfo(dispatch);
+            WeixinSdk.initAddress(dispatch, address);
             const {userinfo, currentMerchantDetail} = this.props;
             if (userinfo.phone && userinfo.phone.length > 0) {
-                UserAction.getMemberInfo();
+                UserAction.getMemberInfo(dispatch);
                 const res = await UserAction.obtainCoupon();
                 if (res.code == ResponseCode.success) {
                     this.setState({obtainCouponList: res.data.rows})
                 }
             }
-            const productTypeResult = await ProductAction.productInfoType({
+            const productTypeResult = await ProductAction.productInfoType(dispatch, {
                 merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1
             });
             invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
@@ -135,9 +136,9 @@ class Index extends Component<any> {
     }
 
     public fetchData = async (type: any) => {
-        const {currentMerchantDetail} = this.props;
+        const {currentMerchantDetail, dispatch} = this.props;
         this.setState({loading: true});
-        const result = await ProductAction.productInfoList({
+        const result = await ProductAction.productInfoList(dispatch, {
             type: `${type.id}`,
             status: 0,
             saleType: 0,
@@ -284,7 +285,8 @@ const select = (state) => {
         advertisement: getMerchantAdvertisement(state),
         currentMerchantDetail: getCurrentMerchantDetail(state),
         userinfo: getUserinfo(state),
-        memberInfo: getMemberInfo(state)
+        memberInfo: getMemberInfo(state),
+        address: getIndexAddress(state)
     }
 }
 

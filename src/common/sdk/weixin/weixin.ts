@@ -1,8 +1,6 @@
 import Taro from '@tarojs/taro';
 import MapSdk from '../../qqmap-wx-jssdk'
 import { UserInterface } from '../../../constants';
-import { store } from '../../../app';
-import { getIndexAddress } from '../../../reducers/app.user';
 import invariant from 'invariant'
 
 /**
@@ -87,7 +85,7 @@ class WeixinSDK {
     }
   }
 
-  public getLocation = async (): Promise<{ success: boolean, result: any, msg: string }> => {
+  public getLocation = async (dispatch): Promise<{ success: boolean, result: any, msg: string }> => {
     const that = this;
     return new Promise((resolve) => {
       Taro.getLocation({
@@ -98,7 +96,7 @@ class WeixinSDK {
               longitude: res.longitude
             },
             success: (result) => {
-              store.dispatch({
+              dispatch({
                 type: that.reducerInterface.RECEIVE_CURRENT_ADDRESS,
                 payload: {
                   address: result.result.address,
@@ -120,8 +118,8 @@ class WeixinSDK {
     })
   }
 
-  public changeCostomIndexAddress = (address: UserInterface.Address) => {
-    store.dispatch({
+  public changeCostomIndexAddress = (address: UserInterface.Address, dispatch) => {
+    dispatch({
       type: this.reducerInterface.CHANGE_COSTOM_INDEX_ADDRESS,
       payload: {
         address
@@ -132,22 +130,22 @@ class WeixinSDK {
   /**
    * @todo [判断当前redux中是否存在首页地址如果没有则初始化]
    */
-  public initAddress = async () => {
+  public initAddress = async (dispatch, address) => {
     try {
-      const state = await store.getState();
-      const address = getIndexAddress(state);
+      // const state = await store.getState();
+      // const address = getIndexAddress(state);
 
       if (address && address.latitude) {
         return;
       }
-      const result = await this.getLocation();
+      const result = await this.getLocation(dispatch);
       invariant(!!result.success, result.msg || '获取地理位置失败');
       const payload = {
         address: result.result.address,
         latitude: result.result.location.lat,
         longitude: result.result.location.lng,
       }
-      this.changeCostomIndexAddress(payload as any);
+      this.changeCostomIndexAddress(payload as any, dispatch);
     } catch (error) {
       Taro.showToast({
         title: error.message,

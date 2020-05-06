@@ -11,8 +11,9 @@ import OrderItem from '../../component/order/order';
 import "../style/product.less";
 import Empty from '../../component/empty';
 import orderAction from '../../actions/order.action';
-import { store } from '../../app';
 import { getUserinfo } from '../../reducers/app.user';
+import { Dispatch } from 'redux';
+import productSdk from 'xxx';
 
 const cssPrefix = 'order';
 
@@ -20,6 +21,8 @@ let pageNum: number = 1;
 const pageSize: number = 20;
 
 interface Props {
+  dispatch: Dispatch;
+  productSDKObj: any;
   orderList: OrderInterface.OrderDetail[];
   orderListTotal: number;
   orderCount: OrderInterface.OrderCount;
@@ -45,6 +48,7 @@ class Order extends Taro.Component<Props, State> {
 
   async componentDidMount() {
     // this.loginCheck();
+    console.log(this.props)
   }
 
   async componentDidShow() {
@@ -73,25 +77,26 @@ class Order extends Taro.Component<Props, State> {
   }
 
   public onChangeTab = async (tabNum: number) => {
-    await store.dispatch({
+    const {dispatch } = this.props;
+    await dispatch({
       type: 'CHANGR_CURRENT_TYPE',
       payload: {
         currentType: tabNum
       }
     });
     this.fetchOrder(1);
-    OrderAction.orderCount();
+    OrderAction.orderCount(dispatch);
   }
 
   public init = async () => {
-    const { currentType } = this.props;
+    const { currentType, dispatch } = this.props;
     pageNum = 1;
-    OrderAction.orderList({ pageNum: pageNum++, pageSize, ...orderAction.getFetchType(currentType) });
-    OrderAction.orderCount();
+    OrderAction.orderList(dispatch, { pageNum: pageNum++, pageSize, ...orderAction.getFetchType(currentType) });
+    OrderAction.orderCount(dispatch);
   }
 
   public fetchOrder = async (page?: number) => {
-    const { currentType } = this.props;
+    const { currentType, dispatch } = this.props;
     try {
       let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === 'number' ? page : pageNum,
@@ -99,7 +104,7 @@ class Order extends Taro.Component<Props, State> {
         ...orderAction.getFetchType(currentType)
       };
 
-      const result = await OrderAction.orderList(payload);
+      const result = await OrderAction.orderList(dispatch, payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       if (typeof page === 'number') {
         pageNum = page;
@@ -123,7 +128,7 @@ class Order extends Taro.Component<Props, State> {
   // }
 
   render() {
-    const { orderList, orderListTotal, orderAllStatus, currentType, userinfo } = this.props;
+    const { orderList, orderListTotal, orderAllStatus, currentType, userinfo, dispatch, productSDKObj } = this.props;
     const hasMore = orderList.length < orderListTotal;
     // const { getUserinfoModal, loginModal } = this.state;
     return (
@@ -147,7 +152,7 @@ class Order extends Taro.Component<Props, State> {
                   orderList.map((item: any) => {
                     return (
                       <View className={`${cssPrefix}-scrollview-item`} key={item.orderNo}>
-                        <OrderItem data={item} orderAllStatus={orderAllStatus} currentType={currentType} />
+                        <OrderItem dispatch={dispatch} productSDKObj data={item} orderAllStatus={orderAllStatus} currentType={currentType} />
                       </View>
                     )
                   })
@@ -231,7 +236,8 @@ const select = (state: any) => ({
   orderCount: getOrderCount(state),
   orderAllStatus: getOrderAllStatus(state),
   currentType: getCurrentType(state),
-  userinfo: getUserinfo(state)
+  userinfo: getUserinfo(state),
+  productSDKObj: state.productSdk,
 });
 
 export default connect(select)(Order);

@@ -6,7 +6,7 @@
  * @Last Modified time: 2020-03-17 16:43:55
  */
 import { ResponseCode, OrderService, OrderInterface, OrderInterfaceMap } from '../constants/index';
-import { store } from '../app';
+// import { store } from '../app';
 import { OrderReducer } from '../reducers/app.order';
 
 class OrderAction {
@@ -16,7 +16,7 @@ class OrderAction {
    *
    * @memberof OrderAction
    */
-  public orderList = async (params: OrderInterface.OrderListFetchFidle) => {
+  public orderList = async (dispatch, params: OrderInterface.OrderListFetchFidle) => {
     const result = await OrderService.orderList(params);
 
     if (result.code === ResponseCode.success) {
@@ -27,7 +27,7 @@ class OrderAction {
           ...result.data as any
         }
       };
-      store.dispatch(reducer);
+      dispatch(reducer);
     }
     return result;
   }
@@ -37,7 +37,7 @@ class OrderAction {
    *
    * @memberof OrderAction
    */
-  public orderDetail = async (params: OrderInterface.OrderDetailFetchField) => {
+  public orderDetail = async (dispatch, params: OrderInterface.OrderDetailFetchField) => {
     const result = await OrderService.orderDetail(params);
 
     if (result.code === ResponseCode.success) {
@@ -47,7 +47,7 @@ class OrderAction {
           data: result.data
         }
       };
-      store.dispatch(reducer);
+      dispatch(reducer);
     }
     return result;
   }
@@ -67,7 +67,7 @@ class OrderAction {
    *
    * @memberof OrderAction
    */
-  public orderCount = async () => {
+  public orderCount = async (dispatch) => {
     const result = await OrderService.orderCount();
 
     if (result.code === ResponseCode.success) {
@@ -77,7 +77,7 @@ class OrderAction {
           data: result.data
         }
       };
-      store.dispatch(reducer);
+      dispatch(reducer);
     }
     return result;
   }
@@ -117,7 +117,7 @@ class OrderAction {
    *
    * @memberof OrderAction
    */
-  public getAbleToUseCoupon  = async (params: any) => {
+  public getAbleToUseCoupon  = async (dispatch,params: any) => {
     const result = await OrderService.getAbleToUseCoupon(params);
     if (result.code === ResponseCode.success) {
       const reducer: OrderReducer.Reducers.AbleToUseCouponsReducer = {
@@ -126,7 +126,7 @@ class OrderAction {
           ableToUseCouponList: result.data.rows
         }
       };
-      store.dispatch(reducer);
+      dispatch(reducer);
     }
     return result;
   }
@@ -136,7 +136,7 @@ class OrderAction {
    *
    * @memberof OrderAction
    */
-  public orderAllStatus = async () => {
+  public orderAllStatus = async (dispatch) => {
     const result = await OrderService.orderAllStatus();
     if (result.code === ResponseCode.success) {
       const reducer: OrderReducer.Reducers.OrderAllStatusReducer = {
@@ -145,7 +145,7 @@ class OrderAction {
           orderAllStatus: result.data.rows
         }
       };
-      store.dispatch(reducer);
+      dispatch(reducer);
     }
     return result;
   }

@@ -9,8 +9,10 @@ import './index.less';
 import { AtFloatLayout, AtButton } from 'taro-ui';
 import classnames from 'classnames';
 import { OrderAction } from '../../actions';
+import { Dispatch } from 'redux';
 
 interface Props {
+  dispatch: Dispatch;
   orderDetail: OrderInterface.OrderDetail;
   currentType: number;
 }
@@ -40,7 +42,7 @@ class OrderCancel extends Taro.Component<Props, State> {
       return;
     }
     Taro.showLoading();
-    const { orderDetail, currentType } = this.props;
+    const { orderDetail, currentType, dispatch } = this.props;
     const { order, orderDetailList } = orderDetail;
     let productInfoList: OrderInterface.RefundOrderProductItem[] = [];
     if (orderDetailList) {
@@ -67,9 +69,9 @@ class OrderCancel extends Taro.Component<Props, State> {
         title: '申请取消订单成功'
       });
       Taro.navigateBack();
-      OrderAction.orderDetail({ orderNo: order.orderNo });
-      OrderAction.orderList({ pageNum: 1, pageSize: 20, ...orderAction.getFetchType(currentType) });
-      OrderAction.orderCount();
+      OrderAction.orderDetail(dispatch, { orderNo: order.orderNo });
+      OrderAction.orderList(dispatch, { pageNum: 1, pageSize: 20, ...orderAction.getFetchType(currentType) });
+      OrderAction.orderCount(dispatch);
     } else {
       Taro.showToast({
         title: res.msg || '申请取消订单失败',

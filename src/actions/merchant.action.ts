@@ -11,12 +11,12 @@ import {
 } from "../constants";
 import { ResponseCode } from '../constants/index';
 import { BASE_PARAM } from '../common/util/config';
-import { store } from '../app';
+// import { store } from '../app';
 
 class MerchantAction {
 
-  public activityInfoList = async () => {
-    const merchantId = store.getState().merchant.currentMerchantDetail.id;
+  public activityInfoList = async (dispatch, merchantId) => {
+    // const merchantId = store.getState().merchant.currentMerchantDetail.id;
     const result = await MerchantService.activityInfoList(merchantId);
     if (result.code === ResponseCode.success) {
 
@@ -32,7 +32,7 @@ class MerchantAction {
         });
       }
       
-      store.dispatch({
+      dispatch({
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ACTIVITYLIST,
         payload: data
       })
@@ -45,10 +45,10 @@ class MerchantAction {
    *
    * @memberof MerchantAction
    */
-  public merchantDetail = async (params: MerchantInterface.merchantDetailFetchField) => {
+  public merchantDetail = async (dispatch, params: MerchantInterface.merchantDetailFetchField) => {
     const result = await MerchantService.merchantInfoDetail(params);
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_DETAIL,
         payload: result.data
       });
@@ -61,19 +61,19 @@ class MerchantAction {
    *
    * @memberof MerchantAction
    */
-  public merchantList = async () => {
+  public merchantList = async (dispatch) => {
     const result = await MerchantService.merchantList();
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_LIST,
         payload: result.data.rows
       });
       if (result.data.rows && result.data.rows.length > 0) {
-        store.dispatch({
+        dispatch({
           type: MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL,
           payload: result.data.rows.filter(val => val.id ===  BASE_PARAM.MCHID)[0] || {merchantId: BASE_PARAM.MCHID}
         });
-        this.advertisement({merchantId: BASE_PARAM.MCHID});
+        this.advertisement(dispatch, {merchantId: BASE_PARAM.MCHID});
       }
     }
     return result;
@@ -84,10 +84,10 @@ class MerchantAction {
    *
    * @memberof MerchantAction
    */
-  public merchantDistance = async (params: MerchantInterface.merchantDistanceFetchField) => {
+  public merchantDistance = async (dispatch, params: MerchantInterface.merchantDistanceFetchField) => {
     const result = await MerchantService.merchantDistance(params);
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_DISTANCE,
         payload: result.data
       })
@@ -95,10 +95,10 @@ class MerchantAction {
     return result;
   }
 
-  public advertisement = async(params: MerchantInterface.merchantDetailFetchField) => {
+  public advertisement = async(dispatch, params: MerchantInterface.merchantDetailFetchField) => {
     const result = await MerchantService.advertisement(params);
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ADVERTISEMENT,
         payload: result.data.rows
       });

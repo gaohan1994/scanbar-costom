@@ -2,7 +2,7 @@ import Taro from '@tarojs/taro';
 import { View } from '@tarojs/components';
 import isNaN from 'lodash/isNaN';
 import classNames from 'classnames';
-import './style.sass';
+import './style.scss';
 
 interface Props { 
   dot?: boolean;

@@ -1,18 +1,18 @@
 import "@tarojs/async-await";
 import Taro, { Component, Config } from "@tarojs/taro";
 import { Provider } from "@tarojs/redux";
-import { View } from "@tarojs/components";
+// import { View } from "@tarojs/components";
 
-// import Index from './pages/index'
+import Index from './pages/index'
 import "./styles/reset.less";
 import configStore from "./store";
 import "taro-ui/dist/style/index.scss"; // 引入组件样式 - 方式一
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
-// if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
-//   require('nerv-devtools')
-// }
+if (process.env.NODE_ENV !== 'production' && process.env.TARO_ENV === 'h5')  {
+  require('nerv-devtools')
+}
 
 export const store = configStore();
 
@@ -129,8 +129,10 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
-        {/* <Index /> */}
-        <View>asd</View>
+        <Index />
+        {/* {
+          process.env.TARO_ENV === 'h5' ? 'h5' : <View>asd</View>
+        } */}
       </Provider>
     );
   }

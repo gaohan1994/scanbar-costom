@@ -11,6 +11,8 @@ const cssPrefix = "component-product";
 const prefix = "product-detail-component";
 
 type Props = {
+  activityList: any;
+  memberInfo: any;
   product: ProductInterface.ProductInfo;
 };
 
@@ -20,12 +22,12 @@ class Page extends Taro.Component<Props> {
   };
 
   public renderPrice = () => {
-    const { product } = this.props;
+    const { product, memberInfo } = this.props;
     const priceNum =
       product && product.price ? numeral(product.price).value() : 0;
     const price = numeral(priceNum).format("0.00");
     const discountPriceNum = numeral(
-      productSdk.getProductItemDiscountPrice(product)
+      productSdk.getProductItemDiscountPrice(product, memberInfo)
     ).value();
     const discountPrice = numeral(discountPriceNum).format("0.00");
     return (
@@ -49,7 +51,7 @@ class Page extends Taro.Component<Props> {
   };
 
   render() {
-    const { product } = this.props;
+    const { product, memberInfo,activityList } = this.props;
     return (
       <View className={`${prefix}-detail`}>
         <ProductShare />
@@ -90,7 +92,7 @@ class Page extends Taro.Component<Props> {
                       {item.type === 1 ? "打折" : "特价"}
                     </View>
                     <View className={`${prefix}-detail-act-text`}>
-                      {productSdk.getDiscountString(item)}
+                      {productSdk.getDiscountString(memberInfo,activityList, item)}
                     </View>
                   </View>
                 );

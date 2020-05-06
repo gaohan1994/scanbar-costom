@@ -6,7 +6,7 @@
  */
 import requestHttp from "../common/request/request.http";
 import { ResponseCode, UserService, UserInterfaceMap, UserInterface } from "../constants";
-import { store } from "../app";
+// import { store } from "../app";
 
 class UserAction {
 
@@ -15,10 +15,10 @@ class UserAction {
    *
    * @memberof UserAction
    */
-  public addressList = async () => {
+  public addressList = async (dispatch) => {
     const result = await UserService.addressList();
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: UserInterfaceMap.reducerInterface.RECEIVE_ADDRESS_LIST,
         payload: result.data
       });
@@ -71,10 +71,10 @@ class UserAction {
    *
    * @memberof UserAction
    */
-  public getMemberCoupons = async (params?: UserInterface.FetchMemberCoupons) => {
+  public getMemberCoupons = async (dispatch, params?: UserInterface.FetchMemberCoupons) => {
     const result = await UserService.getMemberCoupons(params);
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: UserInterfaceMap.reducerInterface.RECEIVE_COUPONS,
         payload: {
           couponList: result.data.rows
@@ -89,10 +89,10 @@ class UserAction {
    *
    * @memberof UserAction
    */
-  public getMemberExpiredCoupons = async (params?: UserInterface.FetchMemberCoupons) => {
+  public getMemberExpiredCoupons = async (dispatch, params?: UserInterface.FetchMemberCoupons) => {
     const result = await UserService.getMemberExpiredCoupons(params);
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: UserInterfaceMap.reducerInterface.RECEIVE_COUPONS,
         payload: {
           couponList: result.data.rows
@@ -117,10 +117,10 @@ class UserAction {
    *
    * @memberof UserAction
    */
-  public getMemberInfo = async () => {
+  public getMemberInfo = async (dispatch) => {
     const result = await UserService.getMemberInfo();
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: UserInterfaceMap.reducerInterface.RECEIVE_MEMBER_INFO,
         payload: {
           memberInfo: result.data

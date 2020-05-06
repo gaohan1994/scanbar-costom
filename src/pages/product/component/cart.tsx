@@ -8,11 +8,14 @@ import { connect } from '@tarojs/redux'
 import productSdk from '../../../common/sdk/product/product.sdk';
 import { AppReducer } from '../../../reducers'
 import { ProductCartInterface } from '../../../common/sdk/product/product.sdk'
+import { Dispatch } from 'redux';
 
 const cssPrefix = 'component-product';
 const prefix = 'product-detail-component'
 
 interface Props { 
+  dispatch: Dispatch;
+  productSDKObj: any;
   product: ProductInterface.ProductInfo;
   productInCart?: ProductCartInterface.ProductCartInfo;
 }
@@ -24,8 +27,8 @@ class Cart extends Taro.Component<Props> {
   }
 
   public manageProduct = (type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce) => {
-    const { product } = this.props;
-    productSdk.manage({type, product });
+    const { product, dispatch, productSDKObj, } = this.props;
+    productSdk.manage(dispatch, productSDKObj, {type, product });
   }
 
   public renderStepper = () => {
@@ -95,6 +98,7 @@ const select = (state: AppReducer.AppState, ownProps: Props) => {
   const productInCart = product !== undefined && productList.find(p => p.id === product.id);
   return {
     product,
+    productSDKObj: state.productSDK,
     productInCart,
   };
 };

@@ -8,10 +8,12 @@ import invariant from 'invariant';
 import { ResponseCode } from '../../constants';
 import { UserAction } from '../../actions';
 import WeixinSDK from '../../common/sdk/weixin/weixin';
+import { Dispatch } from 'redux';
 
 const cssPrefix = 'login-modal';
 
 interface Props {
+  dispatch: Dispatch;
   isOpen: boolean;
   onCancle: () => void;
   callback?: (userinfo: any) => void;
@@ -24,7 +26,7 @@ interface State {
 class LoginModal extends Taro.Component<Props, State> {
 
   public onGetPhoneNumber = async (params) => {
-    const { onCancle, callback } = this.props;
+    const { onCancle, callback, dispatch } = this.props;
     console.log('params: ', params);
     const { detail } = params;
     if (detail.errMsg === "getPhoneNumber:ok") {
@@ -41,11 +43,11 @@ class LoginModal extends Taro.Component<Props, State> {
         const result = await requestHttp.post('/customer/decrypt', payload);
         console.log('result: ', result);
         invariant(result.code === ResponseCode.success, result.msg || '获取手机号失败');
-        const getResult = await LoginManager.getUserInfo();
+        const getResult = await LoginManager.getUserInfo(dispatch);
         invariant(getResult.success, getResult.msg || '获取用户信息失败');
         const userinfo = getResult.result;
         const newCodeRes = await WeixinSDK.getWeixinCode();
-        const loginRes = await LoginManager.login({ phone: JSON.parse(result.data).phoneNumber, code: newCodeRes.result});
+        const loginRes = await LoginManager.login({ phone: JSON.parse(result.data).phoneNumber, code: newCodeRes.result}, dispatch);
         invariant(loginRes.success, loginRes.msg || '登录失败');
         const newUserinfo = {
           ...userinfo,
@@ -58,7 +60,7 @@ class LoginModal extends Taro.Component<Props, State> {
           ...newUserinfo,
           token: loginRes.result.token
         }
-        const setResult: any = await LoginManager.setUserInfo(localUserinfo);
+        const setResult: any = await LoginManager.setUserInfo(localUserinfo, dispatch);
         invariant(setResult.success, setResult.msg || '存储用户信息失败');
         if (callback) {
           callback(newUserinfo);

@@ -11,7 +11,9 @@ import classnames from 'classnames';
 import ProductComponent from './component/product';
 import { OrderAction } from '../../actions';
 import numeral from 'numeral';
+import { Dispatch } from 'redux';
 interface Props {
+  dispatch: Dispatch;
   orderDetail: OrderInterface.OrderDetail;
   currentType: number;
 }
@@ -43,7 +45,7 @@ class OrderRefund extends Taro.Component<Props, State> {
       return;
     }
     Taro.showLoading();
-    const { orderDetail, currentType } = this.props;
+    const { orderDetail, currentType, dispatch } = this.props;
     const { order } = orderDetail;
     let productInfoList: OrderInterface.RefundOrderProductItem[] = [];
     let transAmount = 0;
@@ -72,9 +74,9 @@ class OrderRefund extends Taro.Component<Props, State> {
         title: '申请取消订单成功'
       });
       Taro.navigateBack();
-      OrderAction.orderDetail({ orderNo: order.orderNo });
-      OrderAction.orderList({ pageNum: 1, pageSize: 20, ...orderAction.getFetchType(currentType) });
-      OrderAction.orderCount();
+      OrderAction.orderDetail(dispatch, { orderNo: order.orderNo });
+      OrderAction.orderList(dispatch, { pageNum: 1, pageSize: 20, ...orderAction.getFetchType(currentType) });
+      OrderAction.orderCount(dispatch);
     } else {
       Taro.showToast({
         title: res.msg || '申请取消订单失败',

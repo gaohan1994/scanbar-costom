@@ -10,10 +10,12 @@ import requestHttp from '../../common/request/request.http';
 import {connect} from '@tarojs/redux';
 import {AppReducer} from '../../reducers';
 import {getCurrentMerchantDetail} from '../../reducers/app.merchant';
+import { Dispatch } from 'redux';
 
 const cssPrefix = 'login';
 
 interface Props {
+    dispatch: Dispatch;
     currentMerchantDetail: MerchantInterface.MerchantDetail;
 }
 
@@ -29,7 +31,7 @@ class GetUserinfo extends Taro.Component<Props, State> {
 
     public onGetPhoneNumber = async (params) => {
         // const { onCancle, callback } = this.props;
-        const {currentMerchantDetail} = this.props;
+        const {currentMerchantDetail, dispatch} = this.props;
         console.log('params: ', params);
         const {detail} = params;
         if (detail.errMsg === "getPhoneNumber:ok") {
@@ -47,7 +49,7 @@ class GetUserinfo extends Taro.Component<Props, State> {
                 const result = await requestHttp.post('/customer/decrypt', payload);
                 console.log('result: ', result);
                 invariant(result.code === ResponseCode.success, result.msg || '获取手机号失败');
-                const getResult = await LoginManager.getUserInfo();
+                const getResult = await LoginManager.getUserInfo(dispatch);
                 invariant(getResult.success, getResult.msg || '获取用户信息失败');
                 const userinfo = getResult.result;
                 const newCodeRes = await WeixinSDK.getWeixinCode();
@@ -55,7 +57,7 @@ class GetUserinfo extends Taro.Component<Props, State> {
                     phone: JSON.parse(result.data).phoneNumber,
                     code: newCodeRes.result,
                     merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1
-                });
+                }, dispatch);
                 invariant(loginRes.success, loginRes.msg || '登录失败');
                 const newUserinfo = {
                     ...userinfo,
@@ -69,7 +71,7 @@ class GetUserinfo extends Taro.Component<Props, State> {
                     ...newUserinfo,
                     token: loginRes.result.token
                 }
-                const setResult: any = await LoginManager.setUserInfo(localUserinfo);
+                const setResult: any = await LoginManager.setUserInfo(localUserinfo, dispatch);
                 invariant(setResult.success, setResult.msg || '存储用户信息失败');
                 Taro.navigateBack();
             } catch (error) {
