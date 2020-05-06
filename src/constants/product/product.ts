@@ -34,6 +34,7 @@ export declare namespace ProductInterface {
      */
     interface ProductInfo {
         id: number;
+        sellNum: number;      //
         cost: number;         // 进货价
         avgCost: number;      // 平均进货价
         limitNum: number;     // 库存下限预警
@@ -203,7 +204,7 @@ export declare namespace ProductInterface {
 
 interface ProductInterfaceMap {
     reducerInterfaces: ProductInterface.ReducerInterface;
-    productInfoType: string;
+    productInfoType(params: ProductInterface.ProductInfoTypeFetchFidle): string;
     cashierPay: string;
 
     cashierQueryStatus (params: ProductInterface.ProductCashierQueryStatus): string;

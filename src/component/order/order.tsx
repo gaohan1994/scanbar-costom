@@ -9,10 +9,13 @@ import invariant from 'invariant';
 import productSdk from '../../common/sdk/product/product.sdk';
 import orderAction from '../../actions/order.action';
 import OrderButtons from './order.buttons';
+import { Dispatch } from 'redux';
 
 const cssPrefix = 'component-order-item';
 
 type Props = {
+  dispatch: Dispatch;
+  productSDKObj: any;
   data: OrderInterface.OrderDetail;
   orderAllStatus: any[];
   currentType?: number;
@@ -41,7 +44,7 @@ class OrderItem extends Taro.Component<Props, State> {
   }
 
   public orderCancle = async (order: OrderInterface.OrderInfo) => {
-    const { currentType } = this.props;
+    const { currentType, dispatch } = this.props;
     const { orderNo } = order;
     const payload = {
       orderNo: orderNo
@@ -53,8 +56,8 @@ class OrderItem extends Taro.Component<Props, State> {
         title: '取消订单成功',
         icon: 'success'
       });
-      OrderAction.orderList({ pageNum: 1, pageSize: 20, ...orderAction.getFetchType(currentType) });
-      OrderAction.orderCount();
+      OrderAction.orderList(dispatch, { pageNum: 1, pageSize: 20, ...orderAction.getFetchType(currentType) });
+      OrderAction.orderCount(dispatch);
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -82,11 +85,12 @@ class OrderItem extends Taro.Component<Props, State> {
 
   public orderOneMore = async (order: OrderInterface.OrderDetail) => {
     const { orderDetailList } = order;
+    const {dispatch, productSDKObj}= this.props;
     if (orderDetailList && orderDetailList.length > 0) {
       for (let i = 0; i < orderDetailList.length; i++) {
-        const res = await ProductAction.productInfoDetail({ id: orderDetailList[i].productId });
+        const res = await ProductAction.productInfoDetail(dispatch, { id: orderDetailList[i].productId });
         if (res.code === ResponseCode.success) {
-          productSdk.manage({
+          productSdk.manage(dispatch, productSDKObj,{
             type: productSdk.productCartManageType.ADD,
             product: res.data,
             num: orderDetailList[i].num,

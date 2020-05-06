@@ -7,10 +7,12 @@ import invariant from 'invariant';
 import { ResponseCode } from '../../constants';
 import WeixinSDK from '../../common/sdk/weixin/weixin';
 import { UserAction } from '../../actions';
+import { Dispatch } from 'redux';
 
 const cssPrefix = 'login-modal';
 
 interface Props {
+  dispatch: Dispatch;
   isOpen: boolean;
   onCancle: () => void;
   callback?: (userinfo: any) => void;
@@ -23,10 +25,11 @@ interface State {
 class GetUserinfoModal extends Taro.Component<Props, State> {
 
   public getWxInfo = async (show?: boolean) => {
+    const {dispatch} = this.props;
     try {
       const codeRes = await WeixinSDK.getWeixinCode();
       invariant(codeRes.success, codeRes.msg || '请先登录微信');
-      const result = await LoginManager.getUserInfo();
+      const result = await LoginManager.getUserInfo(dispatch);
       // invariant(result.success, '');
       let userinfo = {};
       if (result.success) {
@@ -46,7 +49,7 @@ class GetUserinfoModal extends Taro.Component<Props, State> {
   public getWxUserInfo = async (userinfo: any, show?: boolean, ) => {
     try {
       
-      const { callback, onCancle } = this.props;
+      const { callback, onCancle, dispatch } = this.props;
       const result: any = await WeixinSDK.getWeixinUserinfo();
       invariant(result.success, result.msg || '获取用户昵称和头像失败');
       const newUserinfo = {
@@ -59,7 +62,7 @@ class GetUserinfoModal extends Taro.Component<Props, State> {
         const saveResult: any = await UserAction.userInfoSave(newUserinfo);
         invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
       }
-      const setResult: any = await LoginManager.setUserInfo(newUserinfo);
+      const setResult: any = await LoginManager.setUserInfo(newUserinfo, dispatch);
       invariant(setResult.success, setResult.msg || '存储用户信息失败');
       onCancle();
       if (callback) {

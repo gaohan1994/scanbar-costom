@@ -8,14 +8,19 @@ import productSdk, {ProductCartInterface} from '../../common/sdk/product/product
 import {getMemberInfo} from '../../reducers/app.user'
 import classnames from 'classnames';
 import numeral from 'numeral';
+import { Dispatch } from 'redux';
 
 const cssPrefix = 'component-product';
 
 interface Props {
+    dispatch: Dispatch;
     product: ProductInterface.ProductInfo;
     direct?: boolean;
     productInCart?: ProductCartInterface.ProductCartInfo;
     last?: boolean;
+    activityList: any;
+    memberInfo: any;
+    productSDKObj: any;
     isHome?: boolean;
     isCart?: boolean;
     selectedIndex?: number[];
@@ -57,8 +62,8 @@ class ProductComponent extends Taro.Component<Props, State> {
         if (e.stopPropagation) {
             e.stopPropagation();
         }
-        const {product} = this.props;
-        productSdk.manage({type, product});
+        const {product, dispatch, productSDKObj} = this.props;
+        productSdk.manage(dispatch, productSDKObj, {type, product});
     }
 
     public onContentClick = () => {
@@ -69,10 +74,10 @@ class ProductComponent extends Taro.Component<Props, State> {
     }
 
     public renderPrice = () => {
-        const {product} = this.props;
+        const {product, memberInfo} = this.props;
         const priceNum = product && product.price ? numeral(product.price).value() : 0;
         const price = numeral(priceNum).format('0.00');
-        const discountPriceNum = numeral(productSdk.getProductItemDiscountPrice(product)).value();
+        const discountPriceNum = numeral(productSdk.getProductItemDiscountPrice(product, memberInfo)).value();
         const discountPrice = numeral(discountPriceNum).format('0.00');
         return (
             <View className={`${cssPrefix}-normal`}>
@@ -161,7 +166,7 @@ class ProductComponent extends Taro.Component<Props, State> {
     }
 
     private renderDetail = () => {
-        const {product} = this.props;
+        const {product, memberInfo} = this.props;
         const activeList = product && Array.isArray(product.activityInfos) ? product.activityInfos : [];
         const singleActiveList = activeList.filter(val => val.type === 1 || val.type === 2);
         const batchActiveList = activeList.filter(val => val.type === 3 || val.type === 4);
@@ -177,10 +182,10 @@ class ProductComponent extends Taro.Component<Props, State> {
                 </View>
                 <View className={`${cssPrefix}-activity`}>
                     {
-                        singleActiveList.length && productSdk.getDiscountString(activeList, product) !== '会员专享' && (
+                        singleActiveList.length && productSdk.getDiscountString(memberInfo, activeList, product) !== '会员专享' && (
                             <View className={`${cssPrefix}-discount`}>
                                 <Text className={`${cssPrefix}-discount-text`}>
-                                    {`${productSdk.getDiscountString(activeList, product)}`}
+                                    {`${productSdk.getDiscountString(memberInfo, activeList, product)}`}
                                 </Text>
                             </View>
                         )
@@ -190,20 +195,20 @@ class ProductComponent extends Taro.Component<Props, State> {
                          * @time 0409
                          * @todo [去掉batchActiveList.length的限制]
                          */
-                        productSdk.getDiscountString(batchActiveList, product) && (
+                        productSdk.getDiscountString(memberInfo, batchActiveList, product) && (
                             <View 
                                 className={classnames({
-                                    [`${cssPrefix}-discount`]: productSdk.getDiscountString(batchActiveList, product) === '会员专享',
-                                    [`${cssPrefix}-batchDiscount`]: productSdk.getDiscountString(batchActiveList, product) !== '会员专享',
+                                    [`${cssPrefix}-discount`]: productSdk.getDiscountString(memberInfo, batchActiveList, product) === '会员专享',
+                                    [`${cssPrefix}-batchDiscount`]: productSdk.getDiscountString(memberInfo, batchActiveList, product) !== '会员专享',
                                 })}
                             >
                                 <Text 
                                     className={classnames({
-                                        [`${cssPrefix}-discount-text`]: productSdk.getDiscountString(batchActiveList, product) === '会员专享',
-                                        [`${cssPrefix}-batchDiscount-text`]: productSdk.getDiscountString(batchActiveList, product) !== '会员专享',
+                                        [`${cssPrefix}-discount-text`]: productSdk.getDiscountString(memberInfo, batchActiveList, product) === '会员专享',
+                                        [`${cssPrefix}-batchDiscount-text`]: productSdk.getDiscountString(memberInfo, batchActiveList, product) !== '会员专享',
                                     })}
                                 >
-                                    {`${productSdk.getDiscountString(batchActiveList, product)}`}
+                                    {`${productSdk.getDiscountString(memberInfo, batchActiveList, product)}`}
                                 </Text>
                             </View>
                         )
@@ -319,6 +324,8 @@ const select = (state: AppReducer.AppState, ownProps: Props) => {
     return {
         product,
         productInCart,
+        activityList: state.merchant.activityList,
+        productSDKObj: state.productSDK,
         memberInfo: getMemberInfo(state)
     };
 };

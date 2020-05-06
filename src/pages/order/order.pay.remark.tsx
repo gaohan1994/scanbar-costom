@@ -7,6 +7,7 @@ import { AppReducer } from '../../reducers'
 import { getPayOrderDetail } from '../../common/sdk/product/product.sdk.reducer'
 import { connect } from '@tarojs/redux'
 import productSdk from '../../common/sdk/product/product.sdk'
+import { Dispatch } from 'redux';
 
 const prefix = 'order-remark'
 
@@ -17,6 +18,7 @@ const remarks = [
 ];
 
 type Props = {
+  dispatch: Dispatch;
   payOrderDetail: any;
 }
 
@@ -45,7 +47,8 @@ class Page extends Taro.Component <Props, State> {
 
   public onSubmit = () => {
     const { remark } = this.state;
-    productSdk.preparePayOrderDetail({remark})
+    const {dispatch} = this.props;
+    productSdk.preparePayOrderDetail({remark}, dispatch)
     Taro.navigateBack({})
   }
 

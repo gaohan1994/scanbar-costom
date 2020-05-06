@@ -11,9 +11,10 @@ import Empty from '../../component/empty';
 import CouponItem from '../../component/coupon/coupon.item';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 import numeral from 'numeral';
-import { store } from '../../app';
+import { Dispatch } from 'redux';
 
 interface Props {
+  dispatch: Dispatch;
   couponList: UserInterface.CouponsItem[];
   userinfo: UserInterface.UserInfo;
   currentMerchantDetail: MerchantInterface.MerchantDetail;
@@ -40,12 +41,13 @@ class Page extends Taro.Component<Props, State> {
       status: 0
     }
     Taro.showLoading();
-    await UserAction.getMemberCoupons(params);
+    await UserAction.getMemberCoupons(this.props.dispatch, params);
     Taro.hideLoading();
   }
 
   public onChangeTab = async (tabNum: number) => {
-    await store.dispatch({
+    const {dispatch} = this.props;
+    await dispatch({
       type: UserInterfaceMap.reducerInterface.RECEIVE_COUPONS,
       payload: {
         couponList: []
@@ -61,7 +63,7 @@ class Page extends Taro.Component<Props, State> {
           status: 1
         }
         Taro.showLoading();
-        await UserAction.getMemberCoupons(params);
+        await UserAction.getMemberCoupons(this.props.dispatch,params);
         Taro.hideLoading();
       } else if (tabNum === 0) {
         // 未使用
@@ -69,7 +71,7 @@ class Page extends Taro.Component<Props, State> {
           status: 0
         }
         Taro.showLoading();
-        await UserAction.getMemberCoupons(params);
+        await UserAction.getMemberCoupons(this.props.dispatch,params);
         Taro.hideLoading();
       } else {
         // 已过期
@@ -77,7 +79,7 @@ class Page extends Taro.Component<Props, State> {
           status: 0
         }
         Taro.showLoading();
-        await UserAction.getMemberExpiredCoupons(params);
+        await UserAction.getMemberExpiredCoupons(this.props.dispatch,params);
         Taro.hideLoading();
       }
     });

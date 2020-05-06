@@ -9,7 +9,7 @@
 import Taro from '@tarojs/taro';
 import { View, Image } from '@tarojs/components';
 import classnames from 'classnames';
-import './style.sass';
+import './style.scss';
 import './form.card.less';
 import { AtInput } from 'taro-ui';
 

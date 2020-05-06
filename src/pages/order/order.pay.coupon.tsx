@@ -10,8 +10,10 @@ import { connect } from '@tarojs/redux';
 import dayJs from 'dayjs';
 import productSdk from '../../common/sdk/product/product.sdk';
 import CouponItem from '../../component/coupon/coupon.item';
+import { Dispatch } from 'redux';
 
 interface Props {
+  dispatch: Dispatch;
   couponList: UserInterface.CouponsItem[];
   payOrderDetail: any;
 }
@@ -95,12 +97,12 @@ class Page extends Taro.Component<Props, State> {
    * @memberof Page
    */
   public couponSelect = (item: UserInterface.CouponsItem) => {
-    const { payOrderDetail } = this.props;
+    const { payOrderDetail, dispatch } = this.props;
     if (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id && payOrderDetail.selectedCoupon.id === item.id) {
-      productSdk.preparePayOrderDetail({ selectedCoupon: {} });
+      productSdk.preparePayOrderDetail({ selectedCoupon: {} }, dispatch);
     } else {
       if (item.ableToUse) {
-        productSdk.preparePayOrderDetail({ selectedCoupon: item });
+        productSdk.preparePayOrderDetail({ selectedCoupon: item }, dispatch);
         Taro.navigateBack();
       }
     }

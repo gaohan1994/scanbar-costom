@@ -18,15 +18,23 @@ import ProductMenu from '../../component/product/product.menu'
 import classnames from 'classnames';
 import orderAction from '../../actions/order.action'
 import merchantAction from '../../actions/merchant.action';
+import { getMemberInfo } from '../../reducers/app.user';
+import { Dispatch } from 'redux';
+import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 
 const cssPrefix = 'order';
 const openTime = 8;
 const closeTime = 24;
 
 type Props = {
+    dispatch: Dispatch;
+    currentMerchantDetail: any;
     payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
     payOrderAddress: UserInterface.Address;
     payOrderDetail: any;
+    activityList: any;
+    memberInfo: any;
+    productSDKObj: any;
 }
 
 type State = {
@@ -55,18 +63,19 @@ class Page extends Taro.Component<Props, State> {
     }
 
     componentDidMount() {
-        merchantAction.activityInfoList();
+        const {dispatch, currentMerchantDetail} = this.props;
+        merchantAction.activityInfoList(dispatch, currentMerchantDetail.id);
         this.getDateList();
-        const {payOrderProductList} = this.props;
+        const {payOrderProductList, activityList, memberInfo, productSDKObj} = this.props;
         let productIds: any[] = [];
         for (let i = 0; i < payOrderProductList.length; i++) {
             productIds.push(payOrderProductList[i].id)
         }
         const params = {
             productIds: productIds,
-            amount: productSdk.getProductTransPrice(payOrderProductList)
+            amount: productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList, payOrderProductList)
         };
-        orderAction.getAbleToUseCoupon(params);
+        orderAction.getAbleToUseCoupon(dispatch, params);
     }
 
     public onSubmit = async () => {
@@ -92,14 +101,8 @@ class Page extends Taro.Component<Props, State> {
 
     public createOrder = async () => {
         try {
-            const {payOrderAddress, payOrderProductList, payOrderDetail} = this.props;
-            const payload = productSdk.getProductInterfacePayload(
-                payOrderProductList,
-                payOrderAddress,
-                {
-                    ...payOrderDetail,
-                    // delivery_time: dayJs().format('YYYY-MM-DD HH:mm:ss'),
-                }
+            const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch} = this.props;
+            const payload = productSdk.getProductInterfacePayload(productSDKObj.currentMerchantDetail,activityList, memberInfo,payOrderProductList, [payOrderAddress],payOrderDetail
             );
             const result = await productSdk.cashierOrder(payload)
             console.log('result', result)
@@ -109,7 +112,7 @@ class Page extends Taro.Component<Props, State> {
             })
             console.log('payment: ', payment)
             if (payment.errMsg !== 'requestPayment:ok') {
-                productSdk.cashierOrderCallback(result.data);
+                productSdk.cashierOrderCallback(dispatch, result.data);
                 Taro.navigateTo({
                     url: '/pages/orderList/order'
                 }).catch((error) => {
@@ -119,8 +122,8 @@ class Page extends Taro.Component<Props, State> {
                 })
                 return;
             }
-            productSdk.cashierOrderCallback(result.data)
-            productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}})
+            productSdk.cashierOrderCallback(dispatch, result.data)
+            productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, dispatch)
         } catch (error) {
             Taro.hideLoading();
             Taro.showToast({
@@ -151,20 +154,22 @@ class Page extends Taro.Component<Props, State> {
     }
 
     onTimeClick = (time: string) => {
+        const {dispatch} = this.props;
         this.onChangeValue('selectTime', time);
         this.onChangeValue('showTimeSelect', false);
         const {currentDate} = this.state;
         this.onChangeValue('selectDate', currentDate);
         // if (selectTime !== '立即送出') {
+            
         const selectTimeStr =
             `${(time === '立即自提' || time === '立即送出') ? '' : (currentDate.date || '')}${time !== '立即自提' && time !== '立即送出' ? ' ' : ''}${time}`;
-        productSdk.preparePayOrderDetail({planDeliveryTime: selectTimeStr});
+        productSdk.preparePayOrderDetail({planDeliveryTime: selectTimeStr}, dispatch);
         // }
     }
 
     getTimeList = () => {
         const {currentDate, selectTime} = this.state;
-        const {payOrderDetail} = this.props;
+        const {payOrderDetail, dispatch} = this.props;
         let timeList: string[] = [];
         if (currentDate.id === undefined) {
             return;
@@ -200,7 +205,7 @@ class Page extends Taro.Component<Props, State> {
             this.setState({selectTime: timeList[0]}, () => {
                 const selectTimeStr =
                     `${(timeList[0] === '立即自提' || timeList[0] === '立即送出') ? '' : (currentDate.date || '')}${timeList[0] !== '立即自提' && timeList[0] !== '立即送出' ? ' ' : ''}${timeList[0]}`;
-                productSdk.preparePayOrderDetail({planDeliveryTime: selectTimeStr});
+                productSdk.preparePayOrderDetail({planDeliveryTime: selectTimeStr}, dispatch);
             })
         }
     }
@@ -242,14 +247,14 @@ class Page extends Taro.Component<Props, State> {
     }
 
     render() {
-        const {payOrderProductList, payOrderDetail} = this.props;
+        const {payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj,} = this.props;
         const {showTimeSelect, currentDate, selectDate, selectTime, timeList, dateList} = this.state;
         const price = payOrderProductList && payOrderProductList.length > 0
-            ? numeral(productSdk.getProductTransPrice(payOrderProductList)).format('0.00')
+            ? numeral(productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList, payOrderProductList)).format('0.00')
             : '0.00';
         const tarnsPrice = payOrderProductList && payOrderProductList.length > 0
             ? numeral(
-                productSdk.getProductTransPrice(payOrderProductList) +
+                productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList) +
                 (payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
                 (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
             ).format('0.00')
@@ -345,6 +350,10 @@ const select = (state: AppReducer.AppState) => {
         payOrderProductList: state.productSDK.payOrderProductList,
         payOrderAddress: state.productSDK.payOrderAddress,
         payOrderDetail: state.productSDK.payOrderDetail,
+        activityList: state.merchant.activityList,
+        currentMerchantDetail: getCurrentMerchantDetail(state),
+        memberInfo: getMemberInfo(state),
+        productSDKObj: state.productSDK,
     }
 }
 export default connect(select)(Page);

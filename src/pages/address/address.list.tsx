@@ -11,8 +11,10 @@ import ButtonFooter from '../../component/button/button.footer'
 import productSdk from '../../common/sdk/product/product.sdk'
 import Empty from '../../component/empty'
 import { UserAction } from '../../actions'
+import { Dispatch } from 'redux';
 
 type Props = {
+  dispatch: Dispatch;
   addressList: UserInterface.Address[];
 }
 
@@ -38,14 +40,14 @@ class Page extends Taro.Component<Props, State> {
   }
 
   componentDidShow () {
-    UserAction.addressList();
+    UserAction.addressList(this.props.dispatch);
   }
 
   public onAddressClick = (address: UserInterface.Address) => {
     const { entry } = this.state;
-
+    const { dispatch} = this.props;
     if (entry === 'order.pay') {
-      productSdk.preparePayOrderAddress(address);
+      productSdk.preparePayOrderAddress(address, dispatch);
       Taro.navigateBack({})
       return;
     }

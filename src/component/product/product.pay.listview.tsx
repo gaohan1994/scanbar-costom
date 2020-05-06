@@ -11,12 +11,16 @@ import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
 import { getOrderDetail, getAbleToUseCouponList } from '../../reducers/app.order';
 import { OrderInterface, UserInterface } from '../../constants';
+import { getMemberInfo } from '../../reducers/app.user';
 
 const cssPrefix = 'product';
 
 type Props = {
   productList: Array<ProductCartInterface.ProductCartInfo>;
   className?: string;
+  productSDKObj: any;
+  activityList: any;
+  memberInfo: any;
   padding?: boolean;
   type?: number;
   payOrderDetail: any;
@@ -122,7 +126,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
   }
 
   private renderProductItem = (item: any) => {
-    const { type } = this.props;
+    const { type, memberInfo } = this.props;
     if (type && type === 1) {
       return (
         <View
@@ -198,11 +202,11 @@ class ProductPayListView extends Taro.Component<Props, State> {
             <View className={`${cssPrefix}-row-corner`}>
               <View>
                 <Text className={`${cssPrefix}-row-corner-price`}>￥</Text>
-                <Text className={`${cssPrefix}-row-corner-big`}>{numeral(productSdk.getProductItemPrice(item) * item.sellNum).format('0.00').split('.')[0]}</Text>
-                <Text className={`${cssPrefix}-row-corner-price`}>{`.${numeral(productSdk.getProductItemPrice(item) * item.sellNum).format('0.00').split('.')[1]}`}</Text>
+                <Text className={`${cssPrefix}-row-corner-big`}>{numeral(productSdk.getProductItemPrice(item, memberInfo) * item.sellNum).format('0.00').split('.')[0]}</Text>
+                <Text className={`${cssPrefix}-row-corner-price`}>{`.${numeral(productSdk.getProductItemPrice(item, memberInfo) * item.sellNum).format('0.00').split('.')[1]}`}</Text>
               </View>
               {
-                (item.price * item.sellNum) !== (productSdk.getProductItemPrice(item) * item.sellNum) && (
+                (item.price * item.sellNum) !== (productSdk.getProductItemPrice(item, memberInfo) * item.sellNum) && (
                   <Text className={`${cssPrefix}-row-corner-origin`}>{`￥${item.price * item.sellNum}`}</Text>
                 )
               }
@@ -214,10 +218,10 @@ class ProductPayListView extends Taro.Component<Props, State> {
   }
 
   private renderDisount = () => {
-    const { payOrderDetail, type, orderDetail } = this.props;
+    const { payOrderDetail, type, orderDetail, productSDKObj, memberInfo, activityList } = this.props;
     const { order } = orderDetail;
     const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
-    const totalActivityMoney = productSdk.getProductTotalActivityPrice();
+    const totalActivityMoney = productSdk.getProductTotalActivityPrice(activityList, memberInfo, productSDKObj.productCartList);
     return (
       <View>
         {totalActivityMoney !== 0 && (
@@ -322,18 +326,18 @@ class ProductPayListView extends Taro.Component<Props, State> {
   }
 
   private renderTotal = () => {
-    const { payOrderDetail, type, orderDetail } = this.props;
+    const { payOrderDetail, type, orderDetail, activityList, memberInfo, productSDKObj } = this.props;
     const { order } = orderDetail;
     let price =
       numeral(
-        productSdk.getProductTransPrice() +
+        productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
         (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
         (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
       ).format('0.00');
     let discountPrice =
       numeral(
-        productSdk.getProductsOriginPrice() -
-        productSdk.getProductTransPrice() +
+        productSdk.getProductsOriginPrice(productSDKObj.productCartList) -
+        productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
         (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
       ).format('0.00');
     if (type && type === 1) {
@@ -367,7 +371,10 @@ const select = (state: AppReducer.AppState) => {
   return {
     payOrderDetail: state.productSDK.payOrderDetail,
     orderDetail: getOrderDetail(state),
+    activityList: state.merchant.activityList,
+    productSDKObj: state.productSDK,
     couponList: getAbleToUseCouponList(state),
+    memberInfo: getMemberInfo(state)
   }
 }
 export default connect(select)(ProductPayListView as any);

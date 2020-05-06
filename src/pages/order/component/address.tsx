@@ -13,6 +13,7 @@ import { getPayOrderAddress } from '../../../common/sdk/product/product.sdk.redu
 import merchantAction from '../../../actions/merchant.action'
 import { getMerchantDistance, getCurrentMerchantDetail } from '../../../reducers/app.merchant'
 import { getCurrentPostion } from '../../../reducers/app.user'
+import { Dispatch } from 'redux';
 
 const tabs = [
   {
@@ -28,6 +29,7 @@ const tabs = [
 const prefix = 'order-component-address'
 
 type Props = {
+  dispatch: Dispatch;
   payOrderAddress: UserInterface.Address;
   merchantDistance: MerchantInterface.Distance;
   currentMerchantDetail: MerchantInterface.MerchantDetail;
@@ -50,7 +52,7 @@ class Comp extends Taro.Component<Props, State> {
   componentDidMount() {
     const { currentPostion, currentMerchantDetail } = this.props;
     this.changeTab(tabs[0])
-    merchantAction.merchantDistance({
+    merchantAction.merchantDistance(this.props.dispatch, {
       latitude: currentPostion.latitude,
       longitude: currentPostion.longitude,
       merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1,
@@ -58,7 +60,7 @@ class Comp extends Taro.Component<Props, State> {
   }
 
   public changeTab = (tab) => {
-    const { changeTabCallback } = this.props;
+    const { changeTabCallback, dispatch } = this.props;
     this.setState({
       currentTab: tab.id
     }, async () => {
@@ -66,9 +68,9 @@ class Comp extends Taro.Component<Props, State> {
         /**
          * @todo 自提
          */
-        await productSdk.preparePayOrderDetail({ deliveryType: 0 })
+        await productSdk.preparePayOrderDetail({ deliveryType: 0 }, dispatch)
       } else {
-        await productSdk.preparePayOrderDetail({ deliveryType: 1 })
+        await productSdk.preparePayOrderDetail({ deliveryType: 1 }, dispatch)
       }
       if (changeTabCallback) {
         changeTabCallback();

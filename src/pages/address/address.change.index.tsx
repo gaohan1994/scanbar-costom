@@ -15,10 +15,12 @@ import GetUserinfoModal from '../../component/login/login.userinfo'
 import LoginModal from '../../component/login/login.modal'
 import { LoginManager } from '../../common/sdk'
 import { UserAction } from '../../actions'
+import { Dispatch } from 'redux';
 
 const prefix = 'address'
 
 type Props = {
+  dispatch: Dispatch
   addressList: UserInterface.Address[];
   currentPostion: UserInterface.Address;
 }
@@ -39,18 +41,18 @@ class Page extends Taro.Component<Props, State> {
   }
 
   componentDidShow() {
-    UserAction.addressList();
+    UserAction.addressList(this.props.dispatch);
   }
 
   public onAddressClick = (address: UserInterface.Address) => {
-    WeixinSdk.changeCostomIndexAddress(address);
+    WeixinSdk.changeCostomIndexAddress(address, this.props.dispatch);
     Taro.navigateBack({})
   }
 
   public reCurrentPostion = async () => {
     try {
       Taro.showLoading();
-      const result = await WeixinSdk.getLocation();
+      const result = await WeixinSdk.getLocation(this.props.dispatch);
       Taro.hideLoading();
       invariant(!!result.success, result.msg || ' ')
     } catch (error) {
@@ -62,7 +64,8 @@ class Page extends Taro.Component<Props, State> {
   }
 
   public onAdd = async () => {
-    const result = await LoginManager.getUserInfo();
+    const {dispatch} = this.props;
+    const result = await LoginManager.getUserInfo(dispatch);
     if (result.success) {
       const userinfo = result.result;
       if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {

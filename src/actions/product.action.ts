@@ -5,7 +5,7 @@
  * @Last Modified time: 2020-03-18 17:04:23
  */
 import { ResponseCode, ProductInterfaceMap, ProductInterface, ProductService } from '../constants/index';
-import { store } from '../app';
+// import { store } from '../app';
 import Taro from '@tarojs/taro';
 
 const CentermProductSearchKey = 'CentermProductSearchKeyC';
@@ -17,10 +17,10 @@ class ProductAction {
    *
    * @memberof ProductAction
    */
-  public productInfoList = async (params?: ProductInterface.ProductInfoListFetchFidle) => {
+  public productInfoList = async (dispatch, params?: ProductInterface.ProductInfoListFetchFidle) => {
     const result = await ProductService.productInfoList(params);
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_LIST,
         payload: result.data
       });
@@ -33,10 +33,11 @@ class ProductAction {
    *
    * @memberof ProductAction
    */
-  public productInfoSearchList = async (params: ProductInterface.ProductInfoListFetchFidle) => {
+  public productInfoSearchList = async (dispatch, params: ProductInterface.ProductInfoListFetchFidle) => {
+    console.log('dispatch', dispatch);
     const result = await ProductService.productInfoList(params);
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_SEARCH_LIST,
         payload: result.data
       });
@@ -51,8 +52,8 @@ class ProductAction {
    *
    * @memberof ProductAction
    */
-  public productInfoEmptySearchList = async () => {
-    store.dispatch({
+  public productInfoEmptySearchList = async (dispatch) => {
+    dispatch({
       type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_SEARCH_LIST,
       payload: { rows: [] }
     });
@@ -63,10 +64,10 @@ class ProductAction {
    *
    * @memberof ProductAction
    */
-  public productInfoType = async (params: ProductInterface.ProductInfoTypeFetchFidle) => {
+  public productInfoType = async (dispatch, params: ProductInterface.ProductInfoTypeFetchFidle) => {
     const result = await ProductService.productInfoType(params);
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_TYPE,
         payload: result.data
       });
@@ -81,10 +82,10 @@ class ProductAction {
    *
    * @memberof ProductAction
    */
-  public productInfoDetail = async (params: ProductInterface.ProductDetailFetchFidle) => {
+  public productInfoDetail = async (dispatch, params: ProductInterface.ProductDetailFetchFidle) => {
     const result = await ProductService.productInfoDetail(params);
     if (result.code === ResponseCode.success) {
-      store.dispatch({
+      dispatch({
         type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_DETAIL,
         payload: result.data
       });

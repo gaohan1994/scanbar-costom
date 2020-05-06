@@ -13,6 +13,7 @@ import productSdk from '../../common/sdk/product/product.sdk'
 import HeaderInput from '../../component/header/header.input'
 import ButtonCostom from '../../component/button/button'
 import {getCurrentMerchantDetail} from '../../reducers/app.merchant'
+import { Dispatch } from 'redux';
 
 const cssPrefix = 'product';
 const prefix = 'page-search'
@@ -38,7 +39,7 @@ class Index extends Component<any> {
 
   async componentDidMount() {
     this.setState({ value: '' })
-    productAction.productInfoEmptySearchList();
+    productAction.productInfoEmptySearchList(this.props.dispatch);
     const res = await productAction.getSearchRecord();
     if (res.success) {
       this.setState({ searchRecordList: res.result });
@@ -49,7 +50,7 @@ class Index extends Component<any> {
     this.setState({ value });
     if (value === '') {
       this.setState({ searchFlag: false });
-      productAction.productInfoEmptySearchList();
+      productAction.productInfoEmptySearchList(this.props.dispatch);
     }
   }
 
@@ -86,7 +87,7 @@ class Index extends Component<any> {
       return
     }
     this.setState({ loading: true });
-    const result = await ProductAction.productInfoSearchList({
+    const result = await ProductAction.productInfoSearchList(this.props.dispatch, {
         status: 0,
         words: value,
         saleType: 0,
@@ -135,7 +136,7 @@ class Index extends Component<any> {
             }}
           >
             <View className={`${prefix}-cart-bge`}>
-              {productSdk.getProductNumber()}
+              {productSdk.getProductNumber(productCartList)}
             </View>
           </View>
         )}
@@ -154,7 +155,7 @@ class Index extends Component<any> {
           isRenderInputRight={true}
           inputRightClick={() => {
             this.setState({ value: '', searchFlag: false });
-            productAction.productInfoEmptySearchList();
+            productAction.productInfoEmptySearchList(this.props.dispatch);
           }}
         >
           <ButtonCostom

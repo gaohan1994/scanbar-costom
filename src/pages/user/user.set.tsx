@@ -4,6 +4,7 @@ import './index.less';
 import "../../component/card/form.card.less";
 import { AtButton } from 'taro-ui';
 import { LoginManager } from '../../common/sdk';
+import { Dispatch } from 'redux';
 
 
 const Rows = [
@@ -20,7 +21,7 @@ const Rows = [
 ];
 
 const cssPrefix = 'user';
-class Page extends Taro.Component {
+class Page extends Taro.Component<{dispatch: Dispatch}> {
 
   config: Config = {
     navigationBarTitleText: '设置'
@@ -37,7 +38,8 @@ class Page extends Taro.Component {
   }
 
   public logout = async () => {
-    const res = await LoginManager.logout();
+    const {dispatch} = this.props;
+    const res = await LoginManager.logout(dispatch);
     if (res.success) {
       Taro.showToast({
         title: '退出登录成功'

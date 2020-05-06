@@ -12,6 +12,8 @@ import ProductDetail from "./component/detail";
 import ProductCart from "./component/cart";
 import { AppReducer } from "../../reducers";
 import { jsonToQueryString } from "../../constants";
+import { getMemberInfo } from '../../reducers/app.user';
+import { getMerchantActivityList } from "../../reducers/app.merchant";
 
 class Page extends Taro.Component<any> {
   config: Config = {
@@ -57,11 +59,11 @@ class Page extends Taro.Component<any> {
   }
 
   public init = async id => {
-    ProductAction.productInfoDetail({ id });
+    ProductAction.productInfoDetail(this.props.dispatch, { id });
   };
 
   render() {
-    const { productDetail } = this.props;
+    const { productDetail, memberInfo, activityList } = this.props;
     const { id } = this.$router.params;
     return (
       <View className="container">
@@ -72,7 +74,7 @@ class Page extends Taro.Component<any> {
             ]
           }
         />
-        <ProductDetail product={productDetail} />
+        <ProductDetail memberInfo={memberInfo} activityList={activityList} product={productDetail} />
         {productDetail && productDetail.id && `${productDetail.id}` === id && (
           <ProductCart product={productDetail} />
         )}
@@ -84,6 +86,8 @@ class Page extends Taro.Component<any> {
 const select = (state: AppReducer.AppState) => {
   return {
     productDetail: state.product.productDetail,
+    memberInfo: getMemberInfo(state),
+    activityList: getMerchantActivityList(state),
     productList: state.productSDK.productCartList
   };
 };

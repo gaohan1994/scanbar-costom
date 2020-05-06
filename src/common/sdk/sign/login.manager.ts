@@ -9,7 +9,7 @@ import Taro from '@tarojs/taro';
 import md5 from 'blueimp-md5';
 import requestHttp from '../../request/request.http';
 import { ResponseCode, ActionsInterface, UserInterfaceMap, UserInterface } from '../../../constants/index';
-import { store } from '../../../app';
+import { Dispatch } from 'redux';
 
 export const CentermOAuthKey: string = 'CentermOAuthTokenCostom';
 
@@ -83,14 +83,14 @@ class LoginManager {
    *
    * @memberof LoginManager
    */
-  public login = async (params: any): Promise<LoginInterface.LoginMangerInfo<LoginInterface.OAuthToken>> => {
+  public login = async (params: any, dispatch: Dispatch): Promise<LoginInterface.LoginMangerInfo<LoginInterface.OAuthToken>> => {
     const payload: LoginInterface.OAuthTokenParams = {
       ...params,
     };
     const { success, result } = await this.autoToken(payload);
 
     if (success === true) {
-      store.dispatch({
+      dispatch({
         type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
         payload: {
           userinfo: result,
@@ -116,8 +116,8 @@ class LoginManager {
    *
    * @memberof LoginManager
    */
-  public logout = async (): Promise<ActionsInterface.ActionBase<string>> => {
-    store.dispatch({
+  public logout = async (dispatch: Dispatch): Promise<ActionsInterface.ActionBase<string>> => {
+    dispatch({
       type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
       payload: {
         userinfo: {},
@@ -140,14 +140,14 @@ class LoginManager {
    *
    * @memberof LoginManager
    */
-  public getUserInfo = (): Promise<LoginInterface.LoginMangerInfo<LoginInterface.OAuthToken>> => {
+  public getUserInfo = (dispatch: Dispatch): Promise<LoginInterface.LoginMangerInfo<LoginInterface.OAuthToken>> => {
     return new Promise((resolve) => {
       Taro
         .getStorage({key: CentermOAuthKey})
         .then(data => {
           if (data.data !== '') {
             resolve({success: true, result: JSON.parse(data.data), msg: ''});
-            store.dispatch({
+            dispatch({
               type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
               payload: {
                 userinfo: JSON.parse(data.data),
@@ -182,8 +182,8 @@ class LoginManager {
    *
    * @memberof LoginManager
    */
-  public setUserInfo = (userInfo: UserInterface.UserInfo) => {
-    store.dispatch({
+  public setUserInfo = (userInfo: UserInterface.UserInfo, dispatch: Dispatch) => {
+    dispatch({
       type: UserInterfaceMap.reducerInterface.RECEIVE_USERINFO,
       payload: {
         userinfo: userInfo,

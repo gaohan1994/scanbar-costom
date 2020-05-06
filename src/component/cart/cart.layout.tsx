@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro';
 import { View, Text, ScrollView, Image } from '@tarojs/components';
 import classNames from 'classnames';
-import "./layout.sass";
+import "./layout.scss";
 import "./cart.less";
 import "../../pages/style/product.less";
 
@@ -21,7 +21,7 @@ function handleTouchScroll (flag: boolean) {
     // 把脱离文档流的body拉上去！否则页面会回到顶部！
     document.body.style.top = `${-scrollTop}px`;
   } else {
-    document.body.style.top = null;
+    document.body.style.top = '';
     document.body.classList.remove('at-frozen');
 
     document.documentElement.scrollTop = scrollTop;

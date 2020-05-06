@@ -16,10 +16,13 @@ import CostomModal from '../../component/login/modal';
 import merchantAction from '../../actions/merchant.action';
 import ProductPayListView from '../../component/product/product.pay.listview'
 import OrderButtons from '../../component/order/order.buttons';
+import { Dispatch } from 'redux';
 
 const cssPrefix = 'order-detail';
 
 interface Props {
+  dispatch: Dispatch;
+  productSDKObj: any;
   orderDetail: OrderInterface.OrderDetail;
   orderAllStatus: any[];
   currentType: number;
@@ -51,7 +54,7 @@ class OrderDetail extends Taro.Component<Props, State> {
       invariant(!!id, '请传入订单id');
       this.init(id);
       // OrderAction.orderList({ pageNum: 1, pageSize: 20 });
-      OrderAction.orderCount();
+      OrderAction.orderCount(this.props.dispatch);
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -68,7 +71,7 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   public init = async (id: string) => {
     try {
-      const result = await OrderAction.orderDetail({ orderNo: id });
+      const result = await OrderAction.orderDetail(this.props.dispatch, { orderNo: id });
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       const { orderDetail, orderAllStatus } = this.props;
       const status = OrderAction.orderStatus(orderAllStatus, orderDetail);
@@ -139,7 +142,7 @@ class OrderDetail extends Taro.Component<Props, State> {
       });
       // OrderAction.orderList({ pageNum: 1, pageSize: 20 });
       this.init(id);
-      OrderAction.orderCount();
+      OrderAction.orderCount(this.props.dispatch);
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -194,11 +197,12 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   public orderOneMore = async (order: OrderInterface.OrderDetail) => {
     const { orderDetailList } = order;
+    const {dispatch, productSDKObj} = this.props;
     if (orderDetailList && orderDetailList.length > 0) {
       for (let i = 0; i < orderDetailList.length; i++) {
-        const res = await ProductAction.productInfoDetail({ id: orderDetailList[i].productId });
+        const res = await ProductAction.productInfoDetail(this.props.dispatch, { id: orderDetailList[i].productId });
         if (res.code === ResponseCode.success) {
-          productSdk.manage({
+          productSdk.manage(dispatch, productSDKObj, {
             type: productSdk.productCartManageType.ADD,
             product: res.data,
             num: orderDetailList[i].num,
@@ -232,7 +236,7 @@ class OrderDetail extends Taro.Component<Props, State> {
     const parmas = {
       merchantId: order.merchantId
     };
-    const res = await merchantAction.merchantDetail(parmas);
+    const res = await merchantAction.merchantDetail(this.props.dispatch, parmas);
     if (res.code === ResponseCode.success) {
       if (res.data && res.data.customerMallConfig && res.data.customerMallConfig.servicePhone) {
         this.onCall(res.data.customerMallConfig.servicePhone);
@@ -288,7 +292,7 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   private renderStatusCard() {
     const { time } = this.state;
-    const { orderDetail, orderAllStatus, currentType } = this.props;
+    const { orderDetail, orderAllStatus, currentType, dispatch } = this.props;
     const res = OrderAction.orderStatus(orderAllStatus, orderDetail, time);
     return (
       <View className={`${cssPrefix}-card ${cssPrefix}-card-status`}>
@@ -344,7 +348,7 @@ class OrderDetail extends Taro.Component<Props, State> {
         }
 
         <View className={`${cssPrefix}-card-status-button`}>
-          <OrderButtons data={orderDetail} orderAllStatus={orderAllStatus} currentType={currentType} />
+          <OrderButtons dispatch={dispatch} productSDKObj data={orderDetail} orderAllStatus={orderAllStatus} currentType={currentType} />
         </View>
       </View>
     )
@@ -541,6 +545,7 @@ class OrderDetail extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => ({
   orderDetail: getOrderDetail(state),
+  productSDKObj: state.productSDK,
   orderAllStatus: getOrderAllStatus(state),
   currentType: getCurrentType(state),
 });
