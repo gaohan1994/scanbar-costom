@@ -11,6 +11,7 @@ import { getMemberInfo } from '../../../reducers/app.user';
 interface Props {
   dispatch: Dispatch;
   activityList: any;
+  style?: any;
   memberInfo: any;
   productCartList: ProductCartInterface.ProductCartInfo[];
   beforeSubmit: () => boolean;
@@ -73,6 +74,7 @@ class Footer extends Taro.Component<Props> {
         ).format('0.00')}`}
         price={tarnsPrice}
         priceOrigin={price}
+        style={this.props.style}
       />
     )
   }

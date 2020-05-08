@@ -11,7 +11,7 @@ interface Props {
   buttonType?: string;
   buttonTitle: string;
   buttonClick: () => void;
-
+  style?: any;
   priceTitle: string;
   priceSubtitle: string;
   price: string;
@@ -24,7 +24,7 @@ class Footer extends Taro.Component<Props> {
   public renderStepper = () => {
     const { buttonType, buttonTitle, buttonClick } = this.props;
     return (
-      <View className={`${prefix}-cart-right`}>
+      <View className={`${prefix}-cart-right`} >
         <View
           className={`${prefix}-cart-right-button ${prefix}-cart-right-button-pay`}
           onClick={() => buttonClick()}
@@ -67,7 +67,7 @@ class Footer extends Taro.Component<Props> {
 
   render() {
     return (
-      <View className={`${prefix}-cart`}>
+      <View className={`${prefix}-cart`} style={this.props.style}>
         <View className={`${prefix}-cart-box`}>
           <View className={`${prefix}-cart-left`}>
             {this.renderPrice()}

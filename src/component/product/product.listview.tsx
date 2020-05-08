@@ -65,7 +65,7 @@ class ProductListView extends Taro.Component<Props> {
       if (nextList.length !== currentList.length || nextList !== currentList) {
         this.setState({
           scrollIntoView: `product${nextList[0].id}`
-        })
+        });
       }
     }
   }
@@ -77,7 +77,7 @@ class ProductListView extends Taro.Component<Props> {
       <ScrollView 
         scrollY={true}
         scrollIntoView={this.state.scrollIntoView}
-        className={classnames(`${cssPrefix}-list-right`, className)}
+        className={classnames(`${cssPrefix}-list-right ${ process.env.TARO_ENV === 'h5' ? `${cssPrefix}&-h5-height` : ''}`, className)}
         onScroll={onScroll}
       >
         {

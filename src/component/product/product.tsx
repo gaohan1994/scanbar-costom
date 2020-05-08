@@ -182,13 +182,13 @@ class ProductComponent extends Taro.Component<Props, State> {
                 </View>
                 <View className={`${cssPrefix}-activity`}>
                     {
-                        singleActiveList.length && productSdk.getDiscountString(memberInfo, activeList, product) !== '会员专享' && (
+                        singleActiveList.length && productSdk.getDiscountString(memberInfo, activeList, product) !== '会员专享' ? (
                             <View className={`${cssPrefix}-discount`}>
                                 <Text className={`${cssPrefix}-discount-text`}>
                                     {`${productSdk.getDiscountString(memberInfo, activeList, product)}`}
                                 </Text>
                             </View>
-                        )
+                        ): null
                     }
                     {
                         /**

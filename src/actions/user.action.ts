@@ -9,7 +9,24 @@ import { ResponseCode, UserService, UserInterfaceMap, UserInterface } from "../c
 // import { store } from "../app";
 
 class UserAction {
-
+  /**
+   * @todo h5验证码
+   *
+   * @memberof UserAction
+   */
+  public h5Code = async (dispatch, param) => {
+    const result = await UserService.h5Code(param);
+    return result;
+  }
+  /**
+   * @todo h5登录
+   *
+   * @memberof UserAction
+   */
+  public h5Login = async (dispatch, param) => {
+    const result = await UserService.h5Login(param);
+    return result;
+  }
   /**
    * @todo 获取收货地址列表
    *

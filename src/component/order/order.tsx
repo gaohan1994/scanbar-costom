@@ -90,6 +90,7 @@ class OrderItem extends Taro.Component<Props, State> {
       for (let i = 0; i < orderDetailList.length; i++) {
         const res = await ProductAction.productInfoDetail(dispatch, { id: orderDetailList[i].productId });
         if (res.code === ResponseCode.success) {
+          console.log('productSDKObj' , productSDKObj)
           productSdk.manage(dispatch, productSDKObj,{
             type: productSdk.productCartManageType.ADD,
             product: res.data,
@@ -228,7 +229,7 @@ class OrderItem extends Taro.Component<Props, State> {
                         )
                     }
 
-                    <Text className={`${cssPrefix}-card-center-product-text`}>
+                    <Text className={`${cssPrefix}-card-center-product-text${process.env.TARO_ENV === 'h5' ? '-h5' : ''}`}>
                       {product.productName}
                     </Text>
                   </View>

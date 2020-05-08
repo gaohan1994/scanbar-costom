@@ -13,7 +13,6 @@ import Empty from '../../component/empty';
 import orderAction from '../../actions/order.action';
 import { getUserinfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
-import productSdk from 'xxx';
 
 const cssPrefix = 'order';
 
@@ -22,7 +21,7 @@ const pageSize: number = 20;
 
 interface Props {
   dispatch: Dispatch;
-  productSDKObj: any;
+  productSDK: any;
   orderList: OrderInterface.OrderDetail[];
   orderListTotal: number;
   orderCount: OrderInterface.OrderCount;
@@ -128,7 +127,7 @@ class Order extends Taro.Component<Props, State> {
   // }
 
   render() {
-    const { orderList, orderListTotal, orderAllStatus, currentType, userinfo, dispatch, productSDKObj } = this.props;
+    const { orderList, orderListTotal, orderAllStatus, currentType, userinfo, dispatch, productSDK } = this.props;
     const hasMore = orderList.length < orderListTotal;
     // const { getUserinfoModal, loginModal } = this.state;
     return (
@@ -141,7 +140,7 @@ class Order extends Taro.Component<Props, State> {
             ? (
               <ScrollView
                 scrollY={true}
-                className={`${cssPrefix}-scrollview`}
+                className={`${cssPrefix}-scrollview${process.env.TARO_ENV === 'h5' ? '-h5' : ''}`}
                 onScrollToLower={() => {
                   if (hasMore) {
                     this.fetchOrder();
@@ -152,7 +151,7 @@ class Order extends Taro.Component<Props, State> {
                   orderList.map((item: any) => {
                     return (
                       <View className={`${cssPrefix}-scrollview-item`} key={item.orderNo}>
-                        <OrderItem dispatch={dispatch} productSDKObj data={item} orderAllStatus={orderAllStatus} currentType={currentType} />
+                        <OrderItem dispatch={dispatch} productSDKObj={productSDK} data={item} orderAllStatus={orderAllStatus} currentType={currentType} />
                       </View>
                     )
                   })
@@ -237,7 +236,7 @@ const select = (state: any) => ({
   orderAllStatus: getOrderAllStatus(state),
   currentType: getCurrentType(state),
   userinfo: getUserinfo(state),
-  productSDKObj: state.productSdk,
+  productSDK: state.productSDK,
 });
 
 export default connect(select)(Order);

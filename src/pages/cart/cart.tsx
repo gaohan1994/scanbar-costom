@@ -214,7 +214,7 @@ class Page extends Taro.Component<Props, State> {
           />
         )}
         {productCartList && productCartList.length > 0 && (
-          <Footer beforeSubmit={this.beforeSubmit} />
+          <Footer beforeSubmit={this.beforeSubmit} style={process.env.TARO_ENV === 'h5' ? {bottom: '50px'}: {}} />
         )}
       </View>
     );

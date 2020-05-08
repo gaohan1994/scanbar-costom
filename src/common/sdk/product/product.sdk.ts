@@ -473,11 +473,11 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products?: ProductCartInterface.ProductCartInfo[], address?: UserInterface.Address, payOrderDetail?: any): ProductCartInterface.ProductPayPayload => {
-        // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products?: ProductCartInterface.ProductCartInfo[], address?: any, payOrderDetail?: any): ProductCartInterface.ProductPayPayload => {
+        // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;  UserInterface.Address
         const productList = products !== undefined ? products : productCartList;
         // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
-
+        console.log(payOrderDetail, 'payOrderDetail', address);
         let order: Partial<ProductCartInterface.ProductOrderPayload> = {
             address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
             deliveryPhone: '',
@@ -537,8 +537,8 @@ class ProductSDK {
     public requestPayment = async (orderNo: string, fail?: (res: any) => void) => {
         const payload = {orderNo};
         const result = await requestHttp.post(`/api/cashier/pay`, payload);
-
-        if (result.code === ResponseCode.success) {
+        console.log('requestPayment', result, ResponseCode);
+        if (result.code === ResponseCode.success && result.data.status !== false) {
             return new Promise((resolve) => {
                 const payload = JSON.parse(result.data.param);
                 delete payload.appId;
@@ -733,9 +733,9 @@ class ProductSDK {
         if (type === this.productCartManageType.EMPTY) {
             this.empty(dispatch);
         } else if (type === this.productCartManageType.ADD) {
-            this.add(dispatch,productSDK, product, num);
+            this.add(dispatch, productSDK, product, num);
         } else {
-            this.reduce(dispatch,productSDK, product, num);
+            this.reduce(dispatch, productSDK, product, num);
         }
         this.storageProductCartList();
 
@@ -766,7 +766,7 @@ class ProductSDK {
      * @todo [清空下单信息]
      */
     public cashierOrderCallback = async (dispatch, result: OrderInterface.OrderDetail) => {
-        this.empty(undefined, result.orderDetailList as any);
+        this.empty(dispatch, result.orderDetailList as any);
         this.preparePayOrder(dispatch, [], [])
         this.preparePayOrderAddress({} as any, dispatch)
         this.preparePayOrderDetail({} as any, dispatch)

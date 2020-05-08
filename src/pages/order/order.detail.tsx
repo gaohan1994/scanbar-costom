@@ -347,7 +347,7 @@ class OrderDetail extends Taro.Component<Props, State> {
             )
         }
 
-        <View className={`${cssPrefix}-card-status-button`}>
+        <View className={`${cssPrefix}-card-status-button`} style={process.env.TARO_ENV === 'h5' ? {marginBottom: '10px'} : {}}>
           <OrderButtons dispatch={dispatch} productSDKObj data={orderDetail} orderAllStatus={orderAllStatus} currentType={currentType} />
         </View>
       </View>
@@ -371,7 +371,6 @@ class OrderDetail extends Taro.Component<Props, State> {
   private renderLogisticsCard() {
     const { orderDetail } = this.props;
     const { order } = orderDetail;
-
     return (
       <View className={`${cssPrefix}-card ${cssPrefix}-card-logistics`}>
         <View className={`${cssPrefix}-card-logistics-item`}>
@@ -387,9 +386,9 @@ class OrderDetail extends Taro.Component<Props, State> {
             <Text className={`${cssPrefix}-card-logistics-item-info-content`}>
               {
                 order && order.deliveryType == 0
-                  ? (order.planDeliveryTime || '未设置')
-                  : order.planDeliveryTime && order.planDeliveryTime.length > 0
-                    ? order.planDeliveryTime
+                  ? (order && order.planDeliveryTime || '未设置')
+                  : order && order.planDeliveryTime &&  order.planDeliveryTime.length > 0
+                    ? order && order.planDeliveryTime
                     : '立即送出'
               }
             </Text>
@@ -434,7 +433,7 @@ class OrderDetail extends Taro.Component<Props, State> {
                   ? order.merchantName && order.merchantName.length
                     ? order.merchantName
                     : '未获取到商店名称'
-                  : order.address && order.address.length > 0
+                  : order && order.address && order.address.length > 0
                     ? order.address
                     : '未设置收货地址'
               }
@@ -451,7 +450,7 @@ class OrderDetail extends Taro.Component<Props, State> {
                   ? order.merchantAddress && order.merchantAddress.length > 0
                     ? order.merchantAddress
                     : '未获取到商店地址'
-                  : (order.receiver && order.receiver.length > 0) || (order.receiverPhone && order.receiverPhone.length > 0)
+                  : (order && order.receiver && order.receiver.length > 0) || (order && order.receiverPhone && order.receiverPhone.length > 0)
                     ? `${order.receiver} ${order.receiverPhone}`
                     : '未设置收货人'
               }
