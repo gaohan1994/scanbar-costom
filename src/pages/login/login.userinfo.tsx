@@ -7,6 +7,7 @@ import { ResponseCode } from '../../constants';
 import WeixinSDK from '../../common/sdk/weixin/weixin';
 import { UserAction } from '../../actions';
 import { Dispatch } from 'redux';
+import Login_h5 from './component/login.h5';
 import {connect} from '@tarojs/redux';
 
 const cssPrefix = 'login';
@@ -87,6 +88,9 @@ class GetUserinfo extends Taro.Component<Props, State> {
   }
 
   render() {
+    if(process.env.TARO_ENV === 'h5') {
+      return <Login_h5 />;
+    }
     return (
       <View className={`${cssPrefix}`}>
         <Image 

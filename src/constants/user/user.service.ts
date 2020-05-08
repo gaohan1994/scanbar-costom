@@ -17,6 +17,16 @@ import { HTTPInterface, jsonToQueryString } from '../index';
 import { UserInterface } from "./user";
 
 class UserService {
+  
+  public h5Code = async (params: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`/api/customer/getCode?phone=${params.phone}` );
+    return result;
+  }
+
+  public h5Login = async (params: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.post('/api/customer/login', params);
+    return result;
+  }
 
   public addressList = async (): Promise<HTTPInterface.ResponseResultBase<UserInterface.Address[]>> => {
     const result = await requestHttp.get('/api/address/list');

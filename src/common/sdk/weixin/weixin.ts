@@ -88,33 +88,40 @@ class WeixinSDK {
   public getLocation = async (dispatch): Promise<{ success: boolean, result: any, msg: string }> => {
     const that = this;
     return new Promise((resolve) => {
-      Taro.getLocation({
-        success: (res) => {
-          mapSdk.reverseGeocoder({
-            location: {
-              latitude: res.latitude,
-              longitude: res.longitude
-            },
-            success: (result) => {
-              dispatch({
-                type: that.reducerInterface.RECEIVE_CURRENT_ADDRESS,
-                payload: {
-                  address: result.result.address,
-                  latitude: result.result.location.lat,
-                  longitude: result.result.location.lng,
-                }
-              })
-              resolve({ success: true, result: result.result, msg: '' })
-            },
-            fail: (error) => {
-              resolve({ success: false, result: undefined, msg: error.message })
-            }
-          })
-        },
-        fail: (error) => {
-          resolve({ success: false, result: undefined, msg: error.message })
-        }
-      })
+      if (process.env.TARO_ENV === 'weapp') {
+        // 微信小程序逻辑
+        Taro.getLocation({
+          success: (res) => {
+            mapSdk.reverseGeocoder({
+              location: {
+                latitude: res.latitude,
+                longitude: res.longitude
+              },
+              success: (result) => {
+                dispatch({
+                  type: that.reducerInterface.RECEIVE_CURRENT_ADDRESS,
+                  payload: {
+                    address: result.result.address,
+                    latitude: result.result.location.lat,
+                    longitude: result.result.location.lng,
+                  }
+                })
+                resolve({ success: true, result: result.result, msg: '' })
+              },
+              fail: (error) => {
+                resolve({ success: false, result: undefined, msg: error.message })
+              }
+            })
+          },
+          fail: (error) => {
+            resolve({ success: false, result: undefined, msg: error.message })
+          }
+        })
+      }
+      if (process.env.TARO_ENV === 'h5') {
+        // H5 逻辑
+      }
+      
     })
   }
 
