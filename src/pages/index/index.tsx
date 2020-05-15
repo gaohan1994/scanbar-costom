@@ -109,7 +109,7 @@ class Index extends Component<any> {
                 }
             }
             const productTypeResult = await ProductAction.productInfoType(dispatch, {
-                merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1
+                merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
             });
             invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
             const {data} = productTypeResult;
@@ -142,7 +142,7 @@ class Index extends Component<any> {
             type: `${type.id}`,
             status: 0,
             saleType: 0,
-            merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1
+            merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
         } as any);
         if (this.common.changeTypeFlag) {
             this.common.changeTypeFlag = false;

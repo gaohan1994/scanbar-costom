@@ -10,6 +10,7 @@ const cssPrefix = 'product';
 type Props = { 
   badge?: number | string;
   title: number | string;
+  style? : any;
 } & ViewProps;
 
 class ButtonCostom extends Taro.Component<Props> {
@@ -19,11 +20,12 @@ class ButtonCostom extends Taro.Component<Props> {
   };
 
   render () {
-    const { title, badge, onClick } = this.props;
+    const { title, badge, onClick, style } = this.props;
     return (
       <View 
         className={`${cssPrefix}-header-button`}
         onClick={onClick}
+        style={style}
       >
         {badge !== undefined && badge !== 0 && (
           <View className={`${cssPrefix}-header-suspension`}>{badge}</View>

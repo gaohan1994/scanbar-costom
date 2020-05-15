@@ -14,7 +14,7 @@ import merchantAction from '../../../actions/merchant.action'
 import { getMerchantDistance, getCurrentMerchantDetail } from '../../../reducers/app.merchant'
 import { getCurrentPostion } from '../../../reducers/app.user'
 import { Dispatch } from 'redux';
-
+import { BASE_PARAM } from "../../../common/util/config";
 const tabs = [
   {
     title: '配送上门',
@@ -55,7 +55,7 @@ class Comp extends Taro.Component<Props, State> {
     merchantAction.merchantDistance(this.props.dispatch, {
       latitude: currentPostion.latitude,
       longitude: currentPostion.longitude,
-      merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1,
+      merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
     })
   }
 

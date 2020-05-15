@@ -25,6 +25,7 @@ const config = {
     }
   },
   defineConstants: {
+    LOCATION_APIKEY: JSON.stringify('LYEBZ-LMSKK-QVBJG-A2MGL-MHYIF-4PFWU')
   },
   weapp: {
     module: {

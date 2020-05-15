@@ -11,6 +11,7 @@ import {connect} from '@tarojs/redux';
 import {AppReducer} from '../../reducers';
 import {getCurrentMerchantDetail} from '../../reducers/app.merchant';
 import { Dispatch } from 'redux';
+import {BASE_PARAM} from '../../common/util/config';
 
 const cssPrefix = 'login';
 
@@ -41,7 +42,7 @@ class GetUserinfo extends Taro.Component<Props, State> {
                 encryptedData: detail.encryptedData,
                 ivStr: detail.iv,
                 code: codeRes.result,
-                merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1,
+                merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
             };
 
             try {
@@ -56,13 +57,13 @@ class GetUserinfo extends Taro.Component<Props, State> {
                 const loginRes = await LoginManager.login({
                     phone: JSON.parse(result.data).phoneNumber,
                     code: newCodeRes.result,
-                    merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1
+                    merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
                 }, dispatch);
                 invariant(loginRes.success, loginRes.msg || '登录失败');
                 const newUserinfo = {
                     ...userinfo,
                     phone: JSON.parse(result.data).phoneNumber,
-                    merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1
+                    merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
                     // token: loginRes.result.token
                 };
                 const saveResult: any = await UserAction.userInfoSave(newUserinfo);

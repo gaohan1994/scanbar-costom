@@ -69,6 +69,7 @@ class MerchantAction {
         payload: result.data.rows
       });
       if (result.data.rows && result.data.rows.length > 0) {
+        console.log('RECEIVE_CURRENT_MERCHANT_DETAIL', result.data.rows.filter(val => val.id ===  BASE_PARAM.MCHID)[0] || {merchantId: BASE_PARAM.MCHID})
         dispatch({
           type: MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL,
           payload: result.data.rows.filter(val => val.id ===  BASE_PARAM.MCHID)[0] || {merchantId: BASE_PARAM.MCHID}

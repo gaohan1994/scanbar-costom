@@ -34,7 +34,7 @@
     .margin(50px, b);
     width: 100%;
     background-color: transparent;
-
+    border: transparent;
     &-image {
       width: 140px;
       height: 140px;
@@ -82,7 +82,7 @@
 
   &-rows {
     margin-top: 30px;
-    width: 690px;
+    width: 98%;
     z-index: 1;
 
     &-item {
@@ -125,8 +125,9 @@
     position: absolute;
     right: 40px;
     top: 70px;
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
+    z-index: 99;
     .bg;
     background-image: url(//net.huanmusic.com/scanbar-c/v2/icon_mine_code.png);
   }
@@ -296,7 +297,6 @@
       left: calc(~'100% + 10px');
       top: 2px;
       height: 32px;
-      width: 94px;
       display: flex;
       flex-direction: row;
       align-items: center;
@@ -319,6 +319,10 @@
       }
     }
     &-qr-code {
+      & > div {
+        width: 350px !important;
+        height: 350px !important;
+      }
       image {
         width: 350px !important;
         height: 350px !important;

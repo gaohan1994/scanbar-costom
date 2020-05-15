@@ -63,6 +63,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
         className={classnames(className, {
           [`${cssPrefix}-pay-pos`]: padding
         })}
+        style={{width: '100%'}}
       >
         <View
           className={classnames('component-form', {

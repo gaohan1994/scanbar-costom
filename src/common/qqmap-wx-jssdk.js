@@ -593,6 +593,7 @@ var Utils = {
         options.header = { "content-type": "application/json" };
         options.method = 'GET';
         options.success = function (res) {
+          console.log('wx.request(Utils.buildWxRequestConfig(options', res)
             var data = res.data;
             if (data.status === 0) {
               that.handleData(param, data, feature);
@@ -601,10 +602,12 @@ var Utils = {
             }
         };
         options.fail = function (res) {
+          console.log('wx.request(Utils.buildWxRequestConfig(options - fail', res)
             res.statusCode = ERROR_CONF.WX_ERR_CODE;
             param.fail(that.buildErrorConfig(ERROR_CONF.WX_ERR_CODE, res.errMsg));
         };
         options.complete = function (res) {
+          console.log('wx.request(Utils.buildWxRequestConfig(options - complete', res)
             var statusCode = +res.statusCode;
             switch(statusCode) {
                 case ERROR_CONF.WX_ERR_CODE: {
@@ -822,19 +825,21 @@ class QQMapWX {
             output: 'json',
             key: that.key
         };
+        
         if (options.poi_options) {
             requestParam.poi_options = options.poi_options
         }
 
         var locationsuccess = function (result) {
             requestParam.location = result.latitude + ',' + result.longitude;
-          if (options.sig) {
-            requestParam.sig = Utils.getSig(requestParam, options.sig, 'reverseGeocoder');
-          }
+            if (options.sig) {
+              requestParam.sig = Utils.getSig(requestParam, options.sig, 'reverseGeocoder');
+            }
             wx.request(Utils.buildWxRequestConfig(options, {
                 url: URL_GET_GEOCODER,
                 data: requestParam
             }, 'reverseGeocoder'));
+
         };
         Utils.locationProcess(options, locationsuccess);
     };

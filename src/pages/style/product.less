@@ -176,7 +176,7 @@
       flex: 1;
       overflow: hidden;
       overflow-y: auto;
-
+      width: 100%;
       &-container {
         margin-top: 94px;
         position: absolute;
@@ -514,9 +514,10 @@
       .padding(@cart-height + 50px, b);
     }
 
-    &-pos {
-      .padding(30px, lr);
+    &-pos {      
+      margin: auto;  
       .margin(6px, t);
+      width: 90% !important;
       background-color: #f2f2f2;
     }
 
@@ -679,7 +680,7 @@
 
     &-items {
       position: relative;
-
+      width: 100%;
       &::after {
         .border1px;
       }

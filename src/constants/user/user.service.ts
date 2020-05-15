@@ -19,12 +19,12 @@ import { UserInterface } from "./user";
 class UserService {
   
   public h5Code = async (params: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
-    const result = await requestHttp.get(`/api/customer/getCode?phone=${params.phone}` );
+    const result = await requestHttp.get(`/customer/getCode?phone=${params.phone}` );
     return result;
   }
 
   public h5Login = async (params: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
-    const result = await requestHttp.post('/api/customer/login', params);
+    const result = await requestHttp.post('/customer/login', params);
     return result;
   }
 

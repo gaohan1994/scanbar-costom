@@ -140,6 +140,7 @@ export declare namespace OrderInterface {
 
   interface OrderDetailFetchField {
     orderNo: string;
+    payType?: any;
   }
 
   interface OrderCount {

@@ -14,6 +14,7 @@ import HeaderInput from '../../component/header/header.input'
 import ButtonCostom from '../../component/button/button'
 import {getCurrentMerchantDetail} from '../../reducers/app.merchant'
 import { Dispatch } from 'redux';
+import {BASE_PARAM} from '../../common/util/config'
 
 const cssPrefix = 'product';
 const prefix = 'page-search'
@@ -91,7 +92,7 @@ class Index extends Component<any> {
         status: 0,
         words: value,
         saleType: 0,
-        merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1
+        merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
     } as any);
     this.setState({ loading: false });
     return result;
@@ -146,6 +147,7 @@ class Index extends Component<any> {
 
   private renderHeader = () => {
     const { value } = this.state;
+    const {dispatch} = this.props;
     return (
       <View className={`${prefix}-header`}>
         <HeaderInput
@@ -155,13 +157,14 @@ class Index extends Component<any> {
           isRenderInputRight={true}
           inputRightClick={() => {
             this.setState({ value: '', searchFlag: false });
-            productAction.productInfoEmptySearchList(this.props.dispatch);
+            productAction.productInfoEmptySearchList(dispatch);
           }}
         >
           <ButtonCostom
             title="搜索"
             onClick={() => this.onSearch()}
             className={`${prefix}-header-button`}
+            style={process.env.TARO_ENV === 'h5' ? {width: '20%'} : {}}
           />
         </HeaderInput>
       </View >
@@ -180,7 +183,7 @@ class Index extends Component<any> {
         </View>
         <View className={`${prefix}-record-list`}>
           {
-            searchRecordList && searchRecordList.length && searchRecordList.map((item) => {
+            searchRecordList && searchRecordList.length ? searchRecordList.map((item) => {
               return (
                 <View
                   key={item}
@@ -194,8 +197,8 @@ class Index extends Component<any> {
                   }}
                 >{item}</View>
               )
-            })
-          }
+            }) : null
+          } 
         </View>
       </View>
     )

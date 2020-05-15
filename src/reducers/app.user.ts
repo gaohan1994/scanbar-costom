@@ -125,6 +125,10 @@ export const getCurrentPostion = (state: AppReducer.AppState) => state.user.curr
 
 export const getCouponList = (state: AppReducer.AppState) => state.user.couponList;
 
-export const getUserinfo = (state: AppReducer.AppState) => state.user.userinfo;
+export const getUserinfo = (state: AppReducer.AppState) => {
+  if(state.user.userinfo){
+    return state.user.userinfo;
+  }
+};
 
 export const getMemberInfo = (state: AppReducer.AppState) => state.user.memberInfo;

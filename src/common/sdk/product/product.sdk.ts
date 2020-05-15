@@ -20,7 +20,8 @@
 import Taro from '@tarojs/taro';
 import {ProductInterface, ProductService, OrderInterface, ResponseCode, UserInterface, MerchantInterface} from '../../../constants';
 // import {store} from '../../../app';
-import {ProductSDKReducer, getProductCartList} from './product.sdk.reducer';
+import {ProductSDKReducer} from './product.sdk.reducer';
+import {BASE_PARAM} from '../../../common/util/config';
 import requestHttp from '../../../common/request/request.http';
 import merge from 'lodash.merge';
 import numeral from 'numeral';
@@ -486,7 +487,7 @@ class ProductSDK {
             deliveryFee: payOrderDetail.deliveryType === 1 ? 3.5 : 0,
             remark: payOrderDetail.remark || "",
             payType: 8,
-            merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : 1,
+            merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
             discount: 0,
             orderSource: 3,
             totalAmount: this.getProductsOriginPrice(productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
@@ -535,24 +536,38 @@ class ProductSDK {
     }
 
     public requestPayment = async (orderNo: string, fail?: (res: any) => void) => {
-        const payload = {orderNo};
+        let payload = {};
+        if(process.env.TARO_ENV === 'h5'){
+            payload = {
+                orderNo,
+                payType: 1
+            };
+        } else {
+            payload = {orderNo};
+        }
         const result = await requestHttp.post(`/api/cashier/pay`, payload);
         console.log('requestPayment', result, ResponseCode);
         if (result.code === ResponseCode.success && result.data.status !== false) {
             return new Promise((resolve) => {
-                const payload = JSON.parse(result.data.param);
-                delete payload.appId;
-                const paymentPayload = {
-                    ...payload,
-                    success: (res) => {
-                        resolve(res)
-                    },
-                    fail: (error) => {
-                        resolve(error)
-                    }
-                };
-                console.log('paymentPayload: ', paymentPayload)
-                Taro.requestPayment(paymentPayload);
+                if(process.env.TARO_ENV === 'h5'){
+                    const data = result.data;
+                    window.location.href = data.codeUrl;
+                } else {
+                    const payload = JSON.parse(result.data.param);
+                    delete payload.appId;
+                    const paymentPayload = {
+                        ...payload,
+                        success: (res) => {
+                            resolve(res)
+                        },
+                        fail: (error) => {
+                            resolve(error)
+                        }
+                    };
+                    console.log('paymentPayload: ', paymentPayload)
+                    Taro.requestPayment(paymentPayload);
+                }
+                
             })
         }
         return result;
