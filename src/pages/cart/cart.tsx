@@ -12,7 +12,7 @@ import productSdk, {
 } from "../../common/sdk/product/product.sdk";
 import Empty from "../../component/empty";
 import SwiperAction from "../../component/swiperAction";
-import { getUserinfo, getMemberInfo } from '../../reducers/app.user';
+import { getUserinfo, getMemberInfo } from "../../reducers/app.user";
 import { UserInterface, MerchantInterface } from "../../constants";
 import "./index.less";
 import { ProductInterface } from "../../constants/product/product";
@@ -60,7 +60,7 @@ class Page extends Taro.Component<Props, State> {
 
   async componentDidShow() {
     // this.loginCheck();
-    const {dispatch, currentMerchantDetail} = this.props;
+    const { dispatch, currentMerchantDetail } = this.props;
     merchantAction.activityInfoList(dispatch, currentMerchantDetail.id);
     dispatch({
       type: "MANAGE_CART_BADGE",
@@ -102,8 +102,12 @@ class Page extends Taro.Component<Props, State> {
       | ProductCartInterface.ProductCartAdd
       | ProductCartInterface.ProductCartReduce
   ) => {
-    const {dispatch, productSDKObj} = this.props;
-    productSdk.manage(dispatch, productSDKObj, { type, product, num: product.sellNum });
+    const { dispatch, productSDKObj } = this.props;
+    productSdk.manage(dispatch, productSDKObj, {
+      type,
+      product,
+      num: product.sellNum
+    });
   };
 
   render() {
@@ -127,19 +131,26 @@ class Page extends Taro.Component<Props, State> {
           <View className="cart-list-info-cont">
             {productFilterCartList &&
               productFilterCartList.length > 0 &&
-              productFilterCartList.map(filterList => {
+              productFilterCartList.map((filterList, filterListIndex) => {
                 const { productList, activity } = filterList;
 
                 let subTotalPrice: number = 0;
                 productList.forEach(product => {
                   if (productCartSelectedIndex.some(id => product.id === id)) {
                     const itemTotal =
-                      productSdk.getProductItemPrice(product, memberInfo) * product.sellNum;
+                      productSdk.getProductItemPrice(product, memberInfo) *
+                      product.sellNum;
                     subTotalPrice += itemTotal;
                   }
                 });
                 return (
-                  <View className="cart-list-info cart-component-sec">
+                  <View
+                    className={`cart-list-info ${
+                      filterListIndex !== productFilterCartList.length - 1
+                        ? "cart-component-sec"
+                        : ""
+                    } `}
+                  >
                     {productList && productList.length > 0 && (
                       <View>
                         {activity && activity.name !== NonActivityName && (
@@ -223,7 +234,10 @@ class Page extends Taro.Component<Props, State> {
           />
         )}
         {productCartList && productCartList.length > 0 && (
-          <Footer beforeSubmit={this.beforeSubmit} style={process.env.TARO_ENV === 'h5' ? {bottom: '50px'}: {}} />
+          <Footer
+            beforeSubmit={this.beforeSubmit}
+            style={process.env.TARO_ENV === "h5" ? { bottom: "50px" } : {}}
+          />
         )}
       </View>
     );
