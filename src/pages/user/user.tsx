@@ -11,6 +11,7 @@ import { getUserinfo, getMemberInfo } from '../../reducers/app.user';
 import { connect } from '@tarojs/redux';
 import numeral from 'numeral';
 import { Dispatch } from 'redux';
+import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 
 const Rows = [
     {
@@ -29,6 +30,7 @@ const cssPrefix = 'user';
 
 interface Props {
     dispatch: Dispatch;
+    currentMerchantDetail: any;
     userinfo: UserInterface.UserInfo;
     memberInfo: UserInterface.MemberInfo;
 }
@@ -46,7 +48,16 @@ class User extends Taro.Component<Props, State> {
     config: Config = {
         navigationBarTitleText: '我的'
     }
-
+    async componentWillMount () {
+        try {
+            await LoginManager.getUserInfo(this.props.dispatch);
+        } catch (error) {
+            Taro.showToast({
+                title: error.message,
+                icon: 'none'
+            });
+        }
+    }
     async componentDidShow() {
         const { userinfo } = this.props;
         if (userinfo.phone && userinfo.phone.length > 0) {
@@ -144,7 +155,7 @@ class User extends Taro.Component<Props, State> {
     }
 
     render() {
-        const { userinfo, memberInfo } = this.props;
+        const { userinfo, memberInfo, currentMerchantDetail } = this.props;
         return (
             <View className={`container ${cssPrefix}`}>
                 <View className={`${cssPrefix}-bg`} />
@@ -217,6 +228,7 @@ class User extends Taro.Component<Props, State> {
                                                 userinfo && userinfo.nickname && userinfo.nickname.length > 0
                                                     ? Taro.navigateTo({ url: '/pages/login/login' })
                                                     : Taro.navigateTo({ url: '/pages/login/login.userinfo' })
+                                                localStorage.setItem('mearchantName', currentMerchantDetail.name);
                                             }}
                                         >
                                             点击登录
@@ -280,7 +292,8 @@ class User extends Taro.Component<Props, State> {
 
 const select = (state: any) => ({
     userinfo: getUserinfo(state),
-    memberInfo: getMemberInfo(state)
+    memberInfo: getMemberInfo(state),
+    currentMerchantDetail: getCurrentMerchantDetail(state)
 });
 
 export default connect(select)(User);

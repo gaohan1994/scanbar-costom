@@ -1,30 +1,30 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn dev:weapp
+  D:\Program Files\nodejs\node.exe C:\Users\75979\AppData\Roaming\npm\node_modules\yarn\bin\yarn.js add src/common/sdk --silent --no-progress
 
 PATH: 
-  /Users/gaozhiying/.rvm/gems/ruby-2.6.3/bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3@global/bin:/Users/gaozhiying/.rvm/rubies/ruby-2.6.3/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Library/Apple/bin:.:/Users/gaozhiying/.rvm/bin:/Library/android-sdk-macosx/tools:/Library/android-sdk-macosx/platform-tools
+  C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\JDK1.8\bin;D:\apache-maven-3.5.4-bin\apache-maven-3.5.4\bin;C:\Program Files\TortoiseSVN\bin;D:\mysql-8.0.12-winx64\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Python27;E:\学习下载的例子\apache-jmeter-5.0\lib\ext\ApacheJMeter_core.jar;E:\学习下;的例子\apache-jmeter-5.0\lib\jorphan.jar;D:\Program Files\Git\cmd;D:\Program Files\Git\bin\git.exe;D:\SDK\platform-tools;D:\Program Files\nodejs\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Intel\iCLS Client\;C:\Program Files\Intel\iCLS Client\;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files\Intel\Intel(R) Management Engine Components\DAL;C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files\Intel\Intel(R) Management Engine Components\IPT;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\Program Files\nodejs\;D:\JDK1.8\bin;D:\apache-maven-3.5.4-bin\apache-maven-3.5.4\bin;C:\Program Files\TortoiseSVN\bin;D:\mysql-8.0.12-winx64\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Python27;E:\学习下载的例子\apache-jmeter-5.0\lib\ext\ApacheJMeter_core.jar;E:\学习下;的例子\apache-jmeter-5.0\lib\jorphan.jar;D:\Program Files\Git\cmd;D:\Program Files\Git\bin\git.exe;D:\SDK\platform-tools;C:\Users\75979\AppData\Local\Microsoft\WindowsApps;D:\Microsoft VS Code\bin;C:\Users\75979\AppData\Local\Turbo\Cmd\;C:\Users\75979\AppData\Local\Microsoft\WindowsApps;C:\Users\75979\AppData\Roaming\npm
 
 Yarn version: 
-  1.17.3
+  1.12.3
 
 Node version: 
-  12.10.0
+  12.16.3
 
 Platform: 
-  darwin x64
+  win32 x64
 
 Trace: 
-  Error: write EIO
-      at afterWriteDispatched (internal/stream_base_commons.js:150:25)
-      at writeGeneric (internal/stream_base_commons.js:141:3)
-      at WriteStream.Socket._writeGeneric (net.js:768:11)
-      at WriteStream.Socket._write (net.js:780:8)
-      at doWrite (_stream_writable.js:428:12)
-      at writeOrBuffer (_stream_writable.js:412:5)
-      at WriteStream.Writable.write (_stream_writable.js:302:11)
-      at Object.clearLine (readline.js:1270:17)
-      at clearLine (/usr/local/lib/node_modules/yarn/lib/cli.js:49621:12)
-      at ConsoleReporter._log (/usr/local/lib/node_modules/yarn/lib/cli.js:96496:43)
+  Error: https://registry.npm.taobao.org/src%2fcommon/sdk: Request "https://registry.npm.taobao.org/src%2fcommon/sdk" returned a 405
+      at Request.params.callback [as _callback] (C:\Users\75979\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:65903:18)
+      at Request.self.callback (C:\Users\75979\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:129018:22)
+      at Request.emit (events.js:310:20)
+      at Request.<anonymous> (C:\Users\75979\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:129990:10)
+      at Request.emit (events.js:310:20)
+      at IncomingMessage.<anonymous> (C:\Users\75979\AppData\Roaming\npm\node_modules\yarn\lib\cli.js:129912:12)
+      at Object.onceWrapper (events.js:416:28)
+      at IncomingMessage.emit (events.js:322:22)
+      at endReadableNT (_stream_readable.js:1187:12)
+      at processTicksAndRejections (internal/process/task_queues.js:84:21)
 
 npm manifest: 
   {
@@ -81,11 +81,13 @@ npm manifest:
       "lodash.merge": "^4.6.2",
       "nerv-devtools": "^1.5.5",
       "nervjs": "^1.5.5",
+      "node-sass": "^4.13.1",
       "numeral": "^2.0.6",
+      "promise-polyfill": "^8.1.3",
       "redux": "^4.0.0",
       "redux-logger": "^3.0.6",
       "redux-thunk": "^2.3.0",
-      "taro-code": "^2.1.0",
+      "taro-code": "^2.2.0",
       "taro-ui": "^2.2.4"
     },
     "devDependencies": {
@@ -7128,10 +7130,10 @@ Lockfile:
     dependencies:
       semver "^6.3.0"
   
-  node-sass@^4.10.0, node-sass@^4.12.0:
+  node-sass@^4.10.0, node-sass@^4.12.0, node-sass@^4.13.1:
     version "4.13.1"
-    resolved "https://registry.npm.taobao.org/node-sass/download/node-sass-4.13.1.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fnode-sass%2Fdownload%2Fnode-sass-4.13.1.tgz#9db5689696bb2eec2c32b98bfea4c7a2e992d0a3"
-    integrity sha1-nbVolpa7LuwsMrmL/qTHoumS0KM=
+    resolved "https://registry.npmjs.org/node-sass/-/node-sass-4.13.1.tgz#9db5689696bb2eec2c32b98bfea4c7a2e992d0a3"
+    integrity sha512-TTWFx+ZhyDx1Biiez2nB0L3YrCZ/8oHagaDalbuBSlqXgUPsdkUSzJsVxeDO9LtPB49+Fh3WQl3slABo6AotNw==
     dependencies:
       async-foreach "^0.1.3"
       chalk "^1.1.1"
@@ -8008,6 +8010,11 @@ Lockfile:
     version "7.1.2"
     resolved "https://registry.npm.taobao.org/promise-polyfill/download/promise-polyfill-7.1.2.tgz#ab05301d8c28536301622d69227632269a70ca3b"
     integrity sha1-qwUwHYwoU2MBYi1pInYyJppwyjs=
+  
+  promise-polyfill@^8.1.3:
+    version "8.1.3"
+    resolved "https://registry.npm.taobao.org/promise-polyfill/download/promise-polyfill-8.1.3.tgz#8c99b3cf53f3a91c68226ffde7bde81d7f904116"
+    integrity sha1-jJmzz1PzqRxoIm/9573oHX+QQRY=
   
   promise@^7.1.1:
     version "7.3.1"
@@ -9693,10 +9700,10 @@ Lockfile:
       fstream "^1.0.12"
       inherits "2"
   
-  taro-code@^2.1.0:
-    version "2.1.0"
-    resolved "https://registry.npm.taobao.org/taro-code/download/taro-code-2.1.0.tgz#c483b44f8c14696c08d5c7444b7506658c007f86"
-    integrity sha1-xIO0T4wUaWwI1cdES3UGZYwAf4Y=
+  taro-code@^2.2.0:
+    version "2.2.0"
+    resolved "https://registry.npmjs.org/taro-code/-/taro-code-2.2.0.tgz#308b4c786fc6377edb13b37c778f2edc519aba8d"
+    integrity sha512-dlT/2xvdFjR7uSuNY9F/1UHreYeZE571itModcSVcKQaJF9kMzRJY50eEMmULRqrBBA2+B6oYeguZcfdcE1cIQ==
   
   taro-ui@^2.2.4:
     version "2.2.4"

@@ -99,6 +99,7 @@ class Item extends Taro.Component<Props> {
                 })}
               >
                 {buttons.map((button) => {
+                  console.log('button', button);
                   return (
                     <View
                       key={button.title}

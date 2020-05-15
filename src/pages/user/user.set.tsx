@@ -5,6 +5,7 @@ import "../../component/card/form.card.less";
 import { AtButton } from 'taro-ui';
 import { LoginManager } from '../../common/sdk';
 import { Dispatch } from 'redux';
+import { connect } from '@tarojs/redux';
 
 
 const Rows = [
@@ -96,6 +97,7 @@ class Page extends Taro.Component<{dispatch: Dispatch}> {
     );
   }
 }
+const select = (state: any) => ({
+});
 
-
-export default Page;
+export default connect(select)(Page);

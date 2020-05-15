@@ -13,6 +13,7 @@ import Empty from '../../component/empty';
 import orderAction from '../../actions/order.action';
 import { getUserinfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
+import { LoginManager } from "../../common/sdk";
 
 const cssPrefix = 'order';
 
@@ -46,8 +47,15 @@ class Order extends Taro.Component<Props, State> {
   }
 
   async componentDidMount() {
-    // this.loginCheck();
-    console.log(this.props)
+    // this.loginCheck();;
+    try {
+        await LoginManager.getUserInfo(this.props.dispatch);
+    } catch (error) {
+        Taro.showToast({
+            title: error.message,
+            icon: 'none'
+        });
+    }
   }
 
   async componentDidShow() {

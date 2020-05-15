@@ -4,9 +4,9 @@ import { UserInterface } from '../../../constants';
 import invariant from 'invariant'
 
 /**
- * @todo 腾讯地图key
+ * @todo 腾讯地图key LYEBZ-LMSKK-QVBJG-A2MGL-MHYIF-4PFWU    DLFBZ-7AXKW-TWYRV-OLVUQ-FA527-2CBQG
  */
-const mapKey = 'DLFBZ-7AXKW-TWYRV-OLVUQ-FA527-2CBQG'
+const mapKey = 'LYEBZ-LMSKK-QVBJG-A2MGL-MHYIF-4PFWU'
 const mapSdk = new MapSdk({ key: mapKey })
 
 class WeixinSDK {
@@ -50,7 +50,9 @@ class WeixinSDK {
           resolve({ success: false, result })
         }
       });
+      
     })
+    
   }
 
   public getWeixinCode = async (): Promise<any> => {
@@ -92,12 +94,14 @@ class WeixinSDK {
         // 微信小程序逻辑
         Taro.getLocation({
           success: (res) => {
+            console.log(' Taro.getLocation-res', res);
             mapSdk.reverseGeocoder({
               location: {
                 latitude: res.latitude,
                 longitude: res.longitude
               },
               success: (result) => {
+                console.log(' Taro.getLocation-result', result)
                 dispatch({
                   type: that.reducerInterface.RECEIVE_CURRENT_ADDRESS,
                   payload: {
@@ -120,6 +124,71 @@ class WeixinSDK {
       }
       if (process.env.TARO_ENV === 'h5') {
         // H5 逻辑
+        wx.getLocation({
+          type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+          success: function (res) {
+            // var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+            // var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+            // var speed = res.speed; // 速度，以米/每秒计
+            // var accuracy = res.accuracy; // 位置精度
+            const Option: any = {
+              url: 'https://apis.map.qq.com/ws/geocoder/v1/',
+              method: 'GET',
+              data: {
+                location: res.latitude+','+res.longitude,
+                key: mapKey,
+                output: 'jsonp'
+              },
+              dataType: 'jsonp',
+              jsonp: "callback",
+				      jsonpCallback: "QQmap",
+              header: {
+                'content-type': 'application/json'
+              },
+              success: (data) => { 
+                const result = data.data;
+                console.log('getLocation++++++++++++++++++++++++++++++', result)
+                dispatch({
+                  type: that.reducerInterface.RECEIVE_CURRENT_ADDRESS,
+                  payload: {
+                    address: result.result.address,
+                    latitude: result.result.location.lat,
+                    longitude: result.result.location.lng,
+                  }
+                })
+                resolve({ success: true, result: result.result, msg: '' })
+              }, 
+              fail: (error) => {
+                resolve({ success: false, result: undefined, msg: error.message })
+              }
+            };
+            Taro.request(Option);
+            
+            const param = {
+              latitude: res.latitude,
+              longitude: res.longitude
+            };
+            mapSdk.reverseGeocoder({location: param,
+              success: (result) => {
+                console.log('getLocation -success', result)
+                dispatch({
+                  type: that.reducerInterface.RECEIVE_CURRENT_ADDRESS,
+                  payload: {
+                    address: result.result.address,
+                    latitude: result.result.location.lat,
+                    longitude: result.result.location.lng,
+                  }
+                })
+                resolve({ success: true, result: result.result, msg: '' })
+              },
+              fail: (error) => {
+                console.log('getLocation -error', error)
+                resolve({ success: false, result: undefined, msg: error.message })
+              }
+            })
+            console.log('getLocation', res)
+          }
+        });
       }
       
     })

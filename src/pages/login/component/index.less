@@ -7,24 +7,53 @@
   width: 100%;
 }
 .login_container {
-  margin: 80px 74px;
-  .login_title {
-    font-size:40px;
-    font-family:PingFang SC;
-    font-weight:bold;
-    color:rgba(51,51,51,1);
+  .login_container_bg{
+    width:100%;
+    height: 352px;
+    background-image: url('../../../assets/bg_registered.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    position: relative;
+    .login_container_bg_title {
+      font-size:52px;
+      font-family:PingFang SC;
+      color:#fff;
+      position: absolute;
+      margin: 80px;
+    }
+    .login_container_bg_logo{
+      width:180px;
+      height:180px;
+      background-image: url('../../../assets/icon_shop.png');
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+      position: absolute;
+      right: 36px;
+      bottom: -30px;
+    }
   }
   .login_content {
       padding-top: 50px;
+      margin: auto;
+      width: 80%;
   }
   .login_content__item {
       display: flex;
       align-items: center;
       border-bottom: 1px solid #cccccc;
-      padding: 20px 0;
-      padding-bottom: 0px;
+      padding: 10px 0;
       font-size: 32px;
-      height: 120px;
+      height: 100px;
+      border:3px solid rgba(227,227,227,1);
+      border-radius:15px;
+      .login_content__item_logo {
+        width:51px;
+        height:45px;
+        margin: 20px;
+        background-image: url('../../../assets/icon_registered_phone.png');
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
   }
   .login_content_item_code {
     display: flex;
@@ -36,55 +65,65 @@
     .login_content_item_code_i {
       border-bottom: 1px solid #cccccc;
       display: flex;
-      align-items: center;
-      padding-left: 10rpx;
-      padding-right: 40px;      
+      align-items: center;    
       font-size: 32px;
       height: 100px;
+      border:3px solid rgba(227,227,227,1);
+      border-radius:15px;
+      width: 65%;
+      margin-top: 30px;
+      .login_content_item_code_i_logo {
+        width:51px;
+        height:45px;
+        margin: 23px;
+        background-image: url('../../../assets/icon_registered_code.png');
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+      }
     }
   }
   .login_content__input {
       width: 100%;
+      font-size: 30px;
   }
   .login_content__code {
-    position: absolute;
-    right: 74px;
     text-align: center;
-    width:200px;
-    height:80px;
-    line-height: 80px;
+    width: 33%;
+    height:100px;
+    border:3px solid rgba(42,134,252,1);
+    border-radius:15px;
+    line-height: 100px;
     font-size:26px;
     font-family:PingFang SC;
     font-weight:500;
-    color:rgba(255,255,255,1);
-    background:@theme-color;
-    border-radius:40px;
-    margin-top: 10px;
+    color:rgba(42,134,252,1);
+    margin-top: 30px;
+    margin-left: 2%;
   }
-  .login_content__code_first {
-    background:@theme-color;
-  }
+
   .login_content__code_wait {
-    background:@theme-false-color;
+    color:#cccccc;
+    border:3px solid rgba(227,227,227,1);
+    border-radius:15px;
   }
   .login_content__btn_true {
-    margin-top: 40px;
+    margin-top: 100px;
     border-radius: 44px;
     color: #ffffff;
     background-color: @theme-color;
     border: none;
-    height: 100px;
-    line-height: 100px;
+    height: 80px;
+    line-height: 80px;
     font-size: 30px;
   }
   .login_content__btn_false {
-    margin-top: 40px;
+    margin-top: 100px;
     border-radius: 44px;
     color: #ffffff;
     background-color: @theme-false-color;
     border: none;
-    height: 100px;
-    line-height: 100px;
+    height: 80px;
+    line-height: 80px;
     font-size: 30px;
   }
   .login_content__info {

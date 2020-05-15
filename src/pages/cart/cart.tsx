@@ -19,6 +19,7 @@ import { ProductInterface } from "../../constants/product/product";
 import merchantAction from "../../actions/merchant.action";
 import { Dispatch } from 'redux';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
+import { LoginManager } from "../../common/sdk";
 
 type Props = {
   dispatch: Dispatch;
@@ -47,6 +48,14 @@ class Page extends Taro.Component<Props, State> {
 
   async componentDidMount() {
     // this.loginCheck();
+    try {
+        await LoginManager.getUserInfo(this.props.dispatch);
+    } catch (error) {
+        Taro.showToast({
+            title: error.message,
+            icon: 'none'
+        });
+    }
   }
 
   async componentDidShow() {
