@@ -145,8 +145,8 @@ class Page extends Taro.Component<Props, State> {
     }
 
     onShowTimeSelect = () => {
-        this.onChangeValue('showTimeSelect', true);
         this.getDateList();
+        this.onChangeValue('showTimeSelect', true);
     }
 
     onDateClick = (date: any) => {
@@ -157,22 +157,28 @@ class Page extends Taro.Component<Props, State> {
 
     onTimeClick = (time: string) => {
         const {dispatch} = this.props;
-        this.onChangeValue('selectTime', time);
-        this.onChangeValue('showTimeSelect', false);
         const {currentDate} = this.state;
-        this.onChangeValue('selectDate', currentDate);
+        // this.onChangeValue('selectTime', time);
+        // this.onChangeValue('selectDate', currentDate);
+        this.setState({
+            selectTime: time,
+            selectDate: currentDate
+        })
         // if (selectTime !== '立即送出') {
-            
+        console.log('selectTime00000000000000', time);
         const selectTimeStr =
             `${(time === '立即自提' || time === '立即送出') ? '' : (currentDate.date || '')}${time !== '立即自提' && time !== '立即送出' ? ' ' : ''}${time}`;
         productSdk.preparePayOrderDetail({planDeliveryTime: selectTimeStr}, dispatch);
         // }
+        console.log('showTimeSelect', this.state);
+        this.onChangeValue('showTimeSelect', false);
     }
 
     getTimeList = () => {
         const {currentDate, selectTime} = this.state;
         const {payOrderDetail, dispatch} = this.props;
         let timeList: string[] = [];
+        console.log('getTimeList', currentDate);
         if (currentDate.id === undefined) {
             return;
         }
@@ -197,7 +203,8 @@ class Page extends Taro.Component<Props, State> {
                 timeList.push(`${i}:30 ~ ${i + 1}:00`);
             }
         }
-        this.onChangeValue('timeList', timeList);
+        // this.onChangeValue('timeList', timeList);
+
         if (
             selectTime === '' ||
             (selectTime === '立即自提' && payOrderDetail.deliveryType === 1) ||
@@ -210,6 +217,10 @@ class Page extends Taro.Component<Props, State> {
                 productSdk.preparePayOrderDetail({planDeliveryTime: selectTimeStr}, dispatch);
             })
         }
+        console.log(timeList, 'timeList');
+        this.setState({
+            timeList: timeList
+        })
     }
 
     getDateList = () => {
@@ -218,6 +229,7 @@ class Page extends Taro.Component<Props, State> {
         const nextDate = dayJs().add(1, 'day');
         let dateList: any[] = [];
         const currentHour = dayJs().hour();
+        console.log('getDateList----------', 1)
         if (currentHour >= closeTime) {
             dateList = [
                 {
@@ -240,12 +252,17 @@ class Page extends Taro.Component<Props, State> {
                 }
             ];
         }
+        console.log('getDateList----------', 2)
         this.onChangeValue('dateList', dateList);
+        console.log('getDateList----------', 3)
         if (currentDate.id === undefined) {
+            console.log('getDateList----------', 5)
             this.setState({currentDate: dateList[0], selectDate: dateList[0]}, () => {
+                console.log('getDateList----------', 6)
                 this.getTimeList();
             });
         }
+        console.log('getDateList----------', 4)
     }
 
     render() {
@@ -261,19 +278,21 @@ class Page extends Taro.Component<Props, State> {
                 (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
             ).format('0.00')
             : '0.00';
-        const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
+        // const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
+        console.log('this.state',this.state)
         return (
-            <View className='container container-color' style={{backgroundColor: '#f2f2f2'}}>
+            <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: '115vh'}}>
                 <View className={`${cssPrefix}-bg`}/>
                 <PickAddress
                     timeSelectClick={() => {
                         this.onShowTimeSelect()
                     }}
-                    currentTime={`${selectTimeStr}`}
+                    currentTime={`${payOrderDetail.planDeliveryTime}`}
                     changeTabCallback={this.getTimeList}
                 />
                 <ProductPayListView
                     productList={payOrderProductList}
+                    payOrderDetail={payOrderDetail}
                 />
                 <View className={`${cssPrefix}-remark`}>
                     <View className={`${cssPrefix}-remark-card`}>
@@ -307,22 +326,23 @@ class Page extends Taro.Component<Props, State> {
                 />
                 <AtFloatLayout
                     isOpened={showTimeSelect}
+                    className={process.env.TARO_ENV === 'h5' ? `${cssPrefix}-modal-h5-layout` : ''}
                     title={`选择${payOrderDetail.deliveryType === 0 ? '自提' : '配送'}时间`}
                     onClose={() => {
                         this.setState({showTimeSelect: false})
                     }
                     }>
-                    <View className={`${cssPrefix}-modal`}>
+                    <View className={process.env.TARO_ENV === 'h5' ? `${cssPrefix}-modal-h5` : `${cssPrefix}-modal`}>
                         <ProductMenu
                             menu={dateList}
                             currentMenu={currentDate}
                             onClick={(type: any) => {
                                 this.onDateClick(type);
                             }}
-                            className={`${cssPrefix}-modal-menu`}
+                            className={process.env.TARO_ENV === 'h5' ? `${cssPrefix}-modal-h5-menu` : `${cssPrefix}-modal-menu`}
                         />
 
-                        <ScrollView scrollY={true} className={`${cssPrefix}-modal-list`}>
+                        <ScrollView scrollY={true} className={process.env.TARO_ENV === 'h5' ? `${cssPrefix}-modal-h5-list` :`${cssPrefix}-modal-list`}>
                             {
                                 timeList && timeList.length > 0 && timeList.map((time: string) => {
                                     return (
@@ -330,8 +350,8 @@ class Page extends Taro.Component<Props, State> {
                                             onClick={() => {
                                                 this.onTimeClick(time)
                                             }}
-                                            className={classnames(`${cssPrefix}-modal-list-item `, {
-                                                [`${cssPrefix}-modal-list-select`]: selectTime === time,
+                                            className={classnames(process.env.TARO_ENV === 'h5' ? `${cssPrefix}-modal-h5-list-item` :`${cssPrefix}-modal-list-item `, {
+                                                [process.env.TARO_ENV === 'h5' ? `${cssPrefix}-modal-h5-list-select` :`${cssPrefix}-modal-list-select`]: selectTime === time,
                                             })}
                                         >
                                             {time}

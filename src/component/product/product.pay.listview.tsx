@@ -61,9 +61,9 @@ class ProductPayListView extends Taro.Component<Props, State> {
     return (
       <View
         className={classnames(className, {
-          [`${cssPrefix}-pay-pos`]: padding
+          [`${cssPrefix}-pay-pos`]: padding,
+          'component-form-wrap': true,
         })}
-        style={{width: '100%'}}
       >
         <View
           className={classnames('component-form', {
@@ -223,6 +223,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const { order } = orderDetail;
     const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
     const totalActivityMoney = productSdk.getProductTotalActivityPrice(activityList, memberInfo, productSDKObj.productCartList);
+    console.log('renderDisount', this.props, payOrderDetail && payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id);
     return (
       <View>
         {totalActivityMoney !== 0 && (
@@ -370,7 +371,6 @@ class ProductPayListView extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => {
   return {
-    payOrderDetail: state.productSDK.payOrderDetail,
     orderDetail: getOrderDetail(state),
     activityList: state.merchant.activityList,
     productSDKObj: state.productSDK,

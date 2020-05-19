@@ -27,6 +27,7 @@
     width: 100%;
     .flex(center, center, row);
     background: #F2F2F2;
+    margin-top: 22px;
     &-card {
       width: 90%;
     }
@@ -180,13 +181,52 @@
       width: 690px;
     }
   }
+  &-modal-h5 {
+    display: flex;
+    background-color: #f6f6f6;
+    height: 100vh;
+    border-top: 1px solid #f9f9f9;
+    &-layout{
+      .at-float-layout__container {
+        height: 484px;
+      }
+    }
+    &-list {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      overflow-y: scroll;
+      background-color: #fff;
 
+      &-item {
+        height: 94px;
+        line-height: 94px;
+        width: 100%;
+        display: block;
+        align-items: center;
+        border-bottom: 1px solid #f9f9f9;
+        font-size: 26px;
+        font-size: #333333;
+        padding: 0 30px;
+      }
+
+      &-select {
+        font-size: #333333;
+        color: #2A86FC;
+      }
+    }
+
+    &-menu {
+      width: 40% !important;
+    }
+  }
   &-modal {
     display: flex;
     background-color: #f6f6f6;
     height: 600px;
     border-top: 1px solid #f9f9f9;
-
+    
     &-list {
       display: flex;
       flex-direction: column;

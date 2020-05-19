@@ -9,7 +9,7 @@ import { connect } from '@tarojs/redux'
 import productSdk from '../../common/sdk/product/product.sdk'
 import { Dispatch } from 'redux';
 
-const prefix = 'order-remark'
+const prefix = 'order-remark-pay'
 
 const remarks = [
   '无接触配送',

@@ -96,7 +96,7 @@ class ProductComponent extends Taro.Component<Props, State> {
     }
 
     render() {
-        const {selectedIndex, selectClick, product, last, isHome} = this.props;
+        const {selectedIndex, selectClick, product, last, isHome, dispatch} = this.props;
         const isCart = Array.isArray(selectedIndex);
         const token = !!isCart && selectedIndex && selectedIndex.some((i) => i === product.id);
         return (
@@ -118,7 +118,7 @@ class ProductComponent extends Taro.Component<Props, State> {
                                 selectClick();
                                 return;
                             } 
-                            productSdk.selectProduct('normal', product as any);
+                            productSdk.selectProduct(dispatch, 'normal', product as any);
                         }}
                     >
                         <View 
