@@ -551,7 +551,8 @@ class ProductSDK {
             return new Promise((resolve) => {
                 if(process.env.TARO_ENV === 'h5'){
                     const data = result.data;
-                    window.location.href = data.codeUrl;
+                    const url = data.codeUrl.replace('-app', '-customer')
+                    window.location.href = url;
                 } else {
                     const payload = JSON.parse(result.data.param);
                     delete payload.appId;

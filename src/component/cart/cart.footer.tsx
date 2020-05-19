@@ -39,7 +39,7 @@ class Footer extends Taro.Component<Props> {
     const { priceTitle, priceSubtitle, price, priceOrigin, priceDiscount } = this.props;
     return (
       <View>
-        <View className={`${cssPrefix}-normal component-cart-text`}>
+        <View className={`${cssPrefix}-normal component-cart-text`} style={process.env.TARO_ENV === 'h5' ? {lineHeight: 'unset'} : {}}>
           {/* <Text className={`${cssPrefix}-price-title`}>{priceTitle}</Text> */}
           {priceSubtitle && (
             <Text className={`${cssPrefix}-price-bge `}>{priceSubtitle}</Text>

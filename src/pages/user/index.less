@@ -2,7 +2,9 @@
 
 @user-prefix: user;
 @user-bg-size: 416px;
-
+page {
+  background: #f2f2f2;
+}
 .@{user-prefix} {
   background-color: #F2F2F2;
   .flex(center, flex-start, column);
@@ -195,10 +197,10 @@
     }
 
     &-scrollview {
-      display: flex;
+      display: block;
       background-color: #F2F2F2;
       height: calc(100% - 90px);
-      
+      width: 100%;
       &-full {
         height: 100% !important;
       }
@@ -214,6 +216,7 @@
       &-item {
         display: flex;
         justify-content: center;
+        width: 100%;
       }
 
       &-unable {

@@ -56,7 +56,9 @@ class Index extends Component<any> {
     }
 
     async componentDidMount() {
+        console.log('componentDidMount');
         try {
+            
             this.init(true);
             orderAction.orderAllStatus(this.props.dispatch);
         } catch (error) {
@@ -65,18 +67,20 @@ class Index extends Component<any> {
                 icon: 'none'
             })
         }
+        // const { userinfo, dispatch } = this.props;
+        // if (userinfo.phone && userinfo.phone.length > 0) {
+        //     UserAction.getMemberInfo(dispatch);
+        //     const res = await UserAction.obtainCoupon();
+        //     if (res.code == ResponseCode.success) {
+        //         console.log('obtainCouponList', res.data.rows);
+        //         this.setState({ obtainCouponList: res.data.rows })
+        //     }
+        // }
         this.setState({couponModalShow: true})
     }
 
     async componentDidShow() {
-        // const { userinfo } = this.props;
-        // if (userinfo.phone && userinfo.phone.length > 0) {
-        //   UserAction.getMemberInfo();
-        //   const res = await UserAction.obtainCoupon();
-        //   if (res.code == ResponseCode.success) {
-        //     this.setState({ obtainCouponList: res.data.rows })
-        //   }
-        // }
+        console.log('componentDidShow');
         this.init();
     }
 
@@ -101,10 +105,11 @@ class Index extends Component<any> {
             await LoginManager.getUserInfo(dispatch);
             WeixinSdk.initAddress(dispatch, address);
             const {userinfo, currentMerchantDetail} = this.props;
-            if (userinfo.phone && userinfo.phone.length > 0) {
+            if (firstTime && userinfo.phone && userinfo.phone.length > 0) {
                 UserAction.getMemberInfo(dispatch);
                 const res = await UserAction.obtainCoupon();
                 if (res.code == ResponseCode.success) {
+                    console.log('obtainCouponList', res.data.rows);
                     this.setState({obtainCouponList: res.data.rows})
                 }
             }

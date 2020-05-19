@@ -73,6 +73,7 @@ class CouponModal extends Taro.Component<Props, State> {
   private renderItem = (item: UserInterface.CouponsItem) => {
     const { onClose } = this.props;
     const { couponVO } = item;
+    console.log("renderItem-coupon : ", item);
     return (
       <View className={`${cssPrefix}-item`}>
         <View

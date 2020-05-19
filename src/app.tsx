@@ -127,15 +127,14 @@ class App extends Component {
   // 在 App 类中的 render() 函数没有实际作用
   // 请勿修改此函数
   componentWillMount () {
-    //
-    // console.log(window.location)
     if(process.env.TARO_ENV === 'h5'){
-      const hash = window.location.hash.split('?');
-      const merchant = hash[1] && hash[1].split('=')[1] ?　hash[1].split('=')[1] :  BASE_PARAM.MCHID;
-      console.log("merchant", merchant, hash)
-      localStorage.setItem('merchantId', `${merchant}`);
-    }
-    if(process.env.TARO_ENV === 'h5'){
+      const keywords = window.location.search.substr(1);
+      const result = keywords.replace(/&/g, '","').replace(/=/g, '":"');
+      if(result){
+        const reqDataString = '{"' + result + '"}';
+        const key = JSON.parse(reqDataString); 
+        localStorage.setItem('merchantId', `${key.merchantId}`);
+      }
       this.initWx();
     }
   }
