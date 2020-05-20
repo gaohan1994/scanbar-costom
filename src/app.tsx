@@ -128,12 +128,14 @@ class App extends Component {
   // 请勿修改此函数
   componentWillMount () {
     if(process.env.TARO_ENV === 'h5'){
-      const keywords = window.location.search.substr(1);
+      const hash = window.location.hash.split('?')
+      const keywords = hash[1] ? hash[1] : '';
       const result = keywords.replace(/&/g, '","').replace(/=/g, '":"');
       if(result){
         const reqDataString = '{"' + result + '"}';
         const key = JSON.parse(reqDataString); 
         localStorage.setItem('merchantId', `${key.merchantId}`);
+        localStorage.setItem('search', `?keywords`);
       }
       this.initWx();
     }
@@ -163,7 +165,7 @@ class App extends Component {
             timestamp: data.timestamp, // 必填，生成签名的时间戳
             nonceStr: data.nonceStr, // 必填，生成签名的随机串
             signature: data.signature,// 必填，签名
-            jsApiList: ['getLocation', 'openLocation'] // 必填，需要使用的JS接口列表
+            jsApiList: ['getLocation', 'openLocation', 'chooseWXPay'] // 必填，需要使用的JS接口列表
           });
           wx.ready(function(res){
             console.log('res-----------------------------------------++++', res)
