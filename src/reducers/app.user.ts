@@ -20,6 +20,12 @@ export declare namespace UserReducer {
       }
     }
 
+    interface ReceiveCouponsCenter {
+      type: string;
+      payload: {
+        couponListCenter: any
+      }
+    }
     interface ReceiveUserinfo {
       type: string;
       payload: {
@@ -40,6 +46,7 @@ export declare namespace UserReducer {
     addressList: UserInterface.Address[];
     currentPostion: UserInterface.Address;
     couponList: UserInterface.CouponsItem[];
+    couponListCenter: UserInterface.CouponsItemCenter[];
     userinfo: UserInterface.UserInfo;
     memberInfo: UserInterface.MemberInfo;
   }
@@ -56,6 +63,7 @@ export const initState: UserReducer.State = {
   addressList: [],
   currentPostion: {} as any,
   couponList: [],
+  couponListCenter: [],
   userinfo: {} as any,
   memberInfo: {} as any,
 };
@@ -93,7 +101,24 @@ export default function merchant (state: UserReducer.State = initState, action: 
         couponList: payload.couponList
       }
     }
-
+    case UserInterfaceMap.reducerInterface.RECEIVE_COUPONS_MORE: {
+      const { payload } = action as UserReducer.Reducers.ReceiveCoupons;
+      return {
+        ...state,
+        couponList: [
+          ...state.couponList,
+          ...payload.couponList
+        ]
+      }
+    }
+    case UserInterfaceMap.reducerInterface.RECEIVE_COUPONS_CENTER: {
+      const { payload } = action as unknown as UserReducer.Reducers.ReceiveCouponsCenter;
+      return {
+        ...state,
+        couponListCenter: payload.couponListCenter
+      }
+    }
+    
     case UserInterfaceMap.reducerInterface.RECEIVE_USERINFO: {
       const { payload } = action as UserReducer.Reducers.ReceiveUserinfo;
       return {
@@ -124,6 +149,7 @@ export const getAddressList = (state: AppReducer.AppState) => state.user.address
 export const getCurrentPostion = (state: AppReducer.AppState) => state.user.currentPostion;
 
 export const getCouponList = (state: AppReducer.AppState) => state.user.couponList;
+export const getcouponListCenter = (state: AppReducer.AppState) => state.user.couponListCenter;
 
 export const getUserinfo = (state: AppReducer.AppState) => {
   if(state.user.userinfo){

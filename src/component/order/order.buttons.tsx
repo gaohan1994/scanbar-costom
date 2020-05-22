@@ -70,7 +70,7 @@ class OrderButtons extends Taro.Component<Props, State> {
   public onPay = async (order: OrderInterface.OrderInfo) => {
     const { orderNo } = order;
     const payment = await productSdk.requestPayment(orderNo)
-    console.log('payment: ', payment)
+
     if (payment.code === ResponseCode.success) {
       Taro.navigateTo({
         url: `/pages/order/order.detail?id=${orderNo}`

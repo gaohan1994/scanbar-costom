@@ -56,7 +56,6 @@ class Index extends Component<any> {
     }
 
     async componentDidMount() {
-        console.log('componentDidMount');
         try {
             
             this.init(true);
@@ -72,7 +71,6 @@ class Index extends Component<any> {
         //     UserAction.getMemberInfo(dispatch);
         //     const res = await UserAction.obtainCoupon();
         //     if (res.code == ResponseCode.success) {
-        //         console.log('obtainCouponList', res.data.rows);
         //         this.setState({ obtainCouponList: res.data.rows })
         //     }
         // }
@@ -80,10 +78,14 @@ class Index extends Component<any> {
     }
 
     async componentDidShow() {
-        console.log('componentDidShow');
+
         this.init();
     }
-
+    componentWillUnmount () {
+        this.setState({
+            obtainCouponList: []
+        })
+    }
     public changeCurrentType = (typeInfo: any, fetchProduct: boolean = true) => {
         this.setState({currentType: typeInfo}, async () => {
             if (fetchProduct) {
@@ -109,7 +111,7 @@ class Index extends Component<any> {
                 UserAction.getMemberInfo(dispatch);
                 const res = await UserAction.obtainCoupon();
                 if (res.code == ResponseCode.success) {
-                    console.log('obtainCouponList', res.data.rows);
+
                     this.setState({obtainCouponList: res.data.rows})
                 }
             }
@@ -202,11 +204,49 @@ class Index extends Component<any> {
             }
         }
     }
-
+    public CouponisNew = (list: any) => {
+        let isNew = false;
+        let hasGet = false;
+        list.forEach(element => {
+            if(`${element.couponVO.obtainWay}` === '1'){
+                isNew = true;   
+            }
+            if(`${element.couponVO.obtainWay}` === '0'){
+                hasGet = true;   
+            }
+        });
+        return {isNew, hasGet };
+    }
+    public GetobtainCoupons = async (list: any) => {
+        const {dispatch} = this.props;
+        const couponIdList = list.map(val => val.couponId);
+        try {
+            const param = {
+                couponIdList: couponIdList
+            }
+            const res = await UserAction.GetobtainCoupons(param);
+            if (res.code == ResponseCode.success) {
+                UserAction.getMemberInfo(dispatch);
+                Taro.showToast({
+                    title: '领取成功',
+                    icon: 'success'
+                });
+                return true;
+            }
+            return false;
+        } catch (error) {
+            Taro.showToast({
+                title: error.message,
+                icon: 'none'
+            });
+            return false;
+        }
+    }
+    
     render() {
         const {currentType, loading, showActivity, obtainCouponList} = this.state;
         const {productList, productType, advertisement, userinfo, memberInfo} = this.props;
-
+        const isNew = this.CouponisNew(obtainCouponList);
         return (
             <View className={`container ${cssPrefix}`}>
                 <IndexAddress/>
@@ -269,7 +309,16 @@ class Index extends Component<any> {
             onClose={() => {
                 this.setState({obtainCouponList: []});
             }}
-            couponList={obtainCouponList}
+            onItemClick={(list: any)=>{
+                if(isNew){
+                    const res = this.GetobtainCoupons(list)
+                    return res;
+                }
+                return false;
+            }}
+            couponList={obtainCouponList || []}
+            isNew={isNew.isNew}
+            hasGet={isNew.hasGet}
         />
     </View>
     )

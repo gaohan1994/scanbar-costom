@@ -40,6 +40,7 @@ class App extends Component {
       "pages/user/user.code",
       "pages/test/test",
       "pages/cart/cart",
+      "pages/user/user.couponCenter",
       "pages/product/product.detail",
       "pages/product/product.search"
       // 'pages/address/address.list',
@@ -134,7 +135,9 @@ class App extends Component {
       if(result){
         const reqDataString = '{"' + result + '"}';
         const key = JSON.parse(reqDataString); 
-        localStorage.setItem('merchantId', `${key.merchantId}`);
+        if(key.merchantId){
+          localStorage.setItem('merchantId', `${key.merchantId}`);
+        }
         localStorage.setItem('search', `?keywords`);
       }
       this.initWx();

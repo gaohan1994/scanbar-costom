@@ -223,7 +223,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const { order } = orderDetail;
     const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
     const totalActivityMoney = productSdk.getProductTotalActivityPrice(activityList, memberInfo, productSDKObj.productCartList);
-    console.log('renderDisount', this.props, payOrderDetail && payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id);
+
     return (
       <View>
         {totalActivityMoney !== 0 && (

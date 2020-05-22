@@ -28,7 +28,7 @@ class GetUserinfo extends Taro.Component<Props, State> {
 
   public getWxInfo = async (show?: boolean) => {
     const {dispatch} = this.props;
-    console.log(this.props)
+
     try {
       const codeRes = await WeixinSDK.getWeixinCode();
       invariant(codeRes.success, codeRes.msg || '请先登录微信');

@@ -36,7 +36,7 @@ class TabsMenu extends Taro.Component<Props, State> {
   public onContentItemClick = (menu: Menu) => {
     const { onPress, onClose } = this.props;
     if (onPress) {
-      console.log('menu: ', menu);
+
       onPress(menu);
 
       if (onClose) {

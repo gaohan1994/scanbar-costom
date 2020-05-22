@@ -52,7 +52,11 @@ class UserService {
     const result = await requestHttp.get(`/api/coupon/getMemberCoupons${jsonToQueryString(params)}`);
     return result;
   }
-
+  public getWaitForObtainCoupons = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`/api/coupon/getWaitForObtainCoupons`);
+    return result;
+  }
+  
   public getMemberExpiredCoupons = async (params?: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
     const result = await requestHttp.get(`/api/coupon/getMemberExpiredCoupons${jsonToQueryString(params)}`);
     return result;
@@ -62,7 +66,10 @@ class UserService {
     const result = await requestHttp.get(`/api/coupon/obtainCoupon`);
     return result;
   }
-
+  public GetobtainCoupons = async (param: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.post(`/api/coupon/obtainCoupons`, param);
+    return result;
+  }
   public getMemberInfo = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
     const result = await requestHttp.get(`/api/memberInfo/getMemberInfo`);
     return result;

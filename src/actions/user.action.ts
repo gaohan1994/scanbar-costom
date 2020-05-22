@@ -82,7 +82,6 @@ class UserAction {
     const result = await UserService.userInfoSave(params);
     return result;
   }
-
   /**
    * @todo 获取用户的优惠券 0-未使用 1-已使用
    *
@@ -118,7 +117,60 @@ class UserAction {
     }
     return result;
   }
+  /**
+   * @todo 获取用户的优惠券 0-未使用 1-已使用 分页加载
+   *
+   * @memberof UserAction
+   */
+  public getMemberCouponsMore = async (dispatch, params?: UserInterface.FetchMemberCoupons) => {
+    const result = await UserService.getMemberCoupons(params);
+    if (result.code === ResponseCode.success) {
+      dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_COUPONS_MORE,
+        payload: {
+          couponList: result.data.rows
+        }
+      });
+    }
+    return result;
+  }
 
+  /**
+   * @todo 获取用户已过期的优惠券 0-未使用 1-已使用 分页加载
+   *
+   * @memberof UserAction
+   */
+  public getMemberExpiredCouponsMore = async (dispatch, params?: UserInterface.FetchMemberCoupons) => {
+    const result = await UserService.getMemberExpiredCoupons(params);
+    if (result.code === ResponseCode.success) {
+      dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_COUPONS_MORE,
+        payload: {
+          couponList: result.data.rows
+        }
+      });
+    }
+    return result;
+  }
+  
+    /**
+   * @todo 获取用户可领优惠券，领券中心
+   *
+   * @memberof UserAction
+   */
+  public getWaitForObtainCoupons = async (dispatch) => {
+
+    const result = await UserService.getWaitForObtainCoupons();
+    if (result.code === ResponseCode.success) {
+      dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_COUPONS_CENTER,
+        payload: {
+          couponListCenter: result.data.rows
+        }
+      });
+    }
+    return result;
+  }
   /**
    * @todo 领取优惠券
    *
@@ -129,6 +181,15 @@ class UserAction {
     return result;
   }
 
+  /**
+   * @todo 领取手动领取的优惠券
+   *
+   * @memberof UserAction
+   */
+  public GetobtainCoupons = async (param: any) => {
+    const result = await UserService.GetobtainCoupons(param);
+    return result;
+  }
   /**
    * @todo 获取会员等级信息
    *

@@ -56,7 +56,7 @@ class Item extends Taro.Component<Props> {
       buttons,
       buttonPos
     } = this.props;
-    console.log('isBorderTop', isBorderTop)
+
     return (
       <View className={`${prefix}-view`}>
         <View 
@@ -99,7 +99,7 @@ class Item extends Taro.Component<Props> {
                 })}
               >
                 {buttons.map((button) => {
-                  console.log('button', button);
+ 
                   return (
                     <View
                       key={button.title}

@@ -478,7 +478,6 @@ class ProductSDK {
         // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;  UserInterface.Address
         const productList = products !== undefined ? products : productCartList;
         // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
-        console.log(payOrderDetail, 'payOrderDetail', address);
         let order: Partial<ProductCartInterface.ProductOrderPayload> = {
             address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
             deliveryPhone: '',
@@ -547,7 +546,6 @@ class ProductSDK {
         //     payload = {orderNo};
         // }
         const result = await requestHttp.post(`/api/cashier/pay`, payload);
-        console.log('requestPayment', result, ResponseCode);
         if (result.code === ResponseCode.success && result.data.status !== false) {
             return new Promise((resolve) => {
                 const payload = JSON.parse(result.data.param);
@@ -561,7 +559,6 @@ class ProductSDK {
                             resolve(error)
                         }
                     };
-                    console.log('paymentPayload: ', paymentPayload)
                     Taro.requestPayment(paymentPayload);
                 // if(process.env.TARO_ENV === 'h5'){
                 //     const data = result.data;

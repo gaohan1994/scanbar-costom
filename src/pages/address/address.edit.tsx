@@ -55,7 +55,7 @@ class Page extends Taro.Component<Props, State> {
       const { address } = this.$router.params;
       invariant(!!address, '请传入地址')
       const addressToJson = JSON.parse(address);
-      console.log('address: ', addressToJson)
+
       this.setState({
         ...addressToJson
       })
@@ -150,9 +150,7 @@ class Page extends Taro.Component<Props, State> {
         userId,
         id,
       }
-      console.log('payload: ', payload)
       const result = await UserAction.addressEdit(payload);
-      console.log('result: ', result)
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       Taro.showToast({
         title: '修改成功',

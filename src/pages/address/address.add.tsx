@@ -48,7 +48,6 @@ class Page extends Taro.Component<Props, State> {
 
   public chooseAddress = async () => {
     const result = await WeixinSdk.chooseAddress();
-    console.log('result', result)
     if (!!result.success) {
       this.setState({
         address: result.result.address,
@@ -98,9 +97,7 @@ class Page extends Taro.Component<Props, State> {
         longitude: longitude,
         userId: 1,
       }
-      console.log('payload: ', payload)
       const result = await UserAction.addressAdd(payload);
-      console.log('result: ', result)
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       Taro.showToast({
         title: '添加成功',

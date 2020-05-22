@@ -7,9 +7,11 @@ import dayJs from 'dayjs';
 
 interface Props {
   data: UserInterface.CouponsItem;
+  isGet?: boolean;
   isOpen: boolean;
   onChangeCouponOpen?: (data: UserInterface.CouponsItem, e: any) => any;
   gotoUse?: () => void;
+  onGet?: (list: any) => void;
   unableToUse: boolean;
   selected?: boolean;
   onSelected?: (data: UserInterface.CouponsItem) => void;
@@ -22,9 +24,11 @@ interface State {
 const cssPrefix = 'coupon';
 
 class CouponItem extends Taro.Component<Props, State> {
-
+  state = {
+    ableObtainNum: 0,
+  }
   render() {
-    const { data, isOpen, onChangeCouponOpen, gotoUse, unableToUse, selected, onSelected, type } = this.props;
+    const { data, isOpen, onChangeCouponOpen, gotoUse,onGet, unableToUse, selected, onSelected, type, isGet } = this.props;
     const couponVO: any = data && data.couponVO ? data.couponVO : {};
     return (
       <View className={`${cssPrefix}-item`} onClick={() => { onSelected ? onSelected(data) : () => { } }}>
@@ -47,8 +51,9 @@ class CouponItem extends Taro.Component<Props, State> {
               <Text className={classnames(`${cssPrefix}-item-top-right-time`, {
                 [`${cssPrefix}-item-text-grey`]: unableToUse,
               })}>
-                {data && data.effectiveTime ? dayJs(data.effectiveTime).format('MM/DD') : '无限期'}~
-                {data && data.invalidTime ? dayJs(data.invalidTime).format('MM/DD') : '无限期'}
+                {isGet ? `领取后${couponVO.expireTime}天失效`: data && data.effectiveTime ? dayJs(data.effectiveTime).format('MM/DD') : '无限期'}
+                {isGet ? '' : '~'}
+                {isGet ? '' : data && data.invalidTime ? dayJs(data.invalidTime).format('MM/DD') : '无限期'}
               </Text>
               <View
                 className={`${cssPrefix}-item-top-right-pop`}
@@ -112,10 +117,26 @@ class CouponItem extends Taro.Component<Props, State> {
                         className={classnames(`${cssPrefix}-item-top-button`, {
                           [`${cssPrefix}-item-text-grey`]: unableToUse,
                           [`${cssPrefix}-item-border-grey`]: unableToUse,
+                          [`${cssPrefix}-item-top-button-isGet`]: isGet && this.state.ableObtainNum < couponVO.ableObtainNum,
                         })}
-                        onClick={() => { !unableToUse && gotoUse ? gotoUse() : () => { } }}
+                        onClick={() => {  
+                            if(isGet && onGet ) {
+                              if(this.state.ableObtainNum < couponVO.ableObtainNum) {
+                                this.setState({
+                                  ableObtainNum: this.state.ableObtainNum + 1
+                                });
+                                onGet([{couponId: data.id}]);
+                              }
+                              
+                            } else {
+                              if (!unableToUse && gotoUse) {
+                                gotoUse();
+                              }
+                            }
+                           
+                         }}
                       >
-                        去使用
+                        {isGet && this.state.ableObtainNum < couponVO.ableObtainNum ? '领取' : '去使用'}
                       </View>
                     )
           }
