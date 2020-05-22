@@ -70,7 +70,6 @@ class OrderItem extends Taro.Component<Props, State> {
   public onPay = async (order: OrderInterface.OrderInfo) => {
     const { orderNo } = order;
     const payment = await productSdk.requestPayment(orderNo)
-    console.log('payment: ', payment)
     if (payment.code === ResponseCode.success) {
       Taro.navigateTo({
         url: `/pages/order/order.detail?id=${orderNo}`
@@ -90,7 +89,6 @@ class OrderItem extends Taro.Component<Props, State> {
       for (let i = 0; i < orderDetailList.length; i++) {
         const res = await ProductAction.productInfoDetail(dispatch, { id: orderDetailList[i].productId });
         if (res.code === ResponseCode.success) {
-          console.log('productSDKObj' , productSDKObj)
           productSdk.manage(dispatch, productSDKObj,{
             type: productSdk.productCartManageType.ADD,
             product: res.data,

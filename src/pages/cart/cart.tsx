@@ -122,9 +122,6 @@ class Page extends Taro.Component<Props, State> {
       productCartList,
       activityList
     );
-    console.log("====================================");
-    console.log(productFilterCartList);
-    console.log("====================================");
     return (
       <View className="container">
         {productCartList && productCartList.length > 0 ? (

@@ -21,13 +21,19 @@
     .bg;
     background-image: url(//net.huanmusic.com/scanbar-c/v2/popup_coupon_n.png);
 
+    &-listNew {
+      position: absolute;
+      top: 330px;
+      left: 32px;
+      height: 385px;
+      width: 90%;
+    }
     &-list {
       position: absolute;
-      top: 295px;
+      top: 300px;
       left: 32px;
-      width: 605px;
-      height: 439px;
-      padding-left: 17px;
+      height: 415px;
+      width: 90.5%;
     }
   }
 
@@ -69,7 +75,10 @@
 
   &-item {
     margin-top: 13px;
-
+    &-get {
+      color: #fff !important;
+      background-color: #FF893B;
+    }
     &-text-grey {
       color: #CCCCCC !important;
     }
@@ -77,11 +86,14 @@
     &-border-grey {
       border-color: #CCCCCC !important;
     }
-
+    &-topNew { 
+      width: 90% !important;
+    }
     &-top {
       position: relative;
       .flex(center, center, row);
-      width: 571px;
+      width: 95%;
+      margin: auto;
       height: 151px;
       z-index: 2;
       .bg;
@@ -164,6 +176,7 @@
 
 .coupon {
   &-item {
+    margin: auto;
     margin-top: 20px;
     width: 90%;
     &-text-grey {
@@ -278,6 +291,11 @@
 
         &-grey {
           background-color: #CCCCCC;
+          color: #FFFFFF;
+          border: none;
+        }
+        &-isGet {
+          background-color: #FF893B;
           color: #FFFFFF;
           border: none;
         }

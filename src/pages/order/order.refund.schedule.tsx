@@ -147,7 +147,7 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
         >
           {this.renderSchedule()}
           {this.renderInfo()}
-          <View style={{ marginBottom: '40px' }}>
+          <View style={{ margin: '10px auto', width: '90%'}}>
             {this.renderRefundProductList()}
           </View>
         </ScrollView>
@@ -175,6 +175,7 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
         <AtTimeline
           pending
           items={items}
+          className={process.env.TARO_ENV === 'h5' ? `${detailCssPrefix}-card-AtTimeline` : ''}
         >
         </AtTimeline>
       </View>

@@ -79,8 +79,27 @@ export declare namespace UserInterface {
     merchantIds: string;
     status: string;       // 是否使用了，0-未使用，1-已使用
     updateTime: string;
+    obtainWay: any;
   }
-
+  interface CouponsItemCenter {
+    ableObtainNum: number;
+    couponType: number;
+    createTime: string;
+    discount: number;
+    excludeActivityType:string;
+    expireTime: number;
+    filterType: number;
+    id: number;
+    merchantId: number;
+    merchantIds: string;
+    name: string;
+    obtainBeginTime: string;
+    obtainWay: number;
+    status: boolean;
+    targetMember: number;
+    threshold: number;
+    useWay: string;
+  }
   interface CouponDetail {
     couponType: number;
     createTime: string;
@@ -130,14 +149,18 @@ export declare namespace UserInterface {
     type RECEIVE_ADDRESS_LIST = string;
     type RECEIVE_COUPONS = string;
     type RECEIVE_MEMBER_INFO = string;
+    type RECEIVE_COUPONS_CENTER = string;
+    type RECEIVE_COUPONS_MORE= string;
   }
 
   interface UserInterfaceMap {
     reducerInterface: {
       RECEIVE_USERINFO: ReducerTypes.RECEIVE_USERINFO;
+      RECEIVE_COUPONS_CENTER: ReducerTypes.RECEIVE_COUPONS_CENTER;
       RECEIVE_MEMBER_INFO: ReducerTypes.RECEIVE_MEMBER_INFO;
       RECEIVE_ADDRESS_LIST: ReducerTypes.RECEIVE_ADDRESS_LIST;
       RECEIVE_COUPONS: ReducerTypes.RECEIVE_COUPONS
+      RECEIVE_COUPONS_MORE: ReducerTypes.RECEIVE_COUPONS_MORE
     };
   }
 }
@@ -146,8 +169,9 @@ class UserInterfaceMap implements UserInterface.UserInterfaceMap {
   public reducerInterface = {
     RECEIVE_USERINFO: 'RECEIVE_USERINFO',
     RECEIVE_MEMBER_INFO: 'RECEIVE_MEMBER_INFO',
+    RECEIVE_COUPONS_CENTER: 'RECEIVE_COUPONS_CENTER',
     RECEIVE_ADDRESS_LIST: 'RECEIVE_ADDRESS_LIST',
-    
+    RECEIVE_COUPONS_MORE: 'RECEIVE_COUPONS_MORE',
     RECEIVE_COUPONS: 'RECEIVE_COUPONS',
   };
 }

@@ -35,7 +35,7 @@ class Page extends Taro.Component<any> {
   };
 
   onLoad(option) {
-    console.log(option.query);
+
     if (option.query) {
       Taro.showToast({
         title: `${jsonToQueryString(option.query)}`

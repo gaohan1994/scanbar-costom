@@ -84,6 +84,35 @@
       flex-direction: column;
       margin: 0 auto;
       margin-top: 22px;
+      &-AtTimeline {
+        .at-timeline-item {
+          height: 92px;
+          line-height: 92px;
+          .at-timeline-item__tail{
+            left: 10px;
+            top: 12px;
+          }
+          .at-timeline-item__icon {
+            width: 24px;
+            height: 24px;
+            top: 5px;
+            & > span {
+              font-size: 24px !important;
+              top: -30px;
+              position: relative;
+            }
+          }
+          .at-timeline-item__content {
+            margin-left: 40px;
+            .at-timeline-item__content-item {
+              font-size: 28px;
+            }
+            .at-timeline-item__content--sub {
+              font-size: 24px;
+            }
+          }
+        }
+      }
       &-status {
         height: 256px;
         padding-left: 32px;

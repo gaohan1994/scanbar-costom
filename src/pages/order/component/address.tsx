@@ -127,7 +127,7 @@ class Comp extends Taro.Component<Props, State> {
     const { payOrderAddress, merchantDistance, currentTime, currentMerchantDetail } = this.props;
     const locations = currentMerchantDetail.location ? currentMerchantDetail.location.split(',') : [];
     const addressNew = locations.join('') + currentMerchantDetail.address;
-    console.log(currentMerchantDetail, 'currentMerchantDetail');
+
     if (currentTab === 1) {
       return (
         <View className={`${prefix}-detail`}>

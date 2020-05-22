@@ -7,7 +7,7 @@ const PhoneKey = ''
 class LoginButton extends Taro.Component {
 
   public onGetPhoneNumber = async (params) => {
-    console.log('params: ', params)
+
     const { detail } = params;
     if (detail.errMsg === "getPhoneNumber:ok") {
       const payload = {
@@ -15,7 +15,6 @@ class LoginButton extends Taro.Component {
 	      ivStr: detail.iv
       };
       const result = await requestHttp.post('/customer/decrypt', payload)
-      console.log('result: ', result);
 
       return new Promise((resolve) => {
         Taro

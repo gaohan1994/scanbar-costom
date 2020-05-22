@@ -102,22 +102,19 @@ class Page extends Taro.Component<Props, State> {
     public createOrder = async () => {
         try {
             const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch} = this.props;
-            console.log(payOrderDetail, 'payOrderDetail', this.props)
             const payload = productSdk.getProductInterfacePayload(productSDKObj.currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail);
-            console.log(payload)
+
             const result = await productSdk.cashierOrder(payload)
-            console.log('result', result)
+
             invariant(result.code === ResponseCode.success, result.msg || ' ');
             Taro.hideLoading();
             const payment = await productSdk.requestPayment(result.data.order.orderNo, (res) => {
             })
-            console.log('payment: ', payment)
             if (payment.errMsg !== 'requestPayment:ok') {
                 productSdk.cashierOrderCallback(this.props.dispatch, result.data);
                 Taro.navigateTo({
                     url: '/pages/orderList/order'
-                }).catch((error) => {
-                    console.log(error)
+                }).catch((error) => {sss
                     /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
                     Taro.switchTab({url: '/pages/orderList/order'})
                 })
@@ -127,7 +124,7 @@ class Page extends Taro.Component<Props, State> {
             productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, dispatch)
         } catch (error) {
             Taro.hideLoading();
-            console.log(error)
+
             Taro.showToast({
                 title: error.message,
                 icon: 'none'
@@ -165,12 +162,10 @@ class Page extends Taro.Component<Props, State> {
             selectDate: currentDate
         })
         // if (selectTime !== '立即送出') {
-        console.log('selectTime00000000000000', time);
         const selectTimeStr =
             `${(time === '立即自提' || time === '立即送出') ? '' : (currentDate.date || '')}${time !== '立即自提' && time !== '立即送出' ? ' ' : ''}${time}`;
         productSdk.preparePayOrderDetail({planDeliveryTime: selectTimeStr}, dispatch);
         // }
-        console.log('showTimeSelect', this.state);
         this.onChangeValue('showTimeSelect', false);
     }
 
@@ -178,7 +173,6 @@ class Page extends Taro.Component<Props, State> {
         const {currentDate, selectTime} = this.state;
         const {payOrderDetail, dispatch} = this.props;
         let timeList: string[] = [];
-        console.log('getTimeList', currentDate);
         if (currentDate.id === undefined) {
             return;
         }
@@ -217,7 +211,6 @@ class Page extends Taro.Component<Props, State> {
                 productSdk.preparePayOrderDetail({planDeliveryTime: selectTimeStr}, dispatch);
             })
         }
-        console.log(timeList, 'timeList');
         this.setState({
             timeList: timeList
         })
@@ -229,7 +222,6 @@ class Page extends Taro.Component<Props, State> {
         const nextDate = dayJs().add(1, 'day');
         let dateList: any[] = [];
         const currentHour = dayJs().hour();
-        console.log('getDateList----------', 1)
         if (currentHour >= closeTime) {
             dateList = [
                 {
@@ -252,17 +244,12 @@ class Page extends Taro.Component<Props, State> {
                 }
             ];
         }
-        console.log('getDateList----------', 2)
         this.onChangeValue('dateList', dateList);
-        console.log('getDateList----------', 3)
         if (currentDate.id === undefined) {
-            console.log('getDateList----------', 5)
             this.setState({currentDate: dateList[0], selectDate: dateList[0]}, () => {
-                console.log('getDateList----------', 6)
                 this.getTimeList();
             });
         }
-        console.log('getDateList----------', 4)
     }
 
     render() {
@@ -279,7 +266,6 @@ class Page extends Taro.Component<Props, State> {
             ).format('0.00')
             : '0.00';
         // const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
-        console.log('this.state',this.state)
         return (
             <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: '115vh'}}>
                 <View className={`${cssPrefix}-bg`}/>
