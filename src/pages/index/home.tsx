@@ -12,7 +12,7 @@ import invariant from "invariant";
 import { ProductAction, MerchantAction, UserAction } from "../../actions";
 import { ResponseCode, ProductInterface } from "../../constants";
 import WeixinSdk from "../../common/sdk/weixin/weixin";
-// import orderAction from "../../actions/order.action";
+import orderAction from "../../actions/order.action";
 import TabsChoose from "../../component/tabs/tabs.choose";
 import {
   getMerchantAdvertisement,
@@ -20,7 +20,12 @@ import {
 } from "../../reducers/app.merchant";
 import { LoginManager } from "../../common/sdk";
 import CouponModal from "../../component/coupon/coupon.modal";
-import { getUserinfo, getMemberInfo } from "../../reducers/app.user";
+import {
+  getUserinfo,
+  getMemberInfo,
+  getIndexAddress
+} from "../../reducers/app.user";
+import { BASE_PARAM } from "../../common/util/config";
 
 const cssPrefix = "product";
 
@@ -59,27 +64,32 @@ class Index extends Component<any> {
   async componentDidMount() {
     try {
       this.init(true);
+      orderAction.orderAllStatus(this.props.dispatch);
     } catch (error) {
       Taro.showToast({
         title: error.message,
         icon: "none"
       });
     }
+    // const { userinfo, dispatch } = this.props;
+    // if (userinfo.phone && userinfo.phone.length > 0) {
+    //     UserAction.getMemberInfo(dispatch);
+    //     const res = await UserAction.obtainCoupon();
+    //     if (res.code == ResponseCode.success) {
+    //         this.setState({ obtainCouponList: res.data.rows })
+    //     }
+    // }
     this.setState({ couponModalShow: true });
   }
 
   async componentDidShow() {
-    // const { userinfo } = this.props;
-    // if (userinfo.phone && userinfo.phone.length > 0) {
-    //   UserAction.getMemberInfo();
-    //   const res = await UserAction.obtainCoupon();
-    //   if (res.code == ResponseCode.success) {
-    //     this.setState({ obtainCouponList: res.data.rows })
-    //   }
-    // }
     this.init();
   }
-
+  componentWillUnmount() {
+    this.setState({
+      obtainCouponList: []
+    });
+  }
   public changeCurrentType = (typeInfo: any, fetchProduct: boolean = true) => {
     this.setState({ currentType: typeInfo }, async () => {
       if (fetchProduct) {
@@ -95,27 +105,25 @@ class Index extends Component<any> {
   };
 
   public init = async (firstTime?: boolean): Promise<void> => {
+    const { dispatch, address } = this.props;
     try {
-      MerchantAction.merchantList(this.props.dispatch);
-      await LoginManager.getUserInfo(this.props.dispatch);
-      WeixinSdk.initAddress(this.props.dispatch);
+      MerchantAction.merchantList(dispatch);
+      await LoginManager.getUserInfo(dispatch);
+      WeixinSdk.initAddress(dispatch, address);
       const { userinfo, currentMerchantDetail } = this.props;
-      if (userinfo.phone && userinfo.phone.length > 0) {
-        UserAction.getMemberInfo(this.props.dispatch);
+      if (firstTime && userinfo.phone && userinfo.phone.length > 0) {
+        UserAction.getMemberInfo(dispatch);
         const res = await UserAction.obtainCoupon();
         if (res.code == ResponseCode.success) {
           this.setState({ obtainCouponList: res.data.rows });
         }
       }
-      const productTypeResult = await ProductAction.productInfoType(
-        this.props.dispatch,
-        {
-          merchantId:
-            currentMerchantDetail && currentMerchantDetail.id
-              ? currentMerchantDetail.id
-              : 1
-        }
-      );
+      const productTypeResult = await ProductAction.productInfoType(dispatch, {
+        merchantId:
+          currentMerchantDetail && currentMerchantDetail.id
+            ? currentMerchantDetail.id
+            : BASE_PARAM.MCHID
+      });
       invariant(
         productTypeResult.code === ResponseCode.success,
         productTypeResult.msg || " "
@@ -144,16 +152,16 @@ class Index extends Component<any> {
   };
 
   public fetchData = async (type: any) => {
-    const { currentMerchantDetail } = this.props;
+    const { currentMerchantDetail, dispatch } = this.props;
     this.setState({ loading: true });
-    const result = await ProductAction.productInfoList(this.props.dispatch, {
+    const result = await ProductAction.productInfoList(dispatch, {
       type: `${type.id}`,
       status: 0,
       saleType: 0,
       merchantId:
         currentMerchantDetail && currentMerchantDetail.id
           ? currentMerchantDetail.id
-          : 1
+          : BASE_PARAM.MCHID
     } as any);
     if (this.common.changeTypeFlag) {
       this.common.changeTypeFlag = false;
@@ -211,6 +219,44 @@ class Index extends Component<any> {
       }
     }
   };
+  public CouponisNew = (list: any) => {
+    let isNew = false;
+    let hasGet = false;
+    list.forEach(element => {
+      if (`${element.couponVO.obtainWay}` === "1") {
+        isNew = true;
+      }
+      if (`${element.couponVO.obtainWay}` === "0") {
+        hasGet = true;
+      }
+    });
+    return { isNew, hasGet };
+  };
+  public GetobtainCoupons = async (list: any) => {
+    const { dispatch } = this.props;
+    const couponIdList = list.map(val => val.couponId);
+    try {
+      const param = {
+        couponIdList: couponIdList
+      };
+      const res = await UserAction.GetobtainCoupons(param);
+      if (res.code == ResponseCode.success) {
+        UserAction.getMemberInfo(dispatch);
+        Taro.showToast({
+          title: "领取成功",
+          icon: "success"
+        });
+        return true;
+      }
+      return false;
+    } catch (error) {
+      Taro.showToast({
+        title: error.message,
+        icon: "none"
+      });
+      return false;
+    }
+  };
 
   render() {
     const { currentType, loading, showActivity, obtainCouponList } = this.state;
@@ -221,14 +267,19 @@ class Index extends Component<any> {
       userinfo,
       memberInfo
     } = this.props;
-
+    const isNew = this.CouponisNew(obtainCouponList);
     return (
       <View className={`container ${cssPrefix}`}>
         <IndexAddress />
         {/* <ScrollView scrollY={true}> */}
         {showActivity && (
           <View className={`${cssPrefix}-activity`}>
-            <Banner advertisement={advertisement} />
+            {userinfo && userinfo.phone && userinfo.phone.length > 0 && (
+              <DiscountInfo />
+            )}
+            {advertisement && advertisement.length > 0 && (
+              <Banner advertisement={advertisement} />
+            )}
           </View>
         )}
         <View className={`${cssPrefix}-list-container-costom`}>
@@ -277,7 +328,16 @@ class Index extends Component<any> {
           onClose={() => {
             this.setState({ obtainCouponList: [] });
           }}
-          couponList={obtainCouponList}
+          onItemClick={(list: any) => {
+            if (isNew) {
+              const res = this.GetobtainCoupons(list);
+              return res;
+            }
+            return false;
+          }}
+          couponList={obtainCouponList || []}
+          isNew={isNew.isNew}
+          hasGet={isNew.hasGet}
         />
       </View>
     );
@@ -298,7 +358,8 @@ const select = state => {
     advertisement: getMerchantAdvertisement(state),
     currentMerchantDetail: getCurrentMerchantDetail(state),
     userinfo: getUserinfo(state),
-    memberInfo: getMemberInfo(state)
+    memberInfo: getMemberInfo(state),
+    address: getIndexAddress(state)
   };
 };
 
