@@ -468,6 +468,7 @@ class OrderDetail extends Taro.Component<Props, State> {
         <ProductPayListView
           productList={orderDetailList}
           type={1}
+          isDetail={true}
           padding={false}
           showCallModal={() => { this.setState({ callModal: true }) }}
         />
