@@ -168,7 +168,7 @@ class App extends Component {
             timestamp: data.timestamp, // 必填，生成签名的时间戳
             nonceStr: data.nonceStr, // 必填，生成签名的随机串
             signature: data.signature,// 必填，签名
-            jsApiList: ['getLocation', 'openLocation', 'chooseWXPay'] // 必填，需要使用的JS接口列表
+            jsApiList: ['getLocation', 'openLocation', 'chooseWXPay', 'chooseLocation'] // 必填，需要使用的JS接口列表
           });
           wx.ready(function(res){
             console.log('res-----------------------------------------++++', res)

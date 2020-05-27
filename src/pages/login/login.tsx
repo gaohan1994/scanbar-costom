@@ -53,15 +53,18 @@ class GetUserinfo extends Taro.Component<Props, State> {
                 invariant(getResult.success, getResult.msg || '获取用户信息失败');
                 const userinfo = getResult.result;
                 const newCodeRes = await WeixinSDK.getWeixinCode();
+                const decrypt = JSON.parse(result.data);
                 const loginRes = await LoginManager.login({
-                    phone: JSON.parse(result.data).phoneNumber,
+                    phone: decrypt.phoneNumber,
                     code: newCodeRes.result,
+                    openId: decrypt.openid,
                     merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
                 }, dispatch);
                 invariant(loginRes.success, loginRes.msg || '登录失败');
                 const newUserinfo = {
                     ...userinfo,
-                    phone: JSON.parse(result.data).phoneNumber,
+                    phone: decrypt.phoneNumber,
+                    openId: decrypt.openid,
                     merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
                     // token: loginRes.result.token
                 };
