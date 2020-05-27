@@ -21,6 +21,7 @@ import merchantAction from '../../actions/merchant.action';
 import { getMemberInfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
+import { getPointConfig } from '../../reducers/app.order';
 
 const cssPrefix = 'order';
 const openTime = 8;
@@ -35,6 +36,7 @@ type Props = {
     activityList: any;
     memberInfo: any;
     productSDKObj: any;
+    getPointConfig: any;
 }
 
 type State = {
@@ -76,6 +78,7 @@ class Page extends Taro.Component<Props, State> {
             amount: productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList, payOrderProductList)
         };
         orderAction.getAbleToUseCoupon(dispatch, params);
+        orderAction.getPointConfig(dispatch);
     }
 
     public onSubmit = async () => {
@@ -102,7 +105,7 @@ class Page extends Taro.Component<Props, State> {
     public createOrder = async () => {
         try {
             const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch} = this.props;
-            const payload = productSdk.getProductInterfacePayload(productSDKObj.currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail);
+            const payload = productSdk.getProductInterfacePayload(productSDKObj.currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal);
 
             const result = await productSdk.cashierOrder(payload)
 
@@ -251,23 +254,36 @@ class Page extends Taro.Component<Props, State> {
             });
         }
     }
-
+    countTotal = () => {
+        const {payOrderProductList} = this.props;
+        let total = 0;
+        payOrderProductList.forEach((val) => {
+            total += val.price;
+        })
+        return total;
+    }
     render() {
         const {payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj,} = this.props;
         const {showTimeSelect, currentDate, selectDate, selectTime, timeList, dateList} = this.state;
         const price = payOrderProductList && payOrderProductList.length > 0
             ? numeral(productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList, payOrderProductList)).format('0.00')
             : '0.00';
-        const tarnsPrice = payOrderProductList && payOrderProductList.length > 0
+        let tarnsPrice = payOrderProductList && payOrderProductList.length > 0
             ? numeral(
                 productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList) +
                 (payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
                 (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
             ).format('0.00')
             : '0.00';
+        if(productSDKObj.pointsTotal){
+            tarnsPrice = numeral(numeral(tarnsPrice).value() - productSDKObj.pointsTotal).format('0.00');
+        }
+        console.log('activityList, memberInfo, productSDKObj.productCartList,payOrderProductList', activityList, memberInfo, productSDKObj.productCartList,payOrderProductList);
+        const priceDiscountPay = this.countTotal() - numeral(tarnsPrice).value();
+
         // const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
         return (
-            <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: '115vh'}}>
+            <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: 'auto'}}>
                 <View className={`${cssPrefix}-bg`}/>
                 <PickAddress
                     timeSelectClick={() => {
@@ -279,6 +295,8 @@ class Page extends Taro.Component<Props, State> {
                 <ProductPayListView
                     productList={payOrderProductList}
                     payOrderDetail={payOrderDetail}
+                    isPay={true}
+                    
                 />
                 <View className={`${cssPrefix}-remark`}>
                     <View className={`${cssPrefix}-remark-card`}>
@@ -309,6 +327,7 @@ class Page extends Taro.Component<Props, State> {
                     priceSubtitle='￥'
                     price={tarnsPrice}
                     priceOrigin={price}
+                    priceDiscountPay={priceDiscountPay}
                 />
                 <AtFloatLayout
                     isOpened={showTimeSelect}
@@ -362,6 +381,7 @@ const select = (state: AppReducer.AppState) => {
         currentMerchantDetail: getCurrentMerchantDetail(state),
         memberInfo: getMemberInfo(state),
         productSDKObj: state.productSDK,
+        getPointConfig: getPointConfig(state),
     }
 }
 export default connect(select)(Page);

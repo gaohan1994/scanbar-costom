@@ -228,7 +228,7 @@ class User extends Taro.Component<Props, State> {
                                                 userinfo && userinfo.nickname && userinfo.nickname.length > 0
                                                     ? Taro.navigateTo({ url: '/pages/login/login' })
                                                     : Taro.navigateTo({ url: '/pages/login/login.userinfo' })
-                                                if(process.env.TARO_ENV === 'h5'){
+                                                if(process.env.TARO_ENV === 'h5' && currentMerchantDetail.name){
                                                     localStorage.setItem('mearchantName', currentMerchantDetail.name);
                                                 }
                                             }}

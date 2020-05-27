@@ -2,7 +2,7 @@
 export declare namespace MerchantInterface {
 
   interface Activity {
-    activityDetailVOList?: Array<{
+    activityDetailList?: Array<{
       giftFlag: boolean;
       identity: string;
       name: string;

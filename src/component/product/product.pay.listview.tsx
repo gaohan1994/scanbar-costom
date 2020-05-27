@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro';
-import { View, Text, Image } from '@tarojs/components';
+import { View, Text, Image, Radio } from '@tarojs/components';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import "../card/form.card.less";
 import "../../pages/style/product.less";
@@ -9,32 +9,39 @@ import classnames from 'classnames';
 import numeral from 'numeral';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
-import { getOrderDetail, getAbleToUseCouponList } from '../../reducers/app.order';
+import { getOrderDetail, getAbleToUseCouponList, getPointConfig } from '../../reducers/app.order';
 import { OrderInterface, UserInterface } from '../../constants';
 import { getMemberInfo } from '../../reducers/app.user';
+import { Dispatch } from 'redux';
 
 const cssPrefix = 'product';
 
 type Props = {
+  dispatch: Dispatch;
   productList: Array<ProductCartInterface.ProductCartInfo>;
   className?: string;
   productSDKObj: any;
   activityList: any;
+  isPay?: true;
   memberInfo: any;
   padding?: boolean;
   type?: number;
   payOrderDetail: any;
+  isDetail?: boolean;
+  pointConfig: any
   orderDetail: OrderInterface.OrderDetail;
   showCallModal?: () => void;
   couponList: UserInterface.CouponsItem[];
 };
 
 type State = {
-
+  pointSet: boolean;
 }
 
 class ProductPayListView extends Taro.Component<Props, State> {
-
+  state = {
+    pointSet: false
+  }
   static options = {
     addGlobalClass: true
   };
@@ -217,16 +224,27 @@ class ProductPayListView extends Taro.Component<Props, State> {
       </View>
     );
   }
-
+  getorderActivityInfoListTotal = (list) => {
+    let total = 0;
+    if(list){
+      list.forEach(element => {
+        total += element.discountAmount
+      });
+    }
+    return total;
+  }
   private renderDisount = () => {
-    const { payOrderDetail, type, orderDetail, productSDKObj, memberInfo, activityList } = this.props;
-    const { order } = orderDetail;
+    const { payOrderDetail, type, orderDetail, productSDKObj, memberInfo, pointConfig, activityList, isDetail, dispatch } = this.props;
+    const { order, orderActivityInfoList } = orderDetail;
     const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
     const totalActivityMoney = productSdk.getProductTotalActivityPrice(activityList, memberInfo, productSDKObj.productCartList);
-
+    const orderActivityInfoListTotal = this.getorderActivityInfoListTotal(orderActivityInfoList);
+    const {countTotal} = this;
+    const {price} = countTotal();
+    console.log(memberInfo.points,pointConfig.deductRate ,numeral(price).value(), 'memberInfo.points * pointConfig.deductRate < numeral(price).value()')
     return (
       <View>
-        {totalActivityMoney !== 0 && (
+        {totalActivityMoney !== 0 && !isDetail && (
           <View className={`${cssPrefix}-row-totals`}>
             <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-column`}>
               <View className={`${cssPrefix}-row-content-column-item`}>
@@ -268,6 +286,32 @@ class ProductPayListView extends Taro.Component<Props, State> {
                 </View>
                 <Text className={`${cssPrefix}-row-content-price`}>-￥20</Text>
               </View> */}
+            </View>
+          </View>
+        )}
+        {orderActivityInfoListTotal !== 0 && isDetail && (
+          <View className={`${cssPrefix}-row-totals`}>
+            <View className={`${cssPrefix}-row-content-item ${cssPrefix}-row-content-column`}>
+              <View className={`${cssPrefix}-row-content-column-item`}>
+                <View className={classnames(
+                  `${cssPrefix}-row-content-row`,
+                  {
+                    [`${cssPrefix}-row-content-row-top`]: false
+                  })}
+                >
+                  <View
+                    className={classnames(
+                      `${cssPrefix}-row-discount`,
+                      {
+                        [`${cssPrefix}-row-discount-full`]: true,
+                        [`${cssPrefix}-row-discount-first`]: false,
+                      })}
+                  >
+                    满减
+                    </View>
+                </View>
+                <Text className={`${cssPrefix}-row-content-price`}>-￥{numeral(orderActivityInfoListTotal).format('0.00')}</Text>
+              </View>
             </View>
           </View>
         )}
@@ -322,13 +366,46 @@ class ProductPayListView extends Taro.Component<Props, State> {
               </View>
             )
         }
-
+        {
+          !isDetail  && memberInfo && memberInfo.points ? (
+            <View className={`${cssPrefix}-row-totals`} >
+              <View className={`${cssPrefix}-row-content-item`}>
+                <Text className={`${cssPrefix}-row-voucher`}>积分抵现<span className={`${cssPrefix}-row-voucher-span`}>({memberInfo.points * pointConfig.deductRate < numeral(price).value() ? memberInfo.points : numeral(price).value()}积分)</span></Text>
+                <View className={`${cssPrefix}-row-content-row`}>
+                  <Text className={`${cssPrefix}-row-content-price`}>
+                    -¥{memberInfo.points * pointConfig.deductRate < numeral(price).value() ? numeral(memberInfo.points * pointConfig.deductRate).format('0.00') : numeral(price).value()}
+                  </Text>
+                  <View 
+                    className={`${cssPrefix}-point-select`}
+                    onClick={() => {
+                        this.setState({
+                          pointSet: !this.state.pointSet,
+                        })
+                        if(!this.state.pointSet){
+                          productSdk.preparePayOrderPoints(numeral(memberInfo.points * pointConfig.deductRate < numeral(price).value() ? numeral(memberInfo.points * pointConfig.deductRate).format('0.00') : numeral(price).value()).value(), dispatch);
+                        } else {
+                          productSdk.preparePayOrderPoints(0, dispatch);
+                        }
+                    }}
+                  >
+                    <View 
+                      className={classnames(`${cssPrefix}-point-select-item`, {
+                          [`${cssPrefix}-point-select-normal`]: !this.state.pointSet, 
+                          [`${cssPrefix}-point-select-active`]: !!this.state.pointSet,
+                      })}
+                    />
+                  </View>
+                </View>
+              </View>
+            </View>
+          ) : null
+        }
+        
       </View>
     )
   }
-
-  private renderTotal = () => {
-    const { payOrderDetail, type, orderDetail, activityList, memberInfo, productSDKObj } = this.props;
+  private countTotal = () => {
+    const { payOrderDetail, type, orderDetail, activityList, memberInfo, pointConfig, productSDKObj } = this.props;
     const { order } = orderDetail;
     let price =
       numeral(
@@ -351,6 +428,46 @@ class ProductPayListView extends Taro.Component<Props, State> {
         discountPrice = numeral(0).format('0.00');
       }
     }
+    return {
+      price,
+      discountPrice
+    }
+  }
+  private renderTotal = () => {
+    const { memberInfo, pointConfig } = this.props;
+    // const { order } = orderDetail;
+    const {countTotal} = this;
+    const {price, discountPrice} = countTotal();
+    let newPrice = price;
+    if(this.state.pointSet === true){
+      if(memberInfo.points < numeral(price).value()){
+        const money = memberInfo.points * pointConfig.deductRate;
+        newPrice = numeral(numeral(price).value() - money).format('0.00');
+      } else {
+        newPrice = '0.00'
+      }
+    }
+    // let price =
+    //   numeral(
+    //     productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
+    //     (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
+    //     (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
+    //   ).format('0.00');
+    // let discountPrice =
+    //   numeral(
+    //     productSdk.getProductsOriginPrice(productSDKObj.productCartList) -
+    //     productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
+    //     (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
+    //   ).format('0.00');
+    // if (type && type === 1) {
+    //   if (orderDetail && orderDetail.order) {
+    //     price = numeral(orderDetail.order.transAmount).format('0.00');
+    //     discountPrice = numeral(order.totalAmount - order.transAmount).format('0.00');
+    //   } else {
+    //     price = numeral(0).format('0.00');
+    //     discountPrice = numeral(0).format('0.00');
+    //   }
+    // }
     return (
       <View className={`${cssPrefix}-row-totals`}>
         <View className={`${cssPrefix}-row-content-item`}>
@@ -359,8 +476,8 @@ class ProductPayListView extends Taro.Component<Props, State> {
             <Text className={`${cssPrefix}-row-tran`}>{`已优惠￥ ${discountPrice}`}</Text>
             <Text className={`${cssPrefix}-row-tran ${cssPrefix}-row-tran-margin`}>{`合计：`}</Text>
             <Text className={`${cssPrefix}-row-tran-price`}>￥</Text>
-            <Text className={`${cssPrefix}-row-tran-price ${cssPrefix}-row-tran-big `}>{price.split('.')[0]}</Text>
-            <Text className={`${cssPrefix}-row-tran-price`}>{`.${price.split('.')[1]}`}</Text>
+            <Text className={`${cssPrefix}-row-tran-price ${cssPrefix}-row-tran-big `}>{newPrice.split('.')[0]}</Text>
+            <Text className={`${cssPrefix}-row-tran-price`}>{`.${newPrice.split('.')[1]}`}</Text>
           </View>
         </View>
       </View>
@@ -375,7 +492,8 @@ const select = (state: AppReducer.AppState) => {
     activityList: state.merchant.activityList,
     productSDKObj: state.productSDK,
     couponList: getAbleToUseCouponList(state),
-    memberInfo: getMemberInfo(state)
+    memberInfo: getMemberInfo(state),
+    pointConfig: getPointConfig(state)
   }
 }
 export default connect(select)(ProductPayListView as any);

@@ -18,6 +18,7 @@ export declare namespace ProductSDKReducer {
     payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
     payOrderDetail: any;
     payOrderAddress: UserInterface.Address;
+    pointsTotal: number;
   }
 
   interface ManageCartPayloadBase {
@@ -82,6 +83,7 @@ const initState: ProductSDKReducer.State = {
     remark: ''
   },
   payOrderAddress: {} as any,
+  pointsTotal: 0,
 };
 
 export default function productSDKReducer(
@@ -155,7 +157,14 @@ export default function productSDKReducer(
         }
       }
     }
+    case productSdk.reducerInterface.RECEIVE_ORDER_PAY_POINTS: {
+      const { payload } = action as any;
 
+      return {
+        ...state,
+        pointsTotal: payload
+      };
+    }
     case productSdk.reducerInterface.RECEIVE_ORDER_PAY_ADDRESS: {
       const { payload } = action as any;
 

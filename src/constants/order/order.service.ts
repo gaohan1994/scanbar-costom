@@ -9,6 +9,11 @@ import { OrderInterfaceMap, OrderInterface, HTTPInterface } from '..';
 import { BASE_PARAM } from '../../common/util/config'
 
 class OrderService {
+
+  public getPointConfig = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(OrderInterfaceMap.getPointConfig());
+  }
+
   public orderList = async (params?: OrderInterface.OrderListFetchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.get(OrderInterfaceMap.orderList(params));
   }
