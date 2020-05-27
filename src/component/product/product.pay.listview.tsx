@@ -13,6 +13,7 @@ import { getOrderDetail, getAbleToUseCouponList, getPointConfig } from '../../re
 import { OrderInterface, UserInterface } from '../../constants';
 import { getMemberInfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
+import { getPayOrderDetail } from '../../common/sdk/product/product.sdk.reducer';
 
 const cssPrefix = 'product';
 
@@ -65,6 +66,8 @@ class ProductPayListView extends Taro.Component<Props, State> {
   render() {
     const { productList, className, padding, payOrderDetail, type, orderDetail, showCallModal } = this.props;
     const { orderDetailList, order } = orderDetail;
+    console.log('this,props', this.props, payOrderDetail, order, ((payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1)
+    || (order && order.deliveryType !== undefined && order.deliveryType === 1)))
     return (
       <View
         className={classnames(className, {
@@ -228,7 +231,9 @@ class ProductPayListView extends Taro.Component<Props, State> {
     let total = 0;
     if(list){
       list.forEach(element => {
-        total += element.discountAmount
+        if(element.activityType === 3){
+          total += element.discountAmount
+        }
       });
     }
     return total;
@@ -236,6 +241,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
   private renderDisount = () => {
     const { payOrderDetail, type, orderDetail, productSDKObj, memberInfo, pointConfig, activityList, isDetail, dispatch } = this.props;
     const { order, orderActivityInfoList } = orderDetail;
+    const {pointSet} = this.state;
     const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
     const totalActivityMoney = productSdk.getProductTotalActivityPrice(activityList, memberInfo, productSDKObj.productCartList);
     const orderActivityInfoListTotal = this.getorderActivityInfoListTotal(orderActivityInfoList);
@@ -379,9 +385,9 @@ class ProductPayListView extends Taro.Component<Props, State> {
                     className={`${cssPrefix}-point-select`}
                     onClick={() => {
                         this.setState({
-                          pointSet: !this.state.pointSet,
+                          pointSet: !pointSet,
                         })
-                        if(!this.state.pointSet){
+                        if(!pointSet){
                           productSdk.preparePayOrderPoints(numeral(memberInfo.points * pointConfig.deductRate < numeral(price).value() ? numeral(memberInfo.points * pointConfig.deductRate).format('0.00') : numeral(price).value()).value(), dispatch);
                         } else {
                           productSdk.preparePayOrderPoints(0, dispatch);
@@ -390,11 +396,25 @@ class ProductPayListView extends Taro.Component<Props, State> {
                   >
                     <View 
                       className={classnames(`${cssPrefix}-point-select-item`, {
-                          [`${cssPrefix}-point-select-normal`]: !this.state.pointSet, 
-                          [`${cssPrefix}-point-select-active`]: !!this.state.pointSet,
+                          [`${cssPrefix}-point-select-normal`]: !pointSet, 
+                          [`${cssPrefix}-point-select-active`]: !!pointSet,
                       })}
                     />
                   </View>
+                </View>
+              </View>
+            </View>
+          ) : null
+        }
+        {
+          order && order.pointDiscount ? (
+            <View className={`${cssPrefix}-row-totals`} >
+              <View className={`${cssPrefix}-row-content-item`}>
+                <Text className={`${cssPrefix}-row-voucher`}>积分抵现</Text>
+                <View className={`${cssPrefix}-row-content-row`}>
+                  <Text className={`${cssPrefix}-row-content-price`}>
+                    -¥{order.pointDiscount}
+                  </Text>
                 </View>
               </View>
             </View>
@@ -436,10 +456,11 @@ class ProductPayListView extends Taro.Component<Props, State> {
   private renderTotal = () => {
     const { memberInfo, pointConfig } = this.props;
     // const { order } = orderDetail;
+    const {pointSet} = this.state;
     const {countTotal} = this;
     const {price, discountPrice} = countTotal();
     let newPrice = price;
-    if(this.state.pointSet === true){
+    if(pointSet === true){
       if(memberInfo.points < numeral(price).value()){
         const money = memberInfo.points * pointConfig.deductRate;
         newPrice = numeral(numeral(price).value() - money).format('0.00');
@@ -493,7 +514,8 @@ const select = (state: AppReducer.AppState) => {
     productSDKObj: state.productSDK,
     couponList: getAbleToUseCouponList(state),
     memberInfo: getMemberInfo(state),
-    pointConfig: getPointConfig(state)
+    pointConfig: getPointConfig(state),
+    payOrderDetail:　getPayOrderDetail(state),
   }
 }
 export default connect(select)(ProductPayListView as any);

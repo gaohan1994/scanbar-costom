@@ -532,6 +532,7 @@ class ProductSDK {
             }
             
         }
+        console.log('pointsTotal-====--0=-==--', pointsTotal);
         if(pointsTotal){
             order = {
                 ...order,
@@ -568,7 +569,7 @@ class ProductSDK {
                 payType: 2
             };
         } else {
-            payload = {orderNo, payType: 8};
+            payload = {orderNo};
         }
         const result = await requestHttp.post(`/api/cashier/pay`, payload);
         if (result.code === ResponseCode.success && result.data.status !== false) {
