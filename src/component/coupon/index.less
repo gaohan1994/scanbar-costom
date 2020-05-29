@@ -3,6 +3,7 @@
 @coupon-modal: coupon-modal;
 
 .@{coupon-modal} {
+  z-index: 9999;
   position: absolute;
   width: 100%;
   height: 100%;
@@ -10,7 +11,6 @@
   bottom: 0;
   left: 0;
   right: 0;
-  z-index: 99;
   .flex(center, center, column);
   background-color: rgba(0, 0, 0, .6);
 
@@ -21,13 +21,19 @@
     .bg;
     background-image: url(//net.huanmusic.com/scanbar-c/v2/popup_coupon_n.png);
 
+    &-listNew {
+      position: absolute;
+      top: 330px;
+      left: 32px;
+      height: 385px;
+      width: 90%;
+    }
     &-list {
       position: absolute;
-      top: 295px;
+      top: 300px;
       left: 32px;
-      width: 605px;
-      height: 439px;
-      padding-left: 17px;
+      height: 415px;
+      width: 90.5%;
     }
   }
 
@@ -52,6 +58,7 @@
     // bottom: 36px;
     // left: 30px;
     border-radius: 84px;
+    border: none;
   }
 
   &-close {
@@ -68,7 +75,10 @@
 
   &-item {
     margin-top: 13px;
-
+    &-get {
+      color: #fff !important;
+      background-color: #FF893B;
+    }
     &-text-grey {
       color: #CCCCCC !important;
     }
@@ -76,11 +86,14 @@
     &-border-grey {
       border-color: #CCCCCC !important;
     }
-
+    &-topNew { 
+      width: 90% !important;
+    }
     &-top {
       position: relative;
       .flex(center, center, row);
-      width: 571px;
+      width: 95%;
+      margin: auto;
       height: 151px;
       z-index: 2;
       .bg;
@@ -163,8 +176,9 @@
 
 .coupon {
   &-item {
+    margin: auto;
     margin-top: 20px;
-
+    width: 90%;
     &-text-grey {
       color: #CCCCCC !important;
     }
@@ -176,14 +190,18 @@
     &-top {
       position: relative;
       .flex(center, center, row);
-      width: 690px;
+      width: 100%;
+      margin: auto;
       height: 181px;
       z-index: 2;
       .bg;
       background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_coupon.png);
-
+      border-radius: 10px;
+      background-size: 100%;
       &-grey {
         background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_coupon_grey_expand.png);
+        background-size: 100%;
+        border-radius: 10px;
       }
 
       &-left {
@@ -276,6 +294,11 @@
           color: #FFFFFF;
           border: none;
         }
+        &-isGet {
+          background-color: #FF893B;
+          color: #FFFFFF;
+          border: none;
+        }
       }
 
       &-radio {
@@ -289,7 +312,8 @@
 
     &-bottom {
       z-index: 1;
-      width: 690px;
+      width: 100%;
+      margin: auto;
       padding: 46px 27px 33px 27px;
       margin-top: -19px;
       border-radius: 10px;

@@ -3,6 +3,7 @@ import { View, Text } from '@tarojs/components'
 import '../../pages/product/component/index.less'
 import '../product/product.less'
 import "./index.less"
+import numeral from 'numeral';
 
 const cssPrefix = 'component-product';
 const prefix = 'product-detail-component'
@@ -11,6 +12,7 @@ interface Props {
   buttonType?: string;
   buttonTitle: string;
   buttonClick: () => void;
+  priceDiscountPay?: number;
   style?: any;
   priceTitle: string;
   priceSubtitle: string;
@@ -36,11 +38,19 @@ class Footer extends Taro.Component<Props> {
   }
 
   public renderPrice = () => {
-    const { priceTitle, priceSubtitle, price, priceOrigin, priceDiscount } = this.props;
+    const { priceTitle, priceSubtitle, price, priceOrigin, priceDiscount, priceDiscountPay } = this.props;
+    console.log(this.props)
     return (
       <View>
-        <View className={`${cssPrefix}-normal component-cart-text`}>
+        <View className={`${cssPrefix}-normal component-cart-text`} style={process.env.TARO_ENV === 'h5' && !priceDiscountPay ? {lineHeight: 'inherit'} : {height: 'auto'}}>
           {/* <Text className={`${cssPrefix}-price-title`}>{priceTitle}</Text> */}
+          {
+            priceDiscountPay ? (<Text className={`${cssPrefix}-price-gray `}>已优惠{numeral(priceDiscountPay).format('0.00')}</Text>) : null
+          }
+          
+          {
+            priceDiscountPay ? (<Text className={`${cssPrefix}-price-grayT `}>合计：</Text>) : null
+          }
           {priceSubtitle && (
             <Text className={`${cssPrefix}-price-bge `}>{priceSubtitle}</Text>
           )}

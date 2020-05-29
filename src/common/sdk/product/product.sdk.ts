@@ -43,6 +43,7 @@ export declare namespace ProductCartInterface {
         address: string;
         deliveryPhone: string;
         delivery_time: string;
+        points: any;
         deliveryType: number;
         receiver: string;
         receiverPhone: string;
@@ -133,6 +134,7 @@ export declare namespace ProductCartInterface {
     type RECEIVE_ORDER_PAY_ADDRESS = string;
     type RECEIVE_ORDER_PAY_DETAIL = string;
     type MANAGE_CART_PRODUCT_REMOVE = string;
+    type RECEIVE_ORDER_PAY_POINTS = string;
 
 
     type ReducerInterface = {
@@ -144,6 +146,7 @@ export declare namespace ProductCartInterface {
         RECEIVE_ORDER_PAY: RECEIVE_ORDER_PAY;
         RECEIVE_ORDER_PAY_DETAIL: RECEIVE_ORDER_PAY_DETAIL;
         RECEIVE_ORDER_PAY_ADDRESS: RECEIVE_ORDER_PAY_ADDRESS;
+        RECEIVE_ORDER_PAY_POINTS: RECEIVE_ORDER_PAY_POINTS;
     };
 
     type ProductCartAdd = string;
@@ -181,6 +184,7 @@ class ProductSDK {
         RECEIVE_ORDER_PAY: 'RECEIVE_ORDER_PAY',
         RECEIVE_ORDER_PAY_ADDRESS: 'RECEIVE_ORDER_PAY_ADDRESS',
         RECEIVE_ORDER_PAY_DETAIL: 'RECEIVE_ORDER_PAY_DETAIL',
+        RECEIVE_ORDER_PAY_POINTS: 'RECEIVE_ORDER_PAY_POINTS',
     };
 
 
@@ -321,6 +325,7 @@ class ProductSDK {
          * @todo 如果有满减活动则计算满减活动
          * @todo 如果有满减金额
          */
+
         if (!!activity && activity.id && activity.rule && activity.rule.length > 0) {
             /**
              * @todo 如果只有一个规则且阈值小于价格则使用满减
@@ -332,9 +337,10 @@ class ProductSDK {
              * @todo 如果有多个规则找出最优惠规则并使用该规则
              */
             const rule: any = this.setMaxActivityRule(price, activity);
-            // console.log('rule: ', rule);
+
             return !!rule ? numeral(price - rule.discount).value() : price;
         }
+
         return price;
     }
 
@@ -347,7 +353,7 @@ class ProductSDK {
         // const activityList = store.getState().merchant.activityList; 
         const filterProductList = this.filterByActivity(products, activityList);
         let activityMoney: number = 0;
-        
+
         filterProductList.forEach((activityItem) => {
             const { activity, productList } = activityItem;
             let subTotal: number = 0;
@@ -359,6 +365,7 @@ class ProductSDK {
                 activityMoney = subTotal - subActivityMoney;
             }
         })
+
         return activityMoney;
     }
 
@@ -376,6 +383,7 @@ class ProductSDK {
         }
         total -= this.getProductTotalActivityPrice(activityList, memberInfo,productCartList, productList);
         // total = this.getProductActivityPrice(total, this.checkActivity(total));
+
         return total;
     }
 
@@ -418,7 +426,17 @@ class ProductSDK {
                 return ``;
         }
     }
-
+    /**
+     * @todo 把积分扣除金额存到order.pay redux中
+     *
+     * @memberof ProductSDK
+     */
+    public preparePayOrderPoints = async (points: number, dispatch) => {
+        dispatch({
+            type: this.reducerInterface.RECEIVE_ORDER_PAY_POINTS,
+            payload: points
+        })
+    }
     /**
      * @todo 把下单地址存到order.pay redux中
      *
@@ -474,11 +492,10 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products?: ProductCartInterface.ProductCartInfo[], address?: any, payOrderDetail?: any): ProductCartInterface.ProductPayPayload => {
+    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products?: ProductCartInterface.ProductCartInfo[], address?: any, payOrderDetail?: any, pointsTotal?: any): ProductCartInterface.ProductPayPayload => {
         // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;  UserInterface.Address
         const productList = products !== undefined ? products : productCartList;
         // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
-        console.log(payOrderDetail, 'payOrderDetail', address);
         let order: Partial<ProductCartInterface.ProductOrderPayload> = {
             address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
             deliveryPhone: '',
@@ -489,6 +506,7 @@ class ProductSDK {
             payType: 8,
             merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
             discount: 0,
+            points: pointsTotal ?　pointsTotal　: null,
             orderSource: 3,
             totalAmount: this.getProductsOriginPrice(productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
             totalNum: this.getProductNumber(productList),
@@ -512,8 +530,15 @@ class ProductSDK {
                 transAmount: transAmount,
                 couponList: [payOrderDetail.selectedCoupon.couponCode]
             }
+            
         }
-
+        console.log('pointsTotal-====--0=-==--', pointsTotal);
+        if(pointsTotal){
+            order = {
+                ...order,
+                transAmount: order.transAmount ? order.transAmount -pointsTotal : order.transAmount
+            }
+        }
         const payload: ProductCartInterface.ProductPayPayload = {
             order: order as any,
             productInfoList: productList.map((item) => {
@@ -532,6 +557,7 @@ class ProductSDK {
                 } as ProductCartInterface.ProductInfoPayload;
             }),
         };
+        
         return payload;
     }
 
@@ -540,18 +566,30 @@ class ProductSDK {
         if(process.env.TARO_ENV === 'h5'){
             payload = {
                 orderNo,
-                payType: 1
+                payType: 2
             };
         } else {
             payload = {orderNo};
         }
         const result = await requestHttp.post(`/api/cashier/pay`, payload);
-        console.log('requestPayment', result, ResponseCode);
         if (result.code === ResponseCode.success && result.data.status !== false) {
             return new Promise((resolve) => {
+                // const payload = JSON.parse(result.data.param);
+                //     delete payload.appId;
+                //     const paymentPayload = {
+                //         ...payload,
+                //         success: (res) => {
+                //             resolve(res)
+                //         },
+                //         fail: (error) => {
+                //             resolve(error)
+                //         }
+                //     };
+                //     Taro.requestPayment(paymentPayload);
                 if(process.env.TARO_ENV === 'h5'){
                     const data = result.data;
-                    window.location.href = data.codeUrl;
+                    const url = data.codeUrl.replace('-app', '-customer')
+                    window.location.href = url;
                 } else {
                     const payload = JSON.parse(result.data.param);
                     delete payload.appId;
@@ -564,7 +602,6 @@ class ProductSDK {
                             resolve(error)
                         }
                     };
-                    console.log('paymentPayload: ', paymentPayload)
                     Taro.requestPayment(paymentPayload);
                 }
                 
@@ -811,11 +848,11 @@ class ProductSDK {
         if (!!activityList && activityList.length > 0) {
             let nextProductList: FilterProductList[] = [];
 
-            if (activityList.length === 1 && !activityList[0].activityDetailVOList) {
+            if (activityList.length === 1 && !activityList[0].activityDetailList) {
             /**
              * @todo [说明是全部满减]
              */
-                return [{productList, activity: {name: NonActivityName} as any}];
+                return [{productList, activity: activityList[0]}];
             }
 
             /**
@@ -823,7 +860,7 @@ class ProductSDK {
              * @todo [全部满减和非满减只能存在一个]
              */
             activityList.forEach((activity) => {
-                if (!!activity.activityDetailVOList) {
+                if (!!activity.activityDetailList) {
                     nextProductList.push({
                         activity,
                         productList: [],
@@ -832,7 +869,7 @@ class ProductSDK {
             });
 
             nextProductList.push({
-                activity: activityList.find((a) => !a.activityDetailVOList) || {name: NonActivityName} as any,
+                activity: activityList.find((a) => !a.activityDetailList) || {name: NonActivityName} as any,
                 productList: [],
             });
 
@@ -844,8 +881,8 @@ class ProductSDK {
                     /**
                      * @todo [如果该分类是部分满减分类]
                      */
-                    if (!execd && !!nextProductListItem.activity && !!nextProductListItem.activity.activityDetailVOList) {
-                        const token = nextProductListItem.activity.activityDetailVOList.some((activityItem) => activityItem.identity === currentProduct.barcode);
+                    if (!execd && !!nextProductListItem.activity && !!nextProductListItem.activity.activityDetailList) {
+                        const token = nextProductListItem.activity.activityDetailList.some((activityItem) => activityItem.identity === currentProduct.barcode);
                         if (!!token) {
                             execd = true;
                             nextProductList[nextProductListItemIndex].productList.push(currentProduct);
@@ -860,6 +897,23 @@ class ProductSDK {
                         }
                     }
                 })
+                if (!execd) {
+                    /**
+                     * @time 0421
+                     * @todo [修改bug，执行到最后一次循环且还没找到对应满减的时候再加入的全部中去]
+                     * @todo [如果没有满足条件的满减分类则插入到全部满减/非满减中]
+                     */
+                    if (
+                        !nextProductList[nextProductList.length - 1].productList.some(
+                        p => p.barcode === currentProduct.barcode
+                        )
+                    ) {
+                        execd = true;
+                        nextProductList[nextProductList.length - 1].productList.push(
+                        currentProduct
+                        );
+                    }
+                }
             }
             return nextProductList;
         }

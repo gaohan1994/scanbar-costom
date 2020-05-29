@@ -20,6 +20,7 @@ import merchantAction from "../../actions/merchant.action";
 import { Dispatch } from 'redux';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 import { LoginManager } from "../../common/sdk";
+import orderAction from "../../actions/order.action";
 
 type Props = {
   dispatch: Dispatch;
@@ -50,6 +51,7 @@ class Page extends Taro.Component<Props, State> {
     // this.loginCheck();
     try {
         await LoginManager.getUserInfo(this.props.dispatch);
+        await orderAction.getPointConfig(this.props.dispatch);
     } catch (error) {
         Taro.showToast({
             title: error.message,
@@ -122,9 +124,6 @@ class Page extends Taro.Component<Props, State> {
       productCartList,
       activityList
     );
-    console.log("====================================");
-    console.log(productFilterCartList);
-    console.log("====================================");
     return (
       <View className="container">
         {productCartList && productCartList.length > 0 ? (

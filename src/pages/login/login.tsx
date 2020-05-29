@@ -33,7 +33,6 @@ class GetUserinfo extends Taro.Component<Props, State> {
     public onGetPhoneNumber = async (params) => {
         // const { onCancle, callback } = this.props;
         const {currentMerchantDetail, dispatch} = this.props;
-        console.log('params: ', params);
         const {detail} = params;
         if (detail.errMsg === "getPhoneNumber:ok") {
             const codeRes = await WeixinSDK.getWeixinCode();
@@ -48,21 +47,24 @@ class GetUserinfo extends Taro.Component<Props, State> {
             try {
                 // onCancle();
                 const result = await requestHttp.post('/customer/decrypt', payload);
-                console.log('result: ', result);
+
                 invariant(result.code === ResponseCode.success, result.msg || '获取手机号失败');
                 const getResult = await LoginManager.getUserInfo(dispatch);
                 invariant(getResult.success, getResult.msg || '获取用户信息失败');
                 const userinfo = getResult.result;
                 const newCodeRes = await WeixinSDK.getWeixinCode();
+                const decrypt = JSON.parse(result.data);
                 const loginRes = await LoginManager.login({
-                    phone: JSON.parse(result.data).phoneNumber,
+                    phone: decrypt.phoneNumber,
                     code: newCodeRes.result,
+                    openId: decrypt.openid,
                     merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
                 }, dispatch);
                 invariant(loginRes.success, loginRes.msg || '登录失败');
                 const newUserinfo = {
                     ...userinfo,
-                    phone: JSON.parse(result.data).phoneNumber,
+                    phone: decrypt.phoneNumber,
+                    openId: decrypt.openid,
                     merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
                     // token: loginRes.result.token
                 };

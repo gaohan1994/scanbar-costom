@@ -19,6 +19,12 @@ export declare namespace OrderReducer {
         currentType: number;
       };
     }
+    interface PointConfigReducer {
+      type: OrderInterface.RECEIVE_POINTCONFIG;
+      payload: {
+        pointConfig: any;
+      };
+    }
     interface OrderListReducer {
       type: OrderInterface.RECEIVE_ORDER_LIST;
       payload: {
@@ -64,6 +70,7 @@ export declare namespace OrderReducer {
     orderCount: OrderInterface.OrderCount;
     orderAllStatus: any[];
     currentType: number;
+    pointConfig: any;
     ableToUseCouponList: UserInterface.CouponsItem[];
   }
 
@@ -84,6 +91,7 @@ const initState: OrderReducer.State = {
   orderAllStatus: [],
   currentType: 0,
   ableToUseCouponList: [],
+  pointConfig: {}
 };
 
 export default function orderReducer(
@@ -110,7 +118,15 @@ export default function orderReducer(
         orderDetail: data
       };
     }
-
+    case OrderInterfaceMap.reducerInterfaces.RECEIVE_POINTCONFIG: {
+      const { payload } = action as unknown as OrderReducer.Reducers.PointConfigReducer;
+      const { pointConfig } = payload;
+      return {
+        ...state,
+        pointConfig: pointConfig
+      };
+    }
+    
     case OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_LIST: {
       const { payload } = action as OrderReducer.Reducers.OrderListReducer;
 
@@ -162,6 +178,7 @@ export default function orderReducer(
 export const getCurrentType = (state: AppReducer.AppState) => state.order.currentType;
 
 export const getOrderList = (state: AppReducer.AppState) => state.order.orderList;
+export const getPointConfig = (state: AppReducer.AppState) => state.order.pointConfig;
 
 export const getOrderListTotal = (state: AppReducer.AppState) => state.order.orderListTotal;
 

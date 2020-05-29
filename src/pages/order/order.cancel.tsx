@@ -128,7 +128,7 @@ class OrderCancel extends Taro.Component<Props, State> {
             {`${remark.length}/300`}
           </View>
         </View>
-        <View className={`${cssPrefix}-footer`}>
+        <View className={`${cssPrefix}-footer`} style={process.env.TARO_ENV === 'weapp' ? {display: 'block'} : {}}>
           <AtButton
             className={classnames(`${cssPrefix}-footer-button`, {
               [`theme-button`]: true,

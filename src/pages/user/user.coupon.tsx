@@ -1,5 +1,5 @@
 import Taro, { Config } from '@tarojs/taro'
-import { View, ScrollView } from '@tarojs/components'
+import { View, ScrollView, Image } from '@tarojs/components'
 import './index.less';
 import "../../component/card/form.card.less";
 import TabsSwitch from '../../component/tabs/tabs.switch';
@@ -12,6 +12,7 @@ import CouponItem from '../../component/coupon/coupon.item';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 import numeral from 'numeral';
 import { Dispatch } from 'redux';
+import classNames from 'classnames';
 
 interface Props {
   dispatch: Dispatch;
@@ -22,6 +23,9 @@ interface Props {
 interface State {
   currentType: number;
   openList: any[];
+  pageSize: number;
+  pageNum: number;
+  total: number;
 }
 
 const cssPrefix = 'user-coupon';
@@ -33,15 +37,23 @@ class Page extends Taro.Component<Props, State> {
 
   state = {
     currentType: 0,
-    openList: [] as any
+    openList: [] as any,
+    pageSize: 10,
+    pageNum: 1,
+    total: 0,
   };
 
   async componentDidMount() {
     const params = {
-      status: 0
+      status: 0,
+      pageSize: 10,
+      pageNum: 1,
     }
     Taro.showLoading();
-    await UserAction.getMemberCoupons(this.props.dispatch, params);
+    const result = await UserAction.getMemberCoupons(this.props.dispatch, params);
+    this.setState({
+      total: result.data.total
+    });
     Taro.hideLoading();
   }
 
@@ -54,32 +66,51 @@ class Page extends Taro.Component<Props, State> {
       }
     });
     this.setState({
-      currentType: tabNum
+      currentType: tabNum,
+      pageSize: 10,
+      pageNum: 1,
     }, async () => {
       this.setState({ openList: [] })
       if (tabNum === 1) {
         // 已使用
         const params = {
-          status: 1
+          status: 1,
+          pageSize: 10,
+          pageNum: 1,
         }
         Taro.showLoading();
-        await UserAction.getMemberCoupons(this.props.dispatch,params);
+        const result =await UserAction.getMemberCoupons(this.props.dispatch,params);
+        this.setState({
+          total: result.data.total
+        });
         Taro.hideLoading();
       } else if (tabNum === 0) {
         // 未使用
         const params = {
-          status: 0
+          status: 0,
+          pageSize: 10,
+          pageNum: 1,
         }
         Taro.showLoading();
-        await UserAction.getMemberCoupons(this.props.dispatch,params);
+        
+        const result = await UserAction.getMemberCoupons(this.props.dispatch,params);
+        this.setState({
+          total: result.data.total
+        });
         Taro.hideLoading();
       } else {
         // 已过期
         const params = {
-          status: 0
+          status: 0,
+          pageSize: 10,
+          pageNum: 1,
         }
         Taro.showLoading();
-        await UserAction.getMemberExpiredCoupons(this.props.dispatch,params);
+        
+        const result = await UserAction.getMemberExpiredCoupons(this.props.dispatch,params);
+        this.setState({
+          total: result.data.total
+        });
         Taro.hideLoading();
       }
     });
@@ -119,6 +150,10 @@ class Page extends Taro.Component<Props, State> {
     });
   }
 
+
+  public navToCenter = () => {
+    Taro.navigateTo({url: '/pages/user/user.couponCenter'});
+  }
   /**
    * @todo 未使用的优惠券要筛选分出本门店可用以及本门店不可用的两个列表
    *
@@ -148,29 +183,85 @@ class Page extends Taro.Component<Props, State> {
       { ableToUseCouponList, unableToUseCouponList }
     );
   }
+  loadData = async () => {
 
+    if (this.state.currentType === 1) {
+      // 已使用
+      const params = {
+        status: 1,
+        pageSize: 10,
+        pageNum: this.state.pageNum + 1,
+      }
+      Taro.showLoading();
+      const result = await UserAction.getMemberCouponsMore(this.props.dispatch,params);
+      this.setState({
+        total: result.data.total,
+        pageNum: this.state.pageNum + 1,
+      });
+      Taro.hideLoading();
+    } else if (this.state.currentType === 0) {
+      // 未使用
+      const params = {
+        status: 0,
+        pageSize: 10,
+        pageNum: this.state.pageNum + 1,
+      }
+      Taro.showLoading();
+      const result =  await UserAction.getMemberCouponsMore(this.props.dispatch,params);
+      this.setState({
+        total: result.data.total,
+        pageNum: this.state.pageNum + 1,
+      });
+      Taro.hideLoading();
+    } else {
+      // 已过期
+      const params = {
+        status: 0,
+        pageSize: 10,
+        pageNum: this.state.pageNum + 1,
+      }
+      Taro.showLoading();
+      const result = await UserAction.getMemberExpiredCouponsMore(this.props.dispatch,params);
+      this.setState({
+        total: result.data.total,
+        pageNum: this.state.pageNum + 1,
+      });
+      Taro.hideLoading();
+    }
+  }
   render() {
     const { couponList } = this.props;
-    const { currentType } = this.state;
+    const { currentType, total } = this.state;
+    const {navToCenter} = this;
     let filterCouponList: any = { ableToUseCouponList: [], unableToUseCouponList: [] };
     if (currentType === 0) {
       filterCouponList = this.getFilterCouponList();
     }
+
     return (
       <View className={`container user`} >
         <View className={`${cssPrefix}-tabs`}>
           {this.renderTabs()}
         </View>
-        {/* <Image
-          className={`${cssPrefix}-banner`}
+        <Image
+          onClick={() => {navToCenter(); }}
+          className={
+            classNames({
+              [`${cssPrefix}-bannerEmpty`]: process.env.TARO_ENV === 'weapp' && couponList && couponList.length === 0,
+              [`${cssPrefix}-banner`]: process.env.TARO_ENV === 'weapp' && couponList && couponList.length > 0,
+              [`${cssPrefix}-bannerH5`]: process.env.TARO_ENV === 'h5' && couponList && couponList.length > 0,
+              [`${cssPrefix}-bannerEmptyH5`]: process.env.TARO_ENV === 'h5' && couponList && couponList.length === 0,
+            })}
           src='//net.huanmusic.com/scanbar-c/v2/img_coupon_banner.png'
-        /> */}
+        />
         {
           couponList && couponList.length > 0
             ? (
               <ScrollView
                 scrollY={true}
                 className={`${cssPrefix}-scrollview`}
+                style={process.env.TARO_ENV === 'weapp' ? {display:'flex'} : {}}
+                onScrollToLower={couponList.length < total ? this.loadData: () => {/** */}}
               >
                 {
                   currentType !== 0 && couponList.map((item: any) => {

@@ -7,6 +7,7 @@ import configStore from "./store";
 import "taro-ui/dist/style/index.scss"; // 引入组件样式 - 方式一
 import {BASE_PARAM} from './common/util/config';
 import getBaseUrl from './common/request/base.url';
+import { LoginManager } from "./common/sdk";
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -40,6 +41,7 @@ class App extends Component {
       "pages/user/user.code",
       "pages/test/test",
       "pages/cart/cart",
+      "pages/user/user.couponCenter",
       "pages/product/product.detail",
       "pages/product/product.search"
       // 'pages/address/address.list',
@@ -127,19 +129,42 @@ class App extends Component {
   // 在 App 类中的 render() 函数没有实际作用
   // 请勿修改此函数
   componentWillMount () {
-    //
-    // console.log(window.location)
-    if(process.env.TARO_ENV === 'h5'){
-      const hash = window.location.hash.split('?');
-      const merchant = hash[1] && hash[1].split('=')[1] ?　hash[1].split('=')[1] :  BASE_PARAM.MCHID;
-      console.log("merchant", merchant, hash)
-      localStorage.setItem('merchantId', `${merchant}`);
-    }
     if(process.env.TARO_ENV === 'h5'){
       this.initWx();
     }
+    if(process.env.TARO_ENV === 'weapp'){
+      if (Taro.canIUse("getUpdateManager")) {
+        const updateManager = Taro.getUpdateManager();
+        updateManager.onCheckForUpdate(function(res) {
+          // 请求完新版本信息的回调
+          if (res.hasUpdate) {
+          }
+        });
+        updateManager.onUpdateReady(function(res) {
+          Taro.showModal({
+            title: "版本更新",
+            content: "新版本已经准备好，确定重启应用？",
+            showCancel: false,
+            success: function(res) {
+              // res: {errMsg: "showModal: ok", cancel: false, confirm: true}
+              if (res.confirm) {
+                // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+                updateManager.applyUpdate();
+              }
+            }
+          });
+        });
+        updateManager.onUpdateFailed(function() {
+          // 新的版本下载失败
+          Taro.showModal({
+            title: "已经有新版本了哟~",
+            content: "新版本已经上线啦~，请您删除当前小程序，重新搜索打开哟~"
+          });
+        });
+      }
+    }
   }
-  initWx () {
+  async initWx () {
     console.log(window.location);
     const href = window.location.href;
     const data = href.split('#')[0];
@@ -164,7 +189,7 @@ class App extends Component {
             timestamp: data.timestamp, // 必填，生成签名的时间戳
             nonceStr: data.nonceStr, // 必填，生成签名的随机串
             signature: data.signature,// 必填，签名
-            jsApiList: ['getLocation', 'openLocation'] // 必填，需要使用的JS接口列表
+            jsApiList: ['getLocation', 'openLocation', 'chooseWXPay', 'chooseLocation'] // 必填，需要使用的JS接口列表
           });
           wx.ready(function(res){
             console.log('res-----------------------------------------++++', res)
@@ -177,7 +202,7 @@ class App extends Component {
       }
     };
     // console.log('option: ', option);
-    Taro.request(option);
+    await Taro.request(option);
     
   }
   render() {

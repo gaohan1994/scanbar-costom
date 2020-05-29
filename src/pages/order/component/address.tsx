@@ -124,7 +124,9 @@ class Comp extends Taro.Component<Props, State> {
 
   private renderDetail = () => {
     const { currentTab } = this.state;
-    const { payOrderAddress, merchantDistance, currentTime } = this.props;
+    const { payOrderAddress, merchantDistance, currentTime, currentMerchantDetail } = this.props;
+    const locations = currentMerchantDetail.location ? currentMerchantDetail.location.split(',') : [];
+    const addressNew = locations.join('') + currentMerchantDetail.address;
 
     if (currentTab === 1) {
       return (
@@ -133,7 +135,7 @@ class Comp extends Taro.Component<Props, State> {
             address={{
               contact: merchantDistance.name,
               phone: `${numeral(merchantDistance.distance).format('0')}米`,
-              address: merchantDistance.location,
+              address: addressNew,
             } as any}
             pre={true}
             showEdit={false}

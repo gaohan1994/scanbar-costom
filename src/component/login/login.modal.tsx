@@ -27,7 +27,7 @@ class LoginModal extends Taro.Component<Props, State> {
 
   public onGetPhoneNumber = async (params) => {
     const { onCancle, callback, dispatch } = this.props;
-    console.log('params: ', params);
+
     const { detail } = params;
     if (detail.errMsg === "getPhoneNumber:ok") {
       const codeRes = await WeixinSDK.getWeixinCode();
@@ -41,7 +41,7 @@ class LoginModal extends Taro.Component<Props, State> {
       try {
         onCancle();
         const result = await requestHttp.post('/customer/decrypt', payload);
-        console.log('result: ', result);
+
         invariant(result.code === ResponseCode.success, result.msg || '获取手机号失败');
         const getResult = await LoginManager.getUserInfo(dispatch);
         invariant(getResult.success, getResult.msg || '获取用户信息失败');

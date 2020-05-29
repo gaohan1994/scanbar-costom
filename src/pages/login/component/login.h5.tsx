@@ -63,7 +63,7 @@ class LoginH5 extends Taro.Component<Props, State> {
           userinfo = {
             ...userinfo,
             ...result.data,
-            avatar: result.data.avatar ? `http://inventory.51cpay.com/memberAvatar/${result.data.avatar}` : ''
+            avatar: result.data.avatar ? result.data.avatar : ''
           };
         }
         const setResult: any = await LoginManager.setUserInfo(userinfo, dispatch);

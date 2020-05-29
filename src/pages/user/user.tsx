@@ -7,7 +7,7 @@ import invariant from 'invariant';
 import { LoginManager } from '../../common/sdk';
 import { ResponseCode, UserInterface } from '../../constants';
 import { UserAction } from '../../actions';
-import { getUserinfo, getMemberInfo } from '../../reducers/app.user';
+import { getUserinfo, getMemberInfo, getcouponListCenter } from '../../reducers/app.user';
 import { connect } from '@tarojs/redux';
 import numeral from 'numeral';
 import { Dispatch } from 'redux';
@@ -30,6 +30,7 @@ const cssPrefix = 'user';
 
 interface Props {
     dispatch: Dispatch;
+    couponListCenter: any;
     currentMerchantDetail: any;
     userinfo: UserInterface.UserInfo;
     memberInfo: UserInterface.MemberInfo;
@@ -51,6 +52,7 @@ class User extends Taro.Component<Props, State> {
     async componentWillMount () {
         try {
             await LoginManager.getUserInfo(this.props.dispatch);
+            await UserAction.getWaitForObtainCoupons(this.props.dispatch);
         } catch (error) {
             Taro.showToast({
                 title: error.message,
@@ -155,7 +157,7 @@ class User extends Taro.Component<Props, State> {
     }
 
     render() {
-        const { userinfo, memberInfo, currentMerchantDetail } = this.props;
+        const { userinfo, memberInfo, currentMerchantDetail, couponListCenter } = this.props;
         return (
             <View className={`container ${cssPrefix}`}>
                 <View className={`${cssPrefix}-bg`} />
@@ -228,7 +230,9 @@ class User extends Taro.Component<Props, State> {
                                                 userinfo && userinfo.nickname && userinfo.nickname.length > 0
                                                     ? Taro.navigateTo({ url: '/pages/login/login' })
                                                     : Taro.navigateTo({ url: '/pages/login/login.userinfo' })
-                                                localStorage.setItem('mearchantName', currentMerchantDetail.name);
+                                                if(process.env.TARO_ENV === 'h5' && currentMerchantDetail.name){
+                                                    localStorage.setItem('mearchantName', currentMerchantDetail.name);
+                                                }
                                             }}
                                         >
                                             点击登录
@@ -255,7 +259,12 @@ class User extends Taro.Component<Props, State> {
                             onClick={() => { this.navTo('/pages/user/user.coupon', true) }}
                         >
                             <Text className={`${cssPrefix}-member-item-number`}>{memberInfo.couponNum || 0}</Text>
-                            {/* <View className={`${cssPrefix}-member-item-pop`}>4张可领</View> */}
+                            
+                            {
+                                couponListCenter.length > 0 ? (
+                                    <View className={`${cssPrefix}-member-item-pop`}>{couponListCenter.length}张可领</View>
+                                ) : null
+                            }
                             <Text>优惠券</Text>
                         </View>
                     </View>
@@ -293,6 +302,7 @@ class User extends Taro.Component<Props, State> {
 const select = (state: any) => ({
     userinfo: getUserinfo(state),
     memberInfo: getMemberInfo(state),
+    couponListCenter: getcouponListCenter(state),
     currentMerchantDetail: getCurrentMerchantDetail(state)
 });
 

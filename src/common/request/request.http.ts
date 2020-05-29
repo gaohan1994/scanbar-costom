@@ -22,7 +22,16 @@ class HttpRequest {
     };
 
     // console.log('token', result)
-    if (!!result) {
+    const list = ['/customer/product/type/', '/customer/merchantInfo/merchantList', 
+    '/customer/advertisement/getAdvertisements/', '/customer/product/list'];
+
+    let haToken = true;
+    list.forEach(element => {
+      if(url.indexOf(element) !== -1){
+        haToken = false;
+      }
+    });
+    if (!!result && haToken) {
       option.header.Authorization = result;
     }
     // console.log('option: ', option);

@@ -265,7 +265,26 @@
       }
     }
   }
-
+  &-point-select {
+    width: 60px;
+    position: relative;
+    // .padding(30px, r);
+    &-item {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      width:34px;
+      height:34px;
+      .bg;
+    }
+    &-normal {
+      background-image: url('../../assets/bt_unavailable.png');
+    }
+    &-active {
+      background-image: url('../../assets/bt_selected.png');
+    }
+  }
   &-select {
     &-header {
       position: relative;
@@ -465,7 +484,8 @@
       }
 
       &-one {
-        width: 100%;
+        width: 90%;
+        margin: auto;
       }
     }
 

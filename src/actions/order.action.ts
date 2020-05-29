@@ -10,7 +10,24 @@ import { ResponseCode, OrderService, OrderInterface, OrderInterfaceMap } from '.
 import { OrderReducer } from '../reducers/app.order';
 
 class OrderAction {
-
+  /**
+   * @todo 获取积分配置
+   *
+   * @memberof OrderAction
+   */
+  public getPointConfig = async (dispatch) => {
+    const result = await OrderService.getPointConfig();
+    if (result.code === ResponseCode.success) {
+      const reducer: OrderReducer.Reducers.PointConfigReducer = {
+        type: OrderInterfaceMap.reducerInterfaces.RECEIVE_POINTCONFIG,
+        payload: {
+          pointConfig: result.data
+        }
+      };
+      dispatch(reducer);
+    }
+    return result;
+  }
   /**
    * @todo 获取订单列表
    *

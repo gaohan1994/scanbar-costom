@@ -70,7 +70,7 @@ class OrderButtons extends Taro.Component<Props, State> {
   public onPay = async (order: OrderInterface.OrderInfo) => {
     const { orderNo } = order;
     const payment = await productSdk.requestPayment(orderNo)
-    console.log('payment: ', payment)
+
     if (payment.code === ResponseCode.success) {
       Taro.navigateTo({
         url: `/pages/order/order.detail?id=${orderNo}`
@@ -126,7 +126,7 @@ class OrderButtons extends Taro.Component<Props, State> {
   }
 
   public orderRefundCancel = async (order: OrderInterface.OrderDetail, type?: number) => {
-    const { currentType } = this.props;
+    const { currentType, dispatch } = this.props;
     const { refundOrderList, orderNo } = order;
     const payload = {
       orderNo: type === 1 ? orderNo : refundOrderList[0].orderNo
@@ -138,9 +138,9 @@ class OrderButtons extends Taro.Component<Props, State> {
         title: '撤销申请成功',
         icon: 'success'
       });
-      OrderAction.orderDetail({ orderNo: orderNo });
-      OrderAction.orderList({ pageNum: 1, pageSize: 20, ...orderAction.getFetchType(currentType) });
-      OrderAction.orderCount();
+      OrderAction.orderDetail(dispatch, { orderNo: orderNo });
+      OrderAction.orderList(dispatch, { pageNum: 1, pageSize: 20, ...orderAction.getFetchType(currentType) });
+      OrderAction.orderCount(dispatch);
     } catch (error) {
       Taro.showToast({
         title: error.message,

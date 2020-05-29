@@ -37,6 +37,7 @@ export declare namespace OrderInterface {
   }
 
   interface OrderInfo {
+    pointDiscount: any;
     detail: string;
     merchantName: string;
     orderNo: string;
@@ -183,6 +184,7 @@ export declare namespace OrderInterface {
   type RECEIVE_ORDER_COUNT = string;
   type RECEIVE_ORDER_ALL_STATUS = string;
   type RECEIVE_ABLE_TO_USE_COUPONS = string;
+  type RECEIVE_POINTCONFIG = string;
 
   type ReducerInterface = {
     CHANGR_CURRENT_TYPE: CHANGR_CURRENT_TYPE;
@@ -191,6 +193,7 @@ export declare namespace OrderInterface {
     RECEIVE_ORDER_COUNT: RECEIVE_ORDER_COUNT;
     RECEIVE_ORDER_ALL_STATUS: RECEIVE_ORDER_ALL_STATUS;
     RECEIVE_ABLE_TO_USE_COUPONS: RECEIVE_ABLE_TO_USE_COUPONS;
+    RECEIVE_POINTCONFIG: RECEIVE_POINTCONFIG;
   };
 
   interface OrderInterfaceMapImp {
@@ -209,8 +212,12 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
     RECEIVE_ORDER_COUNT: 'RECEIVE_ORDER_COUNT',
     RECEIVE_ORDER_ALL_STATUS: 'RECEIVE_ORDER_ALL_STATUS',
     RECEIVE_ABLE_TO_USE_COUPONS: 'RECEIVE_ABLE_TO_USE_COUPONS',
+    RECEIVE_POINTCONFIG: 'RECEIVE_POINTCONFIG',
   };
-
+  
+  public getPointConfig = () => {
+    return `/api/merchant/point/config/detail`;
+  }
   public orderList = (params?: OrderInterface.OrderListFetchFidle) => {
     return `/order/list${params ? jsonToQueryString(params) : ''}`;
   }

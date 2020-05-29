@@ -259,9 +259,10 @@ class OrderRefund extends Taro.Component<Props, State> {
             <Text>{`.${numeral(this.getTotalAmount()).format('0.00').split('.')[1]}`}</Text>
           </Text>
           <AtButton
-              disabled={remark.length === 0 || refundProductList.length === 0}
+            disabled={remark.length === 0 || refundProductList.length === 0}
             className={classnames(`${cssPrefix}-footer-button-little`, {
               [`theme-button`]: true,
+              ['h5-button-refund']: process.env.TARO_ENV === 'h5' ? true : false,
               [`theme-button-cancel`]: remark.length === 0 || refundProductList.length === 0,
             })}
             onClick={() => { this.orderRefund() }}
