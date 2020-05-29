@@ -143,7 +143,6 @@ class Index extends Component<any> {
             if (firstTime) {
                 this.changeCurrentType(firstType);
             }
-            console.log('WeixinSdk.initAddress(dispatch, address)')
             WeixinSdk.initAddress(dispatch, address);
         } catch (error) {
             Taro.showToast({

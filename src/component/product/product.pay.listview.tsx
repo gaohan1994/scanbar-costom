@@ -78,8 +78,6 @@ class ProductPayListView extends Taro.Component<Props, State> {
   render() {
     const { productList, className, padding, payOrderDetail, type, orderDetail, showCallModal } = this.props;
     const { orderDetailList, order } = orderDetail;
-    console.log('this,props', this.props, payOrderDetail, order, ((payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1)
-    || (order && order.deliveryType !== undefined && order.deliveryType === 1)))
     return (
       <View
         className={classnames(className, {
@@ -259,7 +257,8 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const orderActivityInfoListTotal = this.getorderActivityInfoListTotal(orderActivityInfoList);
     const {countTotal} = this;
     const {price} = countTotal();
-    console.log(memberInfo.points,pointConfig.deductRate ,numeral(price).value(), 'memberInfo.points * pointConfig.deductRate < numeral(price).value()')
+    const PointsPre = memberInfo.points * pointConfig.deductRate < numeral(price).value() ? memberInfo.points : numeral(price).value();
+    const MathPointsPre = Math.ceil(PointsPre)
     return (
       <View>
         {totalActivityMoney !== 0 && !isDetail && (
@@ -388,7 +387,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
           !isDetail  && memberInfo && memberInfo.points ? (
             <View className={`${cssPrefix}-row-totals`} >
               <View className={`${cssPrefix}-row-content-item`}>
-                <Text className={`${cssPrefix}-row-voucher`}>积分抵现<span className={`${cssPrefix}-row-voucher-span`}>({memberInfo.points * pointConfig.deductRate < numeral(price).value() ? memberInfo.points : numeral(price).value()}积分)</span></Text>
+                <Text className={`${cssPrefix}-row-voucher`}>积分抵现<Text className={`${cssPrefix}-row-voucher-span`}>({MathPointsPre}积分)</Text></Text>
                 <View className={`${cssPrefix}-row-content-row`}>
                   <Text className={`${cssPrefix}-row-content-price`}>
                     -¥{memberInfo.points * pointConfig.deductRate < numeral(price).value() ? numeral(memberInfo.points * pointConfig.deductRate).format('0.00') : numeral(price).value()}
@@ -422,7 +421,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
           order && order.pointDiscount ? (
             <View className={`${cssPrefix}-row-totals`} >
               <View className={`${cssPrefix}-row-content-item`}>
-                <Text className={`${cssPrefix}-row-voucher`}>积分抵现</Text>
+                <Text className={`${cssPrefix}-row-voucher`}>积分抵现<span className={`${cssPrefix}-row-voucher-span`}>({Math.ceil(order.pointDiscount)}积分)</span></Text>
                 <View className={`${cssPrefix}-row-content-row`}>
                   <Text className={`${cssPrefix}-row-content-price`}>
                     -¥{order.pointDiscount}
