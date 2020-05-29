@@ -89,6 +89,7 @@ class WeixinSDK {
 
   public getLocation = async (dispatch): Promise<{ success: boolean, result: any, msg: string }> => {
     const that = this;
+    console.log('getLocation++++++++++++++++++++++++++')
     return new Promise((resolve) => {
       if (process.env.TARO_ENV === 'weapp') {
         // 微信小程序逻辑

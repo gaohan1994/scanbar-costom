@@ -22,7 +22,7 @@ class HttpRequest {
     };
 
     // console.log('token', result)
-    const list = ['/customer/product/type/', '/customer/merchantInfo/merchantList', '/order/getAllOrderStatus', 
+    const list = ['/customer/product/type/', '/customer/merchantInfo/merchantList', 
     '/customer/advertisement/getAdvertisements/', '/customer/product/list'];
 
     let haToken = true;

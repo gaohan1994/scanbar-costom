@@ -37,6 +37,7 @@ export declare namespace OrderInterface {
   }
 
   interface OrderInfo {
+    pointDiscount: any;
     detail: string;
     merchantName: string;
     orderNo: string;

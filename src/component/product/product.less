@@ -86,7 +86,9 @@
       border-radius: 10px;
       border: 1px solid @product-border-color;
       overflow: hidden;
-
+      &-h5 {
+        border: 4px solid @product-border-color;
+      }
       &-image {
         width: 100%;
         height: 100%;
@@ -157,7 +159,13 @@
     line-clamp: 1;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
-
+    &-h5 {
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      width: 400px;
+      display: block;
+    }
     &-manage {
       width: 100%;
     }
@@ -177,7 +185,13 @@
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
   }
-
+  &-tips-h5 {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    width: 400px;
+    display: block;
+  }
   &-activity {
     .flex(center, flex-start, row);
   }

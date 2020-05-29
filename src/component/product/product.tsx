@@ -133,7 +133,7 @@ class ProductComponent extends Taro.Component<Props, State> {
                     className={`${cssPrefix}-content`}
                     onClick={this.onContentClick.bind(this)}
                 >
-                    <View className={`${cssPrefix}-content-cover`}>
+                    <View className={`${cssPrefix}-content-cover ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-content-cover-h5` : ''}`}>
                         {product.saleNumber <= 0 && (
                             <View className={`${cssPrefix}-content-cover-empty`}>补货中</View>
                         )}
@@ -173,10 +173,10 @@ class ProductComponent extends Taro.Component<Props, State> {
         return (
             <View className={classnames(`${cssPrefix}-content-detail`)}>
                 <View>
-                    <View className={`${cssPrefix}-title`}>
+                    <View className={`${cssPrefix}-title ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-title-h5` : ''}`}>
                         {product.name}
                     </View>
-                    <View className={`${cssPrefix}-tips`}>
+                    <View className={`${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-tips-h5` : ''} ${cssPrefix}-tips`}>
                         {product.description && product.description.length > 0 ? product.description : product.name}
                     </View>
                 </View>

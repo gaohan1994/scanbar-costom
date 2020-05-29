@@ -56,6 +56,24 @@ class Index extends Component<any> {
     }
 
     async componentDidMount() {
+        if(process.env.TARO_ENV === 'h5'){
+            const hash = window.location.hash.split('?')
+            const keywords = hash[1] ? hash[1] : '';
+            const result = keywords.replace(/&/g, '","').replace(/=/g, '":"');
+            if(result){
+              const reqDataString = '{"' + result + '"}';
+              const key = JSON.parse(reqDataString); 
+              const merchantId = localStorage.getItem('merchantId');
+              if(merchantId && parseInt(merchantId) !== parseInt(key.merchantId)){
+                LoginManager.logout(this.props.dispatch);
+              }
+              if(key.merchantId){
+                localStorage.setItem('merchantId', `${key.merchantId}`);
+              }
+              
+              localStorage.setItem('search', `?keywords`);
+            }
+        }
         try {
             
             this.init(true);
@@ -74,6 +92,7 @@ class Index extends Component<any> {
         //         this.setState({ obtainCouponList: res.data.rows })
         //     }
         // }
+        
         this.setState({couponModalShow: true})
     }
 
@@ -105,7 +124,7 @@ class Index extends Component<any> {
         try {
             MerchantAction.merchantList(dispatch);
             await LoginManager.getUserInfo(dispatch);
-            WeixinSdk.initAddress(dispatch, address);
+
             const {userinfo, currentMerchantDetail} = this.props;
             if (firstTime && userinfo.phone && userinfo.phone.length > 0) {
                 UserAction.getMemberInfo(dispatch);
@@ -124,6 +143,8 @@ class Index extends Component<any> {
             if (firstTime) {
                 this.changeCurrentType(firstType);
             }
+            console.log('WeixinSdk.initAddress(dispatch, address)')
+            WeixinSdk.initAddress(dispatch, address);
         } catch (error) {
             Taro.showToast({
                 title: error.message,
