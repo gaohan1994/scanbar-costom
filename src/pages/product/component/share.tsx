@@ -1,17 +1,16 @@
-import Taro from "@tarojs/taro";
-import { View, Button } from "@tarojs/components";
-
-function ProductShare() {
-  if(process.env.TARO_ENV === 'h5'){
-    return '';
-  }
-  return (
-    <View>
-      <Button openType="share" style="background: #fff">
-        微信好友
-      </Button>
-    </View>
-  );
+import Taro from "@tarojs/taro";
+import { View, Button } from "@tarojs/components";
+import './index.less'
+const prefix = 'product-detail-component'
+function ProductShare() {
+  if(process.env.TARO_ENV === 'h5'){
+    return null;
+  }
+  return (
+    <View style={{float: 'right'}}>
+      <Button className={`${prefix}-share`} openType="share" />
+    </View>
+  );
 }
 
-export default ProductShare;
+export default ProductShare;

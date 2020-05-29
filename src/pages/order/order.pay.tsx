@@ -22,6 +22,7 @@ import { getMemberInfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 import { getOrderDetail } from '../../reducers/app.order';
+import { UserAction } from '../../actions'
 
 const cssPrefix = 'order';
 const openTime = 8;
@@ -122,6 +123,7 @@ class Page extends Taro.Component<Props, State> {
             }
             productSdk.cashierOrderCallback(dispatch, result.data)
             productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, dispatch)
+            UserAction.getMemberInfo(dispatch);
         } catch (error) {
             Taro.hideLoading();
             Taro.showToast({
@@ -280,7 +282,7 @@ class Page extends Taro.Component<Props, State> {
         let priceDiscountPay = countTotal() - numeral(tarnsPrice).value();
         const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
         return (
-            <View className='container container-color' style={{backgroundColor: '#f2f2f2'}}>
+            <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: 'auto'}}>
                 <View className={`${cssPrefix}-bg`}/>
                 <PickAddress
                     timeSelectClick={() => {
@@ -288,12 +290,22 @@ class Page extends Taro.Component<Props, State> {
                     }}
                     currentTime={`${selectTimeStr}`}
                     changeTabCallback={this.getTimeList}
-                    onRefProductPayListViewObj={onRefProductPayListViewObj}
+                    // onRefProductPayListViewObj={onRefProductPayListViewObj}
                 />
-                <ProductPayListView
-                    productList={payOrderProductList}
-                    onRef={onRefProductPayListView}
-                />
+                {
+                    payOrderDetail.deliveryType === 0 ? (
+                        <ProductPayListView
+                            productList={payOrderProductList}
+                            // onRef={onRefProductPayListView}
+                        />
+                    ) : (
+                        <ProductPayListView
+                            productList={payOrderProductList}
+                            // onRef={onRefProductPayListView}
+                        />
+                    )
+                }
+                
                 <View className={`${cssPrefix}-remark`}>
                     <View className={`${cssPrefix}-remark-card`}>
                         <FormCard

@@ -39,7 +39,6 @@ class Footer extends Taro.Component<Props> {
 
   public renderPrice = () => {
     const { priceTitle, priceSubtitle, price, priceOrigin, priceDiscount, priceDiscountPay } = this.props;
-    console.log(this.props)
     return (
       <View>
         <View className={`${cssPrefix}-normal component-cart-text`} style={process.env.TARO_ENV === 'h5' && !priceDiscountPay ? {lineHeight: 'inherit'} : {height: 'auto'}}>
