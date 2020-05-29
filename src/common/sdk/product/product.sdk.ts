@@ -301,14 +301,18 @@ class ProductSDK {
         const rule: {discount: number; threshold: number}[] = merge([], activity.rule);
         
         if (!!rule && rule.length > 0) {
-            const discountArray = rule.map((item) => item.discount);
+            const discountArray: any = []
+            rule.forEach((item) => {
+                if(item.threshold < price) {
+                    discountArray.push(item.discount);
+                }
+            });
 
             const maxDiscount = Math.max(...discountArray);
             const maxDiscountIndex = rule.findIndex((r) => r.discount === maxDiscount);
             const maxDiscountItem = rule.find((r) => r.discount === maxDiscount);
-
             while (discountArray.length > 0) {
-                if (maxDiscountItem && price <= maxDiscountItem.threshold) {
+                if (maxDiscountItem && price > maxDiscountItem.threshold) {
                     return maxDiscountItem;
                 } else {
                     discountArray.splice(maxDiscountIndex, 1);
@@ -330,6 +334,7 @@ class ProductSDK {
             /**
              * @todo 如果只有一个规则且阈值小于价格则使用满减
              */
+        
             if (activity.rule.length === 1) {
                 return activity.rule[0].threshold <= price ? numeral(price - activity.rule[0].discount).value() : price;
             }
@@ -337,7 +342,6 @@ class ProductSDK {
              * @todo 如果有多个规则找出最优惠规则并使用该规则
              */
             const rule: any = this.setMaxActivityRule(price, activity);
-
             return !!rule ? numeral(price - rule.discount).value() : price;
         }
 
@@ -532,7 +536,6 @@ class ProductSDK {
             }
             
         }
-        console.log('pointsTotal-====--0=-==--', pointsTotal);
         if(pointsTotal){
             order = {
                 ...order,

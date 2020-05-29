@@ -34,7 +34,7 @@ class ProductAction {
    * @memberof ProductAction
    */
   public productInfoSearchList = async (dispatch, params: ProductInterface.ProductInfoListFetchFidle) => {
-    console.log('dispatch', dispatch);
+    // console.log('dispatch', dispatch);
     const result = await ProductService.productInfoList(params);
     if (result.code === ResponseCode.success) {
       dispatch({

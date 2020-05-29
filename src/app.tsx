@@ -165,7 +165,6 @@ class App extends Component {
     }
   }
   async initWx () {
-    console.log(window.location);
     const href = window.location.href;
     const data = href.split('#')[0];
     const BASE_URL = getBaseUrl('/customer/wx/init');
@@ -180,7 +179,7 @@ class App extends Component {
         'content-type': contentType
       },
       success: (res) => {
-        console.log('success++++++++++++++++++++++++++++++', res)
+        // console.log('success++++++++++++++++++++++++++++++', res)
         if(res.statusCode === 200 && res.data && res.data.code === "response.success"){
           const data = res.data.data;
           wx.config({
@@ -192,13 +191,13 @@ class App extends Component {
             jsApiList: ['getLocation', 'openLocation', 'chooseWXPay', 'chooseLocation'] // 必填，需要使用的JS接口列表
           });
           wx.ready(function(res){
-            console.log('res-----------------------------------------++++', res)
+            // console.log('res-----------------------------------------++++', res)
             // config信息验证后会执行ready方法，所有接口调用都必须在config接口获得结果之后，config是一个客户端的异步操作，所以如果需要在页面加载时就调用相关接口，则须把相关接口放在ready函数中调用来确保正确执行。对于用户触发时才调用的接口，则可以直接调用，不需要放在ready函数中。
           });
         } 
       }, 
       fail: (res) => {
-        console.log('fail+++++++++++++++++++++++++++++++++++', res)
+        // console.log('fail+++++++++++++++++++++++++++++++++++', res)
       }
     };
     // console.log('option: ', option);
