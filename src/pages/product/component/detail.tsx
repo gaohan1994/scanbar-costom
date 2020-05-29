@@ -46,6 +46,7 @@ class Page extends Taro.Component<Props> {
             {price}
           </Text>
         )}
+        <ProductShare />
       </View>
     );
   };
@@ -54,7 +55,6 @@ class Page extends Taro.Component<Props> {
     const { product, memberInfo,activityList } = this.props;
     return (
       <View className={`${prefix}-detail`}>
-        <ProductShare />
         <View className={`${prefix}-detail-box ${prefix}-detail-box-bor`}>
           <View className={`${prefix}-detail-name`}>{product.name}</View>
           <View className={`${prefix}-detail-tip`}>{product.name}</View>
@@ -70,6 +70,7 @@ class Page extends Taro.Component<Props> {
           </View>
 
           {this.renderPrice()}
+
         </View>
         <View className={`${prefix}-detail-box ${prefix}-detail-act`}>
           {product &&
