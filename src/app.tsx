@@ -7,6 +7,7 @@ import configStore from "./store";
 import "taro-ui/dist/style/index.scss"; // 引入组件样式 - 方式一
 import {BASE_PARAM} from './common/util/config';
 import getBaseUrl from './common/request/base.url';
+import { LoginManager } from "./common/sdk";
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -129,21 +130,41 @@ class App extends Component {
   // 请勿修改此函数
   componentWillMount () {
     if(process.env.TARO_ENV === 'h5'){
-      const hash = window.location.hash.split('?')
-      const keywords = hash[1] ? hash[1] : '';
-      const result = keywords.replace(/&/g, '","').replace(/=/g, '":"');
-      if(result){
-        const reqDataString = '{"' + result + '"}';
-        const key = JSON.parse(reqDataString); 
-        if(key.merchantId){
-          localStorage.setItem('merchantId', `${key.merchantId}`);
-        }
-        localStorage.setItem('search', `?keywords`);
-      }
       this.initWx();
     }
+    if(process.env.TARO_ENV === 'weapp'){
+      if (Taro.canIUse("getUpdateManager")) {
+        const updateManager = Taro.getUpdateManager();
+        updateManager.onCheckForUpdate(function(res) {
+          // 请求完新版本信息的回调
+          if (res.hasUpdate) {
+          }
+        });
+        updateManager.onUpdateReady(function(res) {
+          Taro.showModal({
+            title: "版本更新",
+            content: "新版本已经准备好，确定重启应用？",
+            showCancel: false,
+            success: function(res) {
+              // res: {errMsg: "showModal: ok", cancel: false, confirm: true}
+              if (res.confirm) {
+                // 新的版本已经下载好，调用 applyUpdate 应用新版本并重启
+                updateManager.applyUpdate();
+              }
+            }
+          });
+        });
+        updateManager.onUpdateFailed(function() {
+          // 新的版本下载失败
+          Taro.showModal({
+            title: "已经有新版本了哟~",
+            content: "新版本已经上线啦~，请您删除当前小程序，重新搜索打开哟~"
+          });
+        });
+      }
+    }
   }
-  initWx () {
+  async initWx () {
     console.log(window.location);
     const href = window.location.href;
     const data = href.split('#')[0];
@@ -181,7 +202,7 @@ class App extends Component {
       }
     };
     // console.log('option: ', option);
-    Taro.request(option);
+    await Taro.request(option);
     
   }
   render() {
