@@ -32,6 +32,7 @@ type Props = {
   pointConfig: any
   orderDetail: OrderInterface.OrderDetail;
   showCallModal?: () => void;
+  onRef?: (param) => void
   couponList: UserInterface.CouponsItem[];
 };
 
@@ -51,7 +52,18 @@ class ProductPayListView extends Taro.Component<Props, State> {
     padding: true,
     payOrderDetail: {} as any,
   };
-
+  componentWillMount = () => {
+    if(this.props.onRef){
+      this.props.onRef(this)
+    }
+  }
+  changePointSet = () => {
+    const {dispatch} = this.props;
+    this.setState({
+      pointSet: false
+    })
+    productSdk.preparePayOrderPoints(0, dispatch);
+  }
   getAbleToUseCouponsNum = () => {
     const { couponList } = this.props;
     let num = 0;

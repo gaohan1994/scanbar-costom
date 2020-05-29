@@ -49,7 +49,7 @@ type State = {
 }
 
 class Page extends Taro.Component<Props, State> {
-
+    onRefProductPayListViewObj;
     config: Config = {
         navigationBarTitleText: '确认订单'
     }
@@ -263,10 +263,13 @@ class Page extends Taro.Component<Props, State> {
 
         return total;
     }
+    onRefProductPayListView = (reset) => {
+        this.onRefProductPayListViewObj = reset;
+    }
     render() {
         const {payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj,} = this.props;
         const {showTimeSelect, currentDate, selectDate, selectTime, timeList, dateList} = this.state;
-        const {countTotal} = this;
+        const {countTotal, onRefProductPayListView, onRefProductPayListViewObj} = this;
         const price = payOrderProductList && payOrderProductList.length > 0
             ? numeral(productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList, payOrderProductList)).format('0.00')
             : '0.00';
@@ -291,9 +294,11 @@ class Page extends Taro.Component<Props, State> {
                     }}
                     currentTime={`${selectTimeStr}`}
                     changeTabCallback={this.getTimeList}
+                    onRefProductPayListViewObj={onRefProductPayListViewObj}
                 />
                 <ProductPayListView
                     productList={payOrderProductList}
+                    onRef={onRefProductPayListView}
                 />
                 <View className={`${cssPrefix}-remark`}>
                     <View className={`${cssPrefix}-remark-card`}>

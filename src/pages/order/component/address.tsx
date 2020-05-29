@@ -34,6 +34,7 @@ type Props = {
   merchantDistance: MerchantInterface.Distance;
   currentMerchantDetail: MerchantInterface.MerchantDetail;
   currentPostion: any;
+  onRefProductPayListViewObj?: any;
   timeSelectClick?: () => void;
   currentTime?: string;
   changeTabCallback?: () => void;
@@ -60,7 +61,7 @@ class Comp extends Taro.Component<Props, State> {
   }
 
   public changeTab = (tab) => {
-    const { changeTabCallback, dispatch } = this.props;
+    const { changeTabCallback, dispatch, onRefProductPayListViewObj } = this.props;
     this.setState({
       currentTab: tab.id
     }, async () => {
@@ -71,6 +72,9 @@ class Comp extends Taro.Component<Props, State> {
         await productSdk.preparePayOrderDetail({ deliveryType: 0 }, dispatch)
       } else {
         await productSdk.preparePayOrderDetail({ deliveryType: 1 }, dispatch)
+      }
+      if(onRefProductPayListViewObj){
+        onRefProductPayListViewObj.changePointSet();
       }
       if (changeTabCallback) {
         changeTabCallback();
