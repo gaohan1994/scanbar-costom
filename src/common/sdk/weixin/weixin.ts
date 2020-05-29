@@ -89,20 +89,17 @@ class WeixinSDK {
 
   public getLocation = async (dispatch): Promise<{ success: boolean, result: any, msg: string }> => {
     const that = this;
-    console.log('getLocation++++++++++++++++++++++++++')
     return new Promise((resolve) => {
       if (process.env.TARO_ENV === 'weapp') {
         // 微信小程序逻辑
         Taro.getLocation({
           success: (res) => {
-            console.log(' Taro.getLocation-res', res);
             mapSdk.reverseGeocoder({
               location: {
                 latitude: res.latitude,
                 longitude: res.longitude
               },
               success: (result) => {
-                console.log(' Taro.getLocation-result', result)
                 dispatch({
                   type: that.reducerInterface.RECEIVE_CURRENT_ADDRESS,
                   payload: {
@@ -148,7 +145,6 @@ class WeixinSDK {
               },
               success: (data) => { 
                 const result = data.data;
-                console.log('getLocation++++++++++++++++++++++++++++++', result)
                 dispatch({
                   type: that.reducerInterface.RECEIVE_CURRENT_ADDRESS,
                   payload: {
@@ -171,7 +167,6 @@ class WeixinSDK {
             };
             mapSdk.reverseGeocoder({location: param,
               success: (result) => {
-                console.log('getLocation -success', result)
                 dispatch({
                   type: that.reducerInterface.RECEIVE_CURRENT_ADDRESS,
                   payload: {
@@ -183,11 +178,9 @@ class WeixinSDK {
                 resolve({ success: true, result: result.result, msg: '' })
               },
               fail: (error) => {
-                console.log('getLocation -error', error)
                 resolve({ success: false, result: undefined, msg: error.message })
               }
             })
-            console.log('getLocation', res)
           }
         });
       }

@@ -104,22 +104,17 @@ class Page extends Taro.Component<Props, State> {
     public createOrder = async () => {
         try {
             const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch} = this.props;
-            console.log(payOrderDetail, 'payOrderDetail', this.props)
             const payload = productSdk.getProductInterfacePayload(productSDKObj.currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal);
-            console.log(payload)
             const result = await productSdk.cashierOrder(payload)
-            console.log('result', result)
             invariant(result.code === ResponseCode.success, result.msg || ' ');
             Taro.hideLoading();
             const payment = await productSdk.requestPayment(result.data.order.orderNo, (res) => {
             })
-            console.log('payment: ', payment)
             if (payment.errMsg !== 'requestPayment:ok') {
                 productSdk.cashierOrderCallback(this.props.dispatch, result.data);
                 Taro.navigateTo({
                     url: '/pages/orderList/order'
                 }).catch((error) => {
-                    console.log(error)
                     /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
                     Taro.switchTab({url: '/pages/orderList/order'})
                 })
@@ -129,7 +124,6 @@ class Page extends Taro.Component<Props, State> {
             productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, dispatch)
         } catch (error) {
             Taro.hideLoading();
-            console.log(error)
             Taro.showToast({
                 title: error.message,
                 icon: 'none'
