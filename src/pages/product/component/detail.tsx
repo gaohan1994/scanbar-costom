@@ -55,6 +55,10 @@ class Page extends Taro.Component<Props> {
     const { product, memberInfo,activityList } = this.props;
     return (
       <View className={`${prefix}-detail`}>
+<<<<<<< HEAD
+=======
+    
+>>>>>>> 313a424d31b91d4bc3183aeb8f33a096edb50c99
         <View className={`${prefix}-detail-box ${prefix}-detail-box-bor`}>
           <View className={`${prefix}-detail-name`}>{product.name}</View>
           <View className={`${prefix}-detail-tip`}>{product.name}</View>

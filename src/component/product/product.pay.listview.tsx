@@ -418,7 +418,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
           ) : null
         }
         {
-          order && order.pointDiscount ? (
+         isDetail && order && order.pointDiscount ? (
             <View className={`${cssPrefix}-row-totals`} >
               <View className={`${cssPrefix}-row-content-item`}>
                 <Text className={`${cssPrefix}-row-voucher`}>积分抵现<span className={`${cssPrefix}-row-voucher-span`}>({Math.ceil(order.pointDiscount)}积分)</span></Text>

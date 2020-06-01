@@ -76,6 +76,7 @@ class Comp extends Taro.Component<Props, State> {
       if(onRefProductPayListViewObj){
         onRefProductPayListViewObj.changePointSet();
       }
+      productSdk.preparePayOrderPoints(0, dispatch);
       if (changeTabCallback) {
         changeTabCallback();
       }
