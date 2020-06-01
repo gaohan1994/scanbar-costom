@@ -157,4 +157,30 @@
       }
     }
   }
+
+  &-tab {
+    .flex(center, flex-start, row);
+    .padding(30px, lr);
+
+    &-item {
+      position: relative;
+      .margin(56px, r);
+      .padding(14px, tb);
+      font-size: 30px;
+      color: rgba(153, 153, 153, 1);
+      &-active {
+        font-size: 34px;
+        font-weight: bold;
+        color: rgba(44, 134, 254, 1);
+      }
+      &-border {
+        position: absolute;
+        bottom: 0px;
+        height: 4px;
+        width: 130px;
+        background: rgba(44, 134, 254, 1);
+        border-radius: 2px;
+      }
+    }
+  }
 }

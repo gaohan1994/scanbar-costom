@@ -1,10 +1,20 @@
-import MerchantInterfaceMap, { MerchantInterface } from '../constants/merchant/merchant';
+import MerchantInterfaceMap, {
+  MerchantInterface
+} from "../constants/merchant/merchant";
 // import merge from 'lodash.merge';
-import { AppReducer } from './';
-import { BASE_PARAM } from '../common/util/config';
+import { AppReducer } from "./";
+import { BASE_PARAM } from "../common/util/config";
 
 export declare namespace MerchantReducer {
   namespace Reducers {
+    interface ReceiveAlianceList {
+      type: string;
+      payload: {
+        total: number;
+        rows: MerchantInterface.AlianceMerchant[];
+        field: any;
+      };
+    }
     interface ReceiveMerchantDetail {
       type: MerchantInterface.ReducerTypes.RECEIVE_MERCHANT_DETAIL;
       payload: MerchantInterface.MerchantDetail;
@@ -23,8 +33,8 @@ export declare namespace MerchantReducer {
     interface ChangeCostomIndexAddress {
       type: string;
       payload: {
-        address: any
-      }
+        address: any;
+      };
     }
   }
 
@@ -35,10 +45,15 @@ export declare namespace MerchantReducer {
     merchantDistance: MerchantInterface.Distance;
     advertisement: any[];
     activityList: any[];
+    alianceTotal: number;
+    alianceList: MerchantInterface.MerchantDetail[];
   }
 
   type Action =
-    Reducers.ReceiveMerchantDetail | Reducers.ChangeCostomIndexAddress | Reducers.ReceiveMerchantActivity;
+    | Reducers.ReceiveMerchantDetail
+    | Reducers.ChangeCostomIndexAddress
+    | Reducers.ReceiveMerchantActivity
+    | Reducers.ReceiveAlianceList;
 }
 
 export const initState: MerchantReducer.State = {
@@ -50,10 +65,32 @@ export const initState: MerchantReducer.State = {
   merchantDistance: {} as any,
   advertisement: [],
   activityList: [],
+  alianceTotal: -1,
+  alianceList: []
 };
 
-export default function merchant(state: MerchantReducer.State = initState, action: MerchantReducer.Action): MerchantReducer.State {
+export default function merchant(
+  state: MerchantReducer.State = initState,
+  action: MerchantReducer.Action
+): MerchantReducer.State {
   switch (action.type) {
+    case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ALIANCE_LIST: {
+      const { payload } = action;
+      const { field, total, rows } = payload;
+      const { pageNum = 1 } = field;
+      if (pageNum === 1) {
+        return {
+          ...state,
+          alianceList: rows,
+          alianceTotal: total
+        };
+      }
+      return {
+        ...state,
+        alianceList: state.alianceList.concat(rows),
+        alianceTotal: total
+      };
+    }
 
     case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ACTIVITYLIST: {
       const { payload } = action;
@@ -68,11 +105,13 @@ export default function merchant(state: MerchantReducer.State = initState, actio
       return {
         ...state,
         merchantDistance: payload
-      }
+      };
     }
 
     case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_DETAIL: {
-      const { payload } = action as MerchantReducer.Reducers.ReceiveMerchantDetail;
+      const {
+        payload
+      } = action as MerchantReducer.Reducers.ReceiveMerchantDetail;
       return {
         ...state,
         merchantDetail: payload
@@ -80,21 +119,22 @@ export default function merchant(state: MerchantReducer.State = initState, actio
     }
 
     case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_LIST: {
-      const { payload } = action as any
+      const { payload } = action as any;
       return {
         ...state,
         merchantList: payload
       };
     }
-    case MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL: {
-      const { payload } = action as any
+    case MerchantInterfaceMap.reducerInterface
+      .RECEIVE_CURRENT_MERCHANT_DETAIL: {
+      const { payload } = action as any;
       return {
         ...state,
         currentMerchantDetail: payload
       };
     }
     case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ADVERTISEMENT: {
-      const { payload } = action as any
+      const { payload } = action as any;
       return {
         ...state,
         advertisement: payload
@@ -109,14 +149,20 @@ export default function merchant(state: MerchantReducer.State = initState, actio
   }
 }
 
-export const getMerchantDetail = (state: AppReducer.AppState) => state.merchant.merchantDetail;
+export const getMerchantDetail = (state: AppReducer.AppState) =>
+  state.merchant.merchantDetail;
 
-export const getMerchantList = (state: AppReducer.AppState) => state.merchant.merchantList;
+export const getMerchantList = (state: AppReducer.AppState) =>
+  state.merchant.merchantList;
 
-export const getCurrentMerchantDetail = (state: AppReducer.AppState) => state.merchant.currentMerchantDetail;
+export const getCurrentMerchantDetail = (state: AppReducer.AppState) =>
+  state.merchant.currentMerchantDetail;
 
-export const getMerchantDistance = (state: AppReducer.AppState) => state.merchant.merchantDistance;
+export const getMerchantDistance = (state: AppReducer.AppState) =>
+  state.merchant.merchantDistance;
 
-export const getMerchantAdvertisement = (state: AppReducer.AppState) => state.merchant.advertisement;
+export const getMerchantAdvertisement = (state: AppReducer.AppState) =>
+  state.merchant.advertisement;
 
-export const getMerchantActivityList = (state: AppReducer.AppState) => state.merchant.activityList;
+export const getMerchantActivityList = (state: AppReducer.AppState) =>
+  state.merchant.activityList;

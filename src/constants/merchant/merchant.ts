@@ -1,6 +1,17 @@
-
 export declare namespace MerchantInterface {
-
+  interface AlianceMerchant {
+    activityInfo: string[];
+    coupons: any[];
+    isNew: number;
+    deliveryThreshold: string;
+    distanceShow: string;
+    name: string;
+    status: true;
+    minDiscount: number;
+    distance: number;
+    id: number;
+    topMerchantId: number;
+  }
   interface Activity {
     activityDetailVOList?: Array<{
       giftFlag: boolean;
@@ -101,7 +112,6 @@ export declare namespace MerchantInterface {
     longitude: number;
   }
 
-
   namespace ReducerTypes {
     type RECEIVE_MERCHANT_LIST = string;
     type RECEIVE_MERCHANT_DETAIL = string;
@@ -127,17 +137,18 @@ export declare namespace MerchantInterface {
 
 class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
   public reducerInterface = {
-    RECEIVE_MERCHANT_LIST: 'RECEIVE_MERCHANT_LIST',
-    RECEIVE_MERCHANT_DETAIL: 'RECEIVE_MERCHANT_DETAIL',
-    RECEIVE_CURRENT_MERCHANT_DETAIL: 'RECEIVE_CURRENT_MERCHANT_DETAIL',
-    RECEIVE_MERCHANT_DISTANCE: 'RECEIVE_MERCHANT_DISTANCE',
-    RECEIVE_MERCHANT_ADVERTISEMENT: 'RECEIVE_MERCHANT_ADVERTISEMENT',
-    RECEIVE_MERCHANT_ACTIVITYLIST: 'RECEIVE_MERCHANT_ACTIVITYLIST',
+    RECEIVE_MERCHANT_LIST: "RECEIVE_MERCHANT_LIST",
+    RECEIVE_MERCHANT_DETAIL: "RECEIVE_MERCHANT_DETAIL",
+    RECEIVE_CURRENT_MERCHANT_DETAIL: "RECEIVE_CURRENT_MERCHANT_DETAIL",
+    RECEIVE_MERCHANT_DISTANCE: "RECEIVE_MERCHANT_DISTANCE",
+    RECEIVE_MERCHANT_ADVERTISEMENT: "RECEIVE_MERCHANT_ADVERTISEMENT",
+    RECEIVE_MERCHANT_ACTIVITYLIST: "RECEIVE_MERCHANT_ACTIVITYLIST",
+    RECEIVE_MERCHANT_ALIANCE_LIST: "RECEIVE_MERCHANT_ALIANCE_LIST"
   };
-  public merchantInfoDetail = '/customer/merchantInfo/detail';
-  public merchantList = '/customer/merchantInfo/merchantList';
-  public merchantDistance = '/customer/merchantInfo/distance';
-  public advertisement = '/customer/advertisement/getAdvertisements';
+  public merchantInfoDetail = "/customer/merchantInfo/detail";
+  public merchantList = "/customer/merchantInfo/merchantList";
+  public merchantDistance = "/customer/merchantInfo/distance";
+  public advertisement = "/customer/advertisement/getAdvertisements";
 }
 
 export default new MerchantInterfaceMap();

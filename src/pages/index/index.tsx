@@ -1,30 +1,44 @@
 import Taro, { Component, Config } from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
+import { AtActivityIndicator } from "taro-ui";
 import "./index.less";
 import "../style/product.less";
-import ProductListView from "../../component/product/product.listview";
-import ProductMenu from "../../component/product/product.menu";
+import MerchantListView from "../../component/product/merchant.listview";
 import IndexAddress from "./component/address";
-import DiscountInfo from "./component/discountInfo";
 import Banner from "./component/banner";
-import invariant from "invariant";
 import { ProductAction, MerchantAction, UserAction } from "../../actions";
-import { ResponseCode, ProductInterface } from "../../constants";
+import {
+  ResponseCode,
+  ProductInterface,
+  MerchantInterface
+} from "../../constants";
 import WeixinSdk from "../../common/sdk/weixin/weixin";
-// import orderAction from "../../actions/order.action";
-import TabsChoose from "../../component/tabs/tabs.choose";
 import {
   getMerchantAdvertisement,
   getCurrentMerchantDetail
 } from "../../reducers/app.merchant";
 import { LoginManager } from "../../common/sdk";
-import CouponModal from "../../component/coupon/coupon.modal";
 import { getUserinfo, getMemberInfo } from "../../reducers/app.user";
+import Tabs from "./component/tab";
+import { AppReducer } from "src/reducers";
 
 const cssPrefix = "product";
 
-class Index extends Component<any> {
+let page: number = 1;
+
+type Props = {
+  advertisement: any;
+  currentMerchantDetail: any;
+  userinfo: any;
+  dispatch: any;
+  memberInfo: any;
+  merchantList: MerchantInterface.AlianceMerchant[];
+  merchantTotal: any;
+  getNearbyMerchant: (params: any) => void;
+  getOrderedMerchant: (params: any) => void;
+};
+class Index extends Component<Props, any> {
   readonly state = {
     currentType: {
       name: "",
@@ -94,43 +108,42 @@ class Index extends Component<any> {
      */
   };
 
-  public init = async (firstTime?: boolean): Promise<void> => {
+  public init = async (type = "recommand"): Promise<void> => {
     try {
-      MerchantAction.merchantList(this.props.dispatch);
+      this.setState({ loading: true });
       await LoginManager.getUserInfo(this.props.dispatch);
-      WeixinSdk.initAddress(this.props.dispatch);
-      const { userinfo, currentMerchantDetail } = this.props;
-      if (userinfo.phone && userinfo.phone.length > 0) {
-        UserAction.getMemberInfo(this.props.dispatch);
-        const res = await UserAction.obtainCoupon();
-        if (res.code == ResponseCode.success) {
-          this.setState({ obtainCouponList: res.data.rows });
-        }
-      }
-      const productTypeResult = await ProductAction.productInfoType(
-        this.props.dispatch,
-        {
-          merchantId:
-            currentMerchantDetail && currentMerchantDetail.id
-              ? currentMerchantDetail.id
-              : 1
-        }
-      );
-      invariant(
-        productTypeResult.code === ResponseCode.success,
-        productTypeResult.msg || " "
-      );
-      const { data } = productTypeResult;
-      const firstType = data[0] || {};
-      if (firstTime) {
-        this.changeCurrentType(firstType);
-      }
+      const address: any = await WeixinSdk.initAddress(this.props.dispatch);
+      page = 1;
+      // invariant(!!address.longitude, "请先定位");
+      const fetchFunction =
+        type === "recommand"
+          ? this.props.getNearbyMerchant
+          : this.props.getOrderedMerchant;
+      fetchFunction({
+        pageNum: page,
+        pageSize: 20,
+        longitude: address.longitude || 119,
+        latitude: address.latitude || 26,
+        institutionCode: 101
+      });
+
+      this.setState({ loading: false });
     } catch (error) {
+      this.setState({ loading: false });
       Taro.showToast({
         title: error.message,
         icon: "none"
       });
     }
+  };
+
+  /**
+   * @todo 切换附近推荐/常去的店
+   *
+   * @memberof Index
+   */
+  public onTabChange = tab => {
+    this.init(tab.id === 0 ? "recommand" : "nearby");
   };
 
   /**
@@ -141,29 +154,6 @@ class Index extends Component<any> {
   public onTypeClick = (params: ProductInterface.ProductTypeInfo) => {
     this.common.changeTypeFlag = true;
     this.changeCurrentType(params);
-  };
-
-  public fetchData = async (type: any) => {
-    const { currentMerchantDetail } = this.props;
-    this.setState({ loading: true });
-    const result = await ProductAction.productInfoList(this.props.dispatch, {
-      type: `${type.id}`,
-      status: 0,
-      saleType: 0,
-      merchantId:
-        currentMerchantDetail && currentMerchantDetail.id
-          ? currentMerchantDetail.id
-          : 1
-    } as any);
-    if (this.common.changeTypeFlag) {
-      this.common.changeTypeFlag = false;
-      this.common.refreshFlag = true;
-      if (!result || !result.data || !Array.isArray(result.data.rows)) {
-        this.common.refreshFlag = false;
-      }
-    }
-    this.setState({ loading: false });
-    return result;
   };
 
   public onScrollToLower = async () => {
@@ -178,13 +168,6 @@ class Index extends Component<any> {
         break;
       }
     }
-  };
-
-  public getTabs = (tabs: any[]) => {
-    const { currentType } = this.state;
-    let newTabs = [...tabs];
-    newTabs.unshift({ id: currentType.id, name: "全部" });
-    return newTabs;
   };
 
   public onScroll = (event: any) => {
@@ -214,71 +197,29 @@ class Index extends Component<any> {
 
   render() {
     const { currentType, loading, showActivity, obtainCouponList } = this.state;
-    const {
-      productList,
-      productType,
-      advertisement,
-      userinfo,
-      memberInfo
-    } = this.props;
+    const { advertisement, merchantList } = this.props;
 
     return (
       <View className={`container ${cssPrefix}`}>
         <IndexAddress />
-        {/* <ScrollView scrollY={true}> */}
         {showActivity && (
           <View className={`${cssPrefix}-activity`}>
             <Banner advertisement={advertisement} />
           </View>
         )}
-        <View className={`${cssPrefix}-list-container-costom`}>
-          <ProductMenu
-            menu={productType}
-            currentMenu={currentType}
-            onClick={type => this.onTypeClick(type)}
-          />
-          <View className={`${cssPrefix}-list-right`}>
-            <View className={`${cssPrefix}-list-right-types`}>
-              {currentType &&
-              currentType.subCategory &&
-              currentType.subCategory.length > 0 ? (
-                <View className={`${cssPrefix}-list-right-types-secondary`}>
-                  <TabsChoose
-                    tabs={this.getTabs(currentType.subCategory)}
-                    onChange={type => {
-                      this.fetchData(type);
-                    }}
-                    currentType={currentType}
-                  />
-                </View>
-              ) : (
-                <View
-                  className={`${cssPrefix}-list-right-header product-component-section-header-height`}
-                >
-                  <View className={`${cssPrefix}-list-right-header-bge`} />
-                  <Text className={`${cssPrefix}-list-right-header-text`}>
-                    {currentType.name}
-                  </Text>
-                </View>
-              )}
+        <Tabs onChange={tab => this.onTabChange(tab)}>
+          {!!loading ? (
+            <View className="container">
+              <AtActivityIndicator mode="center" />
             </View>
-            <ProductListView
-              loading={loading}
-              productList={productList}
-              className={`${cssPrefix}-list-right-container`}
-              onScroll={this.onScroll}
-              // onScrollToLower={this.onScrollToLower}
-            />
-          </View>
-        </View>
-        {/* </ScrollView> */}
-        <CouponModal
-          isOpen={obtainCouponList.length > 0}
-          onClose={() => {
-            this.setState({ obtainCouponList: [] });
-          }}
-          couponList={obtainCouponList}
-        />
+          ) : (
+            <View className={`${cssPrefix}-list-container-costom`}>
+              <View className={`${cssPrefix}-list-right`}>
+                <MerchantListView data={merchantList} />
+              </View>
+            </View>
+          )}
+        </Tabs>
       </View>
     );
   }
@@ -291,15 +232,22 @@ class Index extends Component<any> {
 //
 // #endregion
 
-const select = state => {
+const select = (state: AppReducer.AppState) => {
   return {
-    productType: state.product.productType,
-    productList: state.product.productList,
     advertisement: getMerchantAdvertisement(state),
     currentMerchantDetail: getCurrentMerchantDetail(state),
     userinfo: getUserinfo(state),
-    memberInfo: getMemberInfo(state)
+    memberInfo: getMemberInfo(state),
+    merchantList: state.merchant.alianceList,
+    merchantTotal: state.merchant.alianceTotal
   };
 };
 
-export default connect(select)(Index);
+const mapDispatch = dispatch => {
+  return {
+    getNearbyMerchant: MerchantAction.getNearbyMerchant(dispatch),
+    getOrderedMerchant: MerchantAction.getOrderedMerchant(dispatch)
+  };
+};
+
+export default connect(select, mapDispatch)(Index as any);

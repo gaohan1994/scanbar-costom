@@ -51,12 +51,4 @@ class Banner extends Taro.Component<Props, State> {
   }
 }
 
-// const select = (state: AppReducer.AppState) => {
-//   return {
-
-//   }
-// }
-
-// export default connect(select)(DiscountInfo as any);
-
 export default Banner;

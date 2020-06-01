@@ -1,7 +1,7 @@
-import Taro from '@tarojs/taro';
-import getBaseUrl from './base.url';
-import interceptors from './interceptors';
-import { LoginManager } from '../sdk';
+import Taro from "@tarojs/taro";
+import getBaseUrl from "./base.url";
+import interceptors from "./interceptors";
+import { LoginManager } from "../sdk";
 
 interceptors.forEach(i => Taro.addInterceptor(i));
 
@@ -17,43 +17,53 @@ class HttpRequest {
       data: data,
       method: method,
       header: {
-        'content-type': contentType
+        "content-type": contentType
       }
     };
 
     // console.log('token', result)
-    const list = ['/customer/product/type/', '/customer/merchantInfo/merchantList', '/order/getAllOrderStatus', 
-    '/customer/advertisement/getAdvertisements/', '/customer/product/list'];
+    const list = [
+      "/customer/product/type/",
+      "/customer/merchantInfo/merchantList",
+      "/order/getAllOrderStatus",
+      "/customer/advertisement/getAdvertisements/",
+      "/customer/product/list",
+      "decrypt"
+    ];
 
     let haToken = true;
     list.forEach(element => {
-      if(url.indexOf(element) !== -1){
+      if (url.indexOf(element) !== -1) {
         haToken = false;
       }
     });
     if (!!result && haToken) {
       option.header.Authorization = result;
     }
-    // console.log('option: ', option);
+    console.log("option: ", option);
     return Taro.request(option);
   }
 
-  get (url: string, data: string = "") {
+  get(url: string, data: string = "") {
     let option = { url, data };
     return this.baseOptions(option);
   }
 
-  post (url: string, data: any, contentType?: string) {
-    let params = { url, data: typeof data === 'string' ? data : JSON.stringify(data), contentType };
+  post(url: string, data: any, contentType?: string) {
+    let params = {
+      url,
+      data: typeof data === "string" ? data : JSON.stringify(data),
+      contentType
+    };
     return this.baseOptions(params, "POST");
   }
 
-  put (url: string, data: string = "") {
+  put(url: string, data: string = "") {
     let option = { url, data };
     return this.baseOptions(option, "PUT");
   }
 
-  delete (url: string, data: string = "") {
+  delete(url: string, data: string = "") {
     let option = { url, data };
     return this.baseOptions(option, "DELETE");
   }
