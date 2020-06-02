@@ -110,7 +110,7 @@ class ProductListView extends Taro.Component<Props> {
           )
         }
         {isRenderFooter && productList && productList.length > 0 && (
-          <View className={`${cssPrefix}-list-bottom`}>已经到底啦</View>
+          <View className={`${cssPrefix}-list-bottom ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-list-bottom-h5`: ''}`}>已经到底啦</View>
         )}
         {bottomSpector && (
           <View style="height: 100px" />

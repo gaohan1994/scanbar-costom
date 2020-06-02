@@ -52,7 +52,11 @@ class Page extends Taro.Component<Props> {
   };
 
   render() {
-    const { product, memberInfo,activityList } = this.props;
+    const { product, memberInfo } = this.props;
+    console.log(this.props);
+    const activityList = product && Array.isArray(product.activityInfos) ? product.activityInfos : [];
+    const singleActiveList = activityList.filter(val => val.type === 1 || val.type === 2);
+    const batchActiveList = activityList.filter(val => val.type === 3 || val.type === 4);
     return (
       <View className={`${prefix}-detail`}>
     
@@ -78,22 +82,32 @@ class Page extends Taro.Component<Props> {
           product.activityInfos.length > 0 ? (
             <View className={`${prefix}-detail-act-title`}>活动</View>
           ) : (
-            <View className={`${prefix}-detail-act-title`}>活动：无</View>
+            <View className={`${prefix}-detail-act-title`}>活动<Text className={`${prefix}-detail-act-title-txt`}>无</Text></View>
           )}
           <View className={`${prefix}-detail-act-boxs`}>
             {product &&
               product.activityInfos &&
               product.activityInfos.length > 0 &&
               product.activityInfos.map(item => {
+                if(item.type === 3) {
+                  return (
+                    <View className={`${prefix}-detail-act-box`}>
+                      <View className={`${prefix}-detail-act-reduce`}>满减</View>
+                      <View className={`${prefix}-detail-act-text`}>
+                      {productSdk.getDiscountString(memberInfo,batchActiveList, item)}
+                      </View>
+                    </View> 
+                  );
+                }
                 return (
                   <View
                     className={`${prefix}-detail-act-box ${prefix}-detail-act-bor`}
                   >
                     <View className={`${prefix}-detail-act-discount`}>
-                      {item.type === 1 ? "打折" : "特价"}
+                      {item.type === 1 ? "打折" :item.type === 2? "特价":''}
                     </View>
                     <View className={`${prefix}-detail-act-text`}>
-                      {productSdk.getDiscountString(memberInfo,activityList, item)}
+                      {productSdk.getDiscountString(memberInfo,singleActiveList, item)}
                     </View>
                   </View>
                 );

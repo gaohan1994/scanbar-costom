@@ -64,7 +64,7 @@ class Item extends Taro.Component<Props> {
           </View>
         </View>
         {!pre && (
-          <View className={`${prefix}-detail`}>
+          <View className={`${prefix}-detail ${process.env.TARO_ENV === 'h5' ? `${prefix}-detail-h5` : ''}`}>
             <View className={`${prefix}-detail-text`}>{address.contact}</View>
             <View className={`${prefix}-detail-text`}>{address.phone}</View>
           </View>

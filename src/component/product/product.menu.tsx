@@ -42,7 +42,8 @@ class ProductMenu extends Taro.Component<Props> {
                 <View 
                   key={type.id}
                   className={classnames(`${cssPrefix}-list-left-item`, {
-                    [`${cssPrefix}-list-left-item-active`]:  type.id === currentMenu.id
+                    [`${cssPrefix}-list-left-item-active`]:  type.id === currentMenu.id,
+                    [`${cssPrefix}-list-left-item-h5`]: process.env.TARO_ENV === 'h5' ? true: false
                   })}
                   onClick={() =>onClick(type)}
                 >
