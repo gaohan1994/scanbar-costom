@@ -183,4 +183,49 @@
       }
     }
   }
+
+  &-card {
+    height: 240px;
+    background: linear-gradient(
+      180deg,
+      rgba(42, 134, 252, 1),
+      rgba(54, 195, 255, 1),
+      rgba(255, 255, 255, 1)
+    );
+    .padding(30px, l);
+    .padding(7px, t);
+
+    &-detail {
+      width: 690px;
+      height: 230px;
+      background: rgba(255, 255, 255, 1);
+      box-shadow: 0px 2px 13px 0px rgba(116, 162, 221, 0.45);
+      border-radius: 10px;
+    }
+  }
+
+  &-search {
+    background-color: #fff;
+    .padding(24px, tb);
+    .padding(30px, l);
+    .flex(center, space-between, row);
+    &-input {
+      width: 540px;
+      height: 54px;
+      background: rgba(248, 248, 250, 1);
+      border-radius: 27px;
+      .flex(center, flex-start, row);
+      &-icon {
+        .margin(30px, lr);
+        width: 30px;
+        height: 30px;
+        .bg;
+        background-image: url(//net.huanmusic.com/scanbar-c/icon_search_grey.png);
+      }
+    }
+
+    &-member {
+      .flex(center, center, row);
+    }
+  }
 }

@@ -6,7 +6,8 @@ import "../style/product.less";
 import ProductListView from "../../component/product/product.listview";
 import ProductMenu from "../../component/product/product.menu";
 import IndexAddress from "./component/address";
-import DiscountInfo from "./component/discountInfo";
+import MerchantSearch from "./component/search";
+import MerchantCard from "./component/merchant.detail";
 import Banner from "./component/banner";
 import invariant from "invariant";
 import { ProductAction, MerchantAction, UserAction } from "../../actions";
@@ -270,18 +271,17 @@ class Index extends Component<any> {
     const isNew = this.CouponisNew(obtainCouponList);
     return (
       <View className={`container ${cssPrefix}`}>
-        <IndexAddress />
+        {showActivity && <MerchantCard />}
+        <MerchantSearch />
+        {/* <View className={`${cssPrefix}-activity`}>
+          <Banner advertisement={advertisement} />
+        </View> */}
         {/* <ScrollView scrollY={true}> */}
-        {showActivity && (
+        {/* {showActivity && (
           <View className={`${cssPrefix}-activity`}>
-            {userinfo && userinfo.phone && userinfo.phone.length > 0 && (
-              <DiscountInfo />
-            )}
-            {advertisement && advertisement.length > 0 && (
-              <Banner advertisement={advertisement} />
-            )}
+            <Banner advertisement={advertisement} />
           </View>
-        )}
+        )} */}
         <View className={`${cssPrefix}-list-container-costom`}>
           <ProductMenu
             menu={productType}
