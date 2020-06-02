@@ -2,7 +2,7 @@
 
 @product-prefix: component-product;
 @product-border-color: #f9f9f9;
-@product-image-size: 150px;
+@product-image-size: 160px;
 // @product-image-size: 64PX;
 @product-content-width: 390px;
 @product-content-size: 150px;
@@ -36,6 +36,7 @@
 .@{product-prefix} {
   width: 100%;
   .padding(@product-padding);
+  padding-right: 30px;
   &-cart {
     display: flex;
     flex-direction: row;
@@ -82,12 +83,13 @@
     &-cover {
       position: relative;
       width: @product-image-size;
+      min-width: @product-image-size;
       height: @product-image-size;
       border-radius: 10px;
       border: 1px solid @product-border-color;
       overflow: hidden;
       &-h5 {
-        border: 4px solid @product-border-color;
+        border: 3px solid @product-border-color;
       }
       &-image {
         width: 100%;
@@ -112,6 +114,7 @@
         font-size: 30px;
         font-weight: 500;
         color: rgba(255, 255, 255, 1);
+        z-index: 99;
       }
     }
 
@@ -163,8 +166,10 @@
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-      width: 400px;
+      width: 370px;
       display: block;
+      line-height: 35px;
+      height: 35px;
     }
     &-manage {
       width: 100%;
@@ -188,8 +193,10 @@
   &-tips-h5 {
     white-space: nowrap;
     text-overflow: ellipsis;
+    height: 28px;
+    line-height: 28px;
     overflow: hidden;
-    width: 400px;
+    width: 370px;
     display: block;
   }
   &-activity {
@@ -205,9 +212,11 @@
 
   &-batchDiscount {
     .item(rgba(255,235,235,1), #FC4E44);
+    padding: 15px;
     margin-right: 12px;
     &-text {
       .item-text;
+      margin-top: 2px;
     }
   }
 
@@ -218,6 +227,8 @@
     .item(rgba(255,240,226,1), #FF893B);
     margin: 0;
     border-radius: 13px 0 0 13px;
+    padding: 15px;
+    padding-top: 18px;
     &-text {
       .item-text;
     }
@@ -323,6 +334,7 @@
       line-height: 30px;
       font-weight: 500;
       color: rgba(255, 255, 255, 1);
+      margin-right: 12px;
     }
 
     &-delete {
@@ -352,7 +364,7 @@
     }
 
     &-text {
-      min-width: 60px;
+      min-width: 48px;
       .flex(center, center);
       font-size: 30px;
       color: #666666;

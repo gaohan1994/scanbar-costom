@@ -87,7 +87,7 @@ const select = (state: AppReducer.AppState) => {
   return {
     productDetail: state.product.productDetail,
     memberInfo: getMemberInfo(state),
-    activityList: getMerchantActivityList(state),
+    activityList: state.merchant.activityList,
     productList: state.productSDK.productCartList
   };
 };

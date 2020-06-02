@@ -26,7 +26,7 @@ class DiscountInfo extends Taro.Component<Props, State> {
             src="//net.huanmusic.com/scanbar-c/v2/icon_home_integral.png"
           /> */}
           <Text className={`${prefix}-discount-item-data`}>{memberInfo.points || 0}</Text>
-          <Text>积分</Text>
+          <Text className={process.env.TARO_ENV === 'h5' ? `${prefix}-discount-item-h5` : ''}>积分</Text>
         </View>
 
         <View className={`${prefix}-discount-item`} onClick={() => { Taro.navigateTo({ url: '/pages/user/user.coupon' }) }}>
@@ -35,7 +35,7 @@ class DiscountInfo extends Taro.Component<Props, State> {
             src="//net.huanmusic.com/scanbar-c/v2/icon_home_coupon.png"
           /> */}
           <Text className={`${prefix}-discount-item-data`}>{memberInfo.couponNum || 0}</Text>
-          <Text>优惠券</Text>
+          <Text className={process.env.TARO_ENV === 'h5' ? `${prefix}-discount-item-h5` : ''}>优惠券</Text>
           {/* <View className={`${prefix}-discount-pop`}>4张可领</View> */}
         </View>
       </View>

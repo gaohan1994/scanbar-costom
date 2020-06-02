@@ -42,12 +42,23 @@ class TabsChoose extends Taro.Component<Props, State> {
 
   public onClickHandle = (value) => {
     const { onChange, tabs } = this.props;
-    this.setState({ current: value }, () => {
+    if(process.env.TARO_ENV === 'h5'){
+
       if (onChange) {
         onChange(tabs[value]);
       }
-    });
-    this.onChangeVisible(false);
+      this.onChangeVisible(false);
+      this.setState({
+        current: value
+      })
+    } else {
+      this.setState({ current: value }, () => {
+        if (onChange) {
+          onChange(tabs[value]);
+        }
+      });
+      this.onChangeVisible(false);
+    }
   }
 
   public onChangeVisible = (visible?: boolean) => {
@@ -70,6 +81,8 @@ class TabsChoose extends Taro.Component<Props, State> {
   render() {
     const { tabs, } = this.props;
     const { current } = this.state;
+    const {onContentItemClick} = this;
+    console.log('this.state', this.state)
     return (
       <View className={`${cssPrefix} ${cssPrefix}-pos`}>
         <View className={`${cssPrefix}-container`}>
@@ -83,12 +96,17 @@ class TabsChoose extends Taro.Component<Props, State> {
               <View className={`${cssPrefix}-header-list-container`}>
                 {
                   tabs && tabs.length > 0 && tabs.map((tab, index) => {
+
+                    console.log(current === index, current,  index)
                     return (
                       <View
                         id={`tab${index}`}
-                        onClick={() => this.onContentItemClick(tab)}
+                        onClick={() => {
+                          onContentItemClick(tab);
+                        }}
                         className={classnames(`${cssPrefix}-header-list-item`, {
-                          [`item-current`]: current === index
+                          [`item-current`]: current === index,
+                          [`${cssPrefix}-header-list-item-h5`]: process.env.TARO_ENV === 'h5' ? true: false
                         })}>
                         <Text>{tab.name}</Text>
                       </View>
@@ -109,7 +127,7 @@ class TabsChoose extends Taro.Component<Props, State> {
     const { visible } = this.state;
     return (
       <View
-        className={`${cssPrefix}-header-corner`}
+        className={process.env.TARO_ENV === 'h5' ? `${cssPrefix}-header-corner-h5`: `${cssPrefix}-header-corner`}
         onClick={() => this.onChangeVisible()}
       >
         {

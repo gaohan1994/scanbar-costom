@@ -7,13 +7,13 @@
 
   .item {
     min-width: 146px;
-    height: 56px;
+    height: 60px;
     .flex(center, center);
     border-radius: 10px;
     background-color: #F5F5F5;
     color: #999999;
     font-size: 26px;
-    line-height: 26px;
+    line-height: 60px;
     text-align: center;
   }
 
@@ -45,7 +45,7 @@
 
     &-list {
       white-space: nowrap;
-      width: 100%;
+      width: 92%;
       .flex(center, flex-start, row);
 
       &-container {
@@ -59,17 +59,35 @@
         margin-right: 14px;
         padding: 0px 15px;
         .item;
+        &-h5 {
+          padding-top: 5px !important;
+        }
       }
     }
-
-    &-corner {
+    &-corner-h5 {
       width: 50px;
       height: 50px;
+      margin-left: 15px;
       .flex(center, center);
 
       &-image {
-        width: 24px;
-        height: 13px;
+        width: 18px;
+        height: 10px;
+
+        &-down {
+          transform: rotate(180deg);
+        }
+      }
+    }
+    &-corner {
+      width: 50px;
+      height: 50px;
+      margin-left: 15px;
+      .flex(center, center);
+
+      &-image {
+        width: 18px;
+        height: 10px;
 
         &-down {
           transform: rotate(180deg);
@@ -95,6 +113,9 @@
       .margin(20px, l);
       .item;
       width: 170px;
+      &-h5 {
+        padding-top: 5px !important;
+      }
     }
 
     &-mask {

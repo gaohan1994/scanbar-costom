@@ -317,7 +317,7 @@ class Index extends Component<any> {
                         <ProductListView
                             loading={loading}
                             productList={productList}
-                            className={`${cssPrefix}-list-right-container`}
+                            className={ `${cssPrefix}-list-right-container`}
                             onScroll={this.onScroll}
                         // onScrollToLower={this.onScrollToLower}
                     />

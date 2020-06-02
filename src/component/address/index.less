@@ -34,6 +34,7 @@
     &-box {
       display: flex;
       flex-direction: row;
+      width: 100%;
     }
     .padding(30px);
     .flex(flex-start, center, column);
@@ -41,14 +42,17 @@
       font-size:30px;
       font-weight:500;
       color:rgba(51,51,51,1);
-      width: 540px;
+      width: 100%;
       .clamp(2);
       .flex(flex-start, flex-start, row);
+    }
+    &-detail-h5 {
+      .margin(2px, t) !important;
     }
     &-detail {
       display: flex;
       flex-direction: row;
-      .margin(18px, t);
+      .margin(10px, t);
       &-bot {
         .margin(0px, t) !important;
         .margin(18px, b);
@@ -68,9 +72,9 @@
       font-weight:500;
       color:rgba(252,146,42,1);
       .margin(10px, r);
-      .margin(10px, t);
+      .margin(4px, t);
       white-space: nowrap;
-
+      padding-top: 6px;
       &-1 {
         background:#E1EEFF;
         color:#2A86FC
@@ -147,7 +151,7 @@
       font-size:30px;
       font-weight:500;
       width: 460px;
-      color:rgba(102,102,102,1);
+      color:#CCCCCC;
       &-place {
         font-size:30px;
         font-weight:500;
@@ -180,7 +184,7 @@
         .padding(24px, lr);
         border:2px solid rgba(204,204,204,1);
         border-radius:10px;
-
+        height: 50px !important;
         font-size:26px;
         font-weight:500;
         color:rgba(153,153,153,1);

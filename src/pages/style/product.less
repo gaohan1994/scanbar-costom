@@ -150,7 +150,9 @@
         &-suspension {
           flex-direction: column;
         }
-
+        &-h5{
+          line-height: @product-list-type-height;
+        }
         &-active {
           background-color: #ffffff;
 
@@ -177,8 +179,12 @@
       overflow: hidden;
       overflow-y: auto;
       width: 100%;
+      &-container-h5 {
+        margin-top: 60px !important;
+      }
+
       &-container {
-        margin-top: 94px;
+        margin-top: 80px;
         position: absolute;
         height: calc(100%);
         width: 100%;
@@ -235,7 +241,9 @@
         }
       }
     }
-
+    &-bottom-h5 {
+      margin-bottom: 44px;
+    }
     &-bottom {
       width: 100%;
       .flex(center, center, row);

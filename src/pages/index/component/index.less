@@ -5,13 +5,18 @@
 @address-height: 130px;
 
 .@{prefix} {
+  &-address-h5 {
+    height: 230px !important;
+    .background-image('//net.huanmusic.com/scanbar-c/v2/bg_home_shang.png') !important;
+    background-size: 100% 120% !important;
+  }
   &-address {
     height: @address-height;
     .padding(30px, lr);
     .padding(3px, t);
     position: relative;
     .bg;
-    background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_home_shang.png);
+    background-image: url('//net.huanmusic.com/scanbar-c/v2/bg_home_shang.png');
     
     display: flex;
     flex-direction: column;
@@ -21,6 +26,9 @@
       height:10px;
       .bg;
       background-image: url(//net.huanmusic.com/scanbar-c/v1/block.png);
+    }
+    &-title-h5 {
+      margin-top: 10px;
     }
     &-title {
       .flex(center, flex-start, row);
@@ -37,10 +45,27 @@
         color:rgba(255,255,255,1);
         .margin(10px, r)
       }
+      &-text-h5 {
+        .clamp(1);
+        max-width: 320px;
+        font-size:36px;
+        font-weight:bold;
+        color:rgba(255,255,255,1);
+        .margin(10px, r);
+        display: block;
+        white-space: nowrap;
+        margin-top: 11px;
+      }
+    }
+    &-box-h5 {
+      position: relative;
     }
     &-box {
       .margin(18px, t);
       display: flex;
+    }
+    &-merchant-h5 {
+      padding: 20px !important;
     }
     &-merchant {
       .padding(20px, lr);
@@ -56,6 +81,9 @@
         line-height: 22px;
         text-align: center;
       }
+    }
+    &-search-h5 {
+      bottom: 0px !important;
     }
     &-search {
       position: absolute;
@@ -93,7 +121,9 @@
       .flex(center, space-between, column);
       color: #fff;
       font-size: 24px;
-
+      &-h5 {
+        margin-top: -10px;
+      }
       &-data {
         font-size: 36px;
         font-weight: bold;
