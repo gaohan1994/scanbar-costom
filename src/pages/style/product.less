@@ -288,9 +288,13 @@
     }
     &-normal {
       background-image: url('../../assets/bt_unavailable.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
     }
     &-active {
       background-image: url('../../assets/bt_selected.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
     }
   }
   &-select {
@@ -545,7 +549,6 @@
     &-pos {      
       margin: auto;  
       .margin(6px, t);
-      width: 90% !important;
       background-color: #f2f2f2;
     }
 
@@ -711,6 +714,7 @@
       width: 100%;
       &::after {
         .border1px;
+        border: 'none'
       }
     }
 
@@ -761,7 +765,7 @@
     &-cover {
       width: 120px;
       height: 120px;
-      border: 1px solid rgba(229, 229, 229, 1);
+      border: 2px solid rgba(229, 229, 229, 1);
       border-radius: 10px;
       .bg;
     }
@@ -832,7 +836,12 @@
       display: flex;
       flex-direction: column;
       align-items: flex-end;
-
+      &-group-h5 {
+        height: 65px;
+      }
+      &-group {
+        height: 45px;
+      }
       &-origin {
         font-size: 18px;
         font-weight: 500;
@@ -893,6 +902,8 @@
       &-full {
         background-color: #FFEBEB;
         color: #FC4E44;
+        border-radius: 5px;
+        padding-top: 5px;
       }
 
       &-first {
@@ -904,6 +915,10 @@
     &-voucher {
       color: #333333;
       font-size: 30px;
+      &-wrap {
+        height: 10px;
+        line-height: 10px;
+      }
       &-span {
         color: #999999;
         font-size: 22px;
@@ -926,7 +941,9 @@
         justify-content: space-between;
         .margin(20px, l);
         position: relative;
-
+        &-coupon-h5 {
+          padding-top: 10px !important;
+        }
         &-coupon {
           padding: 6px 19px;
           color: #fff;
@@ -939,7 +956,7 @@
       &-item {
         .flex(center, space-between, row);
         .padding(30px, lr);
-        .padding(35px, tb);
+        .padding(34px, tb);
         border-top: #E3E3E3 1px solid;
       }
 

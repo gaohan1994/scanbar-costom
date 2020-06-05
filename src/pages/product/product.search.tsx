@@ -187,7 +187,7 @@ class Index extends Component<any> {
               return (
                 <View
                   key={item}
-                  className={`${prefix}-record-list-item`}
+                  className={`${prefix}-record-list-item ${process.env.TARO_ENV === 'h5' ? `${prefix}-record-list-item-h5` : ''}`}
                   onClick={() => {
                     this.setState({
                       value: item

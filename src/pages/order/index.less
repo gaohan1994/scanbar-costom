@@ -10,6 +10,7 @@
   &-tabs {
     width: 100%;
     height: 90px;
+    margin-bottom: 10px;
   }
 
   &-scrollview {
@@ -53,7 +54,9 @@
       width: 100%;
       .background-image('//net.huanmusic.com/weapp/bg_order.png');
     }
-
+    &-container-h5 {
+      display: block !important;
+    }
     &-container {
       .flex(center, flex-start, column);
       .padding(30px, lr);
@@ -78,11 +81,10 @@
 
     &-card {
       border-radius: 10px;
-      width: 90%;
       background-color: #fff;
       display: flex;
       flex-direction: column;
-      margin: 0 auto;
+      margin: 0 30px;
       margin-top: 22px;
       &-AtTimeline {
         .at-timeline-item {
@@ -117,7 +119,7 @@
         height: 256px;
         padding-left: 32px;
         position: relative;
-
+        margin-top: 50px;
         &-img1 {
           position: absolute;
           bottom: 5px;
@@ -280,6 +282,7 @@
             width: 22px;
             height: 23px;
             .margin(11px, l);
+            margin-bottom: 5px;
           }
         }
       }
@@ -291,20 +294,23 @@
     padding-top: 22px;
     height: 100%;
     &-input {
-      width: 90%;
       height: 350px;
       .padding(30px);
       background: rgba(247, 247, 247, 1);
-      border: 1px solid #cccccc;
+      border: 2px solid #cccccc;
       border-radius: 10px;
       position: relative;
-      margin: auto;
+      margin: 30px;
       &-text {
         width: 100%;
         // height: 100%;
         height: 250px;
         background: #f7f7f7;
         border: none;
+        resize:none;
+      }
+      &-text::-webkit-input-placeholder {
+        color: #B3B3B3;
       }
 
       &-corner {
@@ -316,20 +322,17 @@
     }
 
     &-title {
-      width: 90%;
-      margin: auto;
+      margin: 15px 30px;
       font-size: 28px;
       font-weight: 500;
       color: rgba(153, 153, 153, 1);
-      .margin(30px, tb);
     }
 
     &-buttons {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
-      width: 90%;
-      margin: auto;
+      margin: 5px 30px;
     }
 
     &-button {
@@ -342,6 +345,7 @@
       font-weight: 500;
       color: #808080;
       line-height: 60px;
+      padding-top: 5px;
       .margin(20px, b);
       .margin(16px, r);
     }
@@ -353,9 +357,8 @@
 
   &-refund {
     background-color: #fff;
-    width: 100%;
-    height: 100;
-    .flex(center, flex-start, column);
+    height: 100%;
+    // .flex(center, flex-start, column);
 
     &-header {
       .flex(center, space-between, row);
@@ -390,9 +393,9 @@
     }
 
     &-input {
-      width: 90%;
       height: 220px;
-      border: #CCCCCC solid 1px;
+      margin: 0px 30px;
+      border: #CCCCCC solid 2px;
       background-color: #F7F7F7;
       border-radius: 10px;
       .padding(30px);
@@ -405,8 +408,11 @@
         height: 130px;
         background-color: #F7F7F7;
         border: none;
+        resize: none;
       }
-
+      &-text::-webkit-input-placeholder {
+        color: #B3B3B3;
+      }
       &-corner {
         display: flex;
         justify-content: flex-end;
@@ -419,7 +425,26 @@
       background-color: #f6f6f6;
       height: 600px;
       border-top: 1px solid #f9f9f9;
-
+      &-layout-h5 {
+        .at-float-layout__container {
+          max-height: 600px;
+          min-height: 800px;
+          .layout-header {
+            .layout-header__btn-close {
+              left: 18px;
+            }
+          }
+        }
+      }
+      &-layout {
+        .at-float-layout__container {
+          .layout-header {
+            .layout-header__btn-close {
+              left: 18px;
+            }
+          }
+        }
+      }
       &-list {
         display: flex;
         flex-direction: column;

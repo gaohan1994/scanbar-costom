@@ -23,6 +23,7 @@ const cssPrefix = 'product';
 type Props = { 
   className?: string;
   loading?: boolean;
+  ismenu?: boolean;
   title?: string;
   productList: Array<ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo>;
   isRenderFooter?: boolean;
@@ -72,7 +73,7 @@ class ProductListView extends Taro.Component<Props> {
   
 
   render () {
-    const { className, loading, productList, isRenderFooter, bottomSpector, isHome, onScroll } = this.props;
+    const { className, ismenu, loading, productList, isRenderFooter, bottomSpector, isHome, onScroll } = this.props;
     return (
       <ScrollView 
         scrollY={true}
@@ -92,6 +93,7 @@ class ProductListView extends Taro.Component<Props> {
                   <ProductComponent
                     product={product}
                     isHome={isHome}
+                    ismenu={ismenu}
                   /> 
                 </View>
               );

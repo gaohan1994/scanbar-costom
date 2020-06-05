@@ -28,7 +28,7 @@ class CouponItem extends Taro.Component<Props, State> {
     ableObtainNum: 0,
   }
   render() {
-    const { data, isOpen, onChangeCouponOpen, gotoUse,onGet, unableToUse, selected, onSelected, type, isGet } = this.props;
+    const {data, isOpen, onChangeCouponOpen, gotoUse,onGet, unableToUse, selected, onSelected, type, isGet } = this.props;
     const couponVO: any = data && data.couponVO ? data.couponVO : {};
     return (
       <View className={`${cssPrefix}-item`} onClick={() => { onSelected ? onSelected(data) : () => { } }}>
@@ -71,7 +71,7 @@ class CouponItem extends Taro.Component<Props, State> {
                   className={classnames(`${cssPrefix}-item-top-right-pop-img`, {
                     [`${cssPrefix}-item-top-right-pop-img-down`]: isOpen
                   })}
-                  src='//net.huanmusic.com/weapp/icon_packup_gray.png'
+                  src={!unableToUse ? '//net.huanmusic.com/weapp/icon_packup_gray.png' : '//net.huanmusic.com/weapp/icon_expand_light.png'}
                 />
               </View>
             </View>

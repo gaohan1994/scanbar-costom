@@ -183,7 +183,7 @@ class Order extends Taro.Component<Props, State> {
                   />
                 ) : (
                   < Empty
-                    img='//net.huanmusic.com/scanbar-c/v1/img_cart.png'
+                    img='//net.huanmusic.com/scanbar-c/v1/img_order.png'
                     text='还没有订单，快去选购吧'
                     button={{
                       title: '去选购',

@@ -95,7 +95,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
             type && type === 1 && (
               <View className={`${cssPrefix}-row-header`}>
                 <View className={`${cssPrefix}-row-header-item`}>
-                  <Text className={`${cssPrefix}-row-header-shop`}>{order.merchantName || '未知商店'}</Text>
+                  <Text className={`${cssPrefix}-row-header-shop `}>{order.merchantName || '未知商店'}</Text>
                 </View>
                 <View className={`${cssPrefix}-row-header-item`} onClick={() => { showCallModal ? showCallModal() : () => { } }}>
                   <Image
@@ -122,7 +122,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
               <View className={`${cssPrefix}-row-totals`}>
                 <View className={`${cssPrefix}-row-content-item`}>
                   <Text className={`${cssPrefix}-row-voucher`}>配送费</Text>
-                  <View>
+                  <View className={`${cssPrefix}-row-voucher-wrap`}>
                     <Text
                       className={
                         `${cssPrefix}-row-content-price ${cssPrefix}-row-content-price-black`
@@ -221,7 +221,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
             <Text className={`${cssPrefix}-row-name${process.env.TARO_ENV === 'h5' ? '-h5' : ''}`}>{item.name}</Text>
             <Text className={`${cssPrefix}-row-normal`}>{`x ${item.sellNum}`}</Text>
             <View className={`${cssPrefix}-row-corner`}>
-              <View>
+              <View className={process.env.TARO_ENV === 'h5' ? `${cssPrefix}-row-corner-group-h5` : `${cssPrefix}-row-corner-group`}>
                 <Text className={`${cssPrefix}-row-corner-price`}>￥</Text>
                 <Text className={`${cssPrefix}-row-corner-big`}>{numeral(productSdk.getProductItemPrice(item, memberInfo) * item.sellNum).format('0.00').split('.')[0]}</Text>
                 <Text className={`${cssPrefix}-row-corner-price`}>{`.${numeral(productSdk.getProductItemPrice(item, memberInfo) * item.sellNum).format('0.00').split('.')[1]}`}</Text>
@@ -325,7 +325,8 @@ class ProductPayListView extends Taro.Component<Props, State> {
                       })}
                   >
                     满减
-                    </View>
+                  </View>
+                  
                 </View>
                 <Text className={`${cssPrefix}-row-content-price`}>-￥{numeral(orderActivityInfoListTotal).format('0.00')}</Text>
               </View>
@@ -365,7 +366,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
                         : (
                           ableToUseCouponsNum > 0
                             ? (
-                              <View className={`${cssPrefix}-row-content-box-coupon`}>
+                              <View className={`${cssPrefix}-row-content-box-coupon ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-row-content-box-coupon-h5` : ''}`}>
                                 {ableToUseCouponsNum}张可用
                         </View>
                             )

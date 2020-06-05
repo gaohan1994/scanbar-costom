@@ -8,16 +8,16 @@
   &-address-h5 {
     height: 230px !important;
     .background-image('//net.huanmusic.com/scanbar-c/v2/bg_home_shang.png') !important;
-    background-size: 100% 120% !important;
+    background-size: 100% 100% !important;
   }
   &-address {
     height: @address-height;
     .padding(30px, lr);
     .padding(3px, t);
+    padding-bottom: 10px;
     position: relative;
     .bg;
     background-image: url('//net.huanmusic.com/scanbar-c/v2/bg_home_shang.png');
-    
     display: flex;
     flex-direction: column;
     &-icon {
@@ -25,7 +25,7 @@
       width:20px;
       height:10px;
       .bg;
-      background-image: url(//net.huanmusic.com/scanbar-c/v1/block.png);
+      background-image: url(//net.huanmusic.com/scanbar-c/v1/block@2x.png);
     }
     &-title-h5 {
       margin-top: 10px;
@@ -61,7 +61,7 @@
       position: relative;
     }
     &-box {
-      .margin(18px, t);
+      .margin(10px, t);
       display: flex;
     }
     &-merchant-h5 {
@@ -103,20 +103,24 @@
         font-size:28px;
         font-weight:500;
         color:rgba(255,255,255,1);
+        padding-top: 5px;
       }
     }
   }
 
   &-discount {
     width: 100%;
-    height: 122px;
+    height: 142px;
+    padding-top: 10px;
     .bg;
     background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_home_zhong.png);
+    background-size: 100% 101%;
     .flex(flex-start, space-around, row);
 
     &-item {
       position: relative;
       // width: ;
+      padding-top: 10px;
       height: 88px;
       .flex(center, space-between, column);
       color: #fff;

@@ -137,7 +137,7 @@ class SwiperAction extends Taro.Component<Props, State> {
                 {/* 删除 */}
                 <View className="itemDelete right" onClick={this.onRemove}>删除</View>
                 {/* 遮盖层 */}
-                <View className="itemCover" onTouchStart={this.touchstart.bind(this)}
+                <View className="itemCover" style={{border: 'none'}} onTouchStart={this.touchstart.bind(this)}
                       onTouchEnd={this.touchmove.bind(this)} animation={this.state.animation}>
                     {children}
                 </View>

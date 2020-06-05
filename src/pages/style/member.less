@@ -264,6 +264,9 @@
           color: #ffffff;
         }
       }
+      &-search-h5 {
+        height: 65px !important;
+      }
       &-search {
         z-index: @member-search-zindex + 100;
         width: 78%;
@@ -276,6 +279,9 @@
           height: @member-search-icon-size;
           .margin(15px, r);
           .margin(32px, l);
+        }
+        &-del-h5 {
+          height: 24px !important;
         }
         &-del {
           width: @member-search-del-size;
@@ -291,7 +297,7 @@
         }
         &-input {
           font-size: @member-search-input-font-size;
-          color: #CCCCCC;
+          color: #666666;
           // width: 520px - 50px - @member-scan-icon-size;
           display: flex;
           height: 60px;
@@ -301,6 +307,9 @@
           &-holder {
             color: @placeholer-text-color;
           }
+        }
+        &-input::-webkit-input-placeholder {
+          color: #cccccc;
         }
       }
     }
