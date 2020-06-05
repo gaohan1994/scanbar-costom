@@ -321,6 +321,7 @@ class Page extends Taro.Component<Props, State> {
                                 arrow: 'right',
                                 hasBorder: false,
                                 extraTextStyle: 'maxWidth',
+                                isRemark: true
                             }]}
                         />
                     </View>

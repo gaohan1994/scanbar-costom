@@ -344,6 +344,7 @@ class Page extends Taro.Component<Props, State> {
         current={currentType}
         tabs={discountTypes}
         onChangeTab={this.onChangeTab}
+        isCoupon={true}
       />
     )
   }

@@ -41,7 +41,7 @@ class Footer extends Taro.Component<Props> {
     const { priceTitle, priceSubtitle, price, priceOrigin, priceDiscount, priceDiscountPay } = this.props;
     return (
       <View>
-        <View className={`${cssPrefix}-normal component-cart-text`} style={process.env.TARO_ENV === 'h5' && !priceDiscountPay ? {lineHeight: 'inherit'} : {height: 'auto'}}>
+        <View className={`${cssPrefix}-normal ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-normal-h5` : ''} component-cart-text`} style={process.env.TARO_ENV === 'h5' && !priceDiscountPay ? {lineHeight: 'inherit'} : {height: 'auto'}}>
           {/* <Text className={`${cssPrefix}-price-title`}>{priceTitle}</Text> */}
           {
             priceDiscountPay ? (<Text className={`${cssPrefix}-price-gray `}>已优惠{numeral(priceDiscountPay).format('0.00')}</Text>) : null

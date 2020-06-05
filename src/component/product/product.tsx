@@ -14,6 +14,7 @@ const cssPrefix = 'component-product';
 
 interface Props {
     dispatch: Dispatch;
+    ismenu?: boolean;
     product: ProductInterface.ProductInfo;
     direct?: boolean;
     productInCart?: ProductCartInterface.ProductCartInfo;
@@ -96,7 +97,7 @@ class ProductComponent extends Taro.Component<Props, State> {
     }
 
     render() {
-        const {selectedIndex, selectClick, product, last, isHome, dispatch} = this.props;
+        const {selectedIndex, selectClick, product, last, isHome, ismenu, dispatch} = this.props;
         const isCart = Array.isArray(selectedIndex);
         const token = !!isCart && selectedIndex && selectedIndex.some((i) => i === product.id);
         return (
@@ -109,6 +110,7 @@ class ProductComponent extends Taro.Component<Props, State> {
                     [`${cssPrefix}-last`]: last,
                     [`${cssPrefix}-full`]: isHome !== undefined && isHome === false,
                 })}
+                style={ismenu === true ? {} : {border: 'none'}}
             >
                 {isCart && (
                     <View 
@@ -166,17 +168,20 @@ class ProductComponent extends Taro.Component<Props, State> {
     }
 
     private renderDetail = () => {
-        const {product, memberInfo} = this.props;
+        const {product, memberInfo, isHome} = this.props;
         const activeList = product && Array.isArray(product.activityInfos) ? product.activityInfos : [];
         const singleActiveList = activeList.filter(val => val.type === 1 || val.type === 2);
         const batchActiveList = activeList.filter(val => val.type === 3 || val.type === 4);
         return (
-            <View className={classnames(`${cssPrefix}-content-detail`)}>
+            <View className={classnames(`${cssPrefix}-content-detail`)} style={isHome === false ? {} : {width: '70%'}}>
                 <View>
-                    <View className={`${cssPrefix}-title ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-title-h5` : ''}`}>
+                    <View 
+                        className={`${cssPrefix}-title ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-title-h5` : ''} `}
+                        style={process.env.TARO_ENV === 'h5' ? {WebkitBoxOrient: 'vertical'} :{}}
+                    >
                         {product.name}
                     </View>
-                    <View className={`${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-tips-h5` : ''} ${cssPrefix}-tips`}>
+                    <View style={process.env.TARO_ENV === 'h5' ? {WebkitBoxOrient: 'vertical'} :{}} className={`${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-tips-h5` : ''} ${cssPrefix}-tips`}>
                         {product.description && product.description.length > 0 ? product.description : product.name}
                     </View>
                 </View>

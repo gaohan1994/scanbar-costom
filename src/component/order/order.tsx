@@ -193,7 +193,7 @@ class OrderItem extends Taro.Component<Props, State> {
             className={`${cssPrefix}-card-header-icon`}
           />
           <View className={`${cssPrefix}-card-header-text`}>
-            <View className={`${cssPrefix}-card-header-text-shop`}>
+            <View className={`${cssPrefix}-card-header-text-shop ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-card-header-text-shop-h5` : ''}`}>
               {order.merchantName || '未知商店'}
             </View>
             <View className={`${cssPrefix}-card-header-text-time`}>

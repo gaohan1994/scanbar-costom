@@ -45,7 +45,7 @@ class Comp extends Taro.Component<Props, State> {
         >
           <Image className={`${prefix}-title-icon`} src='//net.huanmusic.com/scanbar-c/icon_location.png' />
           <View className={`${prefix}-title-text${process.env.TARO_ENV === 'h5' ? '-h5' : ''}`}>
-          {address}
+          福建省福州市{address}
           </View>
           <View className={`${prefix}-icon`} />
         </View>

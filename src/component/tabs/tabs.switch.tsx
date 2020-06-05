@@ -7,6 +7,7 @@ import './tabs.switch.less';
 interface Props {
   current: number,
   tabs: any[],
+  isCoupon?: boolean;
   onChangeTab: (tabNum: number) => void;
 }
 
@@ -24,13 +25,13 @@ class TabsSwitch extends Taro.Component<Props, State> {
   }
 
   render() {
-    const { current, tabs } = this.props;
+    const { current, tabs, isCoupon } = this.props;
     return (
       <View className={`${cssPrefix}`}>
         {
           tabs && tabs.length && tabs.map((tab: any, index: number) => {
             return (
-              <View className={`${cssPrefix}-tab`} style={`width: ${750 / tabs.length}px`}>
+              <View className={`${cssPrefix}-tab`} style={`width: ${750 / tabs.length}px; ${process.env.TARO_ENV === 'h5' && isCoupon === true ? '    background-color: #F2F2F2;' : ''}`}>
                 <View
                   key={tab.title}
                   className={classnames(`${cssPrefix}-tab-content`, {
@@ -45,7 +46,9 @@ class TabsSwitch extends Taro.Component<Props, State> {
                       <View className={`${cssPrefix}-tab-badge`}>{tab.num}</View>
                     ) : null
                   }
+                  
                 </View>
+                <View className={index === current ? `${cssPrefix}-tab-content-active-div` : ''}/>
               </View>
 
             );

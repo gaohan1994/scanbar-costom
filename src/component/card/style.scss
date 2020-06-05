@@ -75,7 +75,7 @@ $at-list-item-horizontal-padding: 24px;
         padding-left: 20px;
         &-title {
           @include line(1);
-          font-size: 30px;
+          font-size: 30px !important;
           color: #666666;
           line-height: $line-height-zh;
         }

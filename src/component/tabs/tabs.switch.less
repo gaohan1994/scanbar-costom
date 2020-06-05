@@ -12,17 +12,19 @@
 
   &-tab {
     height: 100%;
-    display: flex;
+    display: block;
     align-items: center;
     justify-content: center;
 
     &-badge {
       position: absolute;
-      right: -30px;
-      top: 13px;
+      right: 10px;
+      top: 5px;
       .flex(center, center, row);
       width: 36px;
       height: 36px;
+      padding-top: 5px;
+      text-align: center;
       background-color: #FC4E44;
       border-radius: 18px;
       color: #fff;
@@ -40,8 +42,15 @@
       font-size: 30px;
 
       &-active {
-        border-bottom: 4px solid #2482FE;
+        // border-bottom: 4px solid #2482FE;
         color: #2A86FC;
+        &-div {
+          background-color: #2A86FC;
+          height: 5px;
+          width: 45%;
+          margin: auto;
+          border-radius: 15px;
+        }
       }
     }
 

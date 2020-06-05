@@ -31,7 +31,7 @@ class HeaderInput extends Taro.Component<Props> {
     const { value, onInput, placeholder, isRenderInputRight, inputRightClick, className } = this.props;
     return (
       <View className={`${cssPrefix}-header`}>
-        <View className={classnames(`${memberPrefix}-main-header-search`, className)}>
+        <View className={classnames(`${memberPrefix}-main-header-search  ${process.env.TARO_ENV  === 'h5' ? `${memberPrefix}-main-header-search-h5` : ''}`, className)}>
           <Image src="//net.huanmusic.com/weapp/icon_import.png" className={`${memberPrefix}-main-header-search-icon`} />
           <Input 
             className={classnames(`${memberPrefix}-main-header-search-input`, className)} 
@@ -47,7 +47,7 @@ class HeaderInput extends Taro.Component<Props> {
             >
               <Image 
                 src="//net.huanmusic.com/weapp/icon_del.png" 
-                className={`${memberPrefix}-main-header-search-del`} 
+                className={`${memberPrefix}-main-header-search-del ${process.env.TARO_ENV === 'h5' ? `${memberPrefix}-main-header-search-del-h5` : ''}`} 
               />
             </View>
           )}

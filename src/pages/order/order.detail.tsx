@@ -268,7 +268,7 @@ class OrderDetail extends Taro.Component<Props, State> {
     return (
       <View className={`container order`}>
         <View className={`${cssPrefix}-bg`} />
-        <ScrollView className={`${cssPrefix}-container`} scrollY={true}>
+        <ScrollView className={`${cssPrefix}-container ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-container-h5` : ''}`} scrollY={true}>
           {this.renderStatusCard()}
           {
             orderDetail && orderDetail.refundOrderList && orderDetail.refundOrderList.length > 0 &&
@@ -310,7 +310,7 @@ class OrderDetail extends Taro.Component<Props, State> {
                   src='//net.huanmusic.com/weapp/customer/img_waitting.png'
                 />
               )
-              : res.title === '已取消' || res.title === '商家拒绝了退货申请' || res.title === '您撤销了退货申请'
+              : res.title === '交易关闭' || res.title === '已取消' || res.title === '商家拒绝了退货申请' || res.title === '您撤销了退货申请'
                 ? (
                   <Image
                     className={`${cssPrefix}-card-status-img1`}
