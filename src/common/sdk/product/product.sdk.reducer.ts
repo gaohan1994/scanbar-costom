@@ -1,19 +1,24 @@
 import productSdk, { ProductCartInterface } from "./product.sdk";
 import { AppReducer } from "../../../reducers";
 import { ProductInterface, UserInterface } from "../../../constants";
-import merge from 'lodash.merge';
+import merge from "lodash.merge";
+import { store } from "../../../app";
+import { MerchantInterface } from "src/constants";
 
 /**
- * @Author: Ghan 
- * @Date: 2019-11-22 14:20:31 
+ * @Author: Ghan
+ * @Date: 2019-11-22 14:20:31
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-14 09:51:03
+ * @Last Modified time: 2020-06-08 13:40:34
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
-
   interface State {
-    productCartList: Array<ProductCartInterface.ProductCartInfo>;
+    productCartList: {
+      [key: string]:
+        | ProductInterface.ProductInfo[]
+        | ProductCartInterface.ProductCartInfo[];
+    };
     productCartSelectedIndex: Array<number>;
     payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
     payOrderDetail: any;
@@ -22,10 +27,12 @@ export declare namespace ProductSDKReducer {
 
   interface ManageCartPayloadBase {
     product: ProductInterface.ProductInfo;
-    type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce;
+    type:
+      | ProductCartInterface.ProductCartAdd
+      | ProductCartInterface.ProductCartReduce;
     num?: number;
+    currentMerchantDetail: MerchantInterface.MerchantDetail;
   }
-
 
   /**
    * @todo 添加/减少 普通商品
@@ -34,7 +41,7 @@ export declare namespace ProductSDKReducer {
    * @interface ProductManageCart
    */
   interface ProductManageCart {
-    type: ProductCartInterface.MANAGE_CART_PRODUCT;
+    type: string;
     payload: ManageCartPayloadBase;
   }
 
@@ -45,43 +52,49 @@ export declare namespace ProductSDKReducer {
         type: string;
         product: ProductCartInterface.ProductCartInfo;
         products?: ProductCartInterface.ProductCartInfo[];
-      }
+        currentMerchantDetail: MerchantInterface.MerchantDetail;
+      };
     }
     interface ReceivePayOrderReducer {
       type: string;
       payload: {
         productList: ProductCartInterface.ProductCartInfo[];
-      }
+        currentMerchantDetail: MerchantInterface.MerchantDetail;
+      };
     }
     interface DeleteProductItemreducer {
       type: ProductCartInterface.DELETE_PRODUCT_ITEM;
       payload: {
         product: ProductCartInterface.ProductCartInfo;
         sort: string;
+        currentMerchantDetail: MerchantInterface.MerchantDetail;
       };
     }
     interface ManageCartList {
       type: ProductCartInterface.MANAGE_CART;
-      payload: { productCartList: ProductCartInterface.ProductCartInfo[] };
+      payload: {
+        productCartList: ProductCartInterface.ProductCartInfo[];
+        currentMerchantDetail: MerchantInterface.MerchantDetail;
+      };
     }
   }
 
   type Action =
-    ProductManageCart
+    | ProductManageCart
     | Reducers.ManageCartList
     | Reducers.ReceivePayOrderReducer
     | Reducers.CartSelectedIndex;
 }
 
 const initState: ProductSDKReducer.State = {
-  productCartList: [],
+  productCartList: {},
   productCartSelectedIndex: [],
   payOrderProductList: [],
   payOrderDetail: {
     deliveryType: 0,
-    remark: ''
+    remark: ""
   },
-  payOrderAddress: {} as any,
+  payOrderAddress: {} as any
 };
 
 export default function productSDKReducer(
@@ -89,55 +102,67 @@ export default function productSDKReducer(
   action: ProductSDKReducer.Action
 ): ProductSDKReducer.State {
   switch (action.type) {
+    // case productSdk.reducerInterface.SELECT_INDEX: {
+    //   const {
+    //     payload
+    //   } = action as ProductSDKReducer.Reducers.CartSelectedIndex;
+    //   const { productCartList } = state;
+    //   const { product, products, type = "normal" } = payload;
 
-    case productSdk.reducerInterface.SELECT_INDEX: {
-      const { payload } = action as ProductSDKReducer.Reducers.CartSelectedIndex;
-      const { productCartList } = state;
-      const { product, products, type = 'normal' } = payload;
-      
-      if (type === 'empty') {
-        let nextProductCartSelectedIndex = merge([], state.productCartSelectedIndex);
-        nextProductCartSelectedIndex = nextProductCartSelectedIndex.filter((index) => {
-          return products && products.some((p) => p !== index);
-        });
-        return {
-          ...state,
-          productCartSelectedIndex: !products
-            ? []
-            : nextProductCartSelectedIndex
-        };
-      }
+    //   if (type === "empty") {
+    //     let nextProductCartSelectedIndex = merge(
+    //       [],
+    //       state.productCartSelectedIndex
+    //     );
+    //     nextProductCartSelectedIndex = nextProductCartSelectedIndex.filter(
+    //       index => {
+    //         return products && products.some(p => p !== index);
+    //       }
+    //     );
+    //     return {
+    //       ...state,
+    //       productCartSelectedIndex: !products
+    //         ? []
+    //         : nextProductCartSelectedIndex
+    //     };
+    //   }
 
-      /**
-       * @todo [如果是全选/取消全选]
-       */
-      if (type === 'all') {
-        return {
-          ...state,
-          productCartSelectedIndex: productCartList.length === 0 
-            ? []
-              : state.productCartSelectedIndex.length > 0 
-                ? [] 
-                : productCartList.map((item) => item.id)
-        }
-      }
+    //   /**
+    //    * @todo [如果是全选/取消全选]
+    //    */
+    //   if (type === "all") {
+    //     return {
+    //       ...state,
+    //       productCartSelectedIndex:
+    //         productCartList.length === 0
+    //           ? []
+    //           : state.productCartSelectedIndex.length > 0
+    //           ? []
+    //           : productCartList.map(item => item.id)
+    //     };
+    //   }
 
-      /**
-       * @todo [选择/取消选择商品]
-       */
-      const nextProductCartSelectedIndex: number[] = merge([], state.productCartSelectedIndex);
-      const index = nextProductCartSelectedIndex.findIndex((i) => i === product.id);
-      if (index !== -1) {
-        nextProductCartSelectedIndex.splice(index, 1);
-      } else {
-        nextProductCartSelectedIndex.push(product.id);
-      }
-      
-      return {
-        ...state,
-        productCartSelectedIndex: nextProductCartSelectedIndex
-      };
-    }
+    //   /**
+    //    * @todo [选择/取消选择商品]
+    //    */
+    //   const nextProductCartSelectedIndex: number[] = merge(
+    //     [],
+    //     state.productCartSelectedIndex
+    //   );
+    //   const index = nextProductCartSelectedIndex.findIndex(
+    //     i => i === product.id
+    //   );
+    //   if (index !== -1) {
+    //     nextProductCartSelectedIndex.splice(index, 1);
+    //   } else {
+    //     nextProductCartSelectedIndex.push(product.id);
+    //   }
+
+    //   return {
+    //     ...state,
+    //     productCartSelectedIndex: nextProductCartSelectedIndex
+    //   };
+    // }
 
     case productSdk.reducerInterface.RECEIVE_ORDER_PAY_DETAIL: {
       const { payload } = action as any;
@@ -145,7 +170,7 @@ export default function productSDKReducer(
         return {
           ...state,
           payOrderDetail: payload
-        }
+        };
       }
       return {
         ...state,
@@ -153,7 +178,7 @@ export default function productSDKReducer(
           ...state.payOrderDetail,
           ...payload
         }
-      }
+      };
     }
 
     case productSdk.reducerInterface.RECEIVE_ORDER_PAY_ADDRESS: {
@@ -166,7 +191,9 @@ export default function productSDKReducer(
     }
 
     case productSdk.reducerInterface.RECEIVE_ORDER_PAY: {
-      const { payload } = action as ProductSDKReducer.Reducers.ReceivePayOrderReducer;
+      const {
+        payload
+      } = action as ProductSDKReducer.Reducers.ReceivePayOrderReducer;
       const { productList } = payload;
 
       return {
@@ -177,62 +204,91 @@ export default function productSDKReducer(
 
     case productSdk.reducerInterface.MANAGE_CART: {
       const { payload } = action as ProductSDKReducer.Reducers.ManageCartList;
-      const { productCartList } = payload;
+      const { productCartList, currentMerchantDetail } = payload;
       return {
         ...state,
-        productCartList: productCartList
+        productCartList: {
+          ...state.productCartList,
+          [`${currentMerchantDetail.id}`]: productCartList
+        }
       };
     }
     case productSdk.reducerInterface.MANAGE_EMPTY_CART: {
+      const { currentMerchantDetail } = action.payload;
       return {
         ...state,
-        productCartList: [],
+        productCartList: {
+          ...state.productCartList,
+          [`${currentMerchantDetail.id}`]: [] as any
+        }
       };
     }
     case productSdk.reducerInterface.MANAGE_CART_PRODUCT: {
       const { payload } = action as ProductSDKReducer.ProductManageCart;
-      const { product, type, num } = payload;
+      const { product, type, num, currentMerchantDetail } = payload;
 
-      const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], state.productCartList);
+      const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
+        [],
+        state.productCartList[currentMerchantDetail.id]
+      );
+
       const index = productCartList.findIndex(p => p.id === product.id);
       if (type === productSdk.productCartManageType.ADD) {
         /**
          * @todo [如果是普通商品，如果购物车中有了则+1]
          * @todo [如果是普通商品，如果购物车中没有则新增一个数量为1]
          */
-        let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], productCartList);
+        let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
+          [],
+          productCartList
+        );
         if (index === -1) {
           newProductCartList.push({
             ...product,
-            sellNum: (num || 1)
+            sellNum: num || 1
           });
           return {
             ...state,
-            productCartList: newProductCartList
+            productCartList: {
+              ...state.productCartList,
+              [`${currentMerchantDetail.id}`]: newProductCartList
+            }
           };
         } else {
-          newProductCartList[index].sellNum += (num || 1);;
+          newProductCartList[index].sellNum += num || 1;
           return {
             ...state,
-            productCartList: newProductCartList
+            productCartList: {
+              ...state.productCartList,
+              [`${currentMerchantDetail.id}`]: newProductCartList
+            }
           };
         }
       } else {
         if (index !== -1) {
-          let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge([], productCartList);
+          let newProductCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
+            [],
+            productCartList
+          );
           const currentItem = newProductCartList[index];
           const reduceNum = num || 1;
           if (currentItem.sellNum === reduceNum) {
             newProductCartList.splice(index, 1);
             return {
               ...state,
-              productCartList: newProductCartList,
+              productCartList: {
+                ...state.productCartList,
+                [`${currentMerchantDetail.id}`]: newProductCartList
+              }
             };
           } else {
             newProductCartList[index].sellNum -= reduceNum;
             return {
               ...state,
-              productCartList: newProductCartList
+              productCartList: {
+                ...state.productCartList,
+                [`${currentMerchantDetail.id}`]: newProductCartList
+              }
             };
           }
         } else {
@@ -241,8 +297,28 @@ export default function productSDKReducer(
       }
     }
     case productSdk.reducerInterface.MANAGE_CART_PRODUCT_REMOVE: {
-
     }
+
+    case productSdk.reducerInterface.INIT_ALIANCE_CART: {
+      const { payload } = action as any;
+      const { merchant } = payload;
+      /**
+       * @todo 如果选中店面那么初始化该店面的购物车
+       */
+      if (!state.productCartList[`${merchant.id}`]) {
+        return {
+          ...state,
+          productCartList: {
+            ...state.productCartList,
+            [`${merchant.id}`]: []
+          }
+        };
+      }
+      return {
+        ...state
+      };
+    }
+
     default: {
       return {
         ...state
@@ -251,8 +327,20 @@ export default function productSDKReducer(
   }
 }
 
-export const getProductCartList = (state: AppReducer.AppState) => state.productSDK.productCartList;
+export const getProductCartList = (state: AppReducer.AppState) => {
+  // return state.productSDK.productCartList;
+  if (!!state.merchant.currentMerchantDetail.id) {
+    return (
+      state.productSDK.productCartList[
+        state.merchant.currentMerchantDetail.id
+      ] || []
+    );
+  }
+  return [];
+};
 
-export const getPayOrderAddress = (state: AppReducer.AppState) => state.productSDK.payOrderAddress;
+export const getPayOrderAddress = (state: AppReducer.AppState) =>
+  state.productSDK.payOrderAddress;
 
-export const getPayOrderDetail = (state: AppReducer.AppState) => state.productSDK.payOrderDetail;
+export const getPayOrderDetail = (state: AppReducer.AppState) =>
+  state.productSDK.payOrderDetail;

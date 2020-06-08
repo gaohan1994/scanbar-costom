@@ -17,9 +17,10 @@ import { UserInterface, MerchantInterface } from "../../constants";
 import "./index.less";
 import { ProductInterface } from "../../constants/product/product";
 import merchantAction from "../../actions/merchant.action";
-import { Dispatch } from 'redux';
-import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
+import { Dispatch } from "redux";
+import { getCurrentMerchantDetail } from "../../reducers/app.merchant";
 import { LoginManager } from "../../common/sdk";
+import { getProductCartList } from "../../common/sdk/product/product.sdk.reducer";
 
 type Props = {
   dispatch: Dispatch;
@@ -49,12 +50,12 @@ class Page extends Taro.Component<Props, State> {
   async componentDidMount() {
     // this.loginCheck();
     try {
-        await LoginManager.getUserInfo(this.props.dispatch);
+      await LoginManager.getUserInfo(this.props.dispatch);
     } catch (error) {
-        Taro.showToast({
-            title: error.message,
-            icon: 'none'
-        });
+      Taro.showToast({
+        title: error.message,
+        icon: "none"
+      });
     }
   }
 
@@ -245,7 +246,7 @@ const select = (state: AppReducer.AppState) => {
   return {
     activityList: state.merchant.activityList,
     currentMerchantDetail: getCurrentMerchantDetail(state),
-    productCartList: state.productSDK.productCartList,
+    productCartList: getProductCartList(state),
     productSDKObj: state.productSDK,
     memberInfo: getMemberInfo(state),
     userinfo: getUserinfo(state),

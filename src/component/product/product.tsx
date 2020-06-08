@@ -9,6 +9,7 @@ import {getMemberInfo} from '../../reducers/app.user'
 import classnames from 'classnames';
 import numeral from 'numeral';
 import { Dispatch } from 'redux';
+import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 
 const cssPrefix = 'component-product';
 
@@ -319,7 +320,7 @@ class ProductComponent extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState, ownProps: Props) => {
     const {product} = ownProps;
-    const productList = state.productSDK.productCartList;
+    const productList = getProductCartList(state);
     const productInCart = product !== undefined && productList.find(p => p.id === product.id);
     return {
         product,

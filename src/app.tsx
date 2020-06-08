@@ -5,7 +5,6 @@ import Index from "./pages/index";
 import "./styles/reset.less";
 import configStore from "./store";
 import "taro-ui/dist/style/index.scss"; // 引入组件样式 - 方式一
-import { BASE_PARAM } from "./common/util/config";
 import getBaseUrl from "./common/request/base.url";
 
 // 如果需要在 h5 环境中开启 React Devtools

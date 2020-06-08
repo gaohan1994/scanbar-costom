@@ -1,19 +1,45 @@
 /*
  * @Author: Ghan
  * @Date: 2020-06-02 10:42:16
- * @Last Modified by:   Ghan
- * @Last Modified time: 2020-06-02 10:42:16
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-06-04 16:39:52
  */
 import Taro from "@tarojs/taro";
 import { View } from "@tarojs/components";
 import "./index.less";
+import { MerchantInterface } from "src/constants";
 
 const prefix = "index-component-card";
 
-function MerchantDetailCard() {
+type Props = {
+  merchant: MerchantInterface.AlianceMerchant;
+};
+
+function MerchantDetailCard(props: Props) {
+  const { merchant } = props;
+  console.log("merchant", merchant);
   return (
     <View className={`${prefix}`}>
-      <View className={`${prefix}-detail`}>gaohan</View>
+      <View className={`${prefix}-detail`}>
+        <View className={`${prefix}-detail-like`} />
+        <View className={`${prefix}-detail-top`}>
+          <View className={`${prefix}-detail-avatar`} />
+
+          <View className={`${prefix}-detail-right`}>
+            <View className={`${prefix}-detail-title`}>{merchant.name}</View>
+
+            {merchant.activityInfo && (
+              <View className={`${prefix}-detail-activitys`}>
+                {merchant.activityInfo.map(item => {
+                  return (
+                    <View className={`${prefix}-detail-activity`}>{item}</View>
+                  );
+                })}
+              </View>
+            )}
+          </View>
+        </View>
+      </View>
     </View>
   );
 }

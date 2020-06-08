@@ -19,7 +19,7 @@
  */
 import Taro from '@tarojs/taro';
 import {ProductInterface, ProductService, OrderInterface, ResponseCode, UserInterface, MerchantInterface} from '../../../constants';
-// import {store} from '../../../app';
+import {store} from '../../../app';
 import {ProductSDKReducer} from './product.sdk.reducer';
 import {BASE_PARAM} from '../../../common/util/config';
 import requestHttp from '../../../common/request/request.http';
@@ -137,6 +137,7 @@ export declare namespace ProductCartInterface {
 
     type ReducerInterface = {
         SELECT_INDEX: string;
+        INIT_ALIANCE_CART: string;
         MANAGE_CART: MANAGE_CART;
         MANAGE_EMPTY_CART: MANAGE_EMPTY_CART;
         MANAGE_CART_PRODUCT: MANAGE_CART_PRODUCT;
@@ -174,6 +175,7 @@ class ProductSDK {
 
     public reducerInterface: ProductCartInterface.ReducerInterface = {
         SELECT_INDEX: 'SELECT_INDEX',
+        INIT_ALIANCE_CART: "INIT_ALIANCE_CART",
         MANAGE_CART: 'MANAGE_CART',
         MANAGE_EMPTY_CART: 'MANAGE_EMPTY_CART',
         MANAGE_CART_PRODUCT: 'MANAGE_CART_PRODUCT',
@@ -189,8 +191,6 @@ class ProductSDK {
     }
 
     public refreshCartNumber = (productCartList) => {
-        // const state = store.getState()
-        // const productCartList = getProductCartList(state)
         const total = this.getProductNumber(productCartList);
         if (total !== 0) {
             Taro.setTabBarBadge({
@@ -341,7 +341,7 @@ class ProductSDK {
     /**
      * @todo 商家满减活动
      */
-    public getProductTotalActivityPrice = (activityList, memberInfo,productCartList, productList?: ProductCartInterface.ProductCartInfo[]): number => {
+    public getProductTotalActivityPrice = (activityList, memberInfo, productCartList, productList?: ProductCartInterface.ProductCartInfo[]): number => {
         const products = productList !== undefined ? productList : productCartList;
                 // const products = productList !== undefined ? productList : store.getState().productSDK.productCartList;  
         // const activityList = store.getState().merchant.activityList; 
@@ -594,16 +594,19 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public add = (dispatch, productSDK, product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo,
-                  num?: number,) => {
+    public add = (
+        dispatch, 
+        productSDK, 
+        product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo,
+        num?: number
+    ) => {
 
         Taro.showToast({
             title: '加入购物车'
         });
-
-        // const state = store.getState();
-        // const productCartList = state.productSDK.productCartList;
-        const productCartList = productSDK.productCartList;
+        const { merchant: { currentMerchantDetail } } = store.getState();
+        const productCartList =
+          productSDK.productCartList[currentMerchantDetail.id];
         const index = productCartList.findIndex(p => p.id === product.id);
         let limitNum = -1;
         if (product.activityInfos) {
@@ -670,12 +673,13 @@ class ProductSDK {
         }
 
         const reducer: ProductSDKReducer.ProductManageCart = {
-            type: this.reducerInterface.MANAGE_CART_PRODUCT,
-            payload: {
-                type: this.productCartManageType.ADD,
-                product,
-                num
-            }
+          type: this.reducerInterface.MANAGE_CART_PRODUCT,
+          payload: {
+            type: this.productCartManageType.ADD,
+            product,
+            num,
+            currentMerchantDetail
+          }
         };
         dispatch(reducer);
         /**
@@ -701,13 +705,15 @@ class ProductSDK {
      * @memberof ProductSDK
      */
     public reduce = (dispatch, productSDK, product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, num?: number) => {
+        const { currentMerchantDetail } = store.getState().merchant;
         const reducer: ProductSDKReducer.ProductManageCart = {
-            type: this.reducerInterface.MANAGE_CART_PRODUCT,
-            payload: {
-                type: this.productCartManageType.REDUCE,
-                product,
-                num: num || 1,
-            }
+          type: this.reducerInterface.MANAGE_CART_PRODUCT,
+          payload: {
+            type: this.productCartManageType.REDUCE,
+            product,
+            num: num || 1,
+            currentMerchantDetail
+          }
         };
         dispatch(reducer);
 
@@ -728,7 +734,6 @@ class ProductSDK {
             })
         }
     }
-
 
     /**
      * @todo 清空购物车
@@ -765,7 +770,6 @@ class ProductSDK {
             this.reduce(dispatch, productSDK, product, num);
         }
         this.storageProductCartList();
-
     }
 
     /**

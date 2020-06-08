@@ -266,12 +266,13 @@ class Index extends Component<any> {
       productType,
       advertisement,
       userinfo,
-      memberInfo
+      memberInfo,
+      currentMerchantDetail
     } = this.props;
     const isNew = this.CouponisNew(obtainCouponList);
     return (
       <View className={`container ${cssPrefix}`}>
-        {showActivity && <MerchantCard />}
+        {showActivity && <MerchantCard merchant={currentMerchantDetail} />}
         <MerchantSearch />
         {/* <View className={`${cssPrefix}-activity`}>
           <Banner advertisement={advertisement} />

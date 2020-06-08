@@ -21,6 +21,7 @@ import merchantAction from '../../actions/merchant.action';
 import { getMemberInfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
+import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 
 const cssPrefix = 'order';
 const openTime = 8;
@@ -29,6 +30,7 @@ const closeTime = 24;
 type Props = {
     dispatch: Dispatch;
     currentMerchantDetail: any;
+    productCartList: Array<ProductCartInterface.ProductCartInfo>;
     payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
     payOrderAddress: UserInterface.Address;
     payOrderDetail: any;
@@ -66,14 +68,19 @@ class Page extends Taro.Component<Props, State> {
         const {dispatch, currentMerchantDetail} = this.props;
         merchantAction.activityInfoList(dispatch, currentMerchantDetail.id);
         this.getDateList();
-        const {payOrderProductList, activityList, memberInfo, productSDKObj} = this.props;
+        const {
+          payOrderProductList,
+          activityList,
+          memberInfo,
+          productCartList
+        } = this.props;
         let productIds: any[] = [];
         for (let i = 0; i < payOrderProductList.length; i++) {
             productIds.push(payOrderProductList[i].id)
         }
         const params = {
             productIds: productIds,
-            amount: productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList, payOrderProductList)
+            amount: productSdk.getProductTransPrice(activityList, memberInfo, productCartList, payOrderProductList)
         };
         orderAction.getAbleToUseCoupon(dispatch, params);
     }
@@ -114,7 +121,7 @@ class Page extends Taro.Component<Props, State> {
                 productSdk.cashierOrderCallback(this.props.dispatch, result.data);
                 Taro.navigateTo({
                     url: '/pages/orderList/order'
-                }).catch((error) => {sss
+                }).catch((error) => {
                     /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
                     Taro.switchTab({url: '/pages/orderList/order'})
                 })
@@ -253,18 +260,41 @@ class Page extends Taro.Component<Props, State> {
     }
 
     render() {
-        const {payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj,} = this.props;
+        const {
+          payOrderProductList,
+          payOrderDetail,
+          activityList,
+          memberInfo,
+          productCartList
+        } = this.props;
         const {showTimeSelect, currentDate, selectDate, selectTime, timeList, dateList} = this.state;
-        const price = payOrderProductList && payOrderProductList.length > 0
-            ? numeral(productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList, payOrderProductList)).format('0.00')
-            : '0.00';
-        const tarnsPrice = payOrderProductList && payOrderProductList.length > 0
+        const price =
+          payOrderProductList && payOrderProductList.length > 0
             ? numeral(
-                productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList) +
-                (payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
-                (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
-            ).format('0.00')
-            : '0.00';
+                productSdk.getProductTransPrice(
+                  activityList,
+                  memberInfo,
+                  productCartList,
+                  payOrderProductList
+                )
+              ).format("0.00")
+            : "0.00";
+        const tarnsPrice =
+          payOrderProductList && payOrderProductList.length > 0
+            ? numeral(
+                productSdk.getProductTransPrice(
+                  activityList,
+                  memberInfo,
+                  productCartList,
+                  payOrderProductList
+                ) +
+                  (payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
+                  (payOrderDetail.selectedCoupon &&
+                  payOrderDetail.selectedCoupon.couponVO
+                    ? payOrderDetail.selectedCoupon.couponVO.discount
+                    : 0)
+              ).format("0.00")
+            : "0.00";
         // const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
         return (
             <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: '115vh'}}>
@@ -362,6 +392,7 @@ const select = (state: AppReducer.AppState) => {
         currentMerchantDetail: getCurrentMerchantDetail(state),
         memberInfo: getMemberInfo(state),
         productSDKObj: state.productSDK,
+        productCartList: getProductCartList(state),
     }
 }
 export default connect(select)(Page);

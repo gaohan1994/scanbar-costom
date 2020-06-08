@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2020-06-02 10:42:16
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-02 15:31:16
+ * @Last Modified time: 2020-06-03 11:30:57
  */
 import Taro from "@tarojs/taro";
 import { View } from "@tarojs/components";

@@ -196,11 +196,73 @@
     .padding(7px, t);
 
     &-detail {
+      .flex(flex-start, flex-start, column);
+      position: relative;
       width: 690px;
-      height: 230px;
+      // height: 230px;
+      min-height: 230px;
       background: rgba(255, 255, 255, 1);
       box-shadow: 0px 2px 13px 0px rgba(116, 162, 221, 0.45);
       border-radius: 10px;
+      .padding(30px, tb);
+      .padding(24px, lr);
+
+      &-like {
+        position: absolute;
+        right: 24px;
+        top: 32px;
+        width: 34px;
+        height: 31px;
+        .bg;
+        background-image: url(//net.huanmusic.com/scanbar-c/icon_collect_grey.png);
+        &-active {
+          background-image: url(//net.huanmusic.com/scanbar-c/icon_collect_orange.png);
+        }
+      }
+
+      &-top {
+        .flex(center, flex-start, row);
+        height: 124px;
+        width: 100%;
+      }
+
+      &-right {
+        .flex(flex-start, flex-start, column);
+        .margin(17px, l);
+        flex: 1;
+        height: 100%;
+      }
+
+      &-activitys {
+        .margin(20px, t);
+        display: flex;
+        flex-direction: row;
+      }
+
+      &-activity {
+        .padding(10px, lr);
+        height: 30px;
+        border: 1px solid rgba(252, 78, 68, 1);
+        border-radius: 10px;
+        font-size: 20px;
+        color: rgba(252, 78, 68, 1);
+      }
+
+      &-avatar {
+        width: 124px;
+        height: 124px;
+        .bg;
+        background: rgba(255, 255, 255, 1);
+        border: 1px solid rgba(229, 229, 229, 1);
+        border-radius: 10px;
+      }
+
+      &-title {
+        height: 36px;
+        font-size: 36px;
+        font-weight: bold;
+        color: rgba(51, 51, 51, 1);
+      }
     }
   }
 

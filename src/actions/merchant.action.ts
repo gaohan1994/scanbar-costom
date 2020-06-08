@@ -16,6 +16,7 @@ import { BASE_PARAM } from "../common/util/config";
 import requestHttp from "../common/request/request.http";
 // import { store } from '../app';
 import Taro from "@tarojs/taro";
+import productSdk from "../common/sdk/product/product.sdk";
 
 class MerchantAction {
   public getOrderedMerchant = dispatch => async params => {
@@ -42,6 +43,13 @@ class MerchantAction {
         type:
           MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL,
         payload: merchant
+      });
+
+      dispatch({
+        type: productSdk.reducerInterface.INIT_ALIANCE_CART,
+        payload: {
+          merchant
+        }
       });
     } catch (error) {
       Taro.showToast({

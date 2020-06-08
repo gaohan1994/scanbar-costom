@@ -12,8 +12,9 @@ import ProductDetail from "./component/detail";
 import ProductCart from "./component/cart";
 import { AppReducer } from "../../reducers";
 import { jsonToQueryString } from "../../constants";
-import { getMemberInfo } from '../../reducers/app.user';
+import { getMemberInfo } from "../../reducers/app.user";
 import { getMerchantActivityList } from "../../reducers/app.merchant";
+import { getProductCartList } from "../../common/sdk/product/product.sdk.reducer";
 
 class Page extends Taro.Component<any> {
   config: Config = {
@@ -35,7 +36,6 @@ class Page extends Taro.Component<any> {
   };
 
   onLoad(option) {
-
     if (option.query) {
       Taro.showToast({
         title: `${jsonToQueryString(option.query)}`
@@ -74,7 +74,11 @@ class Page extends Taro.Component<any> {
             ]
           }
         />
-        <ProductDetail memberInfo={memberInfo} activityList={activityList} product={productDetail} />
+        <ProductDetail
+          memberInfo={memberInfo}
+          activityList={activityList}
+          product={productDetail}
+        />
         {productDetail && productDetail.id && `${productDetail.id}` === id && (
           <ProductCart product={productDetail} />
         )}
@@ -88,7 +92,7 @@ const select = (state: AppReducer.AppState) => {
     productDetail: state.product.productDetail,
     memberInfo: getMemberInfo(state),
     activityList: getMerchantActivityList(state),
-    productList: state.productSDK.productCartList
+    productList: getProductCartList(state)
   };
 };
 
