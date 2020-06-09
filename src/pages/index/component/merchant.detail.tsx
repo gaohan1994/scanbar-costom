@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2020-06-02 10:42:16
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-04 16:39:52
+ * @Last Modified time: 2020-06-08 14:25:27
  */
 import Taro from "@tarojs/taro";
 import { View } from "@tarojs/components";
@@ -39,6 +39,12 @@ function MerchantDetailCard(props: Props) {
             )}
           </View>
         </View>
+
+        {merchant.deliveryThreshold && (
+          <View className={`${prefix}-detail-stant`}>
+            {`公告：超出${merchant.deliveryThreshold}公里不配送`}
+          </View>
+        )}
       </View>
     </View>
   );

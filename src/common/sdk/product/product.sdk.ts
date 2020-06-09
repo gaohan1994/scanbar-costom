@@ -20,7 +20,7 @@
 import Taro from '@tarojs/taro';
 import {ProductInterface, ProductService, OrderInterface, ResponseCode, UserInterface, MerchantInterface} from '../../../constants';
 import {store} from '../../../app';
-import {ProductSDKReducer} from './product.sdk.reducer';
+import { ProductSDKReducer, getProductCartList } from './product.sdk.reducer';
 import {BASE_PARAM} from '../../../common/util/config';
 import requestHttp from '../../../common/request/request.http';
 import merge from 'lodash.merge';
@@ -207,13 +207,10 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public getProductNumber = (productCartList: any, products?: ProductCartInterface.ProductCartInfo[]) => {
-        // const productList = products !== undefined
-        //     ? products
-        //     : store.getState().productSDK.productCartList;
+    public getProductNumber = (products?: ProductCartInterface.ProductCartInfo[]) => {
         const productList = products !== undefined
             ? products
-            : productCartList;
+            : getProductCartList(store.getState());
         const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.sellNum
         const total = productList.reduce(reduceCallback, 0);
         return total;

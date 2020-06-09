@@ -49,18 +49,18 @@ class App extends Component {
       // 'pages/address/address.change.index'
     ],
     subPackages: [
-      // {
-      //   root: "pages/order/",
-      //   pages: [
-      //     "order.pay",
-      //     "order.pay.remark",
-      //     "order.pay.coupon",
-      //     "order.detail",
-      //     "order.cancel",
-      //     "order.refund",
-      //     "order.refund.schedule"
-      //   ]
-      // },
+      {
+        root: "pages/order/",
+        pages: [
+          "order.pay",
+          "order.pay.remark",
+          "order.pay.coupon",
+          "order.detail",
+          "order.cancel",
+          "order.refund",
+          "order.refund.schedule"
+        ]
+      },
       // {
       //   root: 'pages/user/',
       //   pages: [

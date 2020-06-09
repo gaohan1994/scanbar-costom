@@ -8,7 +8,7 @@ import ProductMenu from "../../component/product/product.menu";
 import IndexAddress from "./component/address";
 import MerchantSearch from "./component/search";
 import MerchantCard from "./component/merchant.detail";
-import Banner from "./component/banner";
+import CartBar from '../../component/cart/cart';
 import invariant from "invariant";
 import { ProductAction, MerchantAction, UserAction } from "../../actions";
 import { ResponseCode, ProductInterface } from "../../constants";
@@ -340,6 +340,8 @@ class Index extends Component<any> {
           isNew={isNew.isNew}
           hasGet={isNew.hasGet}
         />
+
+        <CartBar />
       </View>
     );
   }
