@@ -11,6 +11,8 @@ import { getMemberInfo } from '../../../reducers/app.user';
 interface Props {
   dispatch: Dispatch;
   activityList: any;
+  selectedIndex?: any;
+  isCart?: boolean;
   style?: any;
   memberInfo: any;
   productCartList: ProductCartInterface.ProductCartInfo[];
@@ -50,7 +52,7 @@ class Footer extends Taro.Component<Props> {
   }
 
   render () {
-    const { activityList, memberInfo, productCartList, productCartSelectedIndex } = this.props;
+    const { activityList, memberInfo, selectedIndex, isCart, productCartList, productCartSelectedIndex, dispatch } = this.props;
 
     const selectProductList = productCartList.filter((product) => {
       return productCartSelectedIndex.some((id) => id === product.id);
@@ -64,6 +66,10 @@ class Footer extends Taro.Component<Props> {
       : '0.00';
     return (
       <CartFooter
+        selectedIndex={selectedIndex}
+        isCart={isCart}
+        dispatch={dispatch}
+        productCartList={productCartList}
         buttonTitle={`结算(${productSdk.getProductNumber(selectProductList)})`}
         buttonClick={() => this.onSubmit()}
         priceTitle={'合计：'}

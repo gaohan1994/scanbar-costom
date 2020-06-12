@@ -84,6 +84,8 @@ class CouponModal extends Taro.Component<Props, State> {
                   this.setState({
                     itemObj: itemObjNew
                   })
+                } else {
+                  onClose();
                 }
               }}
             >

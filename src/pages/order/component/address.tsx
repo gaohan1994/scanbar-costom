@@ -12,9 +12,10 @@ import AddressItem from '../../../component/address/item'
 import { getPayOrderAddress } from '../../../common/sdk/product/product.sdk.reducer'
 import merchantAction from '../../../actions/merchant.action'
 import { getMerchantDistance, getCurrentMerchantDetail } from '../../../reducers/app.merchant'
-import { getCurrentPostion } from '../../../reducers/app.user'
+import { getCurrentPostion, getIndexAddress } from '../../../reducers/app.user';
 import { Dispatch } from 'redux';
 import { BASE_PARAM } from "../../../common/util/config";
+import UserAction from '../../../actions/user.action';
 const tabs = [
   {
     title: '配送上门',
@@ -30,6 +31,7 @@ const prefix = 'order-component-address'
 
 type Props = {
   dispatch: Dispatch;
+  indexAddressObj: any;
   payOrderAddress: UserInterface.Address;
   merchantDistance: MerchantInterface.Distance;
   currentMerchantDetail: MerchantInterface.MerchantDetail;
@@ -51,13 +53,14 @@ class Comp extends Taro.Component<Props, State> {
   }
 
   componentDidMount() {
-    const { currentPostion, currentMerchantDetail } = this.props;
+    const { indexAddressObj, currentMerchantDetail } = this.props;
     this.changeTab(tabs[0])
     merchantAction.merchantDistance(this.props.dispatch, {
-      latitude: currentPostion.latitude,
-      longitude: currentPostion.longitude,
+      latitude: indexAddressObj.latitude,
+      longitude: indexAddressObj.longitude,
       merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
     })
+    UserAction.addressList(this.props.dispatch, indexAddressObj);
   }
 
   public changeTab = (tab) => {
@@ -215,6 +218,7 @@ class Comp extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => {
   return {
+    indexAddressObj: getIndexAddress(state),
     currentPostion: getCurrentPostion(state),
     payOrderAddress: getPayOrderAddress(state),
     merchantDistance: getMerchantDistance(state),

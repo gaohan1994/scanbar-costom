@@ -28,8 +28,8 @@ class UserService {
     return result;
   }
 
-  public addressList = async (): Promise<HTTPInterface.ResponseResultBase<UserInterface.Address[]>> => {
-    const result = await requestHttp.get('/api/address/list');
+  public addressList = async (param): Promise<HTTPInterface.ResponseResultBase<UserInterface.Address[]>> => {
+    const result = await requestHttp.get(`/api/address/list${jsonToQueryString(param)}`);
     return result;
   }
 

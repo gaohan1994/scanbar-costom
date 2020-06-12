@@ -59,14 +59,28 @@ class ProductComponent extends Taro.Component<Props, State> {
         });
     }
 
-    public manageProduct = (type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce, e: any) => {
-        if (e.stopPropagation) {
+    public manageProduct = (type: ProductCartInterface.ProductCartAdd | ProductCartInterface.ProductCartReduce, limit: any, e: any) => {
+        if(e){
             e.stopPropagation();
         }
-        const {product, dispatch, productSDKObj} = this.props;
-        productSdk.manage(dispatch, productSDKObj, {type, product});
+        if(limit && limit.isAdd === true){
+            Taro.showToast({
+                title: '只能购买'+limit.limitNum+'件',
+                icon: 'none'
+            });
+        } else {
+            const {product, dispatch, productSDKObj} = this.props;
+            productSdk.manage(dispatch, productSDKObj, {type, product});
+        }
     }
-
+    public NotAdd = (limitNum: any, e: any) => {
+        console.log('NotAdd', e)
+        e.stopPropagation();
+        Taro.showToast({
+            title: '只能购买'+limitNum+'件',
+            icon: 'none'
+        });
+    }
     public onContentClick = () => {
         const {product} = this.props;
         Taro.navigateTo({
@@ -189,8 +203,8 @@ class ProductComponent extends Taro.Component<Props, State> {
                     {
                         singleActiveList.length && productSdk.getDiscountString(memberInfo, activeList, product) !== '会员专享' ? (
                             <View className={`${cssPrefix}-discount`}>
-                                <Text className={`${cssPrefix}-discount-text`}>
-                                    {`${productSdk.getDiscountString(memberInfo, activeList, product)}`}
+                                <Text className={`${cssPrefix}-discount-text`} style={{WebkitBoxOrient: 'vertical'}}>
+                                    {`${productSdk.getDiscountString(memberInfo, singleActiveList, product)}`}
                                 </Text>
                             </View>
                         ): null
@@ -212,6 +226,7 @@ class ProductComponent extends Taro.Component<Props, State> {
                                         [`${cssPrefix}-discount-text`]: productSdk.getDiscountString(memberInfo, batchActiveList, product) === '会员专享',
                                         [`${cssPrefix}-batchDiscount-text`]: productSdk.getDiscountString(memberInfo, batchActiveList, product) !== '会员专享',
                                     })}
+                                    style={{WebkitBoxOrient: 'vertical'}}
                                 >
                                     {`${productSdk.getDiscountString(memberInfo, batchActiveList, product)}`}
                                 </Text>
@@ -229,6 +244,11 @@ class ProductComponent extends Taro.Component<Props, State> {
     private renderStepper = () => {
         // direct 黑魔法code 不加这段代码 购物车页面减少时有渲染bug
         const {product, productInCart, direct, isCart} = this.props;
+        const activityInfos = product && product.activityInfos.filter(val => val.type !== 3) || [];
+        let limitNum = -1;
+        activityInfos.forEach((item) => {
+            limitNum = item.limitNum;
+        })
         if (direct === true) {
             return (
                 <View className={`${cssPrefix}-stepper`}>
@@ -252,10 +272,10 @@ class ProductComponent extends Taro.Component<Props, State> {
                                     className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-reduce`)}
                                 />
                             </View>
-                            <Text className={`${cssPrefix}-stepper-text`}>{(product as any).sellNum}</Text>
+                            <Text className={`${cssPrefix}-stepper-text`}>{product.sellNum}</Text>
                             <View
                                 className={`${cssPrefix}-stepper-touch`}
-                                onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD)}
+                                onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD, {limitNum: limitNum, isAdd: product && limitNum !== -1 && limitNum === product.sellNum})}
                             >
                                 <View
                                     className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
@@ -279,6 +299,7 @@ class ProductComponent extends Taro.Component<Props, State> {
             )
 
         }
+     
         return (
             <View className={`${cssPrefix}-stepper`}>
                 {product.saleNumber <= 0 ? (
@@ -298,7 +319,7 @@ class ProductComponent extends Taro.Component<Props, State> {
                         <Text className={`${cssPrefix}-stepper-text`}>{productInCart.sellNum}</Text>
                         <View
                             className={`${cssPrefix}-stepper-touch`}
-                            onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD)}
+                            onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD, {limitNum: limitNum, isAdd: productInCart && limitNum !== -1 && limitNum === productInCart.sellNum})}
                         >
                             <View
                                 className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}

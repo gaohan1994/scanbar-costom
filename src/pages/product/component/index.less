@@ -163,19 +163,30 @@
     border-top: 1px solid rgba(227,227,227,1);;
     position: fixed;
     bottom: 0;
+    height: 120px;
     left: 0;
     right: 0;
     background-color: #fff;
     &-box {
       width: 100%;
       height: 120px;
-      .flex(center, space-between, row);
+      // .flex(center, space-between, row);
       .padding(30px, r);
       .padding(30px, l);
     }
     &-left {
-      position: relative;
-      .flex(center, center, column);
+      margin: 20px 0;
+      font-size:24px;
+      // .flex(center, center, column);
+      float: left;
+      &-item { 
+        bottom: 0px;
+        &-txt {
+          position: absolute;
+          top: 35%;
+          left: 10%;
+        }
+      }
       &-detail {
         .margin(40px, l);
       }
@@ -192,9 +203,14 @@
         .margin(8px, t);
       }
     }
-
+    &-rightPrice {
+      float: right;
+      margin: 10px 0px;
+      margin-right: 10px;
+    }
     &-right {
       margin: 20px 0;
+      float: right;
       &-button {
         &-pay {
           width: 240px !important;
@@ -210,6 +226,8 @@
       }
       &-empty {
         background:rgba(204,204,204,1) !important;
+        margin: 20px 0;
+        float: right;
       }
 
       &-stepper {

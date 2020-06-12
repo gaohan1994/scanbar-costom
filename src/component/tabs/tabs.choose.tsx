@@ -82,7 +82,6 @@ class TabsChoose extends Taro.Component<Props, State> {
     const { tabs, } = this.props;
     const { current } = this.state;
     const {onContentItemClick} = this;
-    console.log('this.state', this.state)
     return (
       <View className={`${cssPrefix} ${cssPrefix}-pos`}>
         <View className={`${cssPrefix}-container`}>
@@ -96,8 +95,6 @@ class TabsChoose extends Taro.Component<Props, State> {
               <View className={`${cssPrefix}-header-list-container`}>
                 {
                   tabs && tabs.length > 0 && tabs.map((tab, index) => {
-
-                    console.log(current === index, current,  index)
                     return (
                       <View
                         id={`tab${index}`}

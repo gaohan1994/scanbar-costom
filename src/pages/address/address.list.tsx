@@ -4,7 +4,7 @@ import { View } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
 import { AppReducer } from '../../reducers'
-import { getAddressList } from '../../reducers/app.user'
+import { getAddressList, getIndexAddress } from '../../reducers/app.user';
 import { UserInterface } from '../../constants'
 import AddressItem from '../../component/address/item'
 import ButtonFooter from '../../component/button/button.footer'
@@ -16,6 +16,7 @@ import { Dispatch } from 'redux';
 type Props = {
   dispatch: Dispatch;
   addressList: UserInterface.Address[];
+  indexAddress: any;
 }
 
 type State = {
@@ -40,7 +41,8 @@ class Page extends Taro.Component<Props, State> {
   }
 
   componentDidShow () {
-    UserAction.addressList(this.props.dispatch);
+    const {indexAddress} = this.props;
+    UserAction.addressList(this.props.dispatch, indexAddress);
   }
 
   public onAddressClick = (address: UserInterface.Address) => {
@@ -98,7 +100,8 @@ class Page extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => {
   return {
-    addressList: getAddressList(state)
+    addressList: getAddressList(state),
+    indexAddress: getIndexAddress(state)
   }
 }
 export default connect(select)(Page);

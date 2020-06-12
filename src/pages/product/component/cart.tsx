@@ -33,6 +33,11 @@ class Cart extends Taro.Component<Props> {
 
   public renderStepper = () => {
     const { product, productInCart  } = this.props;
+    const activityInfos = product && product.activityInfos.filter(val => val.type !== 3) || [];
+    let limitNum = -1;
+    activityInfos.forEach((item) => {
+        limitNum = item.limitNum;
+    })
     if (product && product.saleNumber <= 0) {
       return (
         <View 
@@ -53,7 +58,12 @@ class Cart extends Taro.Component<Props> {
             <Text className={`${cssPrefix}-stepper-text ${prefix}-cart-right-text`}>{productInCart.sellNum}</Text>
             <View 
               className={classnames(`${cssPrefix}-stepper-button ${prefix}-cart-right-stepper`, `${cssPrefix}-stepper-button-add`)}
-              onClick={() => this.manageProduct(productSdk.productCartManageType.ADD)}
+              onClick={limitNum !== -1 && limitNum === productInCart.sellNum ? () => {
+                Taro.showToast({
+                  title: '只能购买'+limitNum+'件',
+                  icon: 'none'
+                });
+              } : () => this.manageProduct(productSdk.productCartManageType.ADD)}
             />  
           </View>
         )}

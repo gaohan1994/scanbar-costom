@@ -51,9 +51,11 @@ class Page extends Taro.Component<Props, State> {
     }
     Taro.showLoading();
     const result = await UserAction.getMemberCoupons(this.props.dispatch, params);
-    this.setState({
-      total: result.data.total
-    });
+    if(result && result.data){
+      this.setState({
+        total: result.data.total
+      });
+    }
     Taro.hideLoading();
   }
 
@@ -80,9 +82,11 @@ class Page extends Taro.Component<Props, State> {
         }
         Taro.showLoading();
         const result =await UserAction.getMemberCoupons(this.props.dispatch,params);
-        this.setState({
-          total: result.data.total
-        });
+        if(result && result.data){
+          this.setState({
+            total: result.data.total
+          });
+        }
         Taro.hideLoading();
       } else if (tabNum === 0) {
         // 未使用
@@ -94,9 +98,11 @@ class Page extends Taro.Component<Props, State> {
         Taro.showLoading();
         
         const result = await UserAction.getMemberCoupons(this.props.dispatch,params);
-        this.setState({
-          total: result.data.total
-        });
+        if(result && result.data){
+          this.setState({
+            total: result.data.total
+          });
+        }
         Taro.hideLoading();
       } else {
         // 已过期
@@ -108,9 +114,11 @@ class Page extends Taro.Component<Props, State> {
         Taro.showLoading();
         
         const result = await UserAction.getMemberExpiredCoupons(this.props.dispatch,params);
-        this.setState({
-          total: result.data.total
-        });
+        if(result && result.data){
+          this.setState({
+            total: result.data.total
+          });
+        }
         Taro.hideLoading();
       }
     });
@@ -194,10 +202,12 @@ class Page extends Taro.Component<Props, State> {
       }
       Taro.showLoading();
       const result = await UserAction.getMemberCouponsMore(this.props.dispatch,params);
-      this.setState({
-        total: result.data.total,
-        pageNum: this.state.pageNum + 1,
-      });
+      if(result && result.data){
+        this.setState({
+          total: result.data.total,
+          pageNum: this.state.pageNum + 1,
+        });
+      }
       Taro.hideLoading();
     } else if (this.state.currentType === 0) {
       // 未使用
@@ -208,10 +218,12 @@ class Page extends Taro.Component<Props, State> {
       }
       Taro.showLoading();
       const result =  await UserAction.getMemberCouponsMore(this.props.dispatch,params);
-      this.setState({
-        total: result.data.total,
-        pageNum: this.state.pageNum + 1,
-      });
+      if(result && result.data){
+        this.setState({
+          total: result.data.total,
+          pageNum: this.state.pageNum + 1,
+        });
+      }
       Taro.hideLoading();
     } else {
       // 已过期
@@ -222,10 +234,12 @@ class Page extends Taro.Component<Props, State> {
       }
       Taro.showLoading();
       const result = await UserAction.getMemberExpiredCouponsMore(this.props.dispatch,params);
-      this.setState({
-        total: result.data.total,
-        pageNum: this.state.pageNum + 1,
-      });
+      if(result && result.data){
+        this.setState({
+          total: result.data.total,
+          pageNum: this.state.pageNum + 1,
+        });
+      }
       Taro.hideLoading();
     }
   }

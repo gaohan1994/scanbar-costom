@@ -84,8 +84,10 @@ class OrderButtons extends Taro.Component<Props, State> {
   }
 
   public orderOneMore = async (order: OrderInterface.OrderDetail) => {
+
     const { orderDetailList } = order;
     const {productSDKObj, dispatch} = this.props;
+    console.log(order, 'order--------orderOneMore', productSDKObj);
     if (orderDetailList && orderDetailList.length > 0) {
       for (let i = 0; i < orderDetailList.length; i++) {
         const res = await ProductAction.productInfoDetail(dispatch, { id: orderDetailList[i].productId });

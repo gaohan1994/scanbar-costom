@@ -1,5 +1,5 @@
 import Taro, { Config } from "@tarojs/taro";
-import { View } from "@tarojs/components";
+import { View, Image } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import "../style/product.less";
 import numeral from "numeral";
@@ -111,7 +111,50 @@ class Page extends Taro.Component<Props, State> {
       num: product.sellNum
     });
   };
+  getMaxActivityRule = (subTotalPrice: any, activity: any) => {
+    if(activity.rule){
+      const list: any = [];
+      let maxThreshold = activity.rule[0].threshold;
+      let nowThreshold = activity.rule[0].threshold;
+      activity.rule.forEach(element => {
+        if(subTotalPrice < element.threshold){
+          list.push(element.threshold);
 
+          if(nowThreshold > element.threshold){
+            nowThreshold  = element.threshold;
+          }
+          console.log('activity.rule.forEach', element, nowThreshold)
+          if(maxThreshold < element.threshold){
+            maxThreshold  = element.threshold;
+          }
+        } else {
+          if(nowThreshold < element.threshold){
+            nowThreshold  = element.threshold;
+          }
+          if(maxThreshold < element.threshold){
+            maxThreshold  = element.threshold;
+          }
+        }
+      
+      });
+      let price = list[0];
+      list.forEach(element => {
+        if(price > element){
+          price  = element;
+        }
+      });
+
+      const Item = activity.rule.find((r) => r.threshold === price);
+      const maxDiscountItem = activity.rule.find((r) => r.threshold === maxThreshold);
+      const NowDiscountItem = activity.rule.find((r) => r.threshold === nowThreshold);
+      if(Item){
+        console.log('getMaxActivityRule-----price', {rule: Item, ruleNow: NowDiscountItem});
+        return {rule: Item, ruleNow: NowDiscountItem};
+      }
+      console.log('getMaxActivityRule-----price', {rule: maxDiscountItem, ruleNow: NowDiscountItem});
+      return {rule: maxDiscountItem, ruleNow: NowDiscountItem};
+    } 
+  }
   render() {
     const {
       productCartList,
@@ -120,10 +163,12 @@ class Page extends Taro.Component<Props, State> {
       productCartSelectedIndex,
       memberInfo
     } = this.props;
+    const {getMaxActivityRule} = this;
     const productFilterCartList = productSdk.filterByActivity(
       productCartList,
       activityList
     );
+    console.log('productFilterCartList', productFilterCartList);
     return (
       <View className="container">
         {productCartList && productCartList.length > 0 ? (
@@ -142,6 +187,10 @@ class Page extends Taro.Component<Props, State> {
                     subTotalPrice += itemTotal;
                   }
                 });
+                const ActivityRule = getMaxActivityRule(subTotalPrice, activity);
+                const {rule, ruleNow} = ActivityRule ? ActivityRule : {rule: null, ruleNow: null}
+                console.log('getMaxActivityRule', rule, subTotalPrice, activity, ruleNow)
+                // subTotalPrice < activity.rule[0].threshold
                 return (
                   <View
                     className={`cart-list-info ${
@@ -160,13 +209,13 @@ class Page extends Taro.Component<Props, State> {
                               {activity.name}
                             </View>
 
-                            {`满${activity.rule[0].threshold}减${activity.rule[0].discount}`}
-                            {subTotalPrice < activity.rule[0].threshold ? (
+                            {`满${ruleNow.threshold}减${ruleNow.discount}`}
+                            {rule.threshold > subTotalPrice? (
                               <View style="display: flex">
                                 ，再买
                                 <View style="color: #FC4E44">
                                   {numeral(
-                                    activity.rule[0].threshold - subTotalPrice
+                                    rule.threshold - subTotalPrice
                                   ).format("0.00")}
                                 </View>
                                 元立享优惠
@@ -174,6 +223,20 @@ class Page extends Taro.Component<Props, State> {
                             ) : (
                               <View />
                             )}
+                            {rule.threshold > subTotalPrice ? (
+                              <View
+                                className={`cart-component-section-toHome`}
+                                onClick={() => {
+                                  Taro.navigateTo({url: '/pages/index/index'})
+                                }}
+                              >
+                                去凑单
+                                <Image
+                                  className={`cart-component-section-toHome-img`}
+                                  src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
+                                />
+                              </View>
+                            ) :null}
                           </View>
                         )}
                         {productList.map((item, index) => {
@@ -234,6 +297,8 @@ class Page extends Taro.Component<Props, State> {
         )}
         {productCartList && productCartList.length > 0 && (
           <Footer
+            selectedIndex={productCartSelectedIndex}
+            isCart={true}
             beforeSubmit={this.beforeSubmit}
             style={process.env.TARO_ENV === "h5" ? { bottom: "50px" } : {}}
           />
