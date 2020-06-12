@@ -41,6 +41,7 @@ export declare namespace ProductCartInterface {
 
     interface ProductOrderPayload {
         address: string;
+        deliveryInfo: any;
         deliveryPhone: string;
         delivery_time: string;
         points: any;
@@ -334,7 +335,6 @@ class ProductSDK {
             /**
              * @todo 如果只有一个规则且阈值小于价格则使用满减
              */
-        
             if (activity.rule.length === 1) {
                 return activity.rule[0].threshold <= price ? numeral(price - activity.rule[0].discount).value() : price;
             }
@@ -356,6 +356,7 @@ class ProductSDK {
                 // const products = productList !== undefined ? productList : store.getState().productSDK.productCartList;  
         // const activityList = store.getState().merchant.activityList; 
         const filterProductList = this.filterByActivity(products, activityList);
+        console.log('filterProductList', filterProductList);
         let activityMoney: number = 0;
 
         filterProductList.forEach((activityItem) => {
@@ -365,11 +366,12 @@ class ProductSDK {
                 subTotal += this.getProductItemPrice(product, memberInfo) * product.sellNum;
             })
             const subActivityMoney = this.getProductActivityPrice(subTotal, activity);
-            if (subTotal !== subActivityMoney) {
-                activityMoney = subTotal - subActivityMoney;
+            console.log('subActivityMoney', subActivityMoney, subTotal, subActivityMoney && subTotal !== subActivityMoney);
+            if (subActivityMoney && subTotal !== subActivityMoney ) {
+                activityMoney += subTotal - subActivityMoney;
             }
         })
-
+        console.log('activityMoney', activityMoney);
         return activityMoney;
     }
 
@@ -418,14 +420,16 @@ class ProductSDK {
                 if (!Array.isArray(rules) || !rules.length || !rules[0].threshold || !rules[0].threshold) {
                     return '';
                 }
-                return `满${rules[0].threshold}元减${rules[0].discount}元`;
+                const str = rules.map(val => `满${val.threshold}元减${val.discount}元`)
+                return str.join('；');
             case 4:
                 if (!activity.rule) return '';
                 const ruleList = JSON.parse(activity.rule);
                 if (!Array.isArray(ruleList) || !ruleList.length || !ruleList[0].threshold || !ruleList[0].threshold) {
                     return '';
                 }
-                return `满${ruleList[0].threshold}件打${ruleList[0].discount}折`;
+                const strList = ruleList.map(val => `满${val.threshold}件打${val.discount}折`)
+                return strList.join('；');
             default:
                 return ``;
         }
@@ -501,11 +505,13 @@ class ProductSDK {
         const productList = products !== undefined ? products : productCartList;
         // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
         let order: Partial<ProductCartInterface.ProductOrderPayload> = {
-            address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
+            deliveryInfo: {
+                address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
+                deliveryType: payOrderDetail.deliveryType || 0,
+                deliveryFee: payOrderDetail.deliveryType === 1 ? 3.5 : 0,
+                planDeliveryTime: payOrderDetail.planDeliveryTime || '',
+            },
             deliveryPhone: '',
-            planDeliveryTime: payOrderDetail.planDeliveryTime || '',
-            deliveryType: payOrderDetail.deliveryType || 0,
-            deliveryFee: payOrderDetail.deliveryType === 1 ? 3.5 : 0,
             remark: payOrderDetail.remark || "",
             payType: 8,
             merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
@@ -520,8 +526,12 @@ class ProductSDK {
         if (payOrderDetail.deliveryType === 1) {
             order = {
                 ...order,
-                receiver: address && address.contact || "",
-                receiverPhone: address && address.phone || '',
+                deliveryInfo: {
+                    ...order.deliveryInfo,
+                    receiver: address && address.contact || "",
+                    receiverPhone: address && address.phone || '',
+                }
+
             }
         }
 
@@ -893,10 +903,10 @@ class ProductSDK {
                             /**
                              * @todo [如果没有满足条件的满减分类则插入到全部满减/非满减中]
                              */
-                            if (!nextProductList[nextProductList.length - 1].productList.some((p) => p.barcode === currentProduct.barcode)) {
-                                execd = true;
-                                nextProductList[nextProductList.length - 1].productList.push(currentProduct);
-                            }
+                            // if (!nextProductList[nextProductList.length - 1].productList.some((p) => p.barcode === currentProduct.barcode)) {
+                            //     execd = true;
+                            //     nextProductList[nextProductList.length - 1].productList.push(currentProduct);
+                            // }
                         }
                     }
                 })

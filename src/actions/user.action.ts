@@ -32,8 +32,8 @@ class UserAction {
    *
    * @memberof UserAction
    */
-  public addressList = async (dispatch) => {
-    const result = await UserService.addressList();
+  public addressList = async (dispatch, param) => {
+    const result = await UserService.addressList(param);
     if (result.code === ResponseCode.success) {
       dispatch({
         type: UserInterfaceMap.reducerInterface.RECEIVE_ADDRESS_LIST,

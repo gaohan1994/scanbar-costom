@@ -23,6 +23,7 @@ import { Dispatch } from 'redux';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 import { getOrderDetail } from '../../reducers/app.order';
 import { UserAction } from '../../actions'
+import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 
 const cssPrefix = 'order';
 const openTime = 8;
@@ -34,6 +35,7 @@ type Props = {
     payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
     payOrderAddress: UserInterface.Address;
     payOrderDetail: any;
+    productCartList: any;
     orderDetail: any;
     activityList: any;
     memberInfo: any;
@@ -47,6 +49,7 @@ type State = {
     selectTime: string;
     timeList: string[];
     dateList: OrderInterface.DateItem;
+    isOnClick: boolean;
 }
 
 class Page extends Taro.Component<Props, State> {
@@ -63,6 +66,7 @@ class Page extends Taro.Component<Props, State> {
         selectTime: '',
         timeList: [],
         dateList: [] as any,
+        isOnClick: true,
     }
 
     componentDidMount() {
@@ -103,33 +107,54 @@ class Page extends Taro.Component<Props, State> {
     }
 
     public createOrder = async () => {
-        try {
-            const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch} = this.props;
-            const payload = productSdk.getProductInterfacePayload(productSDKObj.currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal);
-            const result = await productSdk.cashierOrder(payload)
-            invariant(result.code === ResponseCode.success, result.msg || ' ');
-            Taro.hideLoading();
-            const payment = await productSdk.requestPayment(result.data.order.orderNo, (res) => {
+        if(this.state.isOnClick){
+            this.setState({
+                isOnClick: false
             })
-            if (payment.errMsg !== 'requestPayment:ok') {
-                productSdk.cashierOrderCallback(this.props.dispatch, result.data);
-                Taro.navigateTo({
-                    url: '/pages/orderList/order'
-                }).catch((error) => {
-                    /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
-                    Taro.switchTab({url: '/pages/orderList/order'})
+            try {
+                const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch} = this.props;
+                const payload = productSdk.getProductInterfacePayload(productSDKObj.currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal);
+                const result = await productSdk.cashierOrder(payload)
+                invariant(result.code === ResponseCode.success, result.msg || ' ');
+                Taro.hideLoading();
+                const payment = await productSdk.requestPayment(result.data.order.orderNo, (res) => {
                 })
-                return;
+                console.log('payment', payment);
+                if (payment.errMsg !== 'requestPayment:ok') {
+                    productSdk.cashierOrderCallback(this.props.dispatch, result.data);
+                    Taro.navigateTo({
+                        url: '/pages/orderList/order'
+                    }).catch((error) => {
+                        /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
+                        console.log('switchTab');
+                        const {order} = result.data;
+                        Taro.redirectTo({
+                            url: `/pages/order/order.detail?id=${order.orderNo}`
+                        });
+                        // Taro.switchTab({url: '/pages/orderList/order'})
+                    })
+                    this.setState({
+                        isOnClick: true
+                    })
+                    return;
+                }
+                console.log('cashierOrderCallback');
+                productSdk.cashierOrderCallback(this.props.dispatch, result.data)
+                productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, this.props.dispatch)
+                UserAction.getMemberInfo(this.props.dispatch);
+                this.setState({
+                    isOnClick: true
+                })
+            } catch (error) {
+                Taro.hideLoading();
+                Taro.showToast({
+                    title: error.message,
+                    icon: 'none'
+                })
+                this.setState({
+                    isOnClick: true
+                })
             }
-            productSdk.cashierOrderCallback(dispatch, result.data)
-            productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, dispatch)
-            UserAction.getMemberInfo(dispatch);
-        } catch (error) {
-            Taro.hideLoading();
-            Taro.showToast({
-                title: error.message,
-                icon: 'none'
-            })
         }
     }
 
@@ -296,10 +321,12 @@ class Page extends Taro.Component<Props, State> {
                     payOrderDetail.deliveryType === 0 ? (
                         <ProductPayListView
                             productList={payOrderProductList}
+                            payOrderDetail={payOrderDetail}
                             // onRef={onRefProductPayListView}
                         />
                     ) : (
                         <ProductPayListView
+                            payOrderDetail={payOrderDetail}
                             productList={payOrderProductList}
                             // onRef={onRefProductPayListView}
                         />
@@ -330,6 +357,8 @@ class Page extends Taro.Component<Props, State> {
                 </View>
                 <View style='width: 100%; height: 100px' className={'container-color'}/>
                 <CartFooter
+                    dispatch={this.props.dispatch}
+                    productCartList={productSDKObj.productCartList}
                     buttonTitle={'提交订单'}
                     buttonClick={() => this.onSubmit()}
                     priceTitle={'合计：'}
@@ -386,6 +415,7 @@ const select = (state: AppReducer.AppState) => {
         payOrderAddress: state.productSDK.payOrderAddress,
         payOrderDetail: state.productSDK.payOrderDetail,
         orderDetail: getOrderDetail(state),
+        productCartList: getProductCartList(state),
         activityList: state.merchant.activityList,
         currentMerchantDetail: getCurrentMerchantDetail(state),
         memberInfo: getMemberInfo(state),

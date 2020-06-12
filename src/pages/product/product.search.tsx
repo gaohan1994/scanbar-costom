@@ -13,7 +13,7 @@ import productSdk from '../../common/sdk/product/product.sdk'
 import HeaderInput from '../../component/header/header.input'
 import ButtonCostom from '../../component/button/button'
 import {getCurrentMerchantDetail} from '../../reducers/app.merchant'
-import { Dispatch } from 'redux';
+import { AtActivityIndicator } from 'taro-ui';
 import {BASE_PARAM} from '../../common/util/config'
 
 const cssPrefix = 'product';
@@ -25,6 +25,7 @@ class Index extends Component<any> {
     value: '',
     searchRecordList: [] as any[],
     searchFlag: false,
+    loading: false,
   };
 
   /**
@@ -105,7 +106,7 @@ class Index extends Component<any> {
 
   render() {
     const { productList, productCartList } = this.props;
-    const { value, searchFlag } = this.state;
+    const { value, searchFlag, loading } = this.state;
     return (
       <View className={`container ${cssPrefix}`}>
         {this.renderHeader()}
@@ -113,7 +114,7 @@ class Index extends Component<any> {
           (value === '' || searchFlag === false) && this.renderSearchRecord()
         }
         {
-          ((productList && productList.length > 0) || (searchFlag === true)) && (
+          !loading ? ((productList && productList.length > 0) || (searchFlag === true)) && (
             <View className={`${cssPrefix}-list-container-costom`}>
               <View className={`${cssPrefix}-list-right`}>
                 <ProductListView
@@ -122,6 +123,10 @@ class Index extends Component<any> {
                   isHome={false}
                 />
               </View>
+            </View>
+          ) : (
+            <View className="container">
+              <AtActivityIndicator mode='center' />
             </View>
           )
         }
@@ -151,7 +156,7 @@ class Index extends Component<any> {
     return (
       <View className={`${prefix}-header`}>
         <HeaderInput
-          placeholder="请输入商品名称"
+          placeholder="请输入商品名称或条码"
           value={value}
           onInput={this.onValueChange}
           isRenderInputRight={true}

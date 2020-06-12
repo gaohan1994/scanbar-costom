@@ -90,12 +90,14 @@ class Page extends Taro.Component<Props> {
               product.activityInfos.length > 0 &&
               product.activityInfos.map(item => {
                 if(item.type === 3) {
+
                   return (
                     <View className={`${prefix}-detail-act-box`}>
                       <View className={`${prefix}-detail-act-reduce`}>满减</View>
                       <View className={`${prefix}-detail-act-text`}>
-                      {productSdk.getDiscountString(memberInfo,batchActiveList, item)}
+                        {productSdk.getDiscountString(memberInfo,batchActiveList, item)}
                       </View>
+                      
                     </View> 
                   );
                 }

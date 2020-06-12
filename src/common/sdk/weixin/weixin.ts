@@ -145,14 +145,16 @@ class WeixinSDK {
               },
               success: (data) => { 
                 const result = data.data;
-                dispatch({
-                  type: that.reducerInterface.RECEIVE_CURRENT_ADDRESS,
-                  payload: {
-                    address: result.result.address,
-                    latitude: result.result.location.lat,
-                    longitude: result.result.location.lng,
-                  }
-                })
+                if(result.result){
+                  dispatch({
+                    type: that.reducerInterface.RECEIVE_CURRENT_ADDRESS,
+                    payload: {
+                      address: result.result.address,
+                      latitude: result.result.location.lat,
+                      longitude: result.result.location.lng,
+                    }
+                  })
+                }
                 resolve({ success: true, result: result.result, msg: '' })
               }, 
               fail: (error) => {

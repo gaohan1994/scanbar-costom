@@ -42,6 +42,11 @@ class Banner extends Taro.Component<Props, State> {
                   <View
                     className={`${prefix}-banner-swiper-item`}
                     style={`background-image: url(${item.pic})`}
+                    onClick={() => {
+                      if(item.adType === 0 ){
+                        Taro.navigateTo({url: '/pages/product/product.detail?id=' + item.param})
+                      }
+                    }}
                   />
                 </SwiperItem>
               )

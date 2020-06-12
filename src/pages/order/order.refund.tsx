@@ -22,6 +22,7 @@ interface State {
   remark: string;
   isOpen: boolean;
   selectedNum: number;
+  remarkTxt: any;
   refundProductList: any[];
 }
 
@@ -36,12 +37,13 @@ class OrderRefund extends Taro.Component<Props, State> {
     remark: '',
     isOpen: false,
     selectedNum: -1,
+    remarkTxt: '',
     refundProductList: [] as any,
   }
 
   public orderRefund = async () => {
-    const { remark, refundProductList } = this.state;
-    if (remark.length === 0 && refundProductList === 0) {
+    const { remark, refundProductList, remarkTxt } = this.state;
+    if (remarkTxt.length === 0 && refundProductList === 0 ) {
       return;
     }
     Taro.showLoading();
@@ -64,7 +66,7 @@ class OrderRefund extends Taro.Component<Props, State> {
         orderSource: order.orderSource,
         transAmount: transAmount,
         refundByPreOrder: true,
-        remark: remark
+        remark: `${remarkTxt}；${remark}`
       },
       productInfoList: productInfoList
     }
@@ -111,7 +113,7 @@ class OrderRefund extends Taro.Component<Props, State> {
   public onSelected = (item: string, index: number) => {
     this.setState({
       selectedNum: index,
-      remark: item
+      remarkTxt: item
     });
     this.hideModal();
   }
@@ -230,7 +232,7 @@ class OrderRefund extends Taro.Component<Props, State> {
         <View className={`${cssPrefix}-header`}>
           <Text className={`${cssPrefix}-header-title`}>退货原因</Text>
           <View className={`${cssPrefix}-header-right`} onClick={this.showModal}>
-            <Text className={`${cssPrefix}-header-right-text`}>请选择（必须）</Text>
+            <Text className={`${cssPrefix}-header-right-text`}>{this.state.remarkTxt ? this.state.remarkTxt : '请选择（必须）'}</Text>
             <Image
               className={`${cssPrefix}-header-right-icon`}
               src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png'
@@ -244,11 +246,11 @@ class OrderRefund extends Taro.Component<Props, State> {
             value={remark}
             onInput={({ detail: { value } }) => this.changeRemark(value)}
             placeholder='请输入退货说明'
-            maxlength={300}
+            maxlength={50}
           />
 
           <View className={`${cssPrefix}-input-corner`}>
-            {`${remark.length}/300`}
+            {`${remark.length}/50`}
           </View>
         </View>
         {this.renderProductList()}

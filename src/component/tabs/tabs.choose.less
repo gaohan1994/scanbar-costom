@@ -42,12 +42,16 @@
     padding: 0px 15px;
     .flex(center, spacce-between, row);
     background-color: #fff;
-
+    &-list::-webkit-scrollbar {
+      display: none !important;
+    }
     &-list {
       white-space: nowrap;
       width: 92%;
       .flex(center, flex-start, row);
-
+      &-container::-webkit-scrollbar {
+        display: none !important;
+      }
       &-container {
         display: flex;
         flex-direction: row;

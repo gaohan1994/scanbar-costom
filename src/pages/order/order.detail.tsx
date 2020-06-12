@@ -291,7 +291,7 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   private renderStatusCard() {
     const { time } = this.state;
-    const { orderDetail, orderAllStatus, currentType, dispatch } = this.props;
+    const { orderDetail, orderAllStatus, currentType, dispatch, productSDKObj } = this.props;
     const res = OrderAction.orderStatus(orderAllStatus, orderDetail, time);
     return (
       <View className={`${cssPrefix}-card ${cssPrefix}-card-status`}>
@@ -347,7 +347,7 @@ class OrderDetail extends Taro.Component<Props, State> {
         }
 
         <View className={`${cssPrefix}-card-status-button`} style={process.env.TARO_ENV === 'h5' ? {marginBottom: '10px'} : {}}>
-          <OrderButtons dispatch={dispatch} productSDKObj data={orderDetail} orderAllStatus={orderAllStatus} currentType={currentType} />
+          <OrderButtons dispatch={dispatch} productSDKObj={productSDKObj} data={orderDetail} orderAllStatus={orderAllStatus} currentType={currentType} />
         </View>
       </View>
     )
