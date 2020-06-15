@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-04-14 15:58:29
+ * @Last Modified time: 2020-06-15 15:54:21
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -34,133 +34,136 @@ interface FilterProductList {
 }
 
 export declare namespace ProductCartInterface {
-    interface ProductCartInfo extends ProductInterface.ProductInfo {
-        sellNum: number;
-        changePrice?: number; // 称重商品修改的价格
-    }
+  interface ProductCartInfo extends ProductInterface.ProductInfo {
+    sellNum: number;
+    changePrice?: number; // 称重商品修改的价格
+  }
 
-    interface ProductOrderPayload {
-        address: string;
-        deliveryPhone: string;
-        delivery_time: string;
-        deliveryType: number;
-        receiver: string;
-        receiverPhone: string;
-        payType: number;
-        remark: string;
-        discount: number;     // 优惠价格
-        erase: number;        // 抹零金额
-        merchantId: number;
-        memberId: number;     // 会员id，非会员设为-1
-        orderSource: number;  // 订单来源 0=收银机,1=微信,2=终端
-        totalAmount: number;  // 交易总金额=交易金额就好
-        totalNum: number;     // 商品总数量
-        transAmount: number;  // 实付金额
-        planDeliveryTime: string;
-        deliveryFee: number;
-        couponList: UserInterface.CouponsItem[];
-    }
+  interface DeliveryInfo {
+    deliveryFee: number;
+    deliveryType: number;
+    address: string;
+    planDeliveryTime: string;
+    receiver?: string;
+    receiverPhone?: string;
+  }
 
-    interface ProductOrderActivity {
-        auditTime: string;    // 审核时间
-        auditor: string;      // 审核人
-        createBy: string;     // 创建者
-        createTime: string;   // 创建日期
-        docMaker: string;     // 制单人
-        endTime: string;      // 活动结束时间
-        id: number;           // 业务单号id（促销活动id）
-        isDeleted: number;    // 是否删除 0:否 1:是
-        makeTime: string;     // 制单时间
-        merchantId: number;   // 促销门店号
-        name: string;         // 促销活动名称
-        startTime: string;    // 活动开始时间
-        status: string;       // 活动状态(0-未审核，1-已审核)
-        type: string;         // 促销模式(1-特价，2-满金额减，3-满件打折，4-满件赠送)
-        updateBy: string;     // 更新者
-        updateTime: string;   // 更新日期
-    }
+  interface ProductOrderPayload {
+    payType: number;
+    remark: string;
+    // discount: number; // 优惠价格
+    // erase: number; // 抹零金额
+    merchantId: number;
+    memberId: number; // 会员id，非会员设为-1
+    orderSource: number; // 订单来源 0=收银机,1=微信,2=终端
+    totalAmount: number; // 交易总金额=交易金额就好
+    totalNum: number; // 商品总数量
+    transAmount: number; // 实付金额
+    couponList: UserInterface.CouponsItem[];
+    deliveryInfo: ProductCartInterface.DeliveryInfo;
+    orderNo: string;
+    points: number;
+  }
 
-    interface ProductInfoPayload {
-        // activities: Array<Partial<ProductOrderActivity>>;
-        // barcode: string;
-        // brand: string;
-        // discountAmount: number;
-        // discountType: number;
-        productId: number;
-        productName: string;
-        sellNum: number;
-        // standard: string;
-        unitPrice: number;
-        totalAmount: number;
-        transAmount: number;
-        // type: number;
-    }
+  interface ProductOrderActivity {
+    auditTime: string; // 审核时间
+    auditor: string; // 审核人
+    createBy: string; // 创建者
+    createTime: string; // 创建日期
+    docMaker: string; // 制单人
+    endTime: string; // 活动结束时间
+    id: number; // 业务单号id（促销活动id）
+    isDeleted: number; // 是否删除 0:否 1:是
+    makeTime: string; // 制单时间
+    merchantId: number; // 促销门店号
+    name: string; // 促销活动名称
+    startTime: string; // 活动开始时间
+    status: string; // 活动状态(0-未审核，1-已审核)
+    type: string; // 促销模式(1-特价，2-满金额减，3-满件打折，4-满件赠送)
+    updateBy: string; // 更新者
+    updateTime: string; // 更新日期
+  }
 
-    interface ProductPayPayload {
-        // flag: boolean;
-        order: ProductOrderPayload;
-        pic?: string;
-        productInfoList: Array<ProductInfoPayload>;
-        // transProp: boolean;   // true=正常支付流程,false=订单再次支付],直接收款=true
-    }
+  interface ProductInfoPayload {
+    // activities: Array<Partial<ProductOrderActivity>>;
+    // barcode: string;
+    // brand: string;
+    // discountAmount: number;
+    // discountType: number;
+    productId: number;
+    productName: string;
+    sellNum: number;
+    // standard: string;
+    unitPrice: number;
+    totalAmount: number;
+    transAmount: number;
+    // type: number;
+  }
 
-    interface QueryStatusListItem extends Partial<ProductInterface.ProductInfo> {
-        costAmount: number;
-        discountAmount: number;
-        discountType: number;
-        merchantId: number;
-        num: number;
-        profit: number;
-        totalAmount: number;
-        transAmount: number;
-        type: number;
-    }
+  interface ProductPayPayload {
+    // flag: boolean;
+    order: ProductOrderPayload;
+    pic?: string;
+    productInfoList: Array<ProductInfoPayload>;
+    // transProp: boolean;   // true=正常支付流程,false=订单再次支付],直接收款=true
+  }
 
-    interface QueryStatus {
-        orderNo: string;
-        status: boolean;
-        printInfo?: {
-            order: ProductOrderPayload;
-            orderDetailList: QueryStatusListItem[];
-        };
-    }
+  interface QueryStatusListItem extends Partial<ProductInterface.ProductInfo> {
+    costAmount: number;
+    discountAmount: number;
+    discountType: number;
+    merchantId: number;
+    num: number;
+    profit: number;
+    totalAmount: number;
+    transAmount: number;
+    type: number;
+  }
 
-    type MANAGE_CART = string;
-    type MANAGE_CART_PRODUCT = string;
-    type MANAGE_EMPTY_CART = string;
-    type DELETE_PRODUCT_ITEM = string;
-    type RECEIVE_ORDER_PAY = string;
-    type RECEIVE_ORDER_PAY_ADDRESS = string;
-    type RECEIVE_ORDER_PAY_DETAIL = string;
-    type MANAGE_CART_PRODUCT_REMOVE = string;
-
-
-    type ReducerInterface = {
-        SELECT_INDEX: string;
-        INIT_ALIANCE_CART: string;
-        MANAGE_CART: MANAGE_CART;
-        MANAGE_EMPTY_CART: MANAGE_EMPTY_CART;
-        MANAGE_CART_PRODUCT: MANAGE_CART_PRODUCT;
-        MANAGE_CART_PRODUCT_REMOVE: MANAGE_CART_PRODUCT_REMOVE;
-        RECEIVE_ORDER_PAY: RECEIVE_ORDER_PAY;
-        RECEIVE_ORDER_PAY_DETAIL: RECEIVE_ORDER_PAY_DETAIL;
-        RECEIVE_ORDER_PAY_ADDRESS: RECEIVE_ORDER_PAY_ADDRESS;
+  interface QueryStatus {
+    orderNo: string;
+    status: boolean;
+    printInfo?: {
+      order: ProductOrderPayload;
+      orderDetailList: QueryStatusListItem[];
     };
+  }
 
-    type ProductCartAdd = string;
-    type ProductCartReduce = string;
-    type ProductCartEmpty = string;
-    type ProductCartManageType = {
-        ADD: ProductCartAdd;
-        REDUCE: ProductCartReduce;
-        EMPTY: ProductCartEmpty;
-    };
+  type MANAGE_CART = string;
+  type MANAGE_CART_PRODUCT = string;
+  type MANAGE_EMPTY_CART = string;
+  type DELETE_PRODUCT_ITEM = string;
+  type RECEIVE_ORDER_PAY = string;
+  type RECEIVE_ORDER_PAY_ADDRESS = string;
+  type RECEIVE_ORDER_PAY_DETAIL = string;
+  type MANAGE_CART_PRODUCT_REMOVE = string;
 
-    interface ProductSDKManageInterface {
-        type: ProductCartAdd | ProductCartReduce | ProductCartEmpty;
-        product: ProductInterface.ProductInfo | ProductCartInfo;
-        num?: number;
-    }
+  type ReducerInterface = {
+    SELECT_INDEX: string;
+    INIT_ALIANCE_CART: string;
+    MANAGE_CART: MANAGE_CART;
+    MANAGE_EMPTY_CART: MANAGE_EMPTY_CART;
+    MANAGE_CART_PRODUCT: MANAGE_CART_PRODUCT;
+    MANAGE_CART_PRODUCT_REMOVE: MANAGE_CART_PRODUCT_REMOVE;
+    RECEIVE_ORDER_PAY: RECEIVE_ORDER_PAY;
+    RECEIVE_ORDER_PAY_DETAIL: RECEIVE_ORDER_PAY_DETAIL;
+    RECEIVE_ORDER_PAY_ADDRESS: RECEIVE_ORDER_PAY_ADDRESS;
+  };
+
+  type ProductCartAdd = string;
+  type ProductCartReduce = string;
+  type ProductCartEmpty = string;
+  type ProductCartManageType = {
+    ADD: ProductCartAdd;
+    REDUCE: ProductCartReduce;
+    EMPTY: ProductCartEmpty;
+  };
+
+  interface ProductSDKManageInterface {
+    type: ProductCartAdd | ProductCartReduce | ProductCartEmpty;
+    product: ProductInterface.ProductInfo | ProductCartInfo;
+    num?: number;
+  }
 }
 
 class ProductSDK {
@@ -476,27 +479,42 @@ class ProductSDK {
         const productList = products !== undefined ? products : productCartList;
         // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
         let order: Partial<ProductCartInterface.ProductOrderPayload> = {
-            address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
-            deliveryPhone: '',
-            planDeliveryTime: payOrderDetail.planDeliveryTime || '',
+          deliveryInfo: {
+            address:
+              payOrderDetail.deliveryType === 1
+                ? (address && address.address) || ""
+                : "",
             deliveryType: payOrderDetail.deliveryType || 0,
             deliveryFee: payOrderDetail.deliveryType === 1 ? 3.5 : 0,
-            remark: payOrderDetail.remark || "",
-            payType: 8,
-            merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
-            discount: 0,
-            orderSource: 3,
-            totalAmount: this.getProductsOriginPrice(productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
-            totalNum: this.getProductNumber(productList),
-            transAmount: this.getProductTransPrice(activityList, memberInfo, productCartList, productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)
-        }
+            planDeliveryTime: payOrderDetail.planDeliveryTime || "",
+          },
+          remark: payOrderDetail.remark || "",
+          payType: 8,
+          merchantId:
+            currentMerchantDetail && currentMerchantDetail.id
+              ? currentMerchantDetail.id
+              : BASE_PARAM.MCHID,
+        //   discount: 0,
+          orderSource: 3,
+          totalAmount:
+            this.getProductsOriginPrice(productList) +
+            (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
+          totalNum: this.getProductNumber(productList),
+          transAmount:
+            this.getProductTransPrice(
+              activityList,
+              memberInfo,
+              productCartList,
+              productList
+            ) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)
+        };
 
         if (payOrderDetail.deliveryType === 1) {
-            order = {
-                ...order,
-                receiver: address && address.contact || "",
-                receiverPhone: address && address.phone || '',
-            }
+            order.deliveryInfo = {
+              ...order.deliveryInfo as ProductCartInterface.DeliveryInfo,
+              receiver: (address && address.contact) || "",
+              receiverPhone: (address && address.phone) || ""
+            };
         }
 
         if (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id) {
@@ -737,11 +755,15 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public empty = (dispatch, sort?: string, products?: ProductInterface.ProductInfo[]) => {
+    public empty = (dispatch, products?: ProductInterface.ProductInfo[]) => {
+        const { currentMerchantDetail } = store.getState().merchant;
         dispatch({
             type: this.reducerInterface.MANAGE_EMPTY_CART,
-            payload: {sort}
-        });
+            payload: {
+                currentMerchantDetail,
+                productList: products
+            }
+        } as ProductSDKReducer.Reducers.EmptyCart);
 
         dispatch({
             type: this.reducerInterface.SELECT_INDEX,

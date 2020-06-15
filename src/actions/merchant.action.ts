@@ -17,8 +17,25 @@ import requestHttp from "../common/request/request.http";
 // import { store } from '../app';
 import Taro from "@tarojs/taro";
 import productSdk from "../common/sdk/product/product.sdk";
+import { AppReducer } from "src/reducers";
 
 class MerchantAction {
+  public addMember = (state: AppReducer.AppState) => () => {
+    if (
+      state.merchant.currentMerchantDetail &&
+      state.merchant.currentMerchantDetail.id
+    ) {
+      return async () => {
+        const result = await requestHttp.post(
+          `/memberInfo/add/${state.merchant.currentMerchantDetail.id}`,
+          {}
+        );
+        return result;
+      };
+    }
+    return;
+  };
+
   public getOrderedMerchant = dispatch => async params => {
     const result = await requestHttp.get(
       `/customer/merchantInfo/getNearbyMerchant${jsonToQueryString(params)}`

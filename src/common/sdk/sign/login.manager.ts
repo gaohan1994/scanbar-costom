@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan
  * @Date: 2019-11-08 17:10:29
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-16 16:33:41
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-06-09 16:34:50
  */
 
 import Taro from "@tarojs/taro";
@@ -15,6 +15,7 @@ import {
   UserInterface
 } from "../../../constants/index";
 import { Dispatch } from "redux";
+import { BASE_PARAM } from "../../util/config";
 
 export const CentermOAuthKey: string = "CentermOAuthTokenCostom";
 
@@ -73,10 +74,10 @@ class LoginManager {
   };
 
   public autoToken = async (params: any): Promise<any> => {
-    const result = await requestHttp.post(
-      `${this.LoginManagerConfig.login}`,
-      params
-    );
+    const result = await requestHttp.post(`${this.LoginManagerConfig.login}`, {
+      ...params,
+      institutionCode: BASE_PARAM.institutionCode
+    });
     if (result.code === ResponseCode.success) {
       return { success: true, result: result.data };
     } else {

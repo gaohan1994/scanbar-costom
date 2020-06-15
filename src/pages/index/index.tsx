@@ -22,6 +22,7 @@ import { LoginManager } from "../../common/sdk";
 import { getUserinfo, getMemberInfo } from "../../reducers/app.user";
 import Tabs from "./component/tab";
 import { AppReducer } from "src/reducers";
+import { BASE_PARAM } from "../../common/util/config";
 
 const cssPrefix = "product";
 
@@ -124,7 +125,7 @@ class Index extends Component<Props, any> {
         pageSize: 20,
         longitude: address.longitude || 119,
         latitude: address.latitude || 26,
-        institutionCode: 101
+        institutionCode: BASE_PARAM.institutionCode
       });
 
       this.setState({ loading: false });

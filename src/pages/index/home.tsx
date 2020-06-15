@@ -8,7 +8,7 @@ import ProductMenu from "../../component/product/product.menu";
 import IndexAddress from "./component/address";
 import MerchantSearch from "./component/search";
 import MerchantCard from "./component/merchant.detail";
-import CartBar from '../../component/cart/cart';
+import CartBar from "../../component/cart/cart";
 import invariant from "invariant";
 import { ProductAction, MerchantAction, UserAction } from "../../actions";
 import { ResponseCode, ProductInterface } from "../../constants";
@@ -62,28 +62,8 @@ class Index extends Component<any> {
     navigationBarTitleText: "首页"
   };
 
-  async componentDidMount() {
-    try {
-      this.init(true);
-      orderAction.orderAllStatus(this.props.dispatch);
-    } catch (error) {
-      Taro.showToast({
-        title: error.message,
-        icon: "none"
-      });
-    }
-    // const { userinfo, dispatch } = this.props;
-    // if (userinfo.phone && userinfo.phone.length > 0) {
-    //     UserAction.getMemberInfo(dispatch);
-    //     const res = await UserAction.obtainCoupon();
-    //     if (res.code == ResponseCode.success) {
-    //         this.setState({ obtainCouponList: res.data.rows })
-    //     }
-    // }
-    this.setState({ couponModalShow: true });
-  }
-
   async componentDidShow() {
+    this.props.addMember();
     this.init();
   }
   componentWillUnmount() {
@@ -362,7 +342,8 @@ const select = state => {
     currentMerchantDetail: getCurrentMerchantDetail(state),
     userinfo: getUserinfo(state),
     memberInfo: getMemberInfo(state),
-    address: getIndexAddress(state)
+    address: getIndexAddress(state),
+    addMember: MerchantAction.addMember(state)
   };
 };
 

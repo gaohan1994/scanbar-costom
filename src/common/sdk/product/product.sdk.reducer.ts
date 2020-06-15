@@ -9,7 +9,7 @@ import { MerchantInterface } from "src/constants";
  * @Author: Ghan
  * @Date: 2019-11-22 14:20:31
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-08 13:40:34
+ * @Last Modified time: 2020-06-15 15:51:15
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
@@ -46,6 +46,13 @@ export declare namespace ProductSDKReducer {
   }
 
   namespace Reducers {
+    interface EmptyCart {
+      type: string;
+      payload: {
+        currentMerchantDetail: MerchantInterface.MerchantDetail;
+        productList?: ProductCartInterface.ProductCartInfo[];
+      };
+    }
     interface CartSelectedIndex {
       type: string;
       payload: {
@@ -214,12 +221,33 @@ export default function productSDKReducer(
       };
     }
     case productSdk.reducerInterface.MANAGE_EMPTY_CART: {
-      const { currentMerchantDetail } = action.payload;
+      const {
+        payload: { currentMerchantDetail, productList }
+      } = action as ProductSDKReducer.Reducers.EmptyCart;
+
+      const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
+        [],
+        state.productCartList[currentMerchantDetail.id]
+      );
+
+      const nextCartProductList = !!productList
+        ? productCartList.filter(cartProduct => {
+            /**
+             * @todo 留下非购买的商品
+             * @param {cartProduct} 购物车中的商品
+             * @param {buyProduct} 购买的商品
+             */
+            return !productList.some(
+              buyProduct => buyProduct.id === cartProduct.id
+            );
+          })
+        : [];
+
       return {
         ...state,
         productCartList: {
           ...state.productCartList,
-          [`${currentMerchantDetail.id}`]: [] as any
+          [`${currentMerchantDetail.id}`]: nextCartProductList
         }
       };
     }

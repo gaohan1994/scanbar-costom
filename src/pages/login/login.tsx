@@ -38,7 +38,8 @@ class GetUserinfo extends Taro.Component<Props, State> {
         encryptedData: detail.encryptedData,
         ivStr: detail.iv,
         code: codeRes.result,
-        appId: "wxd38feb14d7d81fc2"
+        appId: "wxd38feb14d7d81fc2",
+        institutionCode: BASE_PARAM.institutionCode
         // currentMerchantDetail && currentMerchantDetail.id
         //   ? currentMerchantDetail.id
         //   : BASE_PARAM.MCHID
