@@ -70,7 +70,8 @@ class GetUserinfo extends Taro.Component<Props, State> {
         const newUserinfo = {
           ...userinfo,
           phone: JSON.parse(result.data).phoneNumber,
-          appId: "wxd38feb14d7d81fc2"
+          appId: "wxd38feb14d7d81fc2",
+          openId: JSON.parse(result.data).openid
           // merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
           // token: loginRes.result.token
         };

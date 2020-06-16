@@ -2,7 +2,7 @@
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-03 17:19:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-01 14:33:02
+ * @Last Modified time: 2020-06-16 13:48:41
  */
 import {
   MerchantService,
@@ -53,13 +53,19 @@ class MerchantAction {
     return result;
   };
 
-  public setCurrentMerchantDetail = dispatch => merchant => {
+  public setCurrentMerchantDetail = dispatch => async merchant => {
     try {
       invariant(!!merchant, "请传入要设置的店铺");
+      Taro.showLoading();
+      const result = await requestHttp.get(
+        `/customer/merchantInfo/detail/${merchant.id}`
+      );
+      Taro.hideLoading();
+      console.log("result", result);
       dispatch({
         type:
           MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL,
-        payload: merchant
+        payload: { ...merchant, ...result.data }
       });
 
       dispatch({

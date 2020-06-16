@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-15 15:54:21
+ * @Last Modified time: 2020-06-16 13:49:42
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -550,17 +550,12 @@ class ProductSDK {
     }
 
     public requestPayment = async (orderNo: string, fail?: (res: any) => void) => {
-        let payload = {};
-        payload = {orderNo};
-        // if(process.env.TARO_ENV === 'h5'){
-        //     payload = {
-        //         orderNo,
-        //         payType: 1
-        //     };
-        // } else {
-        //     payload = {orderNo};
-        // }
-        const result = await requestHttp.post(`/api/cashier/pay`, payload);
+        const params = {
+          orderNo,
+          openId: store.getState().user.userinfo.openId,
+          orderSource: 7
+        };
+        const result = await requestHttp.post(`/api/cashier/pay`, params);
         if (result.code === ResponseCode.success && result.data.status !== false) {
             return new Promise((resolve) => {
                 const payload = JSON.parse(result.data.param);

@@ -62,6 +62,10 @@ class Index extends Component<any> {
     navigationBarTitleText: "首页"
   };
 
+  componentDidMount() {
+    this.init(true);
+  }
+
   async componentDidShow() {
     this.props.addMember();
     this.init();
@@ -92,13 +96,13 @@ class Index extends Component<any> {
       await LoginManager.getUserInfo(dispatch);
       WeixinSdk.initAddress(dispatch, address);
       const { userinfo, currentMerchantDetail } = this.props;
-      if (firstTime && userinfo.phone && userinfo.phone.length > 0) {
-        UserAction.getMemberInfo(dispatch);
-        const res = await UserAction.obtainCoupon();
-        if (res.code == ResponseCode.success) {
-          this.setState({ obtainCouponList: res.data.rows });
-        }
-      }
+      // if (firstTime && userinfo.phone && userinfo.phone.length > 0) {
+      //   UserAction.getMemberInfo(dispatch);
+      //   const res = await UserAction.obtainCoupon();
+      //   if (res.code == ResponseCode.success) {
+      //     this.setState({ obtainCouponList: res.data.rows });
+      //   }
+      // }
       const productTypeResult = await ProductAction.productInfoType(dispatch, {
         merchantId:
           currentMerchantDetail && currentMerchantDetail.id
