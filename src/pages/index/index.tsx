@@ -102,6 +102,7 @@ class Index extends Component<any> {
     async componentDidShow() {
 
         this.init();
+        UserAction.getMemberInfo(this.props.dispatch);
         const total = this.getCartTotal() ;
         if (total !== 0) {
             Taro.setTabBarBadge({
@@ -111,6 +112,15 @@ class Index extends Component<any> {
         } else {
             Taro.removeTabBarBadge({index: 2});
         }
+        Taro.getStorage({key: 'CentermOAuthTokenCostom'})
+            .then(data => {
+                console.log('data', data);
+              if (data.data === '') {
+                  console.log('CentermOAuthTokenCostom')
+                const {dispatch} = this.props;
+                LoginManager.logout(dispatch);
+              }
+            })
     }
     getCartTotal () {
         const {productCartList} = this.props;
@@ -151,11 +161,13 @@ class Index extends Component<any> {
             await LoginManager.getUserInfo(dispatch);
 
             const {userinfo, currentMerchantDetail} = this.props;
-            UserAction.getMemberInfo(dispatch);
-            const res = await UserAction.obtainCoupon();
-            if (res.code == ResponseCode.success) {
+            if (firstTime && userinfo.phone && userinfo.phone.length > 0) {
+                UserAction.getMemberInfo(dispatch);
+                const res = await UserAction.obtainCoupon();
+                if (res.code == ResponseCode.success) {
 
-                this.setState({obtainCouponList: res.data.rows})
+                    this.setState({obtainCouponList: res.data.rows})
+                }
             }
             const productTypeResult = await ProductAction.productInfoType(dispatch, {
                 merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID

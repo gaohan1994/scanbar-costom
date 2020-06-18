@@ -7,7 +7,6 @@ import numeral from 'numeral';
 import classnames from 'classnames';
 import productSdk from '../../common/sdk/product/product.sdk';
 import { Dispatch } from 'redux';
-import productSdk from 'xxx';
 
 const cssPrefix = 'component-product';
 const prefix = 'product-detail-component'
@@ -52,13 +51,13 @@ class Footer extends Taro.Component<Props> {
       <View className={isCart === true ? `${prefix}-cart-rightPrice` :  `${prefix}-cart-rightPrice-pay`}>
         <View className={`${cssPrefix}-normal ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-normal-h5` : ''} component-cart-text`} style={process.env.TARO_ENV === 'h5' && !priceDiscountPay ? {lineHeight: 'inherit'} : {height: 'auto'}}>
           {/* <Text className={`${cssPrefix}-price-title`}>{priceTitle}</Text> */}
-          {
+          {/* {
             priceDiscountPay ? (<Text className={`${cssPrefix}-price-gray `}>已优惠{numeral(priceDiscountPay).format('0.00')}</Text>) : null
           }
           
           {
             priceDiscountPay ? (<Text className={`${cssPrefix}-price-grayT `}>合计：</Text>) : null
-          }
+          } */}
           {priceSubtitle && (
             <Text className={`${cssPrefix}-price-bge `}>{priceSubtitle}</Text>
           )}
@@ -78,6 +77,9 @@ class Footer extends Taro.Component<Props> {
             <Text className={`${cssPrefix}-price-discount `}>{priceDiscount}</Text>
           )
         }
+          {
+            priceDiscountPay ? (<Text className={`${cssPrefix}-price-gray `}>已优惠{numeral(priceDiscountPay).format('0.00')}</Text>) : null
+          }
       </View>
 
     )

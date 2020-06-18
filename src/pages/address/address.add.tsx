@@ -110,7 +110,7 @@ class Page extends Taro.Component<Props, State> {
         address: address,
         contact: contact,
         createTime: dayJs().format('YYYY-MM-DD HH:mm:ss'),
-        houseNumber: '',
+        houseNumber: detail,
         phone: phone,
         isDefault: 0,
         flag: flag,

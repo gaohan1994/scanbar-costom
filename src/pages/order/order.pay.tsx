@@ -86,8 +86,8 @@ class Page extends Taro.Component<Props, State> {
             amount: productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList, payOrderProductList)
         };
         orderAction.getAbleToUseCoupon(dispatch, params);
-
-  
+        UserAction.getMemberInfo(this.props.dispatch);
+        orderAction.getPointConfig(this.props.dispatch);
     }
     componentWillReceiveProps = (nextProps) => {
         // console.log(nextProps, 'nextProps')
@@ -327,6 +327,7 @@ class Page extends Taro.Component<Props, State> {
             <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: 'auto'}}>
                 <View className={`${cssPrefix}-bg`}/>
                 <PickAddress
+                    isPay={true}
                     timeSelectClick={() => {
                         this.onShowTimeSelect()
                     }}

@@ -514,9 +514,11 @@ class ProductSDK {
         // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;  UserInterface.Address
         const productList = products !== undefined ? products : productCartList;
         // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
-        let order: Partial<ProductCartInterface.ProductOrderPayload> = {
+        const transAmountNow = this.getProductTransPrice(activityList, memberInfo, productCartList, productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0);
+        // Partial<ProductCartInterface.ProductOrderPayload>
+        let order: any = {
             deliveryInfo: {
-                address: payOrderDetail.deliveryType === 1 ? address && address.address || '' : '',
+                address: payOrderDetail.deliveryType === 1 ? address && address.address ? `${address.address} ${address.houseNumber}`  : '' : '',
                 deliveryType: payOrderDetail.deliveryType || 0,
                 deliveryFee: payOrderDetail.deliveryType === 1 ? 3.5 : 0,
                 planDeliveryTime: payOrderDetail.planDeliveryTime || '',
@@ -530,7 +532,7 @@ class ProductSDK {
             orderSource: 3,
             totalAmount: this.getProductsOriginPrice(productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
             totalNum: this.getProductNumber(productList),
-            transAmount: this.getProductTransPrice(activityList, memberInfo, productCartList, productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)
+            transAmount: transAmountNow
         }
 
         if (payOrderDetail.deliveryType === 1) {
@@ -551,15 +553,16 @@ class ProductSDK {
                 (payOrderDetail.selectedCoupon.couponVO.discount || 0);
             order = {
                 ...order,
-                transAmount: transAmount,
+                transAmount: Math.round(transAmount * 100) / 100,
                 couponList: [payOrderDetail.selectedCoupon.couponCode]
             }
             
         }
         if(pointsTotal){
+            const transAmount = order.transAmount - pointsTotal;
             order = {
                 ...order,
-                transAmount: order.transAmount ? order.transAmount -pointsTotal : order.transAmount
+                transAmount: Math.round(transAmount * 100) / 100,
             }
         }
         const payload: ProductCartInterface.ProductPayPayload = {

@@ -55,6 +55,7 @@ class User extends Taro.Component<Props, State> {
             await UserAction.getWaitForObtainCoupons(this.props.dispatch);
             Taro.getStorage({key: 'CentermOAuthTokenCostom'})
             .then(data => {
+                console.log('data', data);
               if (data.data === '') {
                   console.log('CentermOAuthTokenCostom')
                 const {dispatch} = this.props;
@@ -66,6 +67,15 @@ class User extends Taro.Component<Props, State> {
                 title: error.message,
                 icon: 'none'
             });
+            Taro.getStorage({key: 'CentermOAuthTokenCostom'})
+            .then(data => {
+                console.log('data', data);
+              if (data.data === '') {
+                  console.log('CentermOAuthTokenCostom')
+                const {dispatch} = this.props;
+                LoginManager.logout(dispatch);
+              }
+            })
         }
     }
     async componentDidShow() {
