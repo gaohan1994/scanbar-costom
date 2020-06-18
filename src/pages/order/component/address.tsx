@@ -32,6 +32,7 @@ const prefix = 'order-component-address'
 
 type Props = {
   dispatch: Dispatch;
+  isPay?: boolean;
   indexAddressObj: any;
   payOrderAddress: UserInterface.Address;
   merchantDistance: MerchantInterface.Distance;
@@ -158,7 +159,7 @@ class Comp extends Taro.Component<Props, State> {
   }
   private renderDetail = () => {
     const { currentTab } = this.state;
-    const { payOrderAddress, merchantDistance, currentTime, currentMerchantDetail } = this.props;
+    const { payOrderAddress, merchantDistance, currentTime, currentMerchantDetail, isPay } = this.props;
     const locations = currentMerchantDetail.location ? currentMerchantDetail.location.split(',') : [];
     const addressNew = locations.join('') + currentMerchantDetail.address;
 
@@ -201,6 +202,7 @@ class Comp extends Taro.Component<Props, State> {
         {payOrderAddress.address ? (
           <View>
             <AddressItem
+              isPay={isPay}
               address={payOrderAddress}
               showEdit={false}
               showArrow={true}

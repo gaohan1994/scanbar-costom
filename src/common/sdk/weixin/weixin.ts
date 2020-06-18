@@ -210,7 +210,7 @@ class WeixinSDK {
         return;
       }
       const result = await this.getLocation(dispatch);
-      invariant(!!result.success, result.msg || '获取地理位置失败');
+      invariant(!!result.success, result.msg || '获取位置失败, 请开启手机定位');
       const payload = {
         address: result.result.address,
         latitude: result.result.location.lat,

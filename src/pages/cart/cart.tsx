@@ -164,7 +164,7 @@ class Page extends Taro.Component<Props, State> {
     const productFilterCartList = productSdk.filterByActivity(
       productCartList,
       activityList
-    );
+    ).filter(val => val.productList.length > 0);
     return (
       <View className="container">
         {productCartList && productCartList.length > 0 ? (
@@ -186,13 +186,12 @@ class Page extends Taro.Component<Props, State> {
                 const ActivityRule = getMaxActivityRule(subTotalPrice, activity);
                 const {rule, ruleNow} = ActivityRule ? ActivityRule : {rule: null, ruleNow: null}
                 // subTotalPrice < activity.rule[0].threshold
+                const str = filterListIndex !== productFilterCartList.length - 1
+                ? "cart-list-info cart-component-sec"
+                : "cart-list-info"
                 return (
                   <View
-                    className={`cart-list-info ${
-                      filterListIndex !== productFilterCartList.length - 1
-                        ? "cart-component-sec"
-                        : ""
-                    } `}
+                    className={str}
                   >
                     {productList && productList.length > 0 && (
                       <View>

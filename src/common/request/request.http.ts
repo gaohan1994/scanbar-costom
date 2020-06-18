@@ -18,6 +18,12 @@ class HttpRequest {
       method: method,
       header: {
         'content-type': contentType
+      },
+      fail: (res) => {
+        console.log(res);
+        if(res.errMsg === "request:fail "){
+          Taro.setStorage({ key: 'CentermOAuthTokenCostom', data: '' });
+        }
       }
     };
 
