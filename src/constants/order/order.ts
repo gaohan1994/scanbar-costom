@@ -185,6 +185,7 @@ export declare namespace OrderInterface {
   type RECEIVE_ORDER_ALL_STATUS = string;
   type RECEIVE_ABLE_TO_USE_COUPONS = string;
   type RECEIVE_POINTCONFIG = string;
+  type RECEIVE_DELIVERYFEE = string;
 
   type ReducerInterface = {
     CHANGR_CURRENT_TYPE: CHANGR_CURRENT_TYPE;
@@ -194,6 +195,7 @@ export declare namespace OrderInterface {
     RECEIVE_ORDER_ALL_STATUS: RECEIVE_ORDER_ALL_STATUS;
     RECEIVE_ABLE_TO_USE_COUPONS: RECEIVE_ABLE_TO_USE_COUPONS;
     RECEIVE_POINTCONFIG: RECEIVE_POINTCONFIG;
+    RECEIVE_DELIVERYFEE: RECEIVE_DELIVERYFEE;
   };
 
   interface OrderInterfaceMapImp {
@@ -207,6 +209,7 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
 
   public reducerInterfaces = {
     CHANGR_CURRENT_TYPE: 'CHANGR_CURRENT_TYPE',
+    RECEIVE_DELIVERYFEE: 'RECEIVE_DELIVERYFEE',
     RECEIVE_ORDER_LIST: 'RECEIVE_ORDER_LIST',
     RECEIVE_ORDER_DETAIL: 'RECEIVE_ORDER_DETAIL',
     RECEIVE_ORDER_COUNT: 'RECEIVE_ORDER_COUNT',
@@ -217,6 +220,9 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
   
   public getPointConfig = () => {
     return `/api/merchant/point/config/detail`;
+  }
+  public getDeliveryFee = (param) => {
+    return `/api/cashier/getDeliveryFee${jsonToQueryString(param)}`;
   }
   public orderList = (params?: OrderInterface.OrderListFetchFidle) => {
     return `/order/list${params ? jsonToQueryString(params) : ''}`;

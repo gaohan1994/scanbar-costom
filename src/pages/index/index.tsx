@@ -19,6 +19,7 @@ import {LoginManager} from '../../common/sdk'
 import CouponModal from '../../component/coupon/coupon.modal'
 import { getUserinfo, getMemberInfo, getIndexAddress } from '../../reducers/app.user';
 import {BASE_PARAM} from '../../common/util/config'
+import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 
 const cssPrefix = 'product';
 
@@ -56,6 +57,9 @@ class Index extends Component<any> {
     }
 
     async componentDidMount() {
+        this.initDit();
+    }
+    initDit = () => {
         if(process.env.TARO_ENV === 'h5'){
             const hash = window.location.hash.split('?')
             const keywords = hash[1] ? hash[1] : '';
@@ -95,10 +99,31 @@ class Index extends Component<any> {
         
         this.setState({couponModalShow: true})
     }
-
     async componentDidShow() {
 
         this.init();
+        const total = this.getCartTotal() ;
+        if (total !== 0) {
+            Taro.setTabBarBadge({
+                index: 2,
+                text: `${total}`
+            });
+        } else {
+            Taro.removeTabBarBadge({index: 2});
+        }
+    }
+    getCartTotal () {
+        const {productCartList} = this.props;
+        let total = 0;
+        productCartList.forEach(element => {
+            total += element.sellNum;
+        });
+        return total;
+    }
+    onPullDownRefresh () {
+        this.initDit();
+        setTimeout(() => Taro.stopPullDownRefresh(),100)
+
     }
     componentWillUnmount () {
         this.setState({
@@ -126,13 +151,11 @@ class Index extends Component<any> {
             await LoginManager.getUserInfo(dispatch);
 
             const {userinfo, currentMerchantDetail} = this.props;
-            if (firstTime && userinfo.phone && userinfo.phone.length > 0) {
-                UserAction.getMemberInfo(dispatch);
-                const res = await UserAction.obtainCoupon();
-                if (res.code == ResponseCode.success) {
+            UserAction.getMemberInfo(dispatch);
+            const res = await UserAction.obtainCoupon();
+            if (res.code == ResponseCode.success) {
 
-                    this.setState({obtainCouponList: res.data.rows})
-                }
+                this.setState({obtainCouponList: res.data.rows})
             }
             const productTypeResult = await ProductAction.productInfoType(dispatch, {
                 merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
@@ -357,6 +380,7 @@ const select = (state) => {
     return {
         productType: state.product.productType,
         productList: state.product.productList,
+        productCartList: getProductCartList(state),
         advertisement: getMerchantAdvertisement(state),
         currentMerchantDetail: getCurrentMerchantDetail(state),
         userinfo: getUserinfo(state),

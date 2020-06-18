@@ -39,6 +39,7 @@ class UserAction {
         type: UserInterfaceMap.reducerInterface.RECEIVE_ADDRESS_LIST,
         payload: result.data
       });
+      return result;
     }
     return result;
   }

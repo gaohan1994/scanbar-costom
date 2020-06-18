@@ -151,7 +151,37 @@
       font-size:30px;
       font-weight:500;
       width: 460px;
-      color:#CCCCCC;
+      color: #666666 !important;
+
+      &-Popover {
+        position: absolute;
+        top: -90px;
+        border: 2px solid #cccccc;
+        background: #fff;
+        font-size: 30px;
+        color: #999999;
+        padding: 10px 20px;
+        border-radius: 10px;
+        z-index: 99;
+        width:250px;
+        line-height: 60px;
+        height:80px;
+        border:2px solid #cccccc;
+        background-color:#FFF;
+      }
+      &-Popover:before, &-Popover:after{
+        content:"";display:block;
+        border-width:19px;
+        position:absolute; bottom:-38px;
+        border-style:solid dashed dashed;
+        border-color:#cccccc transparent transparent;
+        font-size:0;
+        line-height:0;
+      }
+      &-Popover:after{
+          bottom:-33px;
+          border-color:#FFF transparent transparent;
+      }
       &-place {
         font-size:30px;
         font-weight:500;

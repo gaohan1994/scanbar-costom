@@ -7,6 +7,7 @@ import numeral from 'numeral';
 import classnames from 'classnames';
 import productSdk from '../../common/sdk/product/product.sdk';
 import { Dispatch } from 'redux';
+import productSdk from 'xxx';
 
 const cssPrefix = 'component-product';
 const prefix = 'product-detail-component'
@@ -45,10 +46,10 @@ class Footer extends Taro.Component<Props> {
   }
 
   public renderPrice = () => {
-    const { priceTitle, priceSubtitle, price, priceOrigin, priceDiscount, priceDiscountPay } = this.props;
+    const { priceTitle, priceSubtitle, price, priceOrigin, priceDiscount, priceDiscountPay, isCart } = this.props;
 
     return (
-      <View className={`${prefix}-cart-rightPrice`}>
+      <View className={isCart === true ? `${prefix}-cart-rightPrice` :  `${prefix}-cart-rightPrice-pay`}>
         <View className={`${cssPrefix}-normal ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-normal-h5` : ''} component-cart-text`} style={process.env.TARO_ENV === 'h5' && !priceDiscountPay ? {lineHeight: 'inherit'} : {height: 'auto'}}>
           {/* <Text className={`${cssPrefix}-price-title`}>{priceTitle}</Text> */}
           {
@@ -89,16 +90,13 @@ class Footer extends Taro.Component<Props> {
         token = true;
       }
     }
-
     return (
       <View className={`${prefix}-cart`} style={this.props.style}>
         <View className={`${prefix}-cart-box`}>
           {
             this.props.isCart === true ? (
               <View className={`${prefix}-cart-left`}
-                onClick={() => {
-                  productSdk.selectProduct(this.props.dispatch, !token ? 'all' : 'empty', this.props.productCartList as any);
-                }}
+                
               >
                 <View 
                     className={classnames(`${cssPrefix}-select-item`, {
@@ -106,8 +104,40 @@ class Footer extends Taro.Component<Props> {
                         [`${cssPrefix}-select-active`]: !!token,
                         [`${prefix}-cart-left-item`]: true,
                     })}
+                    onClick={() => {
+                      productSdk.selectProduct(this.props.dispatch, !token ? 'all' : 'empty', this.props.productCartList as any);
+                    }}
                 />
-                <View className={`${prefix}-cart-left-item-txt`}>全选</View>
+                <View className={`${prefix}-cart-left-item-txt`}>
+                  <span>全选</span>
+                  <View 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      Taro.showModal({
+                        title: '提示',
+                        content: '确认删除所勾选的商品么？',
+                        success: async (confirm) => {
+                          if (confirm.confirm) {
+                            let list: any = [];
+                            this.props.selectedIndex.map(element => {
+                              const filter = this.props.productCartList.filter(val => val.id === element);
+                              list = [
+                                ...list,
+                                ...filter,
+                              ];
+                            });
+         
+                            productSdk.deleteGroup(this.props.dispatch, list)
+                            Taro.showToast({
+                              title: '删除成功',
+                            });
+                          }
+                        }
+                      })
+                    }} 
+                    className={`${prefix}-cart-left-item-txt-delete`} 
+                  >删除</View>
+                </View>
               </View>
             ) : null
           }

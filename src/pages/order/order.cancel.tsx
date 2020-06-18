@@ -21,6 +21,7 @@ interface State {
   remark: string;
   isOpen: boolean;
   selectedNum: number;
+  remarkTxt: string;
 }
 
 const cssPrefix = 'order-refund';
@@ -32,13 +33,14 @@ class OrderCancel extends Taro.Component<Props, State> {
 
   state = {
     remark: '',
+    remarkTxt: '',
     isOpen: false,
     selectedNum: -1,
   }
 
   public orderCancel = async () => {
-    const { remark } = this.state;
-    if (remark.length === 0) {
+    const { remark, remarkTxt } = this.state;
+    if (remarkTxt.length === 0) {
       return;
     }
     Taro.showLoading();
@@ -59,7 +61,7 @@ class OrderCancel extends Taro.Component<Props, State> {
         orderSource: order.orderSource,
         transAmount: order.transAmount,
         refundByPreOrder: true,
-        remark: remark
+        remark: `${remarkTxt}；${remark}`
       },
       productInfoList: productInfoList
     }
@@ -95,7 +97,7 @@ class OrderCancel extends Taro.Component<Props, State> {
   public onSelected = (item: string, index: number) => {
     this.setState({
       selectedNum: index,
-      remark: item
+      remarkTxt: item
     });
     this.hideModal();
   }
@@ -107,7 +109,7 @@ class OrderCancel extends Taro.Component<Props, State> {
         <View className={`${cssPrefix}-header`}>
           <Text className={`${cssPrefix}-header-title`}>取消订单原因</Text>
           <View className={`${cssPrefix}-header-right`} onClick={this.showModal}>
-            <Text className={`${cssPrefix}-header-right-text`}>请选择（必须）</Text>
+            <Text className={`${cssPrefix}-header-right-text`}>{this.state.remarkTxt ? this.state.remarkTxt : '请选择（必须）'}</Text>
             <Image
               className={`${cssPrefix}-header-right-icon`}
               src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png'
@@ -132,7 +134,7 @@ class OrderCancel extends Taro.Component<Props, State> {
           <AtButton
             className={classnames(`${cssPrefix}-footer-button`, {
               [`theme-button`]: true,
-              [`theme-button-cancel`]: remark.length === 0,
+              [`theme-button-cancel`]: this.state.remarkTxt.length === 0,
             })}
             onClick={() => { this.orderCancel() }}
           >

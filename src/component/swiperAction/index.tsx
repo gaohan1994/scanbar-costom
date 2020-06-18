@@ -32,7 +32,7 @@ class SwiperAction extends Taro.Component<Props, State> {
             delay: 100,
             transformOrigin: 'left top 0',
             success: (res) => {
-                console.log(res);
+                // console.log(res);
             }
         });
         this.setState({
@@ -78,9 +78,9 @@ class SwiperAction extends Taro.Component<Props, State> {
                 timingFunction: 'linear',
                 delay: 50,
                 transformOrigin: 'left top 0',
-                success: (res) => {
-                    console.log(res)
-                }
+                // success: (res) => {
+                //     // console.log(res)
+                // }
             })
 
             _animation.translateX(0).step()
@@ -95,9 +95,9 @@ class SwiperAction extends Taro.Component<Props, State> {
                 timingFunction: 'linear',
                 delay: 50,
                 transformOrigin: 'left top 0',
-                success: (res) => {
-                    console.log(res)
-                }
+                // success: (res) => {
+                //     console.log(res)
+                // }
             })
 
             _animation.translateX(-80).step()
@@ -120,9 +120,9 @@ class SwiperAction extends Taro.Component<Props, State> {
             timingFunction: 'linear',
             delay: 50,
             transformOrigin: 'left top 0',
-            success: (res) => {
-                console.log(res);
-            }
+            // success: (res) => {
+            //     console.log(res);
+            // }
         });
         animation.translateX(0).step()
         this.setState({

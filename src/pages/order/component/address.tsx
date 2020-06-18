@@ -3,6 +3,7 @@ import { View, Image } from '@tarojs/components'
 import './index.less'
 import '../../../component/product/product.less'
 import classnames from 'classnames'
+import { AtActionSheet, AtActionSheetItem } from 'taro-ui';
 import { MerchantInterface, UserInterface } from '../../../constants'
 import { connect } from '@tarojs/redux'
 import productSdk from '../../../common/sdk/product/product.sdk';
@@ -12,7 +13,7 @@ import AddressItem from '../../../component/address/item'
 import { getPayOrderAddress } from '../../../common/sdk/product/product.sdk.reducer'
 import merchantAction from '../../../actions/merchant.action'
 import { getMerchantDistance, getCurrentMerchantDetail } from '../../../reducers/app.merchant'
-import { getCurrentPostion, getIndexAddress } from '../../../reducers/app.user';
+import { getCurrentPostion, getIndexAddress, getAddressList } from '../../../reducers/app.user';
 import { Dispatch } from 'redux';
 import { BASE_PARAM } from "../../../common/util/config";
 import UserAction from '../../../actions/user.action';
@@ -38,29 +39,35 @@ type Props = {
   currentPostion: any;
   onRefProductPayListViewObj?: any;
   timeSelectClick?: () => void;
+  addressList: any[];
   currentTime?: string;
   changeTabCallback?: () => void;
 }
 
 type State = {
   currentTab: number;
+  choosePayWay: boolean;
 }
 
 class Comp extends Taro.Component<Props, State> {
 
   state = {
-    currentTab: 0
+    currentTab: 0,
+    choosePayWay: false,
   }
 
-  componentDidMount() {
-    const { indexAddressObj, currentMerchantDetail } = this.props;
+  async componentDidMount() {
+    const { indexAddressObj, currentMerchantDetail, dispatch, addressList } = this.props;
     this.changeTab(tabs[0])
-    merchantAction.merchantDistance(this.props.dispatch, {
+    merchantAction.merchantDistance(dispatch, {
       latitude: indexAddressObj.latitude,
       longitude: indexAddressObj.longitude,
       merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
     })
-    UserAction.addressList(this.props.dispatch, indexAddressObj);
+    const result = await UserAction.addressList(dispatch, indexAddressObj);
+    if(result && result.data && result.data[0]){
+      productSdk.preparePayOrderAddress(result.data[0], dispatch);
+    }
   }
 
   public changeTab = (tab) => {
@@ -126,10 +133,29 @@ class Comp extends Taro.Component<Props, State> {
         </View>
         {this.renderDetail()}
         {/* <PickerComponent /> */}
+        {/* <AtFloatLayout
+          isOpened={this.state.choosePayWay}
+          title={'选择支付方式'}
+          onClose={this.hideModal}
+        >
+
+        </AtFloatLayout> */}
+        <AtActionSheet title={'选择支付方式'} isOpened={this.state.choosePayWay}>
+          <View>anniu1</View>
+        </AtActionSheet>
       </View>
     )
   }
-
+  hideModal () {
+    this.setState({
+      choosePayWay: false,
+    })
+  }
+  choosePayWay () {
+    this.setState({
+      choosePayWay: true,
+    })
+  }
   private renderDetail = () => {
     const { currentTab } = this.state;
     const { payOrderAddress, merchantDistance, currentTime, currentMerchantDetail } = this.props;
@@ -207,7 +233,7 @@ class Comp extends Taro.Component<Props, State> {
             <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
           </View>
         </View>
-        <View className={`${prefix}-detail-row`}>
+        <View className={`${prefix}-detail-row`} onClick={this.choosePayWay}>
           <View className={`${prefix}-detail-row-title`}>支付方式</View>
           <View className={classnames(`${prefix}-detail-row-title`)}>微信支付</View>
         </View>
@@ -220,6 +246,7 @@ const select = (state: AppReducer.AppState) => {
   return {
     indexAddressObj: getIndexAddress(state),
     currentPostion: getCurrentPostion(state),
+    addressList: getAddressList(state),
     payOrderAddress: getPayOrderAddress(state),
     merchantDistance: getMerchantDistance(state),
     currentMerchantDetail: getCurrentMerchantDetail(state),

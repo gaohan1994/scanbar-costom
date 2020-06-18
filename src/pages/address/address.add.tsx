@@ -4,6 +4,7 @@ import { View, Text } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
 import { AtButton } from 'taro-ui'
+
 import { AppReducer } from '../../reducers'
 import { ResponseCode, UserInterface } from '../../constants'
 import WeixinSdk from '../../common/sdk/weixin/weixin'
@@ -12,10 +13,14 @@ import Row from '../../component/address/row'
 import invariant from 'invariant'
 import dayJs from 'dayjs'
 import { UserAction } from '../../actions'
+import { getMemberInfo, getAddressList, getIndexAddress } from '../../reducers/app.user';
 
 const prefix = 'address'
 
 type Props = {
+  memberInfo: any;
+  addressList: any[];
+  indexAddress: any;
 }
 
 type State = {
@@ -27,6 +32,7 @@ type State = {
   phone: string;
   sex: string;
   flag: number;
+  isLoading: boolean;
 }
 
 class Page extends Taro.Component<Props, State> {
@@ -44,8 +50,19 @@ class Page extends Taro.Component<Props, State> {
     phone: '',
     sex: '',
     flag: -1,
+    isLoading: false,
   }
-
+  componentDidMount = () => {
+    const {addressList, indexAddress, memberInfo} = this.props;
+    if(addressList.length === 0){
+      this.setState({
+        address: indexAddress.address || '',
+        latitude: indexAddress.latitude || 0,
+        longitude: indexAddress.longitude || 0,
+        phone: memberInfo.phoneNumber || ''
+      })
+    }
+  }
   public chooseAddress = async () => {
     const result = await WeixinSdk.chooseAddress();
     if (!!result.success) {
@@ -67,7 +84,11 @@ class Page extends Taro.Component<Props, State> {
   }
 
   public submit = async () => {
+    this.setState({
+      isLoading: true
+    })
     try {
+      Taro.showLoading({title: '', mask: true});
       const { 
         address,
         latitude,
@@ -99,6 +120,7 @@ class Page extends Taro.Component<Props, State> {
       }
       const result = await UserAction.addressAdd(payload);
       invariant(result.code === ResponseCode.success, result.msg || ' ');
+      Taro.hideLoading();
       Taro.showToast({
         title: '添加成功',
       });
@@ -106,16 +128,23 @@ class Page extends Taro.Component<Props, State> {
       setTimeout(() => {
         Taro.navigateBack({})
       }, 1000);
+      
     } catch (error) {
+      Taro.hideLoading();
       Taro.showToast({
         title: error.message,
         icon: 'none'
+      })
+      this.setState({
+        isLoading: false
       })
     }
   }
 
   render () {
+    const { memberInfo  } = this.props;
     const { address, detail, contact, phone } = this.state;
+    console.log(this.state)
     return (
       <View className='container'>
         <Row
@@ -150,6 +179,7 @@ class Page extends Taro.Component<Props, State> {
           ]}
           buttonPos='bottom'
         />
+         
         <Row
           isBorder={true}
           title='手机号'
@@ -158,8 +188,13 @@ class Page extends Taro.Component<Props, State> {
           isBorderTop={true}
           inputPlaceHolder='联系人手机号'
           inputOnChange={(value) => this.changeValue('phone', value)}
+          Popover={memberInfo.phoneNumber}
+          onPopover={() => {
+            this.setState({
+              phone: memberInfo.phoneNumber
+            })
+          }}
         />
-
         <Row
           isBorder={false}
           title='标签'
@@ -173,11 +208,12 @@ class Page extends Taro.Component<Props, State> {
         <View className={`${prefix}-button`}>
           <AtButton 
             className={'theme-button'}
-            onClick={() => this.submit()}
+            onClick={this.state.isLoading ? () => {} : () => this.submit()}
           >
             <Text className="theme-button-text" >保存</Text>
           </AtButton>
         </View>
+        
       </View>
     )
   }
@@ -185,6 +221,9 @@ class Page extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => {
   return {
+    memberInfo: getMemberInfo(state),
+    addressList: getAddressList(state),
+    indexAddress: getIndexAddress(state),
   }
 }
 export default connect(select)(Page);

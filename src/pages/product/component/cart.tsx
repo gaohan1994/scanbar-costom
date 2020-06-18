@@ -9,6 +9,7 @@ import productSdk from '../../../common/sdk/product/product.sdk';
 import { AppReducer } from '../../../reducers'
 import { ProductCartInterface } from '../../../common/sdk/product/product.sdk'
 import { Dispatch } from 'redux';
+import { getProductCartList } from '../../../common/sdk/product/product.sdk.reducer';
 
 const cssPrefix = 'component-product';
 const prefix = 'product-detail-component'
@@ -16,6 +17,7 @@ const prefix = 'product-detail-component'
 interface Props { 
   dispatch: Dispatch;
   productSDKObj: any;
+  productCartList: any;
   product: ProductInterface.ProductInfo;
   productInCart?: ProductCartInterface.ProductCartInfo;
 }
@@ -53,7 +55,24 @@ class Cart extends Taro.Component<Props> {
           <View className={`${cssPrefix}-stepper-container`}>    
             <View 
               className={classnames(`${cssPrefix}-stepper-button ${prefix}-cart-right-stepper`, `${cssPrefix}-stepper-button-reduce`)}
-              onClick={() => this.manageProduct(productSdk.productCartManageType.REDUCE)}
+              onClick={() => {
+                if(productInCart.sellNum === 1 ){
+                  Taro.showModal({
+                    title: '提示',
+                    content: '确认将该商品从购物车删除吗？',
+                    success: async (confirm) => {
+                        if (confirm.confirm) {
+                          this.manageProduct(productSdk.productCartManageType.REDUCE)
+                        }
+                    },
+                    
+                  })
+                } else {
+                  this.manageProduct(productSdk.productCartManageType.REDUCE)
+                }
+                
+              }
+              }
             />
             <Text className={`${cssPrefix}-stepper-text ${prefix}-cart-right-text`}>{productInCart.sellNum}</Text>
             <View 
@@ -80,10 +99,20 @@ class Cart extends Taro.Component<Props> {
   }
 
   render () {
+    const {productCartList} = this.props;
+    const total = productSdk.getProductNumber(productCartList);
     return (
       <View className={`${prefix}-cart`}>
         <View className={`${prefix}-cart-box`}>
           <View className={`${prefix}-cart-left ${prefix}-cart-left-detail`}>
+            {
+              total ? (
+                <View className={`${prefix}-cart-left-bge`}>
+                  {total}
+                </View>
+              ) : null
+            }
+            
             <View 
               className={`${prefix}-cart-left-icon`} 
               onClick={() => {
@@ -108,6 +137,7 @@ const select = (state: AppReducer.AppState, ownProps: Props) => {
   const productInCart = product !== undefined && productList.find(p => p.id === product.id);
   return {
     product,
+    productCartList: getProductCartList(state),
     productSDKObj: state.productSDK,
     productInCart,
   };

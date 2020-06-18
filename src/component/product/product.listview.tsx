@@ -51,8 +51,8 @@ class ProductListView extends Taro.Component<Props> {
   };
 
   public onScroll = (event: CommonEventFunction) => {
-    const { detail } = event;
-    console.log('detail: ', detail);
+    // const { detail } = event;
+    // console.log('detail: ', detail);
   }
 
   /**

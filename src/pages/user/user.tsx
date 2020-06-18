@@ -53,6 +53,14 @@ class User extends Taro.Component<Props, State> {
         try {
             await LoginManager.getUserInfo(this.props.dispatch);
             await UserAction.getWaitForObtainCoupons(this.props.dispatch);
+            Taro.getStorage({key: 'CentermOAuthTokenCostom'})
+            .then(data => {
+              if (data.data === '') {
+                  console.log('CentermOAuthTokenCostom')
+                const {dispatch} = this.props;
+                LoginManager.logout(dispatch);
+              }
+            })
         } catch (error) {
             Taro.showToast({
                 title: error.message,
@@ -68,8 +76,8 @@ class User extends Taro.Component<Props, State> {
     }
 
     public address = async () => {
-        const result = await WeixinSDK.chooseAddress();
-        console.log(result);
+        // const result = await WeixinSDK.chooseAddress();
+        // console.log(result);
     }
 
     public onRowClick = (row: any) => {
@@ -241,10 +249,12 @@ class User extends Taro.Component<Props, State> {
                                 </View>
                             )
                     }
-                    <View
-                        className={`${cssPrefix}-code`}
-                        onClick={() => { this.navTo('/pages/user/user.code', true) }}
-                    > </View>
+                    <View className={`${cssPrefix}-code-wrap`} onClick={() => { this.navTo('/pages/user/user.code', true) }}>
+                        <View
+                            className={`${cssPrefix}-code-wrap-code`}
+                            
+                        > </View>
+                    </View>
                     <View className={`${cssPrefix}-member`}>
                         <View className={`${cssPrefix}-member-item`}>
                             <Text className={`${cssPrefix}-member-item-number`}>￥{numeral(memberInfo.overage || 0).format('0.00')}</Text>

@@ -136,10 +136,12 @@ export declare namespace ProductCartInterface {
     type RECEIVE_ORDER_PAY_DETAIL = string;
     type MANAGE_CART_PRODUCT_REMOVE = string;
     type RECEIVE_ORDER_PAY_POINTS = string;
+    type DELETE_GROUP = string;
 
 
     type ReducerInterface = {
         SELECT_INDEX: string;
+        DELETE_GROUP: string;
         MANAGE_CART: MANAGE_CART;
         MANAGE_EMPTY_CART: MANAGE_EMPTY_CART;
         MANAGE_CART_PRODUCT: MANAGE_CART_PRODUCT;
@@ -178,6 +180,7 @@ class ProductSDK {
 
     public reducerInterface: ProductCartInterface.ReducerInterface = {
         SELECT_INDEX: 'SELECT_INDEX',
+        DELETE_GROUP: 'DELETE_GROUP',
         MANAGE_CART: 'MANAGE_CART',
         MANAGE_EMPTY_CART: 'MANAGE_EMPTY_CART',
         MANAGE_CART_PRODUCT: 'MANAGE_CART_PRODUCT',
@@ -356,7 +359,6 @@ class ProductSDK {
                 // const products = productList !== undefined ? productList : store.getState().productSDK.productCartList;  
         // const activityList = store.getState().merchant.activityList; 
         const filterProductList = this.filterByActivity(products, activityList);
-        console.log('filterProductList', filterProductList);
         let activityMoney: number = 0;
 
         filterProductList.forEach((activityItem) => {
@@ -366,12 +368,10 @@ class ProductSDK {
                 subTotal += this.getProductItemPrice(product, memberInfo) * product.sellNum;
             })
             const subActivityMoney = this.getProductActivityPrice(subTotal, activity);
-            console.log('subActivityMoney', subActivityMoney, subTotal, subActivityMoney && subTotal !== subActivityMoney);
             if (subActivityMoney && subTotal !== subActivityMoney ) {
                 activityMoney += subTotal - subActivityMoney;
             }
         })
-        console.log('activityMoney', activityMoney);
         return activityMoney;
     }
 
@@ -390,7 +390,7 @@ class ProductSDK {
         total -= this.getProductTotalActivityPrice(activityList, memberInfo,productCartList, productList);
         // total = this.getProductActivityPrice(total, this.checkActivity(total));
 
-        return total;
+        return Math.round(total * 100) / 100;
     }
 
     /**
@@ -398,7 +398,7 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public getDiscountString = (memberInfo, activityList: any, product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo) => {
+    public getDiscountString = (memberInfo, activityList: any, product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo, type?: any) => {
         // const memberInfo = store.getState().user.memberInfo;
         const { enableMemberPrice } = memberInfo;
         if (!Array.isArray(activityList) || !activityList.length) {
@@ -420,16 +420,26 @@ class ProductSDK {
                 if (!Array.isArray(rules) || !rules.length || !rules[0].threshold || !rules[0].threshold) {
                     return '';
                 }
-                const str = rules.map(val => `满${val.threshold}元减${val.discount}元`)
-                return str.join('；');
+                if(type === 'all'){
+                    const str = rules.map(val => `满${val.threshold}元减${val.discount}元`)
+                    return str.join('；');
+                } else {
+                    return `满${rules[0].threshold}元减${rules[0].discount}元`
+                }
+               
             case 4:
                 if (!activity.rule) return '';
                 const ruleList = JSON.parse(activity.rule);
                 if (!Array.isArray(ruleList) || !ruleList.length || !ruleList[0].threshold || !ruleList[0].threshold) {
                     return '';
                 }
-                const strList = ruleList.map(val => `满${val.threshold}件打${val.discount}折`)
-                return strList.join('；');
+                if(type === 'all'){
+                    const strList = ruleList.map(val => `满${val.threshold}件打${val.discount}折`)
+                    return strList.join('；');
+                } else {
+                    return  `满${ruleList[0].threshold}件打${ruleList[0].discount}折`;
+                }
+                
             default:
                 return ``;
         }
@@ -500,7 +510,7 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products?: ProductCartInterface.ProductCartInfo[], address?: any, payOrderDetail?: any, pointsTotal?: any): ProductCartInterface.ProductPayPayload => {
+    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products?: ProductCartInterface.ProductCartInfo[], address?: any, payOrderDetail?: any, pointsTotal?: any, points?: any): ProductCartInterface.ProductPayPayload => {
         // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;  UserInterface.Address
         const productList = products !== undefined ? products : productCartList;
         // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
@@ -516,7 +526,7 @@ class ProductSDK {
             payType: 8,
             merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
             discount: 0,
-            points: pointsTotal ?　pointsTotal　: null,
+            points: pointsTotal ?points: null,
             orderSource: 3,
             totalAmount: this.getProductsOriginPrice(productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
             totalNum: this.getProductNumber(productList),
@@ -766,7 +776,19 @@ class ProductSDK {
             })
         }
     }
-
+    /**
+     * @todo 批量删除购物车商品
+     *
+     * @memberof ProductSDK
+     */
+    public deleteGroup = (dispatch, products?: ProductInterface.ProductInfo[]) => {
+        dispatch({
+            type: this.reducerInterface.DELETE_GROUP,
+            payload: {
+                deleteGroup: products,
+            }
+        })
+    }
 
     /**
      * @todo 清空购物车

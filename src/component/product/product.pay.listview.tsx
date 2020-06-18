@@ -259,8 +259,6 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const {price} = countTotal();
     const PointsPre = memberInfo.points * pointConfig.deductRate < numeral(price).value() ? memberInfo.points : numeral(price).value();
     const MathPointsPre = Math.ceil(PointsPre)
-    console.log('payOrderDetail && payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id', 
-    payOrderDetail && payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id, payOrderDetail, this.props)
     return (
       <View>
         {totalActivityMoney !== 0 && !isDetail && (
@@ -475,9 +473,10 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const {price, discountPrice} = countTotal();
     let newPrice = price;
     if(pointSet === true){
-      if(memberInfo.points < numeral(price).value()){
-        const money = memberInfo.points * pointConfig.deductRate;
-        newPrice = numeral(numeral(price).value() - money).format('0.00');
+      const money = memberInfo.points * pointConfig.deductRate;
+      if(money < numeral(newPrice).value()){
+ 
+        newPrice = numeral(numeral(newPrice).value() - money).format('0.00');
       } else {
         newPrice = '0.00'
       }

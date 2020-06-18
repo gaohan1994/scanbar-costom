@@ -9,7 +9,9 @@ import { OrderInterfaceMap, OrderInterface, HTTPInterface } from '..';
 import { BASE_PARAM } from '../../common/util/config'
 
 class OrderService {
-
+  public getDeliveryFee = async (param): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(OrderInterfaceMap.getDeliveryFee(param));
+  }
   public getPointConfig = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.get(OrderInterfaceMap.getPointConfig());
   }

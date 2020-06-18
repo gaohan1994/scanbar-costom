@@ -53,7 +53,7 @@ class Page extends Taro.Component<Props> {
 
   render() {
     const { product, memberInfo } = this.props;
-    console.log(this.props);
+
     const activityList = product && Array.isArray(product.activityInfos) ? product.activityInfos : [];
     const singleActiveList = activityList.filter(val => val.type === 1 || val.type === 2);
     const batchActiveList = activityList.filter(val => val.type === 3 || val.type === 4);
@@ -95,7 +95,7 @@ class Page extends Taro.Component<Props> {
                     <View className={`${prefix}-detail-act-box`}>
                       <View className={`${prefix}-detail-act-reduce`}>满减</View>
                       <View className={`${prefix}-detail-act-text`}>
-                        {productSdk.getDiscountString(memberInfo,batchActiveList, item)}
+                        {productSdk.getDiscountString(memberInfo,batchActiveList, item, 'all')}
                       </View>
                       
                     </View> 
