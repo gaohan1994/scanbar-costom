@@ -24,7 +24,8 @@ import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 import { getOrderDetail } from '../../reducers/app.order';
 import { UserAction } from '../../actions'
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
-
+import {BASE_PARAM} from '../../common/util/config';
+ 
 const cssPrefix = 'order';
 const openTime = 8;
 const closeTime = 24;
@@ -46,6 +47,7 @@ type State = {
     showTimeSelect: boolean;
     currentDate: any;
     selectDate: any;
+    isFirst: boolean;
     selectTime: string;
     timeList: string[];
     dateList: OrderInterface.DateItem;
@@ -60,6 +62,7 @@ class Page extends Taro.Component<Props, State> {
 
     state = {
         isOpen: false,
+        isFirst: true,
         showTimeSelect: false,
         currentDate: {} as any,
         selectDate: {} as any,
@@ -70,7 +73,7 @@ class Page extends Taro.Component<Props, State> {
     }
 
     componentDidMount() {
-        const {dispatch, currentMerchantDetail} = this.props;
+        const {dispatch, currentMerchantDetail, payOrderAddress} = this.props;
         merchantAction.activityInfoList(dispatch, currentMerchantDetail.id);
         this.getDateList();
         const {payOrderProductList, activityList, memberInfo, productSDKObj} = this.props;
@@ -83,8 +86,25 @@ class Page extends Taro.Component<Props, State> {
             amount: productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList, payOrderProductList)
         };
         orderAction.getAbleToUseCoupon(dispatch, params);
-    }
 
+  
+    }
+    componentWillReceiveProps = (nextProps) => {
+        // console.log(nextProps, 'nextProps')
+        // const {dispatch, payOrderAddress} = nextProps;
+        // if(payOrderAddress.id && this.state.isFirst === true) {
+        //     console.log(payOrderAddress.id, 'payOrderAddress.id')
+        //     const param = {
+        //         latitude:  payOrderAddress.latitude,
+        //         longitude: payOrderAddress.longitude,
+        //         merchantId: BASE_PARAM.MCHID,
+        //     }
+        //     orderAction.getDeliveryFee(dispatch, param);
+        //     this.setState({
+        //         isFirst: false
+        //     })
+        // }
+    }
     public onSubmit = async () => {
         try {
             Taro.showLoading();
@@ -113,20 +133,18 @@ class Page extends Taro.Component<Props, State> {
             })
             try {
                 const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch} = this.props;
-                const payload = productSdk.getProductInterfacePayload(productSDKObj.currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal);
+                const payload = productSdk.getProductInterfacePayload(productSDKObj.currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal, memberInfo.points || 0);
                 const result = await productSdk.cashierOrder(payload)
                 invariant(result.code === ResponseCode.success, result.msg || ' ');
                 Taro.hideLoading();
                 const payment = await productSdk.requestPayment(result.data.order.orderNo, (res) => {
                 })
-                console.log('payment', payment);
                 if (payment.errMsg !== 'requestPayment:ok') {
                     productSdk.cashierOrderCallback(this.props.dispatch, result.data);
                     Taro.navigateTo({
                         url: '/pages/orderList/order'
                     }).catch((error) => {
                         /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
-                        console.log('switchTab');
                         const {order} = result.data;
                         Taro.redirectTo({
                             url: `/pages/order/order.detail?id=${order.orderNo}`
@@ -138,7 +156,6 @@ class Page extends Taro.Component<Props, State> {
                     })
                     return;
                 }
-                console.log('cashierOrderCallback');
                 productSdk.cashierOrderCallback(this.props.dispatch, result.data)
                 productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, this.props.dispatch)
                 UserAction.getMemberInfo(this.props.dispatch);

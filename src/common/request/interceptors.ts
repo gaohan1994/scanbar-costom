@@ -1,11 +1,13 @@
 import Taro from "@tarojs/taro";
 import { HTTP_STATUS } from './config';
+import { LoginManager } from "../sdk";
 
 const customInterceptor = (chain) => {
 
   const requestParams = chain.requestParams;
 
   return chain.proceed(requestParams).then(res => {
+    console.log('TODO 根据自身业务修改', res);
     if (res.statusCode === HTTP_STATUS.NOT_FOUND) {
       return Promise.reject("请求资源不存在");
 
@@ -16,6 +18,7 @@ const customInterceptor = (chain) => {
       Taro.setStorageSync("Authorization", "");
       // pageToLogin()
       // TODO 根据自身业务修改
+
       return Promise.reject("没有权限访问");
 
     } else if (res.statusCode === HTTP_STATUS.AUTHENTICATE) {
@@ -24,11 +27,10 @@ const customInterceptor = (chain) => {
       return Promise.reject("需要鉴权");
 
     } 
-    // else if (res.data && res.data.code === ResponseCode.unauthorized) {
-    //   console.log('unauthorized');
-    //   Taro.navigateTo({url: '/pages/sign/login'});
-    //   return res.data;
-    // }
+    else if (res.data && res.data.code === 'unauthorized') {
+      Taro.setStorage({ key: 'CentermOAuthTokenCostom', data: '' });
+      return res.data;
+    }
     else if (res.statusCode === HTTP_STATUS.SUCCESS) {
       return res.data;
     } 

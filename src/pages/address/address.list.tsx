@@ -38,11 +38,24 @@ class Page extends Taro.Component<Props, State> {
     if (entry) {
       this.setState({ entry })
     }
+    
   }
+  componentDidMount() {
+    this.init();
 
+  }
   componentDidShow () {
+    this.init();
+  }
+  async init () {
     const {indexAddress} = this.props;
-    UserAction.addressList(this.props.dispatch, indexAddress);
+    try {
+      Taro.showLoading({title: '', mask: true});
+      await UserAction.addressList(this.props.dispatch, indexAddress);
+      Taro.hideLoading();
+    } catch (error) {
+      Taro.hideLoading();
+    }
   }
 
   public onAddressClick = (address: UserInterface.Address) => {

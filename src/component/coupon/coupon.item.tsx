@@ -37,7 +37,7 @@ class CouponItem extends Taro.Component<Props, State> {
             [`${cssPrefix}-item-top-grey`]: unableToUse
           })}>
           <View className={`${cssPrefix}-item-top-left`}>
-            <Text className={`${cssPrefix}-item-top-left-price`}>
+            <Text className={couponVO.discount > 999 ? `${cssPrefix}-item-top-left-priceAuto` : `${cssPrefix}-item-top-left-price`}>
               {couponVO.discount || 0}
               <Text className={`${cssPrefix}-item-top-left-sign`}>¥</Text>
             </Text>

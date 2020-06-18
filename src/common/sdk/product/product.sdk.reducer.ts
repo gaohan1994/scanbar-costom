@@ -140,7 +140,21 @@ export default function productSDKReducer(
         productCartSelectedIndex: nextProductCartSelectedIndex
       };
     }
-
+    case productSdk.reducerInterface.DELETE_GROUP: {
+      const { payload: {deleteGroup} } = action as any;
+      let list: any = state.productCartList;
+      if(deleteGroup.length === 0){
+        list = state.productCartList;
+      } else {
+        deleteGroup.forEach(element => {
+          list = list.filter(val => val.id !== element.id);
+        });
+      }
+      return {
+        ...state,
+        productCartList: list
+      }
+    }
     case productSdk.reducerInterface.RECEIVE_ORDER_PAY_DETAIL: {
       const { payload } = action as any;
       if (payload === {}) {

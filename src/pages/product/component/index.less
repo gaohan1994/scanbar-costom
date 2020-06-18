@@ -123,7 +123,7 @@
         .margin(16px, b);
       }
       &-text {
-        font-size:20px;
+        font-size:24px;
         font-weight:500;
         color:rgba(51,51,51,1);
       }
@@ -179,16 +179,35 @@
       font-size:24px;
       // .flex(center, center, column);
       float: left;
+      &-bge {
+        position: absolute;
+        width: 44px;
+        .flex(center, center);
+        height: 44px;
+        background: rgba(252, 78, 68, 1);
+        border-radius: 50%;
+        right: -15px;
+        top: -22px;        
+        font-size: 26px;
+        font-weight: bold;
+        color: rgba(255, 255, 255, 1);
+      }
       &-item { 
         bottom: 0px;
         &-txt {
           position: absolute;
           top: 35%;
           left: 10%;
+          &-delete {
+            color: #2A86FC;
+            margin-left: 10px;
+            display: -webkit-inline-box;
+          }
         }
       }
       &-detail {
         .margin(40px, l);
+        position: relative;
       }
       &-icon {
         width:46px;
@@ -206,6 +225,11 @@
     &-rightPrice {
       float: right;
       margin: 10px 0px;
+      margin-right: 10px;
+    }
+    &-rightPrice-pay {
+      float: right;
+      margin: 35px 0px;
       margin-right: 10px;
     }
     &-right {

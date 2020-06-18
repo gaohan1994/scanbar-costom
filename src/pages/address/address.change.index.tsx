@@ -4,7 +4,7 @@ import { View, Image } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
 import { AppReducer } from '../../reducers'
-import { getAddressList, getCurrentPostion } from '../../reducers/app.user'
+import { getAddressList, getCurrentPostion, getIndexAddress } from '../../reducers/app.user';
 import { UserInterface } from '../../constants'
 import AddressItem from '../../component/address/item'
 import ButtonFooter from '../../component/button/button.footer';
@@ -20,7 +20,8 @@ import { Dispatch } from 'redux';
 const prefix = 'address'
 
 type Props = {
-  dispatch: Dispatch
+  dispatch: Dispatch;
+  indexAddress: any;
   addressList: UserInterface.Address[];
   currentPostion: UserInterface.Address;
 }
@@ -41,7 +42,8 @@ class Page extends Taro.Component<Props, State> {
   }
 
   componentDidShow() {
-    UserAction.addressList(this.props.dispatch);
+    const {indexAddress} = this.props;
+    UserAction.addressList(this.props.dispatch, indexAddress);
   }
 
   public onAddressClick = (address: UserInterface.Address) => {
@@ -142,6 +144,7 @@ class Page extends Taro.Component<Props, State> {
 const select = (state: AppReducer.AppState) => {
   return {
     addressList: getAddressList(state),
+    indexAddress: getIndexAddress(state),
     currentPostion: getCurrentPostion(state),
   }
 }

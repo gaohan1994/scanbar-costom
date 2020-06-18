@@ -15,16 +15,21 @@ type Props = {
   inputValue?: string;          // 右侧输入框
   inputPlaceHolder?: string;    // 右侧输入框默认值
   inputOnChange?: (value: string) => any; // 输入改变函数
+  onPopover?: () => void;
   onClick?: any;
   buttons?: any[];
+  Popover?: any;
   className?: string;
   buttonPos?: string;
 }
 
 class Item extends Taro.Component<Props> {
-
+  state = {
+    PopoverState: false
+  }
   static options = {
-    addGlobalClass: true
+    addGlobalClass: true,
+
   };
 
   defaultProps = {
@@ -53,8 +58,10 @@ class Item extends Taro.Component<Props> {
       inputDisable,
       inputPlaceHolder,
       inputOnChange,
+      onPopover,
       buttons,
-      buttonPos
+      buttonPos,
+      Popover
     } = this.props;
 
     return (
@@ -79,13 +86,27 @@ class Item extends Taro.Component<Props> {
             {!!arrow && (
               <Image className={`${prefix}-detail-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
             )}
-            
+            {
+              Popover && this.state.PopoverState ? (
+                <View className={`${prefix}-input-Popover`} onClick={() => {
+                  this.setState({
+                    PopoverState: false
+                  })
+                  if(onPopover){
+                    onPopover();
+                  }
+                }}>
+                  <span>{Popover}</span>
+                </View>
+              ) : null
+            }
             {!!isInput && (
               <Input
                 name='row-input'
                 value={inputValue}
                 disabled={inputDisable}
                 placeholder={inputPlaceHolder}
+                onClick={!inputValue ? () => {console.log(this.props, this.state);this.setState({PopoverState: true});} : () => {}}
                 onInput={({detail: {value}}) => inputOnChange && inputOnChange(value)}
                 className={`${prefix}-input`}
                 placeholderClass={`${prefix}-input-place`}

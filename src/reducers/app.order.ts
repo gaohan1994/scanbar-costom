@@ -25,6 +25,13 @@ export declare namespace OrderReducer {
         pointConfig: any;
       };
     }
+    interface DeliveryFeeReducer {
+      type: OrderInterface.RECEIVE_DELIVERYFEE;
+      payload: {
+        DeliveryFee: any;
+      };
+    }
+    
     interface OrderListReducer {
       type: OrderInterface.RECEIVE_ORDER_LIST;
       payload: {
@@ -71,6 +78,7 @@ export declare namespace OrderReducer {
     orderAllStatus: any[];
     currentType: number;
     pointConfig: any;
+    DeliveryFee: any;
     ableToUseCouponList: UserInterface.CouponsItem[];
   }
 
@@ -91,7 +99,8 @@ const initState: OrderReducer.State = {
   orderAllStatus: [],
   currentType: 0,
   ableToUseCouponList: [],
-  pointConfig: {}
+  pointConfig: {},
+  DeliveryFee: 0,
 };
 
 export default function orderReducer(
@@ -116,6 +125,15 @@ export default function orderReducer(
       return {
         ...state,
         orderDetail: data
+      };
+    }
+    
+    case OrderInterfaceMap.reducerInterfaces.RECEIVE_DELIVERYFEE: {
+      const { payload } = action as unknown as OrderReducer.Reducers.DeliveryFeeReducer;
+      const { DeliveryFee } = payload;
+      return {
+        ...state,
+        DeliveryFee: DeliveryFee
       };
     }
     case OrderInterfaceMap.reducerInterfaces.RECEIVE_POINTCONFIG: {
@@ -179,7 +197,7 @@ export const getCurrentType = (state: AppReducer.AppState) => state.order.curren
 
 export const getOrderList = (state: AppReducer.AppState) => state.order.orderList;
 export const getPointConfig = (state: AppReducer.AppState) => state.order.pointConfig;
-
+export const getDeliveryFee = (state: AppReducer.AppState) => state.order.DeliveryFee;
 export const getOrderListTotal = (state: AppReducer.AppState) => state.order.orderListTotal;
 
 export const getOrderDetail = (state: AppReducer.AppState) => state.order.orderDetail;

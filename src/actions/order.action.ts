@@ -11,6 +11,24 @@ import { OrderReducer } from '../reducers/app.order';
 
 class OrderAction {
   /**
+   * @todo 获取配送费
+   *
+   * @memberof OrderAction
+   */
+  public getDeliveryFee = async (dispatch, param) => {
+    const result = await OrderService.getDeliveryFee(param);
+    if (result.code === ResponseCode.success) {
+      const reducer: OrderReducer.Reducers.DeliveryFeeReducer = {
+        type: OrderInterfaceMap.reducerInterfaces.RECEIVE_DELIVERYFEE,
+        payload: {
+          DeliveryFee: result.data
+        }
+      };
+      dispatch(reducer);
+    }
+    return result;
+  }
+  /**
    * @todo 获取积分配置
    *
    * @memberof OrderAction
@@ -252,12 +270,22 @@ class OrderAction {
               detail: '商家同意退货，请您将商品退回'
             }
           case 6:
-            if (order.transFlag !== 10) {
+            if (order.transFlag === 11) {
+              return {
+                title: '待自提',
+                detail: '请去门店自提商品'
+              }
+            } else if (order.transFlag === 12) {
+              return {
+                title: '待收货',
+                detail: '商品待商家配送，请耐心等待'
+              }
+            } else if (order.transFlag !== 10) {
               return {
                 title: '商家拒绝退货',
                 detail: '商家拒绝了您的退货申请'
               }
-            } else {
+            }else {
               return {
                 title: '待发货',
                 detail: '商品待商家配送，请耐心等待'

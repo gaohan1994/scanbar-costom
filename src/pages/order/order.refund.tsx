@@ -209,11 +209,10 @@ class OrderRefund extends Taro.Component<Props, State> {
       for (let i = 0; i < refundProductList.length; i++) {
         if (refundProductList[i].id === product.id) {
           if (refundProductList[i].changeNumber === 1) {
-            let newRefundProductList = [];
-            if (refundProductList.length > 1) {
-              newRefundProductList.concat(refundProductList.slice(0, i)).concat(refundProductList.slice(i + 1, 0));
+            if (refundProductList.length > 0) {
+              refundProductList.splice(i, 1)
             }
-            this.setState({ refundProductList: newRefundProductList });
+            this.setState({ refundProductList: refundProductList });
           } else {
             refundProductList[i].changeNumber -= 1;
             this.setState({
@@ -261,11 +260,11 @@ class OrderRefund extends Taro.Component<Props, State> {
             <Text>{`.${numeral(this.getTotalAmount()).format('0.00').split('.')[1]}`}</Text>
           </Text>
           <AtButton
-            disabled={remark.length === 0 || refundProductList.length === 0}
+            disabled={this.state.remarkTxt.length === 0 || refundProductList.length === 0}
             className={classnames(`${cssPrefix}-footer-button-little`, {
               [`theme-button`]: true,
               ['h5-button-refund']: process.env.TARO_ENV === 'h5' ? true : false,
-              [`theme-button-cancel`]: remark.length === 0 || refundProductList.length === 0,
+              [`theme-button-cancel`]: this.state.remarkTxt.length === 0 || refundProductList.length === 0,
             })}
             onClick={() => { this.orderRefund() }}
           >

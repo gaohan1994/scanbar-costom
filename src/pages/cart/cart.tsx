@@ -123,7 +123,6 @@ class Page extends Taro.Component<Props, State> {
           if(nowThreshold > element.threshold){
             nowThreshold  = element.threshold;
           }
-          console.log('activity.rule.forEach', element, nowThreshold)
           if(maxThreshold < element.threshold){
             maxThreshold  = element.threshold;
           }
@@ -148,10 +147,8 @@ class Page extends Taro.Component<Props, State> {
       const maxDiscountItem = activity.rule.find((r) => r.threshold === maxThreshold);
       const NowDiscountItem = activity.rule.find((r) => r.threshold === nowThreshold);
       if(Item){
-        console.log('getMaxActivityRule-----price', {rule: Item, ruleNow: NowDiscountItem});
         return {rule: Item, ruleNow: NowDiscountItem};
       }
-      console.log('getMaxActivityRule-----price', {rule: maxDiscountItem, ruleNow: NowDiscountItem});
       return {rule: maxDiscountItem, ruleNow: NowDiscountItem};
     } 
   }
@@ -168,7 +165,6 @@ class Page extends Taro.Component<Props, State> {
       productCartList,
       activityList
     );
-    console.log('productFilterCartList', productFilterCartList);
     return (
       <View className="container">
         {productCartList && productCartList.length > 0 ? (
@@ -189,7 +185,6 @@ class Page extends Taro.Component<Props, State> {
                 });
                 const ActivityRule = getMaxActivityRule(subTotalPrice, activity);
                 const {rule, ruleNow} = ActivityRule ? ActivityRule : {rule: null, ruleNow: null}
-                console.log('getMaxActivityRule', rule, subTotalPrice, activity, ruleNow)
                 // subTotalPrice < activity.rule[0].threshold
                 return (
                   <View

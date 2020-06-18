@@ -21,7 +21,7 @@ class PickerComponent extends Taro.Component<Props, State> {
   }
 
   public onChange = (params) => {
-    console.log('params: ', params)
+    // console.log('params: ', params)
   }
 
   render () {

@@ -21,7 +21,6 @@ class WeixinSDK {
     return new Promise((resolve) => {
       Taro.getSetting({
         success: (setting) => {
-          console.log(setting);
           if (setting.authSetting && !!setting.authSetting[key]) {
             resolve({ success: true })
           }

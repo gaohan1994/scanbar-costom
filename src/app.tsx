@@ -83,10 +83,11 @@ class App extends Component {
       }
     ],
     window: {
-      backgroundTextStyle: "light",
+      backgroundTextStyle: "dark",
       navigationBarBackgroundColor: "#2a86fc",
       navigationBarTitleText: "WeChat",
-      navigationBarTextStyle: "white"
+      navigationBarTextStyle: "white",
+      enablePullDownRefresh: true,
     },
     tabBar: {
       color: "#ACACAC",
