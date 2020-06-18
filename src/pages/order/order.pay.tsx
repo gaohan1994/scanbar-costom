@@ -146,9 +146,9 @@ class Page extends Taro.Component<Props, State> {
       if (payment.errMsg !== "requestPayment:ok") {
         productSdk.cashierOrderCallback(this.props.dispatch, result.data);
 
-        Taro.navigateTo({
-          url: `/pages/order/order.detail?id=${result.data.order.orderNo}`
-        });
+        // Taro.redirectTo({
+        //   url: `/pages/order/order.detail?id=${result.data.order.orderNo}`
+        // });
         return;
       }
       productSdk.cashierOrderCallback(dispatch, result.data);
@@ -156,9 +156,6 @@ class Page extends Taro.Component<Props, State> {
         { remark: "", selectedCoupon: {} },
         dispatch
       );
-      Taro.navigateTo({
-        url: `/pages/order/order.detail?id=${result.data.order.orderNo}`
-      });
     } catch (error) {
       Taro.hideLoading();
 

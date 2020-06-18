@@ -1,18 +1,16 @@
-
 /**
- * @Author: Ghan 
- * @Date: 2019-11-13 10:10:53 
- * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-17 17:45:58
- * 
+ * @Author: Ghan
+ * @Date: 2019-11-13 10:10:53
+ * @Last Modified by: Ghan
+ * @Last Modified time: 2020-06-18 11:04:42
+ *
  * @todo [商品相关的类型定义]
  */
 
 import { jsonToQueryString } from "../index";
-import { HTTPInterface } from '..';
+import { HTTPInterface } from "..";
 
 export declare namespace OrderInterface {
-
   interface OrderDetailItem {
     id: number;
     costAmount: number;
@@ -144,10 +142,10 @@ export declare namespace OrderInterface {
   }
 
   interface OrderCount {
-    inTransNum: number;         // 待收货/配送中数量
-    initNum: number;            // 待付款数量
-    waitForReceiptNum: number;  // 待自提
-    waitForDelivery: number;    // 待发货
+    inTransNum: number; // 待收货/配送中数量
+    initNum: number; // 待付款数量
+    waitForReceiptNum: number; // 待自提
+    waitForDelivery: number; // 待发货
     // waitForSend: number;
   }
 
@@ -168,8 +166,8 @@ export declare namespace OrderInterface {
       refundByPreOrder: boolean;
       transAmount: number;
       remark: string;
-    },
-    productInfoList: RefundOrderProductItem[],
+    };
+    productInfoList: RefundOrderProductItem[];
   }
 
   interface RefundOrderProductItem {
@@ -201,43 +199,42 @@ export declare namespace OrderInterface {
 }
 
 class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
-
   public reducerInterfaces = {
-    CHANGR_CURRENT_TYPE: 'CHANGR_CURRENT_TYPE',
-    RECEIVE_ORDER_LIST: 'RECEIVE_ORDER_LIST',
-    RECEIVE_ORDER_DETAIL: 'RECEIVE_ORDER_DETAIL',
-    RECEIVE_ORDER_COUNT: 'RECEIVE_ORDER_COUNT',
-    RECEIVE_ORDER_ALL_STATUS: 'RECEIVE_ORDER_ALL_STATUS',
-    RECEIVE_ABLE_TO_USE_COUPONS: 'RECEIVE_ABLE_TO_USE_COUPONS',
+    CHANGR_CURRENT_TYPE: "CHANGR_CURRENT_TYPE",
+    RECEIVE_ORDER_LIST: "RECEIVE_ORDER_LIST",
+    RECEIVE_ORDER_DETAIL: "RECEIVE_ORDER_DETAIL",
+    RECEIVE_ORDER_COUNT: "RECEIVE_ORDER_COUNT",
+    RECEIVE_ORDER_ALL_STATUS: "RECEIVE_ORDER_ALL_STATUS",
+    RECEIVE_ABLE_TO_USE_COUPONS: "RECEIVE_ABLE_TO_USE_COUPONS"
   };
 
   public orderList = (params?: OrderInterface.OrderListFetchFidle) => {
-    return `/order/list${params ? jsonToQueryString(params) : ''}`;
-  }
+    return `/order/list${params ? jsonToQueryString(params) : ""}`;
+  };
 
   public orderDetail = (params: OrderInterface.OrderDetailFetchField) => {
     return `/order/detail/${params.orderNo}`;
-  }
+  };
 
   public orderCount = () => {
     return `/order/count`;
-  }
+  };
 
   public orderClose = (params: OrderInterface.OrderDetailFetchField) => {
     return `/order/closeOrder/${params.orderNo}`;
-  }
+  };
 
   public orderAllStatus = () => {
     return `/order/getAllOrderStatus`;
-  }
+  };
 
   public orderRefund = () => {
     return `/cashier/refundByOrder`;
-  }
+  };
 
   public orderRefundCancel = (params: OrderInterface.OrderDetailFetchField) => {
     return `/order/cancelRefund/${params.orderNo}`;
-  }
+  };
 }
 
 export default new OrderInterfaceMap();

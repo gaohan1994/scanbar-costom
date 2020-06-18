@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-16 13:49:42
+ * @Last Modified time: 2020-06-18 10:11:06
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -495,7 +495,7 @@ class ProductSDK {
               ? currentMerchantDetail.id
               : BASE_PARAM.MCHID,
         //   discount: 0,
-          orderSource: 3,
+          orderSource: 7,
           totalAmount:
             this.getProductsOriginPrice(productList) +
             (payOrderDetail.deliveryType === 1 ? 3.5 : 0),

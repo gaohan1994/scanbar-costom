@@ -9,7 +9,7 @@ import { MerchantInterface } from "src/constants";
  * @Author: Ghan
  * @Date: 2019-11-22 14:20:31
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-15 15:51:15
+ * @Last Modified time: 2020-06-18 10:59:29
  * @todo productsdk
  */
 export declare namespace ProductSDKReducer {
@@ -225,24 +225,25 @@ export default function productSDKReducer(
         payload: { currentMerchantDetail, productList }
       } = action as ProductSDKReducer.Reducers.EmptyCart;
 
-      const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
-        [],
-        state.productCartList[currentMerchantDetail.id]
-      );
+      // const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
+      //   [],
+      //   state.productCartList[currentMerchantDetail.id]
+      // );
 
-      const nextCartProductList = !!productList
-        ? productCartList.filter(cartProduct => {
-            /**
-             * @todo 留下非购买的商品
-             * @param {cartProduct} 购物车中的商品
-             * @param {buyProduct} 购买的商品
-             */
-            return !productList.some(
-              buyProduct => buyProduct.id === cartProduct.id
-            );
-          })
-        : [];
-
+      // const nextCartProductList = !!productList
+      //   ? productCartList.filter(cartProduct => {
+      //       /**
+      //        * @todo 留下非购买的商品
+      //        * @param {cartProduct} 购物车中的商品
+      //        * @param {buyProduct} 购买的商品
+      //        */
+      //       return !productList.some(
+      //         buyProduct => buyProduct.id === cartProduct.id
+      //       );
+      //     })
+      //   : [];
+      const nextCartProductList = [];
+      console.log("nextCartProductList", nextCartProductList);
       return {
         ...state,
         productCartList: {
