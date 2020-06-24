@@ -2,7 +2,7 @@
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-03 17:19:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-16 13:48:41
+ * @Last Modified time: 2020-06-24 13:41:56
  */
 import {
   MerchantService,
@@ -17,23 +17,15 @@ import requestHttp from "../common/request/request.http";
 // import { store } from '../app';
 import Taro from "@tarojs/taro";
 import productSdk from "../common/sdk/product/product.sdk";
-import { AppReducer } from "src/reducers";
-
 class MerchantAction {
-  public addMember = (state: AppReducer.AppState) => () => {
-    if (
-      state.merchant.currentMerchantDetail &&
-      state.merchant.currentMerchantDetail.id
-    ) {
-      return async () => {
-        const result = await requestHttp.post(
-          `/memberInfo/add/${state.merchant.currentMerchantDetail.id}`,
-          {}
-        );
-        return result;
-      };
-    }
-    return;
+  public addMember = async (
+    currentMerchantDetail: MerchantInterface.MerchantDetail
+  ) => {
+    const result = await requestHttp.post(
+      `/memberInfo/add/${currentMerchantDetail.id}`,
+      {}
+    );
+    return result;
   };
 
   public getOrderedMerchant = dispatch => async params => {
@@ -118,7 +110,7 @@ class MerchantAction {
           data.push(row);
         });
       }
-
+      console.log("activityInfoList", result);
       dispatch({
         type:
           MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ACTIVITYLIST,

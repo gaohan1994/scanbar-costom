@@ -13,7 +13,7 @@ export declare namespace MerchantInterface {
     topMerchantId: number;
   }
   interface Activity {
-    activityDetailVOList?: Array<{
+    activityDetailList?: Array<{
       giftFlag: boolean;
       identity: string;
       name: string;

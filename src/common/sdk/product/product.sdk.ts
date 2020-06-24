@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-18 10:11:06
+ * @Last Modified time: 2020-06-24 13:52:36
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -17,20 +17,27 @@
  * });
  * ```
  */
-import Taro from '@tarojs/taro';
-import {ProductInterface, ProductService, OrderInterface, ResponseCode, UserInterface, MerchantInterface} from '../../../constants';
-import {store} from '../../../app';
-import { ProductSDKReducer, getProductCartList } from './product.sdk.reducer';
-import {BASE_PARAM} from '../../../common/util/config';
-import requestHttp from '../../../common/request/request.http';
-import merge from 'lodash.merge';
-import numeral from 'numeral';
+import Taro from "@tarojs/taro";
+import {
+  ProductInterface,
+  ProductService,
+  OrderInterface,
+  ResponseCode,
+  UserInterface,
+  MerchantInterface
+} from "../../../constants";
+import { store } from "../../../app";
+import { ProductSDKReducer, getProductCartList } from "./product.sdk.reducer";
+import { BASE_PARAM } from "../../../common/util/config";
+import requestHttp from "../../../common/request/request.http";
+import merge from "lodash.merge";
+import numeral from "numeral";
 
-export const NonActivityName = 'NonActivityName';
+export const NonActivityName = "NonActivityName";
 
 interface FilterProductList {
-    activity?: MerchantInterface.Activity;
-    productList: ProductCartInterface.ProductCartInfo[]; 
+  activity?: MerchantInterface.Activity;
+  productList: ProductCartInterface.ProductCartInfo[];
 }
 
 export declare namespace ProductCartInterface {
@@ -167,741 +174,928 @@ export declare namespace ProductCartInterface {
 }
 
 class ProductSDK {
+  public nonBarcodeKey: string = "WM";
 
-    public nonBarcodeKey: string = 'WM';
+  public productCartManageType: ProductCartInterface.ProductCartManageType = {
+    ADD: "ADD",
+    REDUCE: "REDUCE",
+    EMPTY: "EMPTY"
+  };
 
-    public productCartManageType: ProductCartInterface.ProductCartManageType = {
-        ADD: 'ADD',
-        REDUCE: 'REDUCE',
-        EMPTY: 'EMPTY',
-    };
+  public reducerInterface: ProductCartInterface.ReducerInterface = {
+    SELECT_INDEX: "SELECT_INDEX",
+    INIT_ALIANCE_CART: "INIT_ALIANCE_CART",
+    MANAGE_CART: "MANAGE_CART",
+    MANAGE_EMPTY_CART: "MANAGE_EMPTY_CART",
+    MANAGE_CART_PRODUCT: "MANAGE_CART_PRODUCT",
+    MANAGE_CART_PRODUCT_REMOVE: "MANAGE_CART_PRODUCT_REMOVE",
+    RECEIVE_ORDER_PAY: "RECEIVE_ORDER_PAY",
+    RECEIVE_ORDER_PAY_ADDRESS: "RECEIVE_ORDER_PAY_ADDRESS",
+    RECEIVE_ORDER_PAY_DETAIL: "RECEIVE_ORDER_PAY_DETAIL"
+  };
 
-    public reducerInterface: ProductCartInterface.ReducerInterface = {
-        SELECT_INDEX: 'SELECT_INDEX',
-        INIT_ALIANCE_CART: "INIT_ALIANCE_CART",
-        MANAGE_CART: 'MANAGE_CART',
-        MANAGE_EMPTY_CART: 'MANAGE_EMPTY_CART',
-        MANAGE_CART_PRODUCT: 'MANAGE_CART_PRODUCT',
-        MANAGE_CART_PRODUCT_REMOVE: 'MANAGE_CART_PRODUCT_REMOVE',
-        RECEIVE_ORDER_PAY: 'RECEIVE_ORDER_PAY',
-        RECEIVE_ORDER_PAY_ADDRESS: 'RECEIVE_ORDER_PAY_ADDRESS',
-        RECEIVE_ORDER_PAY_DETAIL: 'RECEIVE_ORDER_PAY_DETAIL',
-    };
+  constructor() {}
 
-
-    constructor() {
-
+  public refreshCartNumber = productCartList => {
+    const total = this.getProductNumber(productCartList);
+    if (total !== 0) {
+      Taro.setTabBarBadge({
+        index: 2,
+        text: `${total}`
+      });
+    } else {
+      Taro.removeTabBarBadge({ index: 2 });
     }
+  };
 
-    public refreshCartNumber = (productCartList) => {
-        const total = this.getProductNumber(productCartList);
-        if (total !== 0) {
-            Taro.setTabBarBadge({
-                index: 2,
-                text: `${total}`
-            });
-        } else {
-            Taro.removeTabBarBadge({index: 2});
+  /**
+   * @todo 获取商品的数量
+   *
+   * @memberof ProductSDK
+   */
+  public getProductNumber = (
+    products?: ProductCartInterface.ProductCartInfo[]
+  ) => {
+    const productList =
+      products !== undefined ? products : getProductCartList(store.getState());
+    const reduceCallback = (
+      prevTotal: number,
+      item: ProductCartInterface.ProductCartInfo
+    ) => prevTotal + item.sellNum;
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
+  };
+
+  /**
+   * @todo [拿到单个商品的价格，有优惠价返回优惠价，有会员价返回会员价，没有就原价]
+   */
+  public getProductItemPrice = (
+    product:
+      | ProductCartInterface.ProductCartInfo
+      | ProductInterface.ProductInfo,
+    memberInfo
+  ) => {
+    let discountPrice = product.price;
+    // const state = store.getState();
+    // const memberInfo = getMemberInfo(state);
+    if (product.activityInfos && product.activityInfos.length > 0) {
+      for (let i = 0; i < product.activityInfos.length; i++) {
+        if (product.activityInfos[i].discountPrice < discountPrice) {
+          discountPrice = product.activityInfos[i].discountPrice;
         }
+      }
     }
-
-    /**
-     * @todo 获取商品的数量
-     *
-     * @memberof ProductSDK
-     */
-    public getProductNumber = (products?: ProductCartInterface.ProductCartInfo[]) => {
-        const productList = products !== undefined
-            ? products
-            : getProductCartList(store.getState());
-        const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.sellNum
-        const total = productList.reduce(reduceCallback, 0);
-        return total;
+    if (
+      memberInfo.enableMemberPrice &&
+      product.memberPrice !== undefined &&
+      product.memberPrice < discountPrice
+    ) {
+      return product.memberPrice;
     }
+    return discountPrice;
+  };
 
-    /**
-     * @todo [拿到单个商品的价格，有优惠价返回优惠价，有会员价返回会员价，没有就原价]
-     */
-    public getProductItemPrice = (product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo, memberInfo) => {
-        let discountPrice = product.price;
-        // const state = store.getState();
-        // const memberInfo = getMemberInfo(state);
-        if (product.activityInfos && product.activityInfos.length > 0) {
-            for (let i = 0; i < product.activityInfos.length; i++) {
-                if (product.activityInfos[i].discountPrice < discountPrice) {
-                    discountPrice = product.activityInfos[i].discountPrice;
-                }
-            }
+  /**
+   * @todo [拿到单个商品的价格，有优惠价返回优惠价]
+   */
+  public getProductItemDiscountPrice = (
+    product:
+      | ProductCartInterface.ProductCartInfo
+      | ProductInterface.ProductInfo,
+    memberInfo
+  ) => {
+    // const memberInfo = store.getState().user.memberInfo;
+    const enableMemberPrice = memberInfo ? memberInfo.enableMemberPrice : "";
+    const priceNumber = product && product.price ? product.price : 0;
+    const memberPriceNumber =
+      product && product.memberPrice ? product.memberPrice : 0;
+    let discountPrice = priceNumber;
+    if (product && product.activityInfos && product.activityInfos.length > 0) {
+      for (let i = 0; i < product.activityInfos.length; i++) {
+        if (
+          product.activityInfos[i].type === 1 ||
+          product.activityInfos[i].type === 2 ||
+          product.activityInfos[i].discountPrice < discountPrice
+        ) {
+          discountPrice = product.activityInfos[i].discountPrice;
         }
-        if (memberInfo.enableMemberPrice && product.memberPrice !== undefined && product.memberPrice < discountPrice) {
-            return product.memberPrice
-        }
-        return discountPrice;
+      }
     }
-
-    /**
-     * @todo [拿到单个商品的价格，有优惠价返回优惠价]
-     */
-    public getProductItemDiscountPrice = (product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo, memberInfo) => {
-        // const memberInfo = store.getState().user.memberInfo;
-        const enableMemberPrice = memberInfo ?　memberInfo.enableMemberPrice　: '';
-        const priceNumber = product && product.price ? product.price : 0;
-        const memberPriceNumber = product && product.memberPrice ? product.memberPrice : 0;
-        let discountPrice = priceNumber;
-        if (product && product.activityInfos && product.activityInfos.length > 0) {
-            for (let i = 0; i < product.activityInfos.length; i++) {
-                if (product.activityInfos[i].type === 1 || product.activityInfos[i].type === 2 ||
-                    product.activityInfos[i].discountPrice < discountPrice) {
-                    discountPrice = product.activityInfos[i].discountPrice;
-                }
-            }
-        }
-        if (enableMemberPrice && discountPrice > memberPriceNumber) {
-            discountPrice = memberPriceNumber;
-        }
-        return discountPrice;
+    if (enableMemberPrice && discountPrice > memberPriceNumber) {
+      discountPrice = memberPriceNumber;
     }
+    return discountPrice;
+  };
 
-    /**
-     * @todo 获取商品原价
-     *
-     * @memberof ProductSDK
-     */
-    public getProductsOriginPrice = (productCartList, products?: ProductCartInterface.ProductCartInfo[]) => {
-        // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
-        const productList = products !== undefined ? products : productCartList;
-        const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
-            return prevTotal + (item.price * item.sellNum);
-        };
-        const total = productList.reduce(reduceCallback, 0);
-        return total;
-    }
-
-    /**
-     * @todo 获取商品会员价格
-     *
-     * @memberof ProductSDK
-     */
-    public getProductMemberPrice = (memberInfo, productCartList, products?: ProductCartInterface.ProductCartInfo[]): number => {
-        const productList = products !== undefined ? products : productCartList;
-        const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => {
-          const itemPrice = this.getProductItemPrice(item, memberInfo);
-    
-          return prevTotal + (itemPrice * item.sellNum);
-        };
-        const total = productList.reduce(reduceCallback, 0);
-        return total;
-    }
-
-    public setMaxActivityRule = (price: number, activity: MerchantInterface.Activity) => {
-        const rule: {discount: number; threshold: number}[] = merge([], activity.rule);
-        
-        if (!!rule && rule.length > 0) {
-            const discountArray = rule.map((item) => item.discount);
-
-            const maxDiscount = Math.max(...discountArray);
-            const maxDiscountIndex = rule.findIndex((r) => r.discount === maxDiscount);
-            const maxDiscountItem = rule.find((r) => r.discount === maxDiscount);
-
-            while (discountArray.length > 0) {
-                if (maxDiscountItem && price <= maxDiscountItem.threshold) {
-                    return maxDiscountItem;
-                } else {
-                    discountArray.splice(maxDiscountIndex, 1);
-                }
-            }
-            return {};
-        }
-        return {};
-    }
-
-    public getProductActivityPrice = (price: number, activity?: MerchantInterface.Activity) => {
-
-        /**
-         * @todo 如果有满减活动则计算满减活动
-         * @todo 如果有满减金额
-         */
-        if (!!activity && activity.id && activity.rule && activity.rule.length > 0) {
-            /**
-             * @todo 如果只有一个规则且阈值小于价格则使用满减
-             */
-            if (activity.rule.length === 1) {
-                return activity.rule[0].threshold <= price ? numeral(price - activity.rule[0].discount).value() : price;
-            }
-            /**
-             * @todo 如果有多个规则找出最优惠规则并使用该规则
-             */
-            const rule: any = this.setMaxActivityRule(price, activity);
-            // console.log('rule: ', rule);
-            return !!rule ? numeral(price - rule.discount).value() : price;
-        }
-        return price;
-    }
-
-    /**
-     * @todo 商家满减活动
-     */
-    public getProductTotalActivityPrice = (activityList, memberInfo, productCartList, productList?: ProductCartInterface.ProductCartInfo[]): number => {
-        const products = productList !== undefined ? productList : productCartList;
-                // const products = productList !== undefined ? productList : store.getState().productSDK.productCartList;  
-        // const activityList = store.getState().merchant.activityList; 
-        const filterProductList = this.filterByActivity(products, activityList);
-        let activityMoney: number = 0;
-        
-        filterProductList.forEach((activityItem) => {
-            const { activity, productList } = activityItem;
-            let subTotal: number = 0;
-            productList.forEach((product) => {
-                subTotal += this.getProductItemPrice(product, memberInfo) * product.sellNum;
-            })
-            const subActivityMoney = this.getProductActivityPrice(subTotal, activity);
-            if (subTotal !== subActivityMoney) {
-                activityMoney = subTotal - subActivityMoney;
-            }
-        })
-        return activityMoney;
-    }
-
-    /**
-     * @todo 获取商品交易价格
-     *
-     * @memberof ProductSDK
-     */
-    public getProductTransPrice = (activityList, memberInfo, productCartList, products?: ProductCartInterface.ProductCartInfo[]): number => {
-        const productList = products !== undefined ? products : productCartList;
-        // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
-        let total = 0;
-        for (let i = 0; i < productList.length; i++) {
-            total += this.getProductItemPrice(productList[i], memberInfo) * productList[i].sellNum;
-        }
-        total -= this.getProductTotalActivityPrice(activityList, memberInfo,productCartList, productList);
-        // total = this.getProductActivityPrice(total, this.checkActivity(total));
-        return total;
-    }
-
-    /**
-     * @todo 获取优惠信息
-     *
-     * @memberof ProductSDK
-     */
-    public getDiscountString = (memberInfo, activityList: any, product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo) => {
-        // const memberInfo = store.getState().user.memberInfo;
-        const { enableMemberPrice } = memberInfo;
-        if (!Array.isArray(activityList) || !activityList.length) {
-            if (!enableMemberPrice || product.memberPrice === product.price) return '';
-            return '会员专享';
-        }
-        const activity = activityList[0];
-        const memberFlag = !!enableMemberPrice && activity.discountPrice > product.memberPrice;
-        switch (activity.type) {
-            case 1:
-                return memberFlag 
-                    ? '会员专享' 
-                    : `${activity.discountAmount}折${activity.limitNum && activity.limitNum > 0 ? ` 限${activity.limitNum}件` : ``}`;
-            case 2:
-                return memberFlag ? '会员专享' : `优惠${activity.discountAmount}元${activity.limitNum && activity.limitNum > 0 ? ` 限${activity.limitNum}件` : ``}`;
-            case 3:
-                if (!activity.rule) return '';
-                const rules = JSON.parse(activity.rule);
-                if (!Array.isArray(rules) || !rules.length || !rules[0].threshold || !rules[0].threshold) {
-                    return '';
-                }
-                return `满${rules[0].threshold}元减${rules[0].discount}元`;
-            case 4:
-                if (!activity.rule) return '';
-                const ruleList = JSON.parse(activity.rule);
-                if (!Array.isArray(ruleList) || !ruleList.length || !ruleList[0].threshold || !ruleList[0].threshold) {
-                    return '';
-                }
-                return `满${ruleList[0].threshold}件打${ruleList[0].discount}折`;
-            default:
-                return ``;
-        }
-    }
-
-    /**
-     * @todo 把下单地址存到order.pay redux中
-     *
-     * @memberof ProductSDK
-     */
-    public preparePayOrderAddress = async (address: UserInterface.Address, dispatch) => {
-        dispatch({
-            type: this.reducerInterface.RECEIVE_ORDER_PAY_ADDRESS,
-            payload: address
-        })
-    }
-
-    /**
-     * @todo 把订单详情存到order.pay redux中
-     *
-     * @memberof ProductSDK
-     */
-    public preparePayOrderDetail = async (params, dispatch) => {
-        dispatch({
-            type: this.reducerInterface.RECEIVE_ORDER_PAY_DETAIL,
-            payload: params
-        })
-    }
-
-    /**
-     * @todo 把要下单的数据传到order.pay redux中
-     */
-    public preparePayOrder = async (dispatch, productCartList, products?: ProductCartInterface.ProductCartInfo[]) => {
-        // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
-        const productList = products !== undefined ? products : productCartList;
-        dispatch({
-            type: this.reducerInterface.RECEIVE_ORDER_PAY,
-            payload: {productList}
-        });
-    }
-
-    public prepareEmptyPayOrder = async (dispatch) => {
-        this.preparePayOrder(dispatch, [], []);
-    }
-
-    /**
-     * @todo 计算交易价格
-     *
-     * ```ts
-     * import productSdk from 'xxx';
-     *
-     * @memberof ProductSDK
-     */
-
-    /**
-     * @todo 返回支付需要的数据格式
-     *
-     *
-     * @memberof ProductSDK
-     */
-    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products?: ProductCartInterface.ProductCartInfo[], address?: any, payOrderDetail?: any): ProductCartInterface.ProductPayPayload => {
-        // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;  UserInterface.Address
-        const productList = products !== undefined ? products : productCartList;
-        // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
-        let order: Partial<ProductCartInterface.ProductOrderPayload> = {
-          deliveryInfo: {
-            address:
-              payOrderDetail.deliveryType === 1
-                ? (address && address.address) || ""
-                : "",
-            deliveryType: payOrderDetail.deliveryType || 0,
-            deliveryFee: payOrderDetail.deliveryType === 1 ? 3.5 : 0,
-            planDeliveryTime: payOrderDetail.planDeliveryTime || "",
-          },
-          remark: payOrderDetail.remark || "",
-          payType: 8,
-          merchantId:
-            currentMerchantDetail && currentMerchantDetail.id
-              ? currentMerchantDetail.id
-              : BASE_PARAM.MCHID,
-        //   discount: 0,
-          orderSource: 7,
-          totalAmount:
-            this.getProductsOriginPrice(productList) +
-            (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
-          totalNum: this.getProductNumber(productList),
-          transAmount:
-            this.getProductTransPrice(
-              activityList,
-              memberInfo,
-              productCartList,
-              productList
-            ) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)
-        };
-
-        if (payOrderDetail.deliveryType === 1) {
-            order.deliveryInfo = {
-              ...order.deliveryInfo as ProductCartInterface.DeliveryInfo,
-              receiver: (address && address.contact) || "",
-              receiverPhone: (address && address.phone) || ""
-            };
-        }
-
-        if (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id) {
-            const transAmount = this.getProductTransPrice(activityList, memberInfo, productCartList) +
-                (payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
-                (payOrderDetail.selectedCoupon.couponVO.discount || 0);
-            order = {
-                ...order,
-                transAmount: transAmount,
-                couponList: [payOrderDetail.selectedCoupon.couponCode]
-            }
-        }
-
-        const payload: ProductCartInterface.ProductPayPayload = {
-            order: order as any,
-            productInfoList: productList.map((item) => {
-                /**
-                 * @todo [默认会员价，有就用会员价，没有就用普通价格]
-                 */
-                const itemPrice: number = item.memberPrice !== undefined ? item.memberPrice : item.price;
-                return {
-                    productId: item.id,
-                    productName: item.name,
-                    remark: "",
-                    sellNum: item.sellNum,
-                    totalAmount: itemPrice * item.sellNum,
-                    transAmount: itemPrice * item.sellNum,
-                    unitPrice: itemPrice
-                } as ProductCartInterface.ProductInfoPayload;
-            }),
-        };
-        return payload;
-    }
-
-    public requestPayment = async (orderNo: string, fail?: (res: any) => void) => {
-        const params = {
-          orderNo,
-          openId: store.getState().user.userinfo.openId,
-          orderSource: 7
-        };
-        const result = await requestHttp.post(`/api/cashier/pay`, params);
-        if (result.code === ResponseCode.success && result.data.status !== false) {
-            return new Promise((resolve) => {
-                const payload = JSON.parse(result.data.param);
-                    delete payload.appId;
-                    const paymentPayload = {
-                        ...payload,
-                        success: (res) => {
-                            resolve(res)
-                        },
-                        fail: (error) => {
-                            resolve(error)
-                        }
-                    };
-                    Taro.requestPayment(paymentPayload);
-                // if(process.env.TARO_ENV === 'h5'){
-                //     const data = result.data;
-                //     const url = data.codeUrl.replace('-app', '-customer')
-                //     window.location.href = url;
-                // } else {
-                //     const payload = JSON.parse(result.data.param);
-                //     delete payload.appId;
-                //     const paymentPayload = {
-                //         ...payload,
-                //         success: (res) => {
-                //             resolve(res)
-                //         },
-                //         fail: (error) => {
-                //             resolve(error)
-                //         }
-                //     };
-                //     console.log('paymentPayload: ', paymentPayload)
-                //     Taro.requestPayment(paymentPayload);
-                // }
-                
-            })
-        }
-        return result;
-    }
-
-    public isCartProduct(product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo): product is ProductCartInterface.ProductCartInfo {
-        return product !== undefined && (<ProductCartInterface.ProductCartInfo>product).sellNum !== undefined;
-    }
-
-    /**
-     * @todo 增加购物车商品
-     *
-     * @memberof ProductSDK
-     */
-    public add = (
-        dispatch, 
-        productSDK, 
-        product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo,
-        num?: number
+  /**
+   * @todo 获取商品原价
+   *
+   * @memberof ProductSDK
+   */
+  public getProductsOriginPrice = (
+    productCartList,
+    products?: ProductCartInterface.ProductCartInfo[]
+  ) => {
+    // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const productList = products !== undefined ? products : productCartList;
+    const reduceCallback = (
+      prevTotal: number,
+      item: ProductCartInterface.ProductCartInfo
     ) => {
+      return prevTotal + item.price * item.sellNum;
+    };
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
+  };
 
-        Taro.showToast({
-            title: '加入购物车'
-        });
-        const { merchant: { currentMerchantDetail } } = store.getState();
-        const productCartList =
-          productSDK.productCartList[currentMerchantDetail.id];
-        const index = productCartList.findIndex(p => p.id === product.id);
-        let limitNum = -1;
-        if (product.activityInfos) {
-            for (let i = 0; i < product.activityInfos.length; i++) {
-                if (product.activityInfos[i].limitNum) {
-                    if (product.activityInfos[i].limitNum < limitNum || limitNum === -1) {
-                        limitNum === product.activityInfos[i].limitNum;
-                    }
-                }
-            }
-        }
+  /**
+   * @todo 获取商品会员价格
+   *
+   * @memberof ProductSDK
+   */
+  public getProductMemberPrice = (
+    memberInfo,
+    productCartList,
+    products?: ProductCartInterface.ProductCartInfo[]
+  ): number => {
+    const productList = products !== undefined ? products : productCartList;
+    const reduceCallback = (
+      prevTotal: number,
+      item: ProductCartInterface.ProductCartInfo
+    ) => {
+      const itemPrice = this.getProductItemPrice(item, memberInfo);
 
-        if (num) {
-            if (index !== -1) {
-                if (limitNum !== -1 && (productCartList[index].sellNum + num) > limitNum) {
-                    Taro.showToast({
-                        title: `部分商品超过限购件数`,
-                        icon: 'none'
-                    });
-                    num = (limitNum - productCartList[index].sellNum);
-                }
+      return prevTotal + itemPrice * item.sellNum;
+    };
+    const total = productList.reduce(reduceCallback, 0);
+    return total;
+  };
 
-                if ((productCartList[index].sellNum + num) > product.saleNumber) {
-                    Taro.showToast({
-                        title: `部分商品超过库存`,
-                        icon: 'none'
-                    });
-                    num = product.saleNumber - productCartList[index].sellNum;
-                }
-            } else {
-                if (num > product.saleNumber) {
-                    Taro.showToast({
-                        title: `部分商品超过库存`,
-                        icon: 'none'
-                    });
-                    num = product.saleNumber;
-                }
-            }
+  public setMaxActivityRule = (
+    price: number,
+    activity: MerchantInterface.Activity
+  ) => {
+    const rule: { discount: number; threshold: number }[] = merge(
+      [],
+      activity.rule
+    );
+    if (!!rule && rule.length > 0) {
+      const discountArray = rule.map(item => item.discount);
+
+      const maxDiscount = Math.max(...discountArray);
+      const maxDiscountIndex = rule.findIndex(r => r.discount === maxDiscount);
+      const maxDiscountItem = rule.find(r => r.discount === maxDiscount);
+      console.log("maxDiscountItem", maxDiscountItem);
+      console.log("price", price);
+      while (discountArray.length > 0) {
+        const maxDiscount = Math.max(...discountArray);
+        const maxDiscountIndex = rule.findIndex(
+          r => r.discount === maxDiscount
+        );
+        const maxDiscountItem = rule.find(r => r.discount === maxDiscount);
+        if (maxDiscountItem && price >= maxDiscountItem.threshold) {
+          return maxDiscountItem;
         } else {
-            if (index !== -1) {
-                if (limitNum !== -1 && (productCartList[index].sellNum + 1) > limitNum) {
-                    Taro.showToast({
-                        title: `限购${product.limitNum}份，不可再增加`,
-                        icon: 'none'
-                    });
-                    return;
-                }
-                if ((productCartList[index].sellNum + 1) > product.saleNumber) {
-                    Taro.showToast({
-                        title: `此商品仅剩${product.saleNumber}份，不可再增加`,
-                        icon: 'none'
-                    });
-                    return;
-                }
-            } else {
-                if (product.saleNumber === 0) {
-                    Taro.showToast({
-                        title: `该商品没有库存了`,
-                        icon: 'none'
-                    });
-                    return;
-                }
-            }
+          discountArray.splice(maxDiscountIndex, 1);
         }
+      }
+      return {};
+    }
+    return {};
+  };
 
-        const reducer: ProductSDKReducer.ProductManageCart = {
-          type: this.reducerInterface.MANAGE_CART_PRODUCT,
-          payload: {
-            type: this.productCartManageType.ADD,
-            product,
-            num,
-            currentMerchantDetail
+  public getProductActivityPrice = (
+    price: number,
+    activity?: MerchantInterface.Activity
+  ) => {
+    /**
+     * @todo 如果有满减活动则计算满减活动
+     * @todo 如果有满减金额
+     */
+    if (
+      !!activity &&
+      activity.id &&
+      activity.rule &&
+      activity.rule.length > 0
+    ) {
+      /**
+       * @todo 如果只有一个规则且阈值小于价格则使用满减
+       */
+      if (activity.rule.length === 1) {
+        return activity.rule[0].threshold <= price
+          ? numeral(price - activity.rule[0].discount).value()
+          : price;
+      }
+      /**
+       * @todo 如果有多个规则找出最优惠规则并使用该规则
+       */
+      const rule: any = this.setMaxActivityRule(price, activity);
+      // console.log('rule: ', rule);
+      return !!rule ? numeral(price - rule.discount).value() : price;
+    }
+    return price;
+  };
+
+  /**
+   * @todo 商家满减活动
+   */
+  public getProductTotalActivityPrice = (
+    activityList,
+    memberInfo,
+    productCartList,
+    productList?: ProductCartInterface.ProductCartInfo[]
+  ): number => {
+    //
+    //         // const products = productList !== undefined ? productList : store.getState().productSDK.productCartList;
+    // // const activityList = store.getState().merchant.activityList;
+    // const filterProductList = this.filterByActivity(products, activityList);
+    // let activityMoney: number = 0;
+
+    // filterProductList.forEach((activityItem) => {
+    //     const { activity, productList } = activityItem;
+    //     let subTotal: number = 0;
+    //     productList.forEach((product) => {
+    //         subTotal += this.getProductItemPrice(product, memberInfo) * product.sellNum;
+    //     })
+    //     const subActivityMoney = this.getProductActivityPrice(subTotal, activity);
+    //     if (subTotal !== subActivityMoney) {
+    //         activityMoney = subTotal - subActivityMoney;
+    //     }
+    // })
+    // return activityMoney;
+    const products = productList !== undefined ? productList : productCartList;
+    const filterProductList = this.filterByActivity(products, activityList);
+    let activityMoney: number = 0;
+    filterProductList.forEach(activityItem => {
+      const { activity, productList } = activityItem;
+      if (productList && productList.length > 0) {
+        let subTotal: number = 0;
+        productList.forEach(product => {
+          subTotal +=
+            this.getProductItemPrice(product, memberInfo) * product.sellNum;
+        });
+        const subActivityMoney = this.getProductActivityPrice(
+          subTotal,
+          activity
+        );
+        if (subTotal !== subActivityMoney) {
+          activityMoney += subTotal - subActivityMoney;
+        }
+      }
+    });
+    return activityMoney;
+  };
+
+  /**
+   * @todo 获取商品交易价格
+   *
+   * @memberof ProductSDK
+   */
+  public getProductTransPrice = (
+    activityList,
+    memberInfo,
+    productCartList,
+    products?: ProductCartInterface.ProductCartInfo[]
+  ): number => {
+    const productList = products !== undefined ? products : productCartList;
+    // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    let total = 0;
+    for (let i = 0; i < productList.length; i++) {
+      total +=
+        this.getProductItemPrice(productList[i], memberInfo) *
+        productList[i].sellNum;
+    }
+    total -= this.getProductTotalActivityPrice(
+      activityList,
+      memberInfo,
+      productCartList,
+      productList
+    );
+    // total = this.getProductActivityPrice(total, this.checkActivity(total));
+    return total;
+  };
+
+  /**
+   * @todo 获取优惠信息
+   *
+   * @memberof ProductSDK
+   */
+  public getDiscountString = (
+    memberInfo,
+    activityList: any,
+    product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo
+  ) => {
+    // const memberInfo = store.getState().user.memberInfo;
+    const { enableMemberPrice } = memberInfo;
+    if (!Array.isArray(activityList) || !activityList.length) {
+      if (!enableMemberPrice || product.memberPrice === product.price)
+        return "";
+      return "会员专享";
+    }
+    const activity = activityList[0];
+    const memberFlag =
+      !!enableMemberPrice && activity.discountPrice > product.memberPrice;
+    switch (activity.type) {
+      case 1:
+        return memberFlag
+          ? "会员专享"
+          : `${activity.discountAmount}折${
+              activity.limitNum && activity.limitNum > 0
+                ? ` 限${activity.limitNum}件`
+                : ``
+            }`;
+      case 2:
+        return memberFlag
+          ? "会员专享"
+          : `优惠${activity.discountAmount}元${
+              activity.limitNum && activity.limitNum > 0
+                ? ` 限${activity.limitNum}件`
+                : ``
+            }`;
+      case 3:
+        if (!activity.rule) return "";
+        const rules = JSON.parse(activity.rule);
+        if (
+          !Array.isArray(rules) ||
+          !rules.length ||
+          !rules[0].threshold ||
+          !rules[0].threshold
+        ) {
+          return "";
+        }
+        return `满${rules[0].threshold}元减${rules[0].discount}元`;
+      case 4:
+        if (!activity.rule) return "";
+        const ruleList = JSON.parse(activity.rule);
+        if (
+          !Array.isArray(ruleList) ||
+          !ruleList.length ||
+          !ruleList[0].threshold ||
+          !ruleList[0].threshold
+        ) {
+          return "";
+        }
+        return `满${ruleList[0].threshold}件打${ruleList[0].discount}折`;
+      default:
+        return ``;
+    }
+  };
+
+  /**
+   * @todo 把下单地址存到order.pay redux中
+   *
+   * @memberof ProductSDK
+   */
+  public preparePayOrderAddress = async (
+    address: UserInterface.Address,
+    dispatch
+  ) => {
+    dispatch({
+      type: this.reducerInterface.RECEIVE_ORDER_PAY_ADDRESS,
+      payload: address
+    });
+  };
+
+  /**
+   * @todo 把订单详情存到order.pay redux中
+   *
+   * @memberof ProductSDK
+   */
+  public preparePayOrderDetail = async (params, dispatch) => {
+    dispatch({
+      type: this.reducerInterface.RECEIVE_ORDER_PAY_DETAIL,
+      payload: params
+    });
+  };
+
+  /**
+   * @todo 把要下单的数据传到order.pay redux中
+   */
+  public preparePayOrder = async (
+    dispatch,
+    productCartList,
+    products?: ProductCartInterface.ProductCartInfo[]
+  ) => {
+    // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;
+    const productList = products !== undefined ? products : productCartList;
+    dispatch({
+      type: this.reducerInterface.RECEIVE_ORDER_PAY,
+      payload: { productList }
+    });
+  };
+
+  public prepareEmptyPayOrder = async dispatch => {
+    this.preparePayOrder(dispatch, [], []);
+  };
+
+  /**
+   * @todo 计算交易价格
+   *
+   * ```ts
+   * import productSdk from 'xxx';
+   *
+   * @memberof ProductSDK
+   */
+
+  /**
+   * @todo 返回支付需要的数据格式
+   *
+   *
+   * @memberof ProductSDK
+   */
+  public getProductInterfacePayload = (
+    currentMerchantDetail,
+    activityList,
+    memberInfo,
+    productCartList,
+    products?: ProductCartInterface.ProductCartInfo[],
+    address?: any,
+    payOrderDetail?: any
+  ): ProductCartInterface.ProductPayPayload => {
+    // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;  UserInterface.Address
+    const productList = products !== undefined ? products : productCartList;
+    // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
+    let order: Partial<ProductCartInterface.ProductOrderPayload> = {
+      deliveryInfo: {
+        address:
+          payOrderDetail.deliveryType === 1
+            ? (address && address.address) || ""
+            : "",
+        deliveryType: payOrderDetail.deliveryType || 0,
+        deliveryFee: payOrderDetail.deliveryType === 1 ? 3.5 : 0,
+        planDeliveryTime: payOrderDetail.planDeliveryTime || ""
+      },
+      remark: payOrderDetail.remark || "",
+      payType: 8,
+      merchantId:
+        currentMerchantDetail && currentMerchantDetail.id
+          ? currentMerchantDetail.id
+          : BASE_PARAM.MCHID,
+      //   discount: 0,
+      orderSource: 7,
+      totalAmount:
+        this.getProductsOriginPrice(productList) +
+        (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
+      totalNum: this.getProductNumber(productList),
+      transAmount:
+        this.getProductTransPrice(
+          activityList,
+          memberInfo,
+          productCartList,
+          productList
+        ) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)
+    };
+
+    if (payOrderDetail.deliveryType === 1) {
+      order.deliveryInfo = {
+        ...(order.deliveryInfo as ProductCartInterface.DeliveryInfo),
+        receiver: (address && address.contact) || "",
+        receiverPhone: (address && address.phone) || ""
+      };
+    }
+
+    if (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id) {
+      const transAmount =
+        this.getProductTransPrice(activityList, memberInfo, productCartList) +
+        (payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
+        (payOrderDetail.selectedCoupon.couponVO.discount || 0);
+      order = {
+        ...order,
+        transAmount: transAmount,
+        couponList: [payOrderDetail.selectedCoupon.couponCode]
+      };
+    }
+
+    const payload: ProductCartInterface.ProductPayPayload = {
+      order: order as any,
+      productInfoList: productList.map(item => {
+        /**
+         * @todo [默认会员价，有就用会员价，没有就用普通价格]
+         */
+        const itemPrice: number = this.getProductItemPrice(item, memberInfo);
+        return {
+          productId: item.id,
+          productName: item.name,
+          remark: "",
+          sellNum: item.sellNum,
+          totalAmount: itemPrice * item.sellNum,
+          transAmount: itemPrice * item.sellNum,
+          unitPrice: itemPrice
+        } as ProductCartInterface.ProductInfoPayload;
+      })
+    };
+    return payload;
+  };
+
+  public requestPayment = async (
+    orderNo: string,
+    fail?: (res: any) => void
+  ) => {
+    const params = {
+      orderNo,
+      openId: store.getState().user.userinfo.openId,
+      orderSource: 7
+    };
+    const result = await requestHttp.post(`/api/cashier/pay`, params);
+    if (result.code === ResponseCode.success && result.data.status !== false) {
+      return new Promise(resolve => {
+        const payload = JSON.parse(result.data.param);
+        delete payload.appId;
+        const paymentPayload = {
+          ...payload,
+          success: res => {
+            resolve(res);
+          },
+          fail: error => {
+            resolve(error);
           }
         };
-        dispatch(reducer);
-        /**
-         * @todo [新增的商品则默认选中状态]
-         */
-        const { productCartSelectedIndex } = productSDK;
-        const token = index !== -1 
-            ? productCartSelectedIndex.some((i) => i === product.id) 
-            : false;
-        if (!token) {
-            dispatch({
-                type: this.reducerInterface.SELECT_INDEX,
-                payload: {
-                    product,
-                }
-            })
-        }
+        Taro.requestPayment(paymentPayload);
+        // if(process.env.TARO_ENV === 'h5'){
+        //     const data = result.data;
+        //     const url = data.codeUrl.replace('-app', '-customer')
+        //     window.location.href = url;
+        // } else {
+        //     const payload = JSON.parse(result.data.param);
+        //     delete payload.appId;
+        //     const paymentPayload = {
+        //         ...payload,
+        //         success: (res) => {
+        //             resolve(res)
+        //         },
+        //         fail: (error) => {
+        //             resolve(error)
+        //         }
+        //     };
+        //     console.log('paymentPayload: ', paymentPayload)
+        //     Taro.requestPayment(paymentPayload);
+        // }
+      });
     }
+    return result;
+  };
 
-    /**
-     * @todo 减少购物车商品
-     *
-     * @memberof ProductSDK
-     */
-    public reduce = (dispatch, productSDK, product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo, num?: number) => {
-        const { currentMerchantDetail } = store.getState().merchant;
-        const reducer: ProductSDKReducer.ProductManageCart = {
-          type: this.reducerInterface.MANAGE_CART_PRODUCT,
-          payload: {
-            type: this.productCartManageType.REDUCE,
-            product,
-            num: num || 1,
-            currentMerchantDetail
+  public isCartProduct(
+    product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo
+  ): product is ProductCartInterface.ProductCartInfo {
+    return (
+      product !== undefined &&
+      (<ProductCartInterface.ProductCartInfo>product).sellNum !== undefined
+    );
+  }
+
+  /**
+   * @todo 增加购物车商品
+   *
+   * @memberof ProductSDK
+   */
+  public add = (
+    dispatch,
+    productSDK,
+    product:
+      | ProductInterface.ProductInfo
+      | ProductCartInterface.ProductCartInfo,
+    num?: number
+  ) => {
+    Taro.showToast({
+      title: "加入购物车"
+    });
+    const {
+      merchant: { currentMerchantDetail }
+    } = store.getState();
+    const productCartList =
+      productSDK.productCartList[currentMerchantDetail.id];
+    const index = productCartList.findIndex(p => p.id === product.id);
+    let limitNum = -1;
+    if (product.activityInfos) {
+      for (let i = 0; i < product.activityInfos.length; i++) {
+        if (product.activityInfos[i].limitNum) {
+          if (product.activityInfos[i].limitNum < limitNum || limitNum === -1) {
+            limitNum === product.activityInfos[i].limitNum;
           }
-        };
-        dispatch(reducer);
+        }
+      }
+    }
 
+    if (num) {
+      if (index !== -1) {
+        if (
+          limitNum !== -1 &&
+          productCartList[index].sellNum + num > limitNum
+        ) {
+          Taro.showToast({
+            title: `部分商品超过限购件数`,
+            icon: "none"
+          });
+          num = limitNum - productCartList[index].sellNum;
+        }
+
+        if (productCartList[index].sellNum + num > product.saleNumber) {
+          Taro.showToast({
+            title: `部分商品超过库存`,
+            icon: "none"
+          });
+          num = product.saleNumber - productCartList[index].sellNum;
+        }
+      } else {
+        if (num > product.saleNumber) {
+          Taro.showToast({
+            title: `部分商品超过库存`,
+            icon: "none"
+          });
+          num = product.saleNumber;
+        }
+      }
+    } else {
+      if (index !== -1) {
+        if (limitNum !== -1 && productCartList[index].sellNum + 1 > limitNum) {
+          Taro.showToast({
+            title: `限购${product.limitNum}份，不可再增加`,
+            icon: "none"
+          });
+          return;
+        }
+        if (productCartList[index].sellNum + 1 > product.saleNumber) {
+          Taro.showToast({
+            title: `此商品仅剩${product.saleNumber}份，不可再增加`,
+            icon: "none"
+          });
+          return;
+        }
+      } else {
+        if (product.saleNumber === 0) {
+          Taro.showToast({
+            title: `该商品没有库存了`,
+            icon: "none"
+          });
+          return;
+        }
+      }
+    }
+
+    const reducer: ProductSDKReducer.ProductManageCart = {
+      type: this.reducerInterface.MANAGE_CART_PRODUCT,
+      payload: {
+        type: this.productCartManageType.ADD,
+        product,
+        num,
+        currentMerchantDetail
+      }
+    };
+    dispatch(reducer);
+    /**
+     * @todo [新增的商品则默认选中状态]
+     */
+    const { productCartSelectedIndex } = productSDK;
+    const token =
+      index !== -1
+        ? productCartSelectedIndex.some(i => i === product.id)
+        : false;
+    if (!token) {
+      dispatch({
+        type: this.reducerInterface.SELECT_INDEX,
+        payload: {
+          product
+        }
+      });
+    }
+  };
+
+  /**
+   * @todo 减少购物车商品
+   *
+   * @memberof ProductSDK
+   */
+  public reduce = (
+    dispatch,
+    productSDK,
+    product:
+      | ProductInterface.ProductInfo
+      | ProductCartInterface.ProductCartInfo,
+    num?: number
+  ) => {
+    const { currentMerchantDetail } = store.getState().merchant;
+    const reducer: ProductSDKReducer.ProductManageCart = {
+      type: this.reducerInterface.MANAGE_CART_PRODUCT,
+      payload: {
+        type: this.productCartManageType.REDUCE,
+        product,
+        num: num || 1,
+        currentMerchantDetail
+      }
+    };
+    dispatch(reducer);
+
+    /**
+     * @todo [减少商品时，如果商品存在购物车且是选中状态，那么从购物车中删除时要删掉这个商品]
+     */
+    const reduceNumber = num || 1;
+    // const { productCartSelectedIndex } = store.getState().productSDK;
+    const { productCartSelectedIndex } = productSDK;
+    const token = productCartSelectedIndex.some(i => i === product.id);
+    if (!!token && reduceNumber >= (product as any).sellNum) {
+      dispatch({
+        type: this.reducerInterface.SELECT_INDEX,
+        payload: {
+          type: "normal",
+          product
+        }
+      });
+    }
+  };
+
+  /**
+   * @todo 清空购物车
+   *
+   * @memberof ProductSDK
+   */
+  public empty = (dispatch, products?: ProductInterface.ProductInfo[]) => {
+    const { currentMerchantDetail } = store.getState().merchant;
+    dispatch({
+      type: this.reducerInterface.MANAGE_EMPTY_CART,
+      payload: {
+        currentMerchantDetail,
+        productList: products
+      }
+    } as ProductSDKReducer.Reducers.EmptyCart);
+
+    dispatch({
+      type: this.reducerInterface.SELECT_INDEX,
+      payload: {
+        type: "empty",
+        products
+      }
+    });
+  };
+
+  /**
+   * @todo 购物车管理，判断操作类型是增加、删除或者清空，执行相应操作
+   *
+   * @memberof ProductSDK
+   */
+  public manage = (
+    dispatch,
+    productSDK,
+    params: ProductCartInterface.ProductSDKManageInterface
+  ) => {
+    const { product, type, num } = params;
+    if (type === this.productCartManageType.EMPTY) {
+      this.empty(dispatch);
+    } else if (type === this.productCartManageType.ADD) {
+      this.add(dispatch, productSDK, product, num);
+    } else {
+      this.reduce(dispatch, productSDK, product, num);
+    }
+    this.storageProductCartList();
+  };
+
+  /**
+   * @todo 下单
+   *
+   * @memberof ProductSDK
+   */
+  public cashierOrder = async (
+    params: ProductCartInterface.ProductPayPayload
+  ) => {
+    const result = await ProductService.cashierOrder(params);
+    return result;
+  };
+
+  /**
+   * @todo 支付
+   *
+   * @memberof ProductSDK
+   */
+  public cashierPay = async (
+    params: ProductCartInterface.ProductPayPayload
+  ) => {
+    const result = await ProductService.cashierPay(params);
+    return result;
+  };
+
+  /**
+   * @todo [清空购物车]
+   * @todo [清空下单信息]
+   */
+  public cashierOrderCallback = async (
+    dispatch,
+    result: OrderInterface.OrderDetail
+  ) => {
+    this.empty(dispatch, result.orderDetailList as any);
+    this.preparePayOrder(dispatch, [], []);
+    this.preparePayOrderAddress({} as any, dispatch);
+    this.preparePayOrderDetail({} as any, dispatch);
+    const { order } = result;
+    Taro.showLoading();
+    await ProductService.cashierQueryStatus({ orderNo: order.orderNo });
+    Taro.hideLoading();
+    Taro.redirectTo({
+      url: `/pages/order/order.detail?id=${order.orderNo}`
+    });
+  };
+
+  public storageProductCartList = () => {
+    // const productCartList = store.getState().productSDK.productCartList;
+  };
+
+  /**
+   * @time 0410
+   * @todo [根据店家的活动把商品进行分类显示]
+   */
+  public filterByActivity = (
+    productList: ProductCartInterface.ProductCartInfo[],
+    activityList?: MerchantInterface.Activity[]
+  ): Array<FilterProductList> => {
+    if (!!activityList && activityList.length > 0) {
+      let nextProductList: FilterProductList[] = [];
+
+      if (activityList.length === 1 && !activityList[0].activityDetailList) {
         /**
-         * @todo [减少商品时，如果商品存在购物车且是选中状态，那么从购物车中删除时要删掉这个商品]
+         * @todo [说明是全部满减]
          */
-        const reduceNumber = num || 1;
-        // const { productCartSelectedIndex } = store.getState().productSDK;
-        const { productCartSelectedIndex } = productSDK;
-        const token = productCartSelectedIndex.some((i) => i === product.id);
-        if (!!token && reduceNumber >= (product as any).sellNum) {
-            dispatch({
-                type: this.reducerInterface.SELECT_INDEX,
-                payload: {
-                    type: 'normal',
-                    product,
-                }
-            })
+        return [{ productList, activity: activityList[0] }];
+      }
+
+      /**
+       * @todo [先把活动和非活动预设好]
+       * @todo [全部满减和非满减只能存在一个]
+       */
+      activityList.forEach(activity => {
+        if (!!activity.activityDetailList) {
+          nextProductList.push({
+            activity,
+            productList: []
+          });
         }
-    }
+      });
 
-    /**
-     * @todo 清空购物车
-     *
-     * @memberof ProductSDK
-     */
-    public empty = (dispatch, products?: ProductInterface.ProductInfo[]) => {
-        const { currentMerchantDetail } = store.getState().merchant;
-        dispatch({
-            type: this.reducerInterface.MANAGE_EMPTY_CART,
-            payload: {
-                currentMerchantDetail,
-                productList: products
-            }
-        } as ProductSDKReducer.Reducers.EmptyCart);
+      nextProductList.push({
+        activity:
+          activityList.find(a => !a.activityDetailList) ||
+          ({ name: NonActivityName } as any),
+        productList: []
+      });
 
-        dispatch({
-            type: this.reducerInterface.SELECT_INDEX,
-            payload: {
-                type: 'empty',
-                products,
-            }
-        })
-    }
+      for (let i = 0; i < productList.length; i++) {
+        let execd = false;
+        const currentProduct = productList[i];
 
-    /**
-     * @todo 购物车管理，判断操作类型是增加、删除或者清空，执行相应操作
-     *
-     * @memberof ProductSDK
-     */
-    public manage = (dispatch, productSDK, params: ProductCartInterface.ProductSDKManageInterface) => {
-        const {product, type, num} = params;
-        if (type === this.productCartManageType.EMPTY) {
-            this.empty(dispatch);
-        } else if (type === this.productCartManageType.ADD) {
-            this.add(dispatch, productSDK, product, num);
-        } else {
-            this.reduce(dispatch, productSDK, product, num);
-        }
-        this.storageProductCartList();
-    }
-
-    /**
-     * @todo 下单
-     *
-     * @memberof ProductSDK
-     */
-    public cashierOrder = async (params: ProductCartInterface.ProductPayPayload) => {
-        const result = await ProductService.cashierOrder(params);
-        return result;
-    }
-
-    /**
-     * @todo 支付
-     *
-     * @memberof ProductSDK
-     */
-    public cashierPay = async (params: ProductCartInterface.ProductPayPayload) => {
-        const result = await ProductService.cashierPay(params);
-        return result;
-    }
-
-    /**
-     * @todo [清空购物车]
-     * @todo [清空下单信息]
-     */
-    public cashierOrderCallback = async (dispatch, result: OrderInterface.OrderDetail) => {
-        this.empty(dispatch, result.orderDetailList as any);
-        this.preparePayOrder(dispatch, [], [])
-        this.preparePayOrderAddress({} as any, dispatch)
-        this.preparePayOrderDetail({} as any, dispatch)
-        const {order} = result;
-        Taro.showLoading();
-        await ProductService.cashierQueryStatus({orderNo: order.orderNo});
-        Taro.hideLoading();
-        Taro.redirectTo({
-            url: `/pages/order/order.detail?id=${order.orderNo}`
-        });
-    }
-
-    public storageProductCartList = () => {
-        // const productCartList = store.getState().productSDK.productCartList;
-    }
-
-
-
-    /**
-     * @time 0410
-     * @todo [根据店家的活动把商品进行分类显示]
-     */
-    public filterByActivity = (
-        productList: ProductCartInterface.ProductCartInfo[], 
-        activityList?: MerchantInterface.Activity[]
-    ): Array<FilterProductList> => {
-        if (!!activityList && activityList.length > 0) {
-            let nextProductList: FilterProductList[] = [];
-
-            if (activityList.length === 1 && !activityList[0].activityDetailVOList) {
+        nextProductList.forEach(
+          (nextProductListItem, nextProductListItemIndex) => {
             /**
-             * @todo [说明是全部满减]
+             * @todo [如果该分类是部分满减分类]
              */
-                return [{productList, activity: {name: NonActivityName} as any}];
+            if (
+              !execd &&
+              !!nextProductListItem.activity &&
+              !!nextProductListItem.activity.activityDetailList
+            ) {
+              const token = nextProductListItem.activity.activityDetailList.some(
+                activityItem => activityItem.identity === currentProduct.barcode
+              );
+              if (!!token) {
+                execd = true;
+                nextProductList[nextProductListItemIndex].productList.push(
+                  currentProduct
+                );
+              }
             }
+          }
+        );
 
-            /**
-             * @todo [先把活动和非活动预设好]
-             * @todo [全部满减和非满减只能存在一个]
-             */
-            activityList.forEach((activity) => {
-                if (!!activity.activityDetailVOList) {
-                    nextProductList.push({
-                        activity,
-                        productList: [],
-                    });
-                }
-            });
-
-            nextProductList.push({
-                activity: activityList.find((a) => !a.activityDetailVOList) || {name: NonActivityName} as any,
-                productList: [],
-            });
-
-            for (let i = 0; i < productList.length; i++) {
-                let execd = false;
-                const currentProduct = productList[i];
-
-                nextProductList.forEach((nextProductListItem, nextProductListItemIndex) => {
-                    /**
-                     * @todo [如果该分类是部分满减分类]
-                     */
-                    if (!execd && !!nextProductListItem.activity && !!nextProductListItem.activity.activityDetailVOList) {
-                        const token = nextProductListItem.activity.activityDetailVOList.some((activityItem) => activityItem.identity === currentProduct.barcode);
-                        if (!!token) {
-                            execd = true;
-                            nextProductList[nextProductListItemIndex].productList.push(currentProduct);
-                        } else {
-                            /**
-                             * @todo [如果没有满足条件的满减分类则插入到全部满减/非满减中]
-                             */
-                            if (!nextProductList[nextProductList.length - 1].productList.some((p) => p.barcode === currentProduct.barcode)) {
-                                execd = true;
-                                nextProductList[nextProductList.length - 1].productList.push(currentProduct);
-                            }
-                        }
-                    }
-                })
-            }
-            return nextProductList;
+        if (!execd) {
+          /**
+           * @time 0421
+           * @todo [修改bug，执行到最后一次循环且还没找到对应满减的时候再加入的全部中去]
+           * @todo [如果没有满足条件的满减分类则插入到全部满减/非满减中]
+           */
+          if (
+            !nextProductList[nextProductList.length - 1].productList.some(
+              p => p.barcode === currentProduct.barcode
+            )
+          ) {
+            execd = true;
+            nextProductList[nextProductList.length - 1].productList.push(
+              currentProduct
+            );
+          }
         }
-        return [{productList, activity: {name: NonActivityName} as any}];
+      }
+      return nextProductList;
     }
+    return [{ productList, activity: { name: NonActivityName } as any }];
+  };
 
-    public selectProduct = (dispatch, type: string = 'normal', product?: ProductCartInterface.ProductCartInfo) => {
-        dispatch({
-            type: this.reducerInterface.SELECT_INDEX,
-            payload: { type, product }
-        });
-    }
+  public selectProduct = (
+    dispatch,
+    type: string = "normal",
+    product?: ProductCartInterface.ProductCartInfo
+  ) => {
+    dispatch({
+      type: this.reducerInterface.SELECT_INDEX,
+      payload: { type, product }
+    });
+  };
 }
 
 export default new ProductSDK();

@@ -31,6 +31,9 @@ type Props = {
   userinfo: UserInterface.UserInfo;
   activityList: MerchantInterface.Activity[];
   productCartSelectedIndex: number[];
+  productCartAllList: {
+    [key: string]: ProductCartInterface.ProductCartInfo[];
+  };
 };
 
 type State = {
@@ -240,6 +243,12 @@ class Page extends Taro.Component<Props, State> {
       </View>
     );
   }
+
+  // renderList = (merchant: {}, productCartList: ProductCartInterface.ProductCartInfo[];) => {
+  //   return (
+
+  //   );
+  // }
 }
 
 const select = (state: AppReducer.AppState) => {
@@ -247,6 +256,7 @@ const select = (state: AppReducer.AppState) => {
     activityList: state.merchant.activityList,
     currentMerchantDetail: getCurrentMerchantDetail(state),
     productCartList: getProductCartList(state),
+    productCartAllList: state.productSDK.productCartList,
     productSDKObj: state.productSDK,
     memberInfo: getMemberInfo(state),
     userinfo: getUserinfo(state),

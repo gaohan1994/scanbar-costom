@@ -5,7 +5,6 @@ import "./index.less";
 import "../style/product.less";
 import ProductListView from "../../component/product/product.listview";
 import ProductMenu from "../../component/product/product.menu";
-import IndexAddress from "./component/address";
 import MerchantSearch from "./component/search";
 import MerchantCard from "./component/merchant.detail";
 import CartBar from "../../component/cart/cart";
@@ -13,7 +12,6 @@ import invariant from "invariant";
 import { ProductAction, MerchantAction, UserAction } from "../../actions";
 import { ResponseCode, ProductInterface } from "../../constants";
 import WeixinSdk from "../../common/sdk/weixin/weixin";
-import orderAction from "../../actions/order.action";
 import TabsChoose from "../../component/tabs/tabs.choose";
 import {
   getMerchantAdvertisement,
@@ -67,7 +65,6 @@ class Index extends Component<any> {
   }
 
   async componentDidShow() {
-    this.props.addMember();
     this.init();
   }
   componentWillUnmount() {
@@ -90,7 +87,7 @@ class Index extends Component<any> {
   };
 
   public init = async (firstTime?: boolean): Promise<void> => {
-    const { dispatch, address } = this.props;
+    const { dispatch, address, currentMerchantDetail } = this.props;
     try {
       MerchantAction.merchantList(dispatch);
       await LoginManager.getUserInfo(dispatch);
@@ -118,6 +115,12 @@ class Index extends Component<any> {
       if (firstTime) {
         this.changeCurrentType(firstType);
       }
+
+      const addMemberResult = await MerchantAction.addMember(
+        currentMerchantDetail
+      );
+
+      UserAction.getMemberInfo(dispatch, currentMerchantDetail);
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -346,8 +349,7 @@ const select = state => {
     currentMerchantDetail: getCurrentMerchantDetail(state),
     userinfo: getUserinfo(state),
     memberInfo: getMemberInfo(state),
-    address: getIndexAddress(state),
-    addMember: MerchantAction.addMember(state)
+    address: getIndexAddress(state)
   };
 };
 

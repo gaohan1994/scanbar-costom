@@ -63,6 +63,10 @@ class GetUserinfo extends Taro.Component<Props, State> {
             phone: JSON.parse(result.data).phoneNumber,
             code: newCodeRes.result,
             appId: "wxd38feb14d7d81fc2"
+            avatar: userinfo.avatar,
+            // "institutionCode": 0,
+            nickname: userinfo.nickname,
+            // sex: 0
           },
           dispatch
         );

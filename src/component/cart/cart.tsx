@@ -182,7 +182,8 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
     const { productCartList } = this.props;
     let cartPrice: number = 0;
     productCartList.map(item => {
-      cartPrice += item.price * item.sellNum;
+      cartPrice +=
+        productSdk.getProductItemPrice(item, {} as any) * item.sellNum;
     });
     return (
       <View style="width: 100%; height: 100%">

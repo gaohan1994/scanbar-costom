@@ -2,7 +2,7 @@
  * @Author: Ghan
  * @Date: 2019-11-08 10:01:17
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-17 10:16:57
+ * @Last Modified time: 2020-06-24 13:43:02
  *
  * @todo [商户相关的接口]
  */
@@ -10,12 +10,15 @@
 import requestHttp from "../../common/request/request.http";
 import { HTTPInterface, jsonToQueryString } from "../index";
 import MerchantInterfaceMap, { MerchantInterface } from "./merchant";
+import { BASE_PARAM } from "../../common/util/config";
 
 class MerchantService {
   public activityInfoList = async (
     id: any
   ): Promise<HTTPInterface.ResponseArray<any>> => {
-    const result = await requestHttp.get(`/activityInfo/list/${id}`);
+    const result = await requestHttp.get(
+      `/customer/activityInfo/list/${BASE_PARAM.institutionCode}/${id}`
+    );
     return result;
   };
 
