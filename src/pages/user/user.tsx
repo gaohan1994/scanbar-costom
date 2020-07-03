@@ -250,7 +250,12 @@ class User extends Taro.Component<Props, State> {
             </View>
           )}
           <View className={`${cssPrefix}-member`}>
-            <View className={`${cssPrefix}-member-item`}>
+            <View
+              onClick={() => {
+                this.navTo("/pages/user/user.card", true);
+              }}
+              className={`${cssPrefix}-member-item`}
+            >
               <View className={`${cssPrefix}-member-item-vip`} />
               <Text>会员卡 4</Text>
             </View>

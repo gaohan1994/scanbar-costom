@@ -2,7 +2,7 @@
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-03 17:13:16
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-24 11:02:20
+ * @Last Modified time: 2020-07-03 14:02:40
  */
 import requestHttp from "../common/request/request.http";
 import {
@@ -224,6 +224,11 @@ class UserAction {
         }
       });
     }
+    return result;
+  };
+
+  public getMyMemberCard = async () => {
+    const result = await requestHttp.get(`/memberInfo/getMyMemberCard`);
     return result;
   };
 }

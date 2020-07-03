@@ -383,4 +383,56 @@ page {
       margin-right: 16px;
     }
   }
+  &-card {
+    &-item {
+      display: flex;
+      flex-direction: row;
+      .padding(30px, t);
+      position: relative;
+      width: 690px;
+      height: 280px;
+      .margin(30px, l);
+      .margin(20px, t);
+      .background-image("//net.huanmusic.com/weapp/bg_mine_vipcard.png");
+
+      &-avatar {
+        .margin(30px, l);
+        // .margin(30px, t);
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 1);
+        border: 1px solid rgba(229, 229, 229, 1);
+        border-radius: 10px;
+      }
+
+      &-detail {
+        display: flex;
+        flex-direction: column;
+        .margin(18px, l);
+      }
+      &-title {
+        font-size: 36px;
+        font-weight: bold;
+        color: rgba(138, 102, 78, 1);
+      }
+      &-number {
+        font-size: 22px;
+        color: rgba(138, 102, 78, 1);
+      }
+      &-vip {
+        position: absolute;
+        bottom: 49px;
+        left: 72px;
+        font-size: 30px;
+        color: rgba(138, 102, 78, 1);
+      }
+      &-icon {
+        position: absolute;
+        bottom: 51px;
+        right: 53px;
+        font-size: 26px;
+        color: rgba(255, 248, 202, 1);
+      }
+    }
+  }
 }

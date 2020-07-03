@@ -39,7 +39,8 @@ class App extends Component {
       "pages/user/user.coupon",
       "pages/user/user.code",
       // "pages/test/test",
-      "pages/cart/cart"
+      "pages/cart/cart",
+      "pages/user/user.card"
       // "pages/user/user.couponCenter",
       // 'pages/address/address.list',
       // 'pages/address/address.add',
