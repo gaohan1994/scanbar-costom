@@ -74,6 +74,19 @@ class UserService {
     const result = await requestHttp.get(`/api/memberInfo/getMemberInfo`);
     return result;
   }
+  public getRechargeRule = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`/api/storeCard/rechargeRule/list`);
+    return result;
+  }
+  public cashierStore = async (param): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.post(`/api/cashier/store`, param);
+    return result;
+  }
+  public getBalanceChange = async (param): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`/api/order/balanceChange/list`, param);
+    return result;
+  }
+  
 }
 
 export default new UserService();

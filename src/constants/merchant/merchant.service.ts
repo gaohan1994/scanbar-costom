@@ -23,8 +23,8 @@ class MerchantService {
     return result;
   }
 
-  public merchantList = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
-    const result = await requestHttp.get(`${MerchantInterfaceMap.merchantList}`);
+  public merchantList = async (param: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`${MerchantInterfaceMap.merchantList}${jsonToQueryString(param)}`);
     return result;
   }
 

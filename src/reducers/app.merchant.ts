@@ -35,6 +35,7 @@ export declare namespace MerchantReducer {
     merchantDistance: MerchantInterface.Distance;
     advertisement: any[];
     activityList: any[];
+    orderPayType: any;
   }
 
   type Action =
@@ -50,11 +51,18 @@ export const initState: MerchantReducer.State = {
   merchantDistance: {} as any,
   advertisement: [],
   activityList: [],
+  orderPayType: process.env.TARO_ENV === 'h5' ? 2 : 8,
 };
 
 export default function merchant(state: MerchantReducer.State = initState, action: MerchantReducer.Action): MerchantReducer.State {
   switch (action.type) {
-
+    case MerchantInterfaceMap.reducerInterface.SET_PAYTYPE: {
+      const { payload: {orderPayType} } = action;
+      return {
+        ...state,
+        orderPayType: orderPayType
+      };
+    }
     case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ACTIVITYLIST: {
       const { payload } = action;
       return {
@@ -108,6 +116,7 @@ export default function merchant(state: MerchantReducer.State = initState, actio
     }
   }
 }
+export const getOrderPayType = (state: AppReducer.AppState) => state.merchant.orderPayType;
 
 export const getMerchantDetail = (state: AppReducer.AppState) => state.merchant.merchantDetail;
 

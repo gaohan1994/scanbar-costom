@@ -14,7 +14,19 @@ import { BASE_PARAM } from '../common/util/config';
 // import { store } from '../app';
 
 class MerchantAction {
-
+  /**
+   * @todo 设置支付方式
+   *
+   * @memberof MerchantAction
+   */
+  public setPayType = async (dispatch, type) => {
+    dispatch({
+      type: MerchantInterfaceMap.reducerInterface.SET_PAYTYPE,
+      payload: {
+        orderPayType: type
+      }
+    })
+  }
   public activityInfoList = async (dispatch, merchantId) => {
     // const merchantId = store.getState().merchant.currentMerchantDetail.id;
     const result = await MerchantService.activityInfoList(merchantId);
@@ -61,8 +73,8 @@ class MerchantAction {
    *
    * @memberof MerchantAction
    */
-  public merchantList = async (dispatch) => {
-    const result = await MerchantService.merchantList();
+  public merchantList = async (dispatch, param, currentMerchantDetail) => {
+    const result = await MerchantService.merchantList(param);
     if (result.code === ResponseCode.success) {
       dispatch({
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_LIST,
@@ -71,9 +83,9 @@ class MerchantAction {
       if (result.data.rows && result.data.rows.length > 0) {
         dispatch({
           type: MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL,
-          payload: result.data.rows.filter(val => val.id ===  BASE_PARAM.MCHID)[0] || {merchantId: BASE_PARAM.MCHID}
+          payload: result.data.rows.filter(val => val.id ===  currentMerchantDetail.id)[0] || {merchantId: currentMerchantDetail.id}
         });
-        this.advertisement(dispatch, {merchantId: BASE_PARAM.MCHID});
+        this.advertisement(dispatch, {merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID});
       }
     }
     return result;

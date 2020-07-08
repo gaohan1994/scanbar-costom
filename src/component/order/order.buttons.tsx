@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro';
 import { View, Image, Text } from '@tarojs/components';
 import './order.less';
-import { OrderInterface, ResponseCode } from '../../constants';
+import { OrderInterface, ResponseCode, ProductService } from '../../constants';
 import numeral from 'numeral';
 import { OrderAction, ProductAction } from '../../actions';
 import classnames from 'classnames'
@@ -18,6 +18,7 @@ type Props = {
   data: OrderInterface.OrderDetail;
   orderAllStatus: any[];
   currentType?: number;
+  init?: () => void;
 };
 type State = {};
 
@@ -69,11 +70,20 @@ class OrderButtons extends Taro.Component<Props, State> {
 
   public onPay = async (order: OrderInterface.OrderInfo) => {
     const { orderNo } = order;
-    const payment = await productSdk.requestPayment(orderNo)
+    const payment = await productSdk.requestPayment(orderNo, order.payType)
 
-    if (payment.code === ResponseCode.success) {
+    if (payment.code === ResponseCode.success || payment.errMsg === "requestPayment:ok") {
+      Taro.showLoading();
+      if(order.payType !== 7) await ProductService.cashierQueryStatus({orderNo: orderNo});
+      Taro.hideLoading();
       Taro.navigateTo({
-        url: `/pages/order/order.detail?id=${orderNo}`
+        url: `/pages/order/order.detail?id=${orderNo}`,
+        success: (res) => {
+          console.log('success', res);
+        },
+        fail: (res) => {
+          console.log('fail', res);
+        }
       })
     } else {
       Taro.showToast({

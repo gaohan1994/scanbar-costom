@@ -7,7 +7,7 @@
  * @todo 商品列表
  */
 import Taro from '@tarojs/taro';
-import { ScrollView, View } from '@tarojs/components';
+import { ScrollView, View, Image } from '@tarojs/components';
 import ProductComponent from './product';
 import "../../pages/style/product.less";
 import { ProductInterface } from '../../constants';
@@ -107,7 +107,8 @@ class ProductListView extends Taro.Component<Props> {
             )
           : (
             <View className="container">
-              <AtActivityIndicator mode='center' />
+              {/* <AtActivityIndicator mode='center' /> */}
+              <Image className='container-Loading' src={'//net.huanmusic.com/weapp/loading.gif'}/>
             </View>
           )
         }

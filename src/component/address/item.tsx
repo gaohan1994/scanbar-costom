@@ -9,17 +9,20 @@ const prefix = 'address-component-item'
 
 type Props = {
   address: UserInterface.Address;
+  currentMerchantDetail: any;
   isBorder?: boolean;
+  onAddressClick?: (param: any) => void;
   pre?: boolean;
   showEdit?: boolean;
   onClick?: any;
   showArrow?: boolean;
   onEditClick?: any;
+  productCartListMerchantIndex?: boolean;
   isPay?: any
+  hasRadio?: boolean;
 }
 
 class Item extends Taro.Component<Props> {
-
   onEditPress = (event: ITouchEvent) => {
     event.stopPropagation();
     const { onEditClick } = this.props;
@@ -27,7 +30,7 @@ class Item extends Taro.Component<Props> {
   }
 
   render() {
-    const { address,isPay, pre = false, onClick = undefined, isBorder = true, showEdit = true, showArrow = false } = this.props;
+    const { address,currentMerchantDetail,hasRadio,productCartListMerchantIndex, isPay, onAddressClick,pre = false, onClick = undefined, isBorder = true, showEdit = true, showArrow = false } = this.props;
     const showFlag = address && address.flag ? (address.flag === 0 || address.flag === 1 || address.flag === 2) : false;
     return (
       <View
@@ -37,6 +40,14 @@ class Item extends Taro.Component<Props> {
         onClick={() => {
           if (!!onClick) {
             onClick()
+          }
+          if(!!onAddressClick){
+            const param = {
+              latitude:  address.latitude,
+              longitude: address.longitude,
+              merchantId: currentMerchantDetail.id,
+            }
+            onAddressClick(param);
           }
         }}
       >
@@ -89,6 +100,16 @@ class Item extends Taro.Component<Props> {
             />
           </View>
         )}
+        {
+          !!hasRadio && (
+            <View 
+              className={classNames(`${prefix}-select-item`, {
+                  [`${prefix}-select-normal`]: !productCartListMerchantIndex, 
+                  [`${prefix}-select-active`]: productCartListMerchantIndex, 
+              })}
+            />
+          )
+        }
       </View>
     )
   }

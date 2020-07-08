@@ -39,13 +39,13 @@ class LoginH5 extends Taro.Component<Props, State> {
     })
   }
   async login() {
-    const {dispatch} = this.props;
+    const {dispatch, currentMerchantDetail} = this.props;
     try {
       const { phone, password } = this.state
       invariant(!!phone, '请输入手机号');
       invariant(phone.length === 11, '请输入正确的手机号');
       invariant(!!password, '请输入验证码');
-      const result: HTTPInterface.ResponseResultBase<any> = await UserAction.h5Login(this.props.dispatch, {phone, validCode: md5(password), merchantId: BASE_PARAM.MCHID});
+      const result: HTTPInterface.ResponseResultBase<any> = await UserAction.h5Login(this.props.dispatch, {phone, validCode: md5(password), merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,});
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       if (result.code === ResponseCode.success) {
         Taro.showToast({

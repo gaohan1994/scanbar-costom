@@ -126,6 +126,10 @@ class CouponItem extends Taro.Component<Props, State> {
                                   ableObtainNum: this.state.ableObtainNum + 1
                                 });
                                 onGet([{couponId: data.id}]);
+                              } else {
+                                if (!unableToUse && gotoUse) {
+                                  gotoUse();
+                                }
                               }
                               
                             } else {

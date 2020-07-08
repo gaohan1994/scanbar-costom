@@ -10,13 +10,16 @@ import AddressItem from '../../component/address/item'
 import ButtonFooter from '../../component/button/button.footer'
 import productSdk from '../../common/sdk/product/product.sdk'
 import Empty from '../../component/empty'
-import { UserAction } from '../../actions'
+import { UserAction, OrderAction } from '../../actions'
 import { Dispatch } from 'redux';
-
+import {BASE_PARAM} from '../../common/util/config';
+import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
+import { ResponseCode } from '../../constants/index';
 type Props = {
   dispatch: Dispatch;
   addressList: UserInterface.Address[];
   indexAddress: any;
+  currentMerchantDetail: any;
 }
 
 type State = {
@@ -58,12 +61,22 @@ class Page extends Taro.Component<Props, State> {
     }
   }
 
-  public onAddressClick = (address: UserInterface.Address) => {
+  public onAddressClick = async (address: UserInterface.Address) => {
     const { entry } = this.state;
-    const { dispatch} = this.props;
+    const { dispatch, currentMerchantDetail} = this.props;
     if (entry === 'order.pay') {
       productSdk.preparePayOrderAddress(address, dispatch);
-      Taro.navigateBack({})
+      const param = {
+        latitude:  address.latitude,
+        longitude: address.longitude,
+        merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
+      }
+      const result = await OrderAction.getDeliveryFee(dispatch, param);
+      if(result.code !== ResponseCode.success){
+          productSdk.preparePayOrderAddress({}, dispatch);
+      } else {
+        Taro.navigateBack({})
+      }
       return;
     }
 
@@ -73,12 +86,13 @@ class Page extends Taro.Component<Props, State> {
   }
 
   render () {
-    const { addressList } = this.props;
+    const { addressList, currentMerchantDetail } = this.props;
     return (
       <View className='container'>
         {addressList && addressList.length > 0 ? addressList.map((address, index) => {
           return(
             <AddressItem
+              currentMerchantDetail={currentMerchantDetail}
               key={`address${index}`}
               address={address}
               onClick={() => this.onAddressClick(address)}
@@ -114,7 +128,8 @@ class Page extends Taro.Component<Props, State> {
 const select = (state: AppReducer.AppState) => {
   return {
     addressList: getAddressList(state),
-    indexAddress: getIndexAddress(state)
+    indexAddress: getIndexAddress(state),
+    currentMerchantDetail: getCurrentMerchantDetail(state),
   }
 }
 export default connect(select)(Page);

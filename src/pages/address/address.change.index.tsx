@@ -16,12 +16,14 @@ import LoginModal from '../../component/login/login.modal'
 import { LoginManager } from '../../common/sdk'
 import { UserAction } from '../../actions'
 import { Dispatch } from 'redux';
+import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 
 const prefix = 'address'
 
 type Props = {
   dispatch: Dispatch;
   indexAddress: any;
+  currentMerchantDetail: any;
   addressList: UserInterface.Address[];
   currentPostion: UserInterface.Address;
 }
@@ -59,7 +61,7 @@ class Page extends Taro.Component<Props, State> {
       invariant(!!result.success, result.msg || ' ')
     } catch (error) {
       Taro.showToast({
-        title: error.message,
+        title: '获取位置失败, 请开启手机定位',
         icon: 'none'
       })
     }
@@ -91,7 +93,7 @@ class Page extends Taro.Component<Props, State> {
   }
 
   render() {
-    const { addressList, currentPostion } = this.props;
+    const { addressList, currentPostion, currentMerchantDetail } = this.props;
     // const { getUserinfoModal, loginModal } = this.state;
     return (
       <View className='container'>
@@ -115,6 +117,7 @@ class Page extends Taro.Component<Props, State> {
                 return (
                   <AddressItem
                     key={`address${index}`}
+                    currentMerchantDetail={currentMerchantDetail}
                     address={address}
                     showEdit={false}
                     onClick={() => this.onAddressClick(address)}
@@ -146,6 +149,7 @@ const select = (state: AppReducer.AppState) => {
     addressList: getAddressList(state),
     indexAddress: getIndexAddress(state),
     currentPostion: getCurrentPostion(state),
+    currentMerchantDetail: getCurrentMerchantDetail(state),
   }
 }
 export default connect(select)(Page);
