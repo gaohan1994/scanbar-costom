@@ -21,6 +21,31 @@
 
   &-item {
     position: relative;
+    &-select {
+      width: 60px;
+      position: relative;
+      // .padding(30px, r);
+      &-item {
+        position: absolute;
+        top: 50%;
+        right: 30px;
+        transform: translateY(-50%);
+        width:34px;
+        height:34px;
+        z-index: 99;
+        .bg;
+      }
+      &-normal {
+        background-image: url('//net.huanmusic.com/weapp//bt_unavailable.png');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+      }
+      &-active {
+        background-image: url('//net.huanmusic.com/weapp//bt_selected.png');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+      }
+    }
     &-top {
       &::before {
         .bordertop;

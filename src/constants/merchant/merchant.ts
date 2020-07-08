@@ -104,6 +104,7 @@ export declare namespace MerchantInterface {
 
   namespace ReducerTypes {
     type RECEIVE_MERCHANT_LIST = string;
+    type SET_PAYTYPE = string;
     type RECEIVE_MERCHANT_DETAIL = string;
     type RECEIVE_CURRENT_MERCHANT_DETAIL = string;
     type RECEIVE_MERCHANT_DISTANCE = string;
@@ -113,6 +114,7 @@ export declare namespace MerchantInterface {
 
   interface MerchantInterfaceMap {
     reducerInterface: {
+      SET_PAYTYPE: ReducerTypes.SET_PAYTYPE;
       RECEIVE_MERCHANT_LIST: ReducerTypes.RECEIVE_MERCHANT_LIST;
       RECEIVE_MERCHANT_DETAIL: ReducerTypes.RECEIVE_MERCHANT_DETAIL;
       RECEIVE_CURRENT_MERCHANT_DETAIL: ReducerTypes.RECEIVE_CURRENT_MERCHANT_DETAIL;
@@ -127,6 +129,7 @@ export declare namespace MerchantInterface {
 
 class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
   public reducerInterface = {
+    SET_PAYTYPE: 'SET_PAYTYPE',
     RECEIVE_MERCHANT_LIST: 'RECEIVE_MERCHANT_LIST',
     RECEIVE_MERCHANT_DETAIL: 'RECEIVE_MERCHANT_DETAIL',
     RECEIVE_CURRENT_MERCHANT_DETAIL: 'RECEIVE_CURRENT_MERCHANT_DETAIL',
@@ -135,7 +138,9 @@ class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
     RECEIVE_MERCHANT_ACTIVITYLIST: 'RECEIVE_MERCHANT_ACTIVITYLIST',
   };
   public merchantInfoDetail = '/customer/merchantInfo/detail';
-  public merchantList = '/customer/merchantInfo/merchantList';
+  
+  public merchantList = '/customer/merchantInfo/listSubMerchant';
+  // public merchantList = '/customer/merchantInfo/merchantList';
   public merchantDistance = '/customer/merchantInfo/distance';
   public advertisement = '/customer/advertisement/getAdvertisements';
 }

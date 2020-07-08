@@ -153,7 +153,7 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   public onPay = async (order: OrderInterface.OrderInfo) => {
     const { orderNo } = order;
-    const payment = await productSdk.requestPayment(orderNo)
+    const payment = await productSdk.requestPayment(orderNo, order.payType)
     if (payment.code === ResponseCode.success) {
       const { params: { id } } = this.$router;
       this.init(id);

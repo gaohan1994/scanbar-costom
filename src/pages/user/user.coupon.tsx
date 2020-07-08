@@ -4,7 +4,7 @@ import './index.less';
 import "../../component/card/form.card.less";
 import TabsSwitch from '../../component/tabs/tabs.switch';
 import { connect } from '@tarojs/redux';
-import { getCouponList, getUserinfo } from '../../reducers/app.user';
+import { getCouponList, getUserinfo, getcouponListCenter } from '../../reducers/app.user';
 import { UserAction } from '../../actions';
 import { UserInterface, MerchantInterface, UserInterfaceMap } from '../../constants';
 import Empty from '../../component/empty';
@@ -18,6 +18,7 @@ interface Props {
   dispatch: Dispatch;
   couponList: UserInterface.CouponsItem[];
   userinfo: UserInterface.UserInfo;
+  couponListCenter: any;
   currentMerchantDetail: MerchantInterface.MerchantDetail;
 }
 interface State {
@@ -43,13 +44,20 @@ class Page extends Taro.Component<Props, State> {
     total: 0,
   };
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.init();
+  }
+  componentDidShow() {
+    this.init();
+  }
+  async init () {
     const params = {
       status: 0,
       pageSize: 10,
       pageNum: 1,
     }
     Taro.showLoading();
+    await UserAction.getWaitForObtainCoupons(this.props.dispatch);
     const result = await UserAction.getMemberCoupons(this.props.dispatch, params);
     if(result && result.data){
       this.setState({
@@ -58,7 +66,6 @@ class Page extends Taro.Component<Props, State> {
     }
     Taro.hideLoading();
   }
-
   public onChangeTab = async (tabNum: number) => {
     const {dispatch} = this.props;
     await dispatch({
@@ -244,7 +251,7 @@ class Page extends Taro.Component<Props, State> {
     }
   }
   render() {
-    const { couponList } = this.props;
+    const { couponList, couponListCenter } = this.props;
     const { currentType, total } = this.state;
     const {navToCenter} = this;
     let filterCouponList: any = { ableToUseCouponList: [], unableToUseCouponList: [] };
@@ -257,17 +264,22 @@ class Page extends Taro.Component<Props, State> {
         <View className={`${cssPrefix}-tabs`}>
           {this.renderTabs()}
         </View>
-        <Image
-          onClick={() => {navToCenter(); }}
-          className={
-            classNames({
-              [`${cssPrefix}-bannerEmpty`]: process.env.TARO_ENV === 'weapp' && couponList && couponList.length === 0,
-              [`${cssPrefix}-banner`]: process.env.TARO_ENV === 'weapp' && couponList && couponList.length > 0,
-              [`${cssPrefix}-bannerH5`]: process.env.TARO_ENV === 'h5' && couponList && couponList.length > 0,
-              [`${cssPrefix}-bannerEmptyH5`]: process.env.TARO_ENV === 'h5' && couponList && couponList.length === 0,
-            })}
-          src='//net.huanmusic.com/scanbar-c/v2/img_coupon_banner.png'
-        />
+        {
+          couponListCenter.length > 0 ? (
+            <Image
+              onClick={() => {navToCenter(); }}
+              className={
+                classNames({
+                  [`${cssPrefix}-bannerEmpty`]: process.env.TARO_ENV === 'weapp' && couponList && couponList.length === 0,
+                  [`${cssPrefix}-banner`]: process.env.TARO_ENV === 'weapp' && couponList && couponList.length > 0,
+                  [`${cssPrefix}-bannerH5`]: process.env.TARO_ENV === 'h5' && couponList && couponList.length > 0,
+                  [`${cssPrefix}-bannerEmptyH5`]: process.env.TARO_ENV === 'h5' && couponList && couponList.length === 0,
+                })}
+              src='//net.huanmusic.com/scanbar-c/v2/img_coupon_banner.png'
+            />
+          ) : null
+        }
+       
         {
           couponList && couponList.length > 0
             ? (
@@ -367,6 +379,7 @@ class Page extends Taro.Component<Props, State> {
 
 const select = (state: any) => ({
   couponList: getCouponList(state),
+  couponListCenter: getcouponListCenter(state),
   userinfo: getUserinfo(state),
   currentMerchantDetail: getCurrentMerchantDetail(state),
 });

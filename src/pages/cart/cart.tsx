@@ -85,10 +85,12 @@ class Page extends Taro.Component<Props, State> {
 
   public beforeSubmit = async () => {
     const { userinfo } = this.props;
-    if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
-      // this.setState({ getUserinfoModal: true });
-      Taro.navigateTo({ url: "/pages/login/login.userinfo" });
-      return false;
+    if(process.env.TARO_ENV === 'weapp'){
+      if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
+        // this.setState({ getUserinfoModal: true });
+        Taro.navigateTo({ url: "/pages/login/login.userinfo" });
+        return false;
+      }
     }
     if (userinfo.phone === undefined || userinfo.phone.length === 0) {
       // this.setState({ loginModal: true });

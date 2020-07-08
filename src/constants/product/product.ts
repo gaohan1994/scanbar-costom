@@ -232,7 +232,7 @@ class ProductInterfaceMap {
     }
 
     public cashierQueryStatus = (params: ProductInterface.ProductCashierQueryStatus) => {
-        return `/cashier/queryStatus/${params.orderNo}`;
+        return `/cashier/queryStatus/${params.orderNo}/60`;
     }
 
     public productInfoList = (params?: ProductInterface.ProductInfoListFetchFidle) => {

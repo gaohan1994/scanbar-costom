@@ -46,7 +46,6 @@ class OrderService {
 
   public getAbleToUseCoupon = async (params: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
   const result = await requestHttp.post('/api/coupon/getAbleToUseCoupon', {
-        merchantId: BASE_PARAM.MCHID,
         ...params,
     });
     return result;

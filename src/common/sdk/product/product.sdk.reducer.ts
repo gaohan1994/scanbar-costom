@@ -2,6 +2,7 @@ import productSdk, { ProductCartInterface } from "./product.sdk";
 import { AppReducer } from "../../../reducers";
 import { ProductInterface, UserInterface } from "../../../constants";
 import merge from 'lodash.merge';
+import { BASE_PARAM } from '../../util/config';
 
 /**
  * @Author: Ghan 
@@ -14,11 +15,14 @@ export declare namespace ProductSDKReducer {
 
   interface State {
     productCartList: Array<ProductCartInterface.ProductCartInfo>;
+    productCartListMerchant: any;
+    productCartListMerchantIndex: number;
     productCartSelectedIndex: Array<number>;
     payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
     payOrderDetail: any;
     payOrderAddress: UserInterface.Address;
     pointsTotal: number;
+    pointsTotalSell: number;
   }
 
   interface ManageCartPayloadBase {
@@ -84,6 +88,9 @@ const initState: ProductSDKReducer.State = {
   },
   payOrderAddress: {} as any,
   pointsTotal: 0,
+  pointsTotalSell: 0,
+  productCartListMerchant: {[BASE_PARAM.MCHID]: []},
+  productCartListMerchantIndex: BASE_PARAM.MCHID,
 };
 
 export default function productSDKReducer(
@@ -91,7 +98,22 @@ export default function productSDKReducer(
   action: ProductSDKReducer.Action
 ): ProductSDKReducer.State {
   switch (action.type) {
+    case productSdk.reducerInterface.CHANGE_STORE_CART: {
+      const { payload: {id} } = action as any;
+      const cart = state.productCartList;
+      const newCart = id === state.productCartListMerchantIndex ? state.productCartList : state.productCartListMerchant[id] || [];
+      const newProductCartListMerchant = {
+        ...state.productCartListMerchant,
+        [state.productCartListMerchantIndex]: cart,
+      } 
+      return {
+        ...state,
+        productCartList: newCart,
+        productCartListMerchant: newProductCartListMerchant,
+        productCartListMerchantIndex: id
+      }
 
+    }
     case productSdk.reducerInterface.SELECT_INDEX: {
       const { payload } = action as ProductSDKReducer.Reducers.CartSelectedIndex;
       const { productCartList } = state;
@@ -172,11 +194,12 @@ export default function productSDKReducer(
       }
     }
     case productSdk.reducerInterface.RECEIVE_ORDER_PAY_POINTS: {
-      const { payload } = action as any;
+      const { payload: {pointsTotalSell, pointsTotal}  } = action as any;
 
       return {
         ...state,
-        pointsTotal: payload
+        pointsTotal: pointsTotal,
+        pointsTotalSell: pointsTotalSell,
       };
     }
     case productSdk.reducerInterface.RECEIVE_ORDER_PAY_ADDRESS: {
@@ -279,3 +302,4 @@ export const getProductCartList = (state: AppReducer.AppState) => state.productS
 export const getPayOrderAddress = (state: AppReducer.AppState) => state.productSDK.payOrderAddress;
 
 export const getPayOrderDetail = (state: AppReducer.AppState) => state.productSDK.payOrderDetail;
+export const getProductCartListMerchantIndex= (state: AppReducer.AppState) => state.productSDK.productCartListMerchantIndex;

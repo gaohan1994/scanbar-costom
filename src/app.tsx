@@ -53,6 +53,7 @@ class App extends Component {
       {
         root: "pages/order/",
         pages: [
+          "store",
           "order.pay",
           "order.pay.remark",
           "order.pay.coupon",
@@ -80,6 +81,10 @@ class App extends Component {
       {
         root: "pages/login/",
         pages: ["login", "login.userinfo"]
+      },
+      {
+        root: "pages/TopUp/",
+        pages: ["TopUp", "ChangeDetails", 'Error']
       }
     ],
     window: {

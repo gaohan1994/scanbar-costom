@@ -11,7 +11,9 @@ import { getIndexAddress } from '../../../reducers/app.user'
 const prefix = 'index-component-address'
 
 type Props = {
+  initDit: () => void;
   indexAddress: UserInterface.Address;
+  changeModalStroe: (param) => void;
   currentMerchantDetail: MerchantInterface.MerchantDetail;
 }
 
@@ -27,7 +29,7 @@ class Comp extends Taro.Component<Props, State> {
   }
 
   render () {
-    const { indexAddress, currentMerchantDetail } = this.props;
+    const { indexAddress, currentMerchantDetail, changeModalStroe, initDit } = this.props;
 
     const address = indexAddress && indexAddress.address 
       ? indexAddress.address.indexOf('市') !== -1
@@ -41,17 +43,17 @@ class Comp extends Taro.Component<Props, State> {
       >
         <View 
           className={`${prefix}-title  ${process.env.TARO_ENV === 'h5' ? `${prefix}-title-h5` : ''}`}
-          onClick={() => this.onNavAddress()}
+          onClick={address ? () => this.onNavAddress() : () => {initDit();}}
         >
           <Image className={`${prefix}-title-icon`} src='//net.huanmusic.com/scanbar-c/icon_location.png' />
           <View className={`${prefix}-title-text${process.env.TARO_ENV === 'h5' ? '-h5' : ''}`}>
-            {address}
+            {address ? address : '点击重新获取定位'}
           </View>
           <View className={`${prefix}-icon`} />
         </View>
         <View className={`${prefix}-box ${process.env.TARO_ENV === 'h5' ? `${prefix}-box-h5` : ''}`}>
           <View className={`${prefix}-merchant ${process.env.TARO_ENV === 'h5' ? `${prefix}-merchant-h5` : ''}`}>
-            <View className={`${prefix}-merchant-name`}>
+            <View className={`${prefix}-merchant-name`} onClick={() => {changeModalStroe(true)}}>
               {
                 currentMerchantDetail && currentMerchantDetail.name && currentMerchantDetail.name.length > 0 ? currentMerchantDetail.name : '未获取到店名'
               }

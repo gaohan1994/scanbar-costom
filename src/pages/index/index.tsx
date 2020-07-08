@@ -1,6 +1,7 @@
 import Taro, {Component, Config} from '@tarojs/taro'
-import {View, Text} from '@tarojs/components'
+import {View, Text, Button} from '@tarojs/components'
 import {connect} from '@tarojs/redux'
+import { AtFloatLayout, AtModal, AtModalHeader, AtModalContent, AtModalAction} from "taro-ui"
 import './index.less'
 import '../style/product.less'
 import ProductListView from '../../component/product/product.listview'
@@ -10,16 +11,17 @@ import DiscountInfo from './component/discountInfo'
 import Banner from './component/banner'
 import invariant from 'invariant'
 import {ProductAction, MerchantAction, UserAction} from '../../actions'
-import {ResponseCode, ProductInterface} from '../../constants'
+import {ResponseCode, ProductInterface, MerchantInterfaceMap} from '../../constants'
 import WeixinSdk from '../../common/sdk/weixin/weixin'
 import orderAction from '../../actions/order.action'
 import TabsChoose from '../../component/tabs/tabs.choose'
-import {getMerchantAdvertisement, getCurrentMerchantDetail} from '../../reducers/app.merchant'
+import { getMerchantAdvertisement, getCurrentMerchantDetail, getMerchantList } from '../../reducers/app.merchant';
 import {LoginManager} from '../../common/sdk'
 import CouponModal from '../../component/coupon/coupon.modal'
 import { getUserinfo, getMemberInfo, getIndexAddress } from '../../reducers/app.user';
 import {BASE_PARAM} from '../../common/util/config'
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
+import ProductSDK from '../../common/sdk/product/product.sdk';
 
 const cssPrefix = 'product';
 
@@ -37,6 +39,8 @@ class Index extends Component<any> {
         showActivity: true,
         couponModalShow: false,
         obtainCouponList: [],
+        showStore: false,
+        chooseAddressModal: false
     };
 
     common = {
@@ -73,6 +77,7 @@ class Index extends Component<any> {
               }
               if(key.merchantId){
                 localStorage.setItem('merchantId', `${key.merchantId}`);
+                localStorage.setItem('MCHIDFist', `${key.merchantId}`);
               }
               
               localStorage.setItem('search', `?keywords`);
@@ -100,8 +105,76 @@ class Index extends Component<any> {
         this.setState({couponModalShow: true})
     }
     async componentDidShow() {
+        this.init(true);
+        this.changeRefrash();
+    }
+    async getNewData (self) {
+        const {dispatch, address} = self.props;
+        const total = self.getCartTotal() ;
+        if (total !== 0) {
+            Taro.setTabBarBadge({
+                index: 2,
+                text: `${total}`
+            });
+        } else {
+            Taro.removeTabBarBadge({index: 2});
+        }
+        try {
 
-        this.init();
+            await LoginManager.getUserInfo(dispatch);
+
+            const {userinfo, currentMerchantDetail} = self.props;
+            UserAction.getMemberInfo(dispatch);
+            const res = await UserAction.obtainCoupon();
+            if (res.code == ResponseCode.success) {
+
+                self.setState({obtainCouponList: res.data.rows})
+            }
+            const productTypeResult = await ProductAction.productInfoType(dispatch, {
+                merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
+            });
+            invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
+            const {data} = productTypeResult;
+            const firstType = data[0] || {};
+            self.changeCurrentType(firstType);
+            await WeixinSdk.initAddress(dispatch, address);
+            const param = {
+                merchantId: BASE_PARAM.MCHIDFist,
+                latitude: self.props.address.latitude,
+                longitude: self.props.address.longitude
+            }
+            const resMear = await MerchantAction.merchantList(dispatch, param, currentMerchantDetail);
+            if(resMear.data.total === 0){
+                Taro.showModal({
+                    title: '',
+                    content: '该地址无法配送，请选择其他收货地址',
+                    showCancel: false,
+                    confirmText: '去选择',
+                    confirmColor: '#2a86fc',
+                    success: function(res) {
+                        if (res.confirm) {
+                            Taro.navigateTo({
+                                url: `/pages/address/address.change.index`
+                            });
+                        } 
+                    }
+                })
+                // self.setState({
+                //     chooseAddressModal: true,
+                // })
+            } else {
+                // self.setState({
+                //     chooseAddressModal: false,
+                // })
+            }
+        } catch (error) {
+            Taro.showToast({
+                title: error.message,
+                icon: 'none'
+            });
+        }
+    }
+    changeRefrash () {
         UserAction.getMemberInfo(this.props.dispatch);
         const total = this.getCartTotal() ;
         if (total !== 0) {
@@ -112,11 +185,10 @@ class Index extends Component<any> {
         } else {
             Taro.removeTabBarBadge({index: 2});
         }
+        
         Taro.getStorage({key: 'CentermOAuthTokenCostom'})
             .then(data => {
-                console.log('data', data);
               if (data.data === '') {
-                  console.log('CentermOAuthTokenCostom')
                 const {dispatch} = this.props;
                 LoginManager.logout(dispatch);
               }
@@ -137,7 +209,14 @@ class Index extends Component<any> {
     }
     componentWillUnmount () {
         this.setState({
-            obtainCouponList: []
+            obtainCouponList: [],
+            chooseAddressModal: false,
+        })
+        
+    }
+    handleClose () {
+        this.setState({
+            showStore: false
         })
     }
     public changeCurrentType = (typeInfo: any, fetchProduct: boolean = true) => {
@@ -153,11 +232,15 @@ class Index extends Component<any> {
          * @todo 判断当前
          */
     }
-
+    changeModalStroe = (type) => {
+        this.setState({
+            showStore: type
+        })
+    }
     public init = async (firstTime?: boolean): Promise<void> => {
         const {dispatch, address} = this.props;
         try {
-            MerchantAction.merchantList(dispatch);
+
             await LoginManager.getUserInfo(dispatch);
 
             const {userinfo, currentMerchantDetail} = this.props;
@@ -178,7 +261,36 @@ class Index extends Component<any> {
             if (firstTime) {
                 this.changeCurrentType(firstType);
             }
-            WeixinSdk.initAddress(dispatch, address);
+            await WeixinSdk.initAddress(dispatch, address);
+            const param = {
+                merchantId: BASE_PARAM.MCHIDFist,
+                latitude: this.props.address.latitude,
+                longitude: this.props.address.longitude
+            }
+            const resMear = await MerchantAction.merchantList(dispatch, param, currentMerchantDetail);
+            if(resMear && resMear.data && resMear.data.total === 0){
+                // this.setState({
+                //     chooseAddressModal: true,
+                // })
+                Taro.showModal({
+                    title: '',
+                    content: '该地址无法配送，请选择其他收货地址',
+                    // showCancel: false,
+                    confirmText: '去选择',
+                    confirmColor: '#2a86fc',
+                    success: function(res) {
+                        if (res.confirm) {
+                            Taro.navigateTo({
+                                url: `/pages/address/address.change.index`
+                            });
+                        } 
+                    }
+                })
+            } else {
+                // this.setState({
+                //     chooseAddressModal: false,
+                // })
+            }
         } catch (error) {
             Taro.showToast({
                 title: error.message,
@@ -299,12 +411,13 @@ class Index extends Component<any> {
     }
     
     render() {
-        const {currentType, loading, showActivity, obtainCouponList} = this.state;
-        const {productList, productType, advertisement, userinfo, memberInfo} = this.props;
+        const {currentType, loading, showActivity, obtainCouponList, showStore, chooseAddressModal} = this.state;
+        const {productList, productType, advertisement, userinfo, merchantList, currentMerchantDetail, dispatch} = this.props;
         const isNew = this.CouponisNew(obtainCouponList);
+        const {changeRefrash, getNewData} = this;
         return (
             <View className={`container ${cssPrefix}`}>
-                <IndexAddress/>
+                <IndexAddress initDit={this.initDit} changeModalStroe={process.env.TARO_ENV === 'weapp' ? this.changeModalStroe : () => {}}/>
                 {/* <ScrollView scrollY={true}> */}
                 {
                     showActivity && (
@@ -360,6 +473,51 @@ class Index extends Component<any> {
                 </View>
             </View>
     {/* </ScrollView> */}
+        {
+            process.env.TARO_ENV === 'weapp' ? (
+                <AtFloatLayout className={`switchStore`} isOpened={showStore} title="这是个标题" onClose={this.handleClose.bind(this)}>
+                    <View className={`switchStore-b`}>
+                    {
+                        merchantList.map((merch, indexM) => {
+                            return (
+                                <View 
+                                    className={`switchStore-wrap ${indexM === 0 ? 'switchStore-wrap-top' : ''}  `}
+                                    onClick={() => {
+                                        dispatch({
+                                            type: MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL,
+                                            payload: merch
+                                        });
+                                        ProductSDK.changeStoreCart(merch.id, dispatch);
+                                        getNewData(this);
+                                
+                                        this.setState({
+                                            showStore: false
+                                        })
+                                    }}
+                                >
+                                    <View className={`switchStore-card ${currentMerchantDetail.id === merch.id ? 'switchStore-card-active' : ''}`}>
+                                        <View className={`switchStore-card-name ${ currentMerchantDetail.id === merch.id ? 'switchStore-card-txt-active' : ''}`}>
+                                            {merch.name} 
+                                            <View className={`switchStore-card-distanceStr ${ currentMerchantDetail.id === merch.id ? 'switchStore-card-txt-active' : ''}`}>{merch.distanceStr}</View></View>
+                                    </View>
+                                </View>
+                            );
+                        })
+                    }
+                    </View>
+                </AtFloatLayout>
+            ) : null
+        }
+        {
+            <AtModal closeOnClickOverlay={false} isOpened={chooseAddressModal}>
+                <AtModalContent>
+                <View  className={'chooseAddressModal'}>该地址无法配送，请选择其他收货地址</View>
+                </AtModalContent>
+                <AtModalAction><Button onClick={() => { Taro.navigateTo({
+                    url: `/pages/address/address.change.index`
+                    });}}>去选择地址</Button> </AtModalAction>
+            </AtModal>
+        }
         <CouponModal
             isOpen={obtainCouponList.length > 0}
             onClose={() => {
@@ -391,6 +549,7 @@ class Index extends Component<any> {
 const select = (state) => {
     return {
         productType: state.product.productType,
+        merchantList: getMerchantList(state),
         productList: state.product.productList,
         productCartList: getProductCartList(state),
         advertisement: getMerchantAdvertisement(state),

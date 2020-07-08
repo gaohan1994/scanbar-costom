@@ -101,10 +101,16 @@ class Page extends Taro.Component<Props, State> {
   render() {
     const { couponListCenter } = this.props;
     const { currentType } = this.state;
+    const list: any = [];
+    couponListCenter.forEach((val) => {
+      for (let index = 0; index < val.ableObtainNum; index++) {
+        list.push(val)
+      }
+    })
     return (
       <View className={`container user`} >
         {
-          couponListCenter && couponListCenter.length > 0
+          list && list.length > 0
             ? (
               <ScrollView
                 scrollY={true}
@@ -112,7 +118,7 @@ class Page extends Taro.Component<Props, State> {
                 style={{height: '100%'}}
               >
                 {
-                  couponListCenter.map((item: any) => {
+                  list.map((item: any) => {
                     return (
                       <View className={`${cssPrefix}-scrollview-item`} key={item.id}>
                         <CouponItem

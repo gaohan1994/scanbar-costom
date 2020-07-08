@@ -141,6 +141,7 @@ export declare namespace ProductCartInterface {
 
     type ReducerInterface = {
         SELECT_INDEX: string;
+        CHANGE_STORE_CART: string;
         DELETE_GROUP: string;
         MANAGE_CART: MANAGE_CART;
         MANAGE_EMPTY_CART: MANAGE_EMPTY_CART;
@@ -180,6 +181,7 @@ class ProductSDK {
 
     public reducerInterface: ProductCartInterface.ReducerInterface = {
         SELECT_INDEX: 'SELECT_INDEX',
+        CHANGE_STORE_CART: 'CHANGE_STORE_CART',
         DELETE_GROUP: 'DELETE_GROUP',
         MANAGE_CART: 'MANAGE_CART',
         MANAGE_EMPTY_CART: 'MANAGE_EMPTY_CART',
@@ -445,14 +447,31 @@ class ProductSDK {
         }
     }
     /**
+     * @todo 切换门店改变购物车数据
+     *
+     * @memberof ProductSDK
+     */
+    public changeStoreCart = async (id: number, dispatch) => {
+        dispatch({
+            type: this.reducerInterface.CHANGE_STORE_CART,
+            payload: {
+                id: id
+            }
+        })
+    }
+    /**
      * @todo 把积分扣除金额存到order.pay redux中
      *
      * @memberof ProductSDK
      */
-    public preparePayOrderPoints = async (points: number, dispatch) => {
+    public preparePayOrderPoints = async (points: any, dispatch) => {
         dispatch({
             type: this.reducerInterface.RECEIVE_ORDER_PAY_POINTS,
-            payload: points
+            payload: {
+                pointsTotalSell: points.pointsTotalSell, 
+                pointsTotal: points.pointsTotal, 
+            }
+            
         })
     }
     /**
@@ -460,7 +479,7 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public preparePayOrderAddress = async (address: UserInterface.Address, dispatch) => {
+    public preparePayOrderAddress = async (address: any, dispatch) => {
         dispatch({
             type: this.reducerInterface.RECEIVE_ORDER_PAY_ADDRESS,
             payload: address
@@ -510,27 +529,28 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products?: ProductCartInterface.ProductCartInfo[], address?: any, payOrderDetail?: any, pointsTotal?: any, points?: any): ProductCartInterface.ProductPayPayload => {
+    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products: ProductCartInterface.ProductCartInfo[], address: any, payOrderDetail: any, pointsTotal: any, points: any, DeliveryFee: any, payType: any): ProductCartInterface.ProductPayPayload => {
         // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;  UserInterface.Address
         const productList = products !== undefined ? products : productCartList;
         // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
-        const transAmountNow = this.getProductTransPrice(activityList, memberInfo, productCartList, productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0);
+        const transAmountNow = this.getProductTransPrice(activityList, memberInfo, productCartList, productList) + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0);
         // Partial<ProductCartInterface.ProductOrderPayload>
+        console.log(currentMerchantDetail, 'currentMerchantDetail');
         let order: any = {
             deliveryInfo: {
                 address: payOrderDetail.deliveryType === 1 ? address && address.address ? `${address.address} ${address.houseNumber}`  : '' : '',
                 deliveryType: payOrderDetail.deliveryType || 0,
-                deliveryFee: payOrderDetail.deliveryType === 1 ? 3.5 : 0,
+                deliveryFee: payOrderDetail.deliveryType === 1 ? DeliveryFee : 0,
                 planDeliveryTime: payOrderDetail.planDeliveryTime || '',
             },
             deliveryPhone: '',
             remark: payOrderDetail.remark || "",
-            payType: 8,
+            payType: payType,
             merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
             discount: 0,
             points: pointsTotal ?points: null,
             orderSource: 3,
-            totalAmount: this.getProductsOriginPrice(productList) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
+            totalAmount: this.getProductsOriginPrice(productList) + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0),
             totalNum: this.getProductNumber(productList),
             transAmount: transAmountNow
         }
@@ -549,7 +569,7 @@ class ProductSDK {
 
         if (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id) {
             const transAmount = this.getProductTransPrice(activityList, memberInfo, productCartList) +
-                (payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
+                (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
                 (payOrderDetail.selectedCoupon.couponVO.discount || 0);
             order = {
                 ...order,
@@ -587,19 +607,14 @@ class ProductSDK {
         return payload;
     }
 
-    public requestPayment = async (orderNo: string, fail?: (res: any) => void) => {
-        let payload = {};
-        if(process.env.TARO_ENV === 'h5'){
-            payload = {
-                orderNo,
-                payType: 2
-            };
-        } else {
-            payload = {orderNo};
-        }
+    public requestPayment = async (orderNo: string, payType: any, fail?: (res: any) => void) => {
+        let payload = {
+            orderNo,
+            payType: payType
+        };
         const result = await requestHttp.post(`/api/cashier/pay`, payload);
-        if (result.code === ResponseCode.success && result.data.status !== false) {
-            return new Promise((resolve) => {
+        if (result.code === ResponseCode.success && payType !== 7 && result.data.result.param) {
+            return new Promise(async (resolve) => {
                 // const payload = JSON.parse(result.data.param);
                 //     delete payload.appId;
                 //     const paymentPayload = {
@@ -612,12 +627,14 @@ class ProductSDK {
                 //         }
                 //     };
                 //     Taro.requestPayment(paymentPayload);
+                
                 if(process.env.TARO_ENV === 'h5'){
+                
                     const data = result.data;
                     const url = data.codeUrl.replace('-app', '-customer')
                     window.location.href = url;
                 } else {
-                    const payload = JSON.parse(result.data.param);
+                    const payload = JSON.parse(result.data.result.param);
                     delete payload.appId;
                     const paymentPayload = {
                         ...payload,
@@ -629,8 +646,8 @@ class ProductSDK {
                         }
                     };
                     Taro.requestPayment(paymentPayload);
+
                 }
-                
             })
         }
         return result;
@@ -850,22 +867,32 @@ class ProductSDK {
         const result = await ProductService.cashierPay(params);
         return result;
     }
-
     /**
      * @todo [清空购物车]
      * @todo [清空下单信息]
      */
-    public cashierOrderCallback = async (dispatch, result: OrderInterface.OrderDetail) => {
+    public cashierOrderCallbackOnly = async (dispatch, result: OrderInterface.OrderDetail, orderPayType: any) => {
         this.empty(dispatch, result.orderDetailList as any);
         this.preparePayOrder(dispatch, [], [])
         this.preparePayOrderAddress({} as any, dispatch)
         this.preparePayOrderDetail({} as any, dispatch)
-        const {order} = result;
+    }
+    /**
+     * @todo [清空购物车]
+     * @todo [清空下单信息]
+     */
+    public cashierOrderCallback = async (dispatch, result: OrderInterface.OrderDetail, orderPayType: any) => {
+        const {order, orderNo} = result;
         Taro.showLoading();
-        await ProductService.cashierQueryStatus({orderNo: order.orderNo});
+        if(orderPayType !== 7) await ProductService.cashierQueryStatus({orderNo: order.orderNo || orderNo});
         Taro.hideLoading();
+        this.empty(dispatch, result.orderDetailList as any);
+        this.preparePayOrder(dispatch, [], [])
+        this.preparePayOrderAddress({} as any, dispatch)
+        this.preparePayOrderDetail({} as any, dispatch)
+
         Taro.redirectTo({
-            url: `/pages/order/order.detail?id=${order.orderNo}`
+            url: `/pages/order/order.detail?id=${order.orderNo || orderNo}`
         });
     }
 

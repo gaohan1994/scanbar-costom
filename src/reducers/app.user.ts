@@ -49,6 +49,8 @@ export declare namespace UserReducer {
     couponListCenter: UserInterface.CouponsItemCenter[];
     userinfo: UserInterface.UserInfo;
     memberInfo: UserInterface.MemberInfo;
+    rechangeRule: any;
+    balanceChange: any;
   }
 
   type Action = 
@@ -66,11 +68,42 @@ export const initState: UserReducer.State = {
   couponListCenter: [],
   userinfo: {} as any,
   memberInfo: {} as any,
+  rechangeRule:[],
+  balanceChange: {
+    rows: [],
+    total: 0,
+  }
 };
 
 export default function merchant (state: UserReducer.State = initState, action: UserReducer.Action): UserReducer.State {
   switch (action.type) {
-
+    
+    case UserInterfaceMap.reducerInterface.RECEIVE_BALANCECHANGEMORE: {
+      const { payload } = action as any;
+      return {
+        ...state,
+        balanceChange: {
+          rows: [
+            ...state.balanceChange.rows,
+            ...payload.rows,
+          ]
+        }
+      }
+    }
+    case UserInterfaceMap.reducerInterface.RECEIVE_BALANCECHANGE: {
+      const { payload } = action as any;
+      return {
+        ...state,
+        balanceChange: payload
+      }
+    }
+    case UserInterfaceMap.reducerInterface.RECEIVE_RECHARGERULE: {
+      const { payload } = action as any;
+      return {
+        ...state,
+        rechangeRule: payload
+      }
+    }
     case weixinSdk.reducerInterface.RECEIVE_CURRENT_ADDRESS: {
       const { payload } = action as any;
       return {
@@ -141,6 +174,9 @@ export default function merchant (state: UserReducer.State = initState, action: 
     }
   }
 }
+export const getBalanceChange = (state: AppReducer.AppState) => state.user.balanceChange; 
+
+export const getRechangeRule = (state: AppReducer.AppState) => state.user.rechangeRule; 
 
 export const getIndexAddress = (state: AppReducer.AppState) => state.user.indexAddress; 
 

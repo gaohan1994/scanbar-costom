@@ -8,6 +8,7 @@
 import { ResponseCode, OrderService, OrderInterface, OrderInterfaceMap } from '../constants/index';
 // import { store } from '../app';
 import { OrderReducer } from '../reducers/app.order';
+import Taro from '@tarojs/taro';
 
 class OrderAction {
   /**
@@ -25,6 +26,12 @@ class OrderAction {
         }
       };
       dispatch(reducer);
+    } else {
+      Taro.showToast({
+        title: result.msg,
+        icon: 'none',
+        duration: 2000
+      })
     }
     return result;
   }
@@ -240,6 +247,9 @@ class OrderAction {
       }
       case 6: {
         return '刷脸';
+      }
+      case 7: {
+        return '储值';
       }
       default: {
         return '微信';

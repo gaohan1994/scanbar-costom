@@ -11,7 +11,7 @@ import numeral from 'numeral'
 import PickAddress from './component/address'
 import invariant from 'invariant'
 import dayJs from 'dayjs'
-import {ResponseCode, OrderInterface, UserInterface} from '../../constants'
+import {ResponseCode, OrderInterface, UserInterface, ProductService} from '../../constants'
 import FormCard from '../../component/card/form.card'
 import {AtFloatLayout} from 'taro-ui'
 import ProductMenu from '../../component/product/product.menu'
@@ -20,8 +20,8 @@ import orderAction from '../../actions/order.action'
 import merchantAction from '../../actions/merchant.action';
 import { getMemberInfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
-import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
-import { getOrderDetail } from '../../reducers/app.order';
+import { getCurrentMerchantDetail, getOrderPayType } from '../../reducers/app.merchant';
+import { getOrderDetail, getDeliveryFee } from '../../reducers/app.order';
 import { UserAction } from '../../actions'
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 import {BASE_PARAM} from '../../common/util/config';
@@ -32,6 +32,7 @@ const closeTime = 24;
 
 type Props = {
     dispatch: Dispatch;
+    orderPayType: any;
     currentMerchantDetail: any;
     payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
     payOrderAddress: UserInterface.Address;
@@ -41,6 +42,7 @@ type Props = {
     activityList: any;
     memberInfo: any;
     productSDKObj: any;
+    DeliveryFee: any;
 }
 
 type State = {
@@ -83,27 +85,31 @@ class Page extends Taro.Component<Props, State> {
         }
         const params = {
             productIds: productIds,
+            merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
             amount: productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList, payOrderProductList)
         };
         orderAction.getAbleToUseCoupon(dispatch, params);
         UserAction.getMemberInfo(this.props.dispatch);
         orderAction.getPointConfig(this.props.dispatch);
     }
-    componentWillReceiveProps = (nextProps) => {
-        // console.log(nextProps, 'nextProps')
-        // const {dispatch, payOrderAddress} = nextProps;
-        // if(payOrderAddress.id && this.state.isFirst === true) {
-        //     console.log(payOrderAddress.id, 'payOrderAddress.id')
-        //     const param = {
-        //         latitude:  payOrderAddress.latitude,
-        //         longitude: payOrderAddress.longitude,
-        //         merchantId: BASE_PARAM.MCHID,
-        //     }
-        //     orderAction.getDeliveryFee(dispatch, param);
-        //     this.setState({
-        //         isFirst: false
-        //     })
-        // }
+    componentWillReceiveProps = async (nextProps) => {
+        console.log(nextProps, 'nextProps')
+        const {dispatch, payOrderAddress, currentMerchantDetail} = nextProps;
+        if(payOrderAddress.id && this.state.isFirst === true) {
+            console.log(payOrderAddress.id, 'payOrderAddress.id')
+            const param = {
+                latitude:  payOrderAddress.latitude,
+                longitude: payOrderAddress.longitude,
+                merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
+            }
+            const result = await orderAction.getDeliveryFee(dispatch, param);
+            if(result.code !== ResponseCode.success){
+                productSdk.preparePayOrderAddress({}, dispatch);
+            }
+            this.setState({
+                isFirst: false
+            })
+        }
     }
     public onSubmit = async () => {
         try {
@@ -132,36 +138,76 @@ class Page extends Taro.Component<Props, State> {
                 isOnClick: false
             })
             try {
-                const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch} = this.props;
-                const payload = productSdk.getProductInterfacePayload(productSDKObj.currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal, memberInfo.points || 0);
+                const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch, DeliveryFee, orderPayType, currentMerchantDetail} = this.props;
+                const payload = productSdk.getProductInterfacePayload(currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal, productSDKObj.pointsTotalSell, DeliveryFee, orderPayType);
                 const result = await productSdk.cashierOrder(payload)
                 invariant(result.code === ResponseCode.success, result.msg || ' ');
                 Taro.hideLoading();
-                const payment = await productSdk.requestPayment(result.data.order.orderNo, (res) => {
+                const payment = await productSdk.requestPayment(result.data.order.orderNo, orderPayType, (res) => {
                 })
-                if (payment.errMsg !== 'requestPayment:ok') {
-                    productSdk.cashierOrderCallback(this.props.dispatch, result.data);
-                    Taro.navigateTo({
-                        url: '/pages/orderList/order'
-                    }).catch((error) => {
-                        /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
-                        const {order} = result.data;
+                console.log('payment', payment);
+                if (payment.code === ResponseCode.success || payment.errMsg === "requestPayment:ok") {
+                    productSdk.cashierOrderCallback(this.props.dispatch, result.data, orderPayType);
+                    if(process.env.TARO_ENV === 'h5') {
                         Taro.redirectTo({
-                            url: `/pages/order/order.detail?id=${order.orderNo}`
+                            url: `/pages/order/order.detail?id=${result.data.order.orderNo || result.data.orderNo}`
                         });
-                        // Taro.switchTab({url: '/pages/orderList/order'})
-                    })
+                    } else {
+                        Taro.navigateTo({
+                            url: '/pages/orderList/order'
+                        }).catch((error) => {
+                            /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
+                            const {order} = result.data;
+                            Taro.redirectTo({
+                                url: `/pages/order/order.detail?id=${order.orderNo}`
+                            });
+                            // Taro.switchTab({url: '/pages/orderList/order'})
+                        })
+                        
+                        
+                    }
+                    
                     this.setState({
                         isOnClick: true
                     })
                     return;
+                } else {
+                    if(payment.msg === '余额不足') {
+                        Taro.showToast({
+                            title: '余额不足请充值',
+                            icon: 'none',
+                            duration: 2000
+                        })
+                        setTimeout(() => {
+                            if(process.env.TARO_ENV === 'h5'){
+                                Taro.redirectTo({
+                                    url: `/pages/TopUp/TopUp?id=${result.data.order.orderNo || result.data.orderNo}`
+                                });
+                            } else {
+                                const {order} = result.data;
+                                Taro.redirectTo({
+                                    url: `/pages/TopUp/TopUp?id=${order.orderNo}`
+                                });
+                            }
+
+                        }, 500);
+
+                        productSdk.cashierOrderCallbackOnly(this.props.dispatch, result.data, orderPayType)
+                    } else {
+                        productSdk.cashierOrderCallbackOnly(this.props.dispatch, result.data, orderPayType)
+                        const {order} = result.data;
+                        Taro.redirectTo({
+                            url: `/pages/order/order.detail?id=${order.orderNo}`
+                        });
+                    }
+                    productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, this.props.dispatch)
+                    UserAction.getMemberInfo(this.props.dispatch);
+                    this.setState({
+                        isOnClick: true
+                    })
+                    
                 }
-                productSdk.cashierOrderCallback(this.props.dispatch, result.data)
-                productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, this.props.dispatch)
-                UserAction.getMemberInfo(this.props.dispatch);
-                this.setState({
-                    isOnClick: true
-                })
+                
             } catch (error) {
                 Taro.hideLoading();
                 Taro.showToast({
@@ -176,17 +222,28 @@ class Page extends Taro.Component<Props, State> {
     }
 
     public onChangeValue = (key: string, value: any) => {
-        this.setState(prevState => {
-            return {
-                ...prevState,
-                [key]: value
-            };
-        });
+        if(process.env.TARO_ENV === 'h5'){
+            const obj = this.state;
+            obj[key] = value;
+            this.setState(obj)
+        } else {
+            this.setState(prevState => {
+                console.log('prevState', prevState, key, value)
+                return {
+                    ...prevState,
+                    [key]: value
+                };
+            });
+        }
+        console.log('onChangeValue', key, value)
     }
 
     onShowTimeSelect = () => {
-        this.onChangeValue('showTimeSelect', true);
+
         this.getDateList();
+        this.setState({
+            showTimeSelect: true
+        })
     }
 
     onDateClick = (date: any) => {
@@ -288,24 +345,24 @@ class Page extends Taro.Component<Props, State> {
         }
     }
     countTotal = () => {
-        const {payOrderDetail, orderDetail, payOrderProductList } = this.props;
+        const {payOrderDetail, orderDetail, payOrderProductList, DeliveryFee } = this.props;
         const { order } = orderDetail;
         let total = 0;
         payOrderProductList.forEach((val) => {
-            total += val.price;
+            total += val.price * val.sellNum;
         })
         if(((payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1)
         || (order && order.deliveryType !== undefined && order.deliveryType === 1))){
-            total += 3.5;
+            total += DeliveryFee;
         }
-
+        console.log('total', total)
         return total;
     }
     onRefProductPayListView = (reset) => {
         this.onRefProductPayListViewObj = reset;
     }
     render() {
-        const {payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj,} = this.props;
+        const {payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, DeliveryFee, dispatch} = this.props;
         const {showTimeSelect, currentDate, selectDate, selectTime, timeList, dateList} = this.state;
         const {countTotal, onRefProductPayListView, onRefProductPayListViewObj} = this;
         const price = payOrderProductList && payOrderProductList.length > 0
@@ -314,7 +371,7 @@ class Page extends Taro.Component<Props, State> {
         let tarnsPrice = payOrderProductList && payOrderProductList.length > 0
             ? numeral(
                 productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList) +
-                (payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
+                (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
                 (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
             ).format('0.00')
             : '0.00';
@@ -322,14 +379,16 @@ class Page extends Taro.Component<Props, State> {
             tarnsPrice = numeral(numeral(tarnsPrice).value() - productSDKObj.pointsTotal).format('0.00');
         }
         let priceDiscountPay = countTotal() - numeral(tarnsPrice).value();
+    
         const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
+        console.log('orderPay', priceDiscountPay, tarnsPrice, productSDKObj);
         return (
             <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: 'auto'}}>
                 <View className={`${cssPrefix}-bg`}/>
                 <PickAddress
                     isPay={true}
                     timeSelectClick={() => {
-                        this.onShowTimeSelect()
+                        this.onShowTimeSelect();
                     }}
                     currentTime={`${selectTimeStr}`}
                     changeTabCallback={this.getTimeList}
@@ -338,12 +397,14 @@ class Page extends Taro.Component<Props, State> {
                 {
                     payOrderDetail.deliveryType === 0 ? (
                         <ProductPayListView
+                            DeliveryFee={DeliveryFee}
                             productList={payOrderProductList}
                             payOrderDetail={payOrderDetail}
                             // onRef={onRefProductPayListView}
                         />
                     ) : (
                         <ProductPayListView
+                            DeliveryFee={DeliveryFee}
                             payOrderDetail={payOrderDetail}
                             productList={payOrderProductList}
                             // onRef={onRefProductPayListView}
@@ -392,14 +453,14 @@ class Page extends Taro.Component<Props, State> {
                         this.setState({showTimeSelect: false})
                     }
                     }>
-                    <View className={`${cssPrefix}-modal`}>
+                    <View className={process.env.TARO_ENV === 'h5' ? `${cssPrefix}-modal-h5` : `${cssPrefix}-modal`}>
                         <ProductMenu
                             menu={dateList}
                             currentMenu={currentDate}
                             onClick={(type: any) => {
                                 this.onDateClick(type);
                             }}
-                            className={`${cssPrefix}-modal-menu`}
+                            className={process.env.TARO_ENV === 'h5' ? `${cssPrefix}-modal-h5-menu` : `${cssPrefix}-modal-menu`}
                         />
 
                         <ScrollView scrollY={true} className={`${cssPrefix}-modal-list`}>
@@ -410,7 +471,7 @@ class Page extends Taro.Component<Props, State> {
                                             onClick={() => {
                                                 this.onTimeClick(time)
                                             }}
-                                            className={classnames(`${cssPrefix}-modal-list-item `, {
+                                            className={classnames(`${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-modal-h5-list-item` : `${cssPrefix}-modal-list-item`} `, {
                                                 [`${cssPrefix}-modal-list-select`]: selectTime === time,
                                             })}
                                         >
@@ -429,6 +490,8 @@ class Page extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => {
     return {
+        DeliveryFee: getDeliveryFee(state),
+        orderPayType: getOrderPayType(state),
         payOrderProductList: state.productSDK.payOrderProductList,
         payOrderAddress: state.productSDK.payOrderAddress,
         payOrderDetail: state.productSDK.payOrderDetail,

@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import numeral from 'numeral';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
-import { getOrderDetail, getAbleToUseCouponList, getPointConfig } from '../../reducers/app.order';
+import { getOrderDetail, getAbleToUseCouponList, getPointConfig, getDeliveryFee } from '../../reducers/app.order';
 import { OrderInterface, UserInterface } from '../../constants';
 import { getMemberInfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
@@ -29,6 +29,7 @@ type Props = {
   type?: number;
   payOrderDetail: any;
   isDetail?: boolean;
+  DeliveryFee: any;
   pointConfig: any
   orderDetail: OrderInterface.OrderDetail;
   showCallModal?: () => void;
@@ -62,7 +63,11 @@ class ProductPayListView extends Taro.Component<Props, State> {
     this.setState({
       pointSet: false
     })
-    productSdk.preparePayOrderPoints(0, dispatch);
+    const points = {
+      pointsTotalSell: 0, 
+      pointsTotal: 0, 
+    }
+    productSdk.preparePayOrderPoints(points, dispatch);
   }
   getAbleToUseCouponsNum = () => {
     const { couponList } = this.props;
@@ -76,7 +81,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
   }
 
   render() {
-    const { productList, className, padding, payOrderDetail, type, orderDetail, showCallModal } = this.props;
+    const { productList, className, padding, payOrderDetail, type, orderDetail, showCallModal, DeliveryFee } = this.props;
     const { orderDetailList, order } = orderDetail;
     return (
       <View
@@ -128,7 +133,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
                         `${cssPrefix}-row-content-price ${cssPrefix}-row-content-price-black`
                       }
                     >
-                      ￥{numeral(3.5).format('0.00')}
+                      ￥{numeral(DeliveryFee).format('0.00')}
                     </Text>
                     {/* <Image
                       className={`${cssPrefix}-card-products-header-next`}
@@ -249,7 +254,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
     return total;
   }
   private renderDisount = () => {
-    const { payOrderDetail, type, orderDetail, productSDKObj, memberInfo, pointConfig, activityList, isDetail, dispatch } = this.props;
+    const { payOrderDetail, type, orderDetail, productSDKObj, memberInfo, pointConfig, activityList, isDetail, dispatch, DeliveryFee } = this.props;
     const { order, orderActivityInfoList } = orderDetail;
     const {pointSet} = this.state;
     const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
@@ -257,9 +262,9 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const orderActivityInfoListTotal = this.getorderActivityInfoListTotal(orderActivityInfoList);
     const {countTotal} = this;
     const {price} = countTotal();
-    const PointsPre = memberInfo.points * pointConfig.deductRate < numeral(price).value() ? memberInfo.points : numeral(price).value();
+    const pointPrice = DeliveryFee && payOrderDetail.deliveryType === 1 ? numeral(price).value() - DeliveryFee : numeral(price).value();
+    const PointsPre = memberInfo.points * pointConfig.deductRate < pointPrice ? memberInfo.points : pointPrice;
     const MathPointsPre = Math.ceil(PointsPre)
-    console.log('MathPointsPre', MathPointsPre, PointsPre, memberInfo, pointConfig)
     return (
       <View>
         {totalActivityMoney !== 0 && !isDetail && (
@@ -392,7 +397,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
                 <Text className={`${cssPrefix}-row-voucher`}>积分抵现<Text className={`${cssPrefix}-row-voucher-span`}>({MathPointsPre}积分)</Text></Text>
                 <View className={`${cssPrefix}-row-content-row`}>
                   <Text className={`${cssPrefix}-row-content-price`}>
-                    -¥{memberInfo.points * pointConfig.deductRate < numeral(price).value() ? numeral(memberInfo.points * pointConfig.deductRate).format('0.00') : numeral(price).value()}
+                    -¥{PointsPre}
                   </Text>
                   <View 
                     className={`${cssPrefix}-point-select`}
@@ -401,9 +406,17 @@ class ProductPayListView extends Taro.Component<Props, State> {
                           pointSet: !pointSet,
                         })
                         if(!pointSet){
-                          productSdk.preparePayOrderPoints(numeral(memberInfo.points * pointConfig.deductRate < numeral(price).value() ? numeral(memberInfo.points * pointConfig.deductRate).format('0.00') : numeral(price).value()).value(), dispatch);
+                          const points = {
+                            pointsTotal: numeral(PointsPre).value(), 
+                            pointsTotalSell: MathPointsPre, 
+                          }
+                          productSdk.preparePayOrderPoints(points, dispatch);
                         } else {
-                          productSdk.preparePayOrderPoints(0, dispatch);
+                          const points = {
+                            pointsTotalSell: 0, 
+                            pointsTotal: 0, 
+                          }
+                          productSdk.preparePayOrderPoints(points, dispatch);
                         }
                     }}
                   >
@@ -438,12 +451,12 @@ class ProductPayListView extends Taro.Component<Props, State> {
     )
   }
   private countTotal = () => {
-    const { payOrderDetail, type, orderDetail, activityList, memberInfo, pointConfig, productSDKObj } = this.props;
+    const { payOrderDetail, type, orderDetail, activityList, memberInfo, pointConfig, productSDKObj, DeliveryFee } = this.props;
     const { order } = orderDetail;
     let price =
       numeral(
         productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
-        (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
+        (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
         (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
       ).format('0.00');
     let discountPrice =
@@ -467,7 +480,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
     }
   }
   private renderTotal = () => {
-    const { memberInfo, pointConfig } = this.props;
+    const { memberInfo, pointConfig, DeliveryFee, payOrderDetail} = this.props;
     // const { order } = orderDetail;
     const {pointSet} = this.state;
     const {countTotal} = this;
@@ -475,17 +488,25 @@ class ProductPayListView extends Taro.Component<Props, State> {
     let newPrice = price;
     if(pointSet === true){
       const money = memberInfo.points * pointConfig.deductRate;
-      if(money < numeral(newPrice).value()){
- 
-        newPrice = numeral(numeral(newPrice).value() - money).format('0.00');
+      if( DeliveryFee && payOrderDetail.deliveryType === 1){
+        const pointPrice= numeral(newPrice).value() - DeliveryFee;
+        if(money < numeral(pointPrice).value()){
+          newPrice = numeral(numeral(newPrice).value() - money).format('0.00');
+        } else {
+          newPrice = numeral(DeliveryFee).format('0.00');
+        }
       } else {
-        newPrice = '0.00'
+        if(money < numeral(newPrice).value()){
+          newPrice = numeral(numeral(newPrice).value() - money).format('0.00');
+        } else {
+          newPrice = '0.00'
+        }
       }
     }
     // let price =
     //   numeral(
     //     productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
-    //     (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
+    //     (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
     //     (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
     //   ).format('0.00');
     // let discountPrice =

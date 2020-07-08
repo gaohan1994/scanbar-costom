@@ -266,7 +266,7 @@ class User extends Taro.Component<Props, State> {
                         > </View>
                     </View>
                     <View className={`${cssPrefix}-member`}>
-                        <View className={`${cssPrefix}-member-item`}>
+                        <View className={`${cssPrefix}-member-item`} onClick={() => { this.navTo('/pages/TopUp/TopUp?entry=nolmal', true) }}>
                             <Text className={`${cssPrefix}-member-item-number`}>￥{numeral(memberInfo.overage || 0).format('0.00')}</Text>
                             <Text>储值余额</Text>
                         </View>

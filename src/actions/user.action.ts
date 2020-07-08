@@ -9,6 +9,73 @@ import { ResponseCode, UserService, UserInterfaceMap, UserInterface } from "../c
 // import { store } from "../app";
 
 class UserAction {
+  
+  /**
+   * @todo 变动明细More
+   *
+   * @memberof UserAction
+   */
+  public getBalanceChangeMore = async (dispatch, param) => {
+    const result = await UserService.getBalanceChange(param);
+    if (result.code === ResponseCode.success) {
+      dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_BALANCECHANGEMORE,
+        payload: result.data
+      });
+      return result;
+    }
+    return result;
+  }
+  /**
+   * @todo 变动明细
+   *
+   * @memberof UserAction
+   */
+  public getBalanceChange = async (dispatch, param) => {
+    const result = await UserService.getBalanceChange(param);
+    if (result.code === ResponseCode.success) {
+      dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_BALANCECHANGE,
+        payload: result.data
+      });
+      return result;
+    }
+    return result;
+  }
+  /**
+   * @todo 充值
+   *
+   * @memberof UserAction
+   */
+  public cashierStore = async (param) => {
+    const result = await UserService.cashierStore(param);
+    return result;
+  }
+  /**
+   * @todo h获取我的充值规则列表
+   *
+   * @memberof UserAction
+   */
+  public getRechargeRule = async (dispatch) => {
+    const result = await UserService.getRechargeRule();
+    if (result.code === ResponseCode.success) {
+      dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_RECHARGERULE,
+        payload: result.data
+      });
+      return result;
+    }
+    return result;
+  }
+    /**
+   * @todo h5验证码
+   *
+   * @memberof UserAction
+   */
+  public h5Code = async (dispatch, param) => {
+    const result = await UserService.h5Code(param);
+    return result;
+  }
   /**
    * @todo h5验证码
    *
