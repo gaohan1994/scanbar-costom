@@ -185,6 +185,7 @@
   }
 
   &-card {
+    // position: relative;
     height: 240px;
     background: linear-gradient(
       180deg,
@@ -194,6 +195,41 @@
     );
     .padding(30px, l);
     .padding(7px, t);
+
+    &-close {
+      position: absolute;
+      bottom: 25px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 78px;
+      height: 29px;
+      .bg;
+      background-image: url(//net.huanmusic.com/scanbar-c/icon_shouqi_l.png);
+    }
+
+    &-tip {
+      font-size: 30px;
+      font-weight: bold;
+      color: rgba(51, 51, 51, 1);
+      .margin(35px, t);
+    }
+
+    &-text {
+      .margin(20px, t);
+      width: 521px;
+      font-size: 24px;
+      color: rgba(102, 102, 102, 1);
+    }
+
+    &-wrap {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1000;
+      background: #fff;
+    }
 
     &-detail {
       .flex(flex-start, flex-start, column);
@@ -206,6 +242,14 @@
       border-radius: 10px;
       .padding(30px, tb);
       .padding(24px, lr);
+
+      &-pos {
+        position: absolute;
+        // top: 30px;
+        top: 7px;
+        left: 30px;
+        bottom: 40px;
+      }
 
       &-like {
         position: absolute;

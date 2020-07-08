@@ -2,16 +2,17 @@
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-03 17:13:16
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-07-03 14:02:40
+ * @Last Modified time: 2020-07-07 14:21:14
  */
 import requestHttp from "../common/request/request.http";
 import {
   ResponseCode,
   UserService,
   UserInterfaceMap,
-  UserInterface
+  UserInterface,
+  jsonToQueryString
 } from "../constants";
-// import { store } from "../app";
+import { store } from "../app";
 
 class UserAction {
   /**
@@ -230,6 +231,21 @@ class UserAction {
   public getMyMemberCard = async () => {
     const result = await requestHttp.get(`/memberInfo/getMyMemberCard`);
     return result;
+  };
+
+  public getMerchantAttention = async (params?: any) => {
+    const address = store.getState().user.indexAddress;
+    if (address && address.longitude) {
+      const result = await requestHttp.get(
+        `/merchantInfo/getMerchantAttention${jsonToQueryString({
+          longitude: address.longitude,
+          latitude: address.latitude,
+          ...params
+        })}`
+      );
+      return result;
+    }
+    return {};
   };
 }
 

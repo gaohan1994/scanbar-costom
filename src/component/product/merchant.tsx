@@ -45,6 +45,7 @@ class MerchantComponent extends Taro.Component<Props, State> {
     return (
       <View
         className={classnames(`${cssPrefix}-border`)}
+        style="background: #fff"
         onClick={() => this.onMerchantClick()}
       >
         <View

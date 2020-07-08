@@ -2,7 +2,7 @@
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-03 17:19:06
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-24 13:41:56
+ * @Last Modified time: 2020-07-07 14:59:31
  */
 import {
   MerchantService,
@@ -17,6 +17,7 @@ import requestHttp from "../common/request/request.http";
 // import { store } from '../app';
 import Taro from "@tarojs/taro";
 import productSdk from "../common/sdk/product/product.sdk";
+import { store } from "../app";
 class MerchantAction {
   public addMember = async (
     currentMerchantDetail: MerchantInterface.MerchantDetail
@@ -30,7 +31,7 @@ class MerchantAction {
 
   public getOrderedMerchant = dispatch => async params => {
     const result = await requestHttp.get(
-      `/customer/merchantInfo/getNearbyMerchant${jsonToQueryString(params)}`
+      `/merchantInfo/getNearbyMerchant${jsonToQueryString(params)}`
     );
     if (result.code === ResponseCode.success) {
       dispatch({
@@ -45,12 +46,24 @@ class MerchantAction {
     return result;
   };
 
+  public getMerchantDetail = async merchant => {
+    Taro.showLoading();
+    const result = await requestHttp.get(`/merchantInfo/detail/${merchant.id}`);
+    Taro.hideLoading();
+    console.log("result", result);
+    store.dispatch({
+      type:
+        MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL,
+      payload: { ...merchant, ...result.data }
+    });
+  };
+
   public setCurrentMerchantDetail = dispatch => async merchant => {
     try {
       invariant(!!merchant, "请传入要设置的店铺");
       Taro.showLoading();
       const result = await requestHttp.get(
-        `/customer/merchantInfo/detail/${merchant.id}`
+        `/merchantInfo/detail/${merchant.id}`
       );
       Taro.hideLoading();
       console.log("result", result);
@@ -77,7 +90,7 @@ class MerchantAction {
   public getNearbyMerchant = dispatch => async params => {
     console.log("params: ", params);
     const result = await requestHttp.get(
-      `/customer/merchantInfo/getNearbyMerchant${jsonToQueryString(params)}`
+      `/merchantInfo/getNearbyMerchant${jsonToQueryString(params)}`
     );
     if (result.code === ResponseCode.success) {
       dispatch({
@@ -197,6 +210,25 @@ class MerchantAction {
         payload: result.data.rows
       });
     }
+    return result;
+  };
+
+  public addMerchantAttention = async (
+    merchant: MerchantInterface.AlianceMerchant
+  ) => {
+    const result = await requestHttp.post(
+      `/merchantInfo/addMerchantAttention/${merchant.id}`,
+      {}
+    );
+    return result;
+  };
+
+  public cancelMerchantAttention = async (
+    merchant: MerchantInterface.AlianceMerchant
+  ) => {
+    const result = await requestHttp.delete(
+      `/merchantInfo/cancelMerchantAttention/${merchant.id}`
+    );
     return result;
   };
 }

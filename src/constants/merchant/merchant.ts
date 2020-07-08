@@ -1,6 +1,7 @@
 export declare namespace MerchantInterface {
   interface AlianceMerchant {
     activityInfo: string[];
+    address: string;
     coupons: any[];
     isNew: number;
     deliveryThreshold: string;
@@ -11,6 +12,9 @@ export declare namespace MerchantInterface {
     distance: number;
     id: number;
     topMerchantId: number;
+    isAttentioned: boolean;
+    businessStartTime: string;
+    businessEndTime: string;
   }
   interface Activity {
     activityDetailList?: Array<{
@@ -145,10 +149,10 @@ class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
     RECEIVE_MERCHANT_ACTIVITYLIST: "RECEIVE_MERCHANT_ACTIVITYLIST",
     RECEIVE_MERCHANT_ALIANCE_LIST: "RECEIVE_MERCHANT_ALIANCE_LIST"
   };
-  public merchantInfoDetail = "/customer/merchantInfo/detail";
-  public merchantList = "/customer/merchantInfo/merchantList";
-  public merchantDistance = "/customer/merchantInfo/distance";
-  public advertisement = "/customer/advertisement/getAdvertisements";
+  public merchantInfoDetail = "/merchantInfo/detail";
+  public merchantList = "/merchantInfo/merchantList";
+  public merchantDistance = "/merchantInfo/distance";
+  public advertisement = "/advertisement/getAdvertisements";
 }
 
 export default new MerchantInterfaceMap();
