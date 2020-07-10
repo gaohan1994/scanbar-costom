@@ -461,7 +461,7 @@ class OrderDetail extends Taro.Component<Props, State> {
   }
 
   private renderProductList() {
-    const { orderDetail } = this.props;
+    const { orderDetail, productSDKObj } = this.props;
     if (orderDetail && orderDetail.orderDetailList && orderDetail.orderDetailList.length > 0) {
       const { orderDetailList } = orderDetail;
       return (
@@ -470,6 +470,7 @@ class OrderDetail extends Taro.Component<Props, State> {
           type={1}
           isDetail={true}
           padding={false}
+          productSDKObj={productSDKObj}
           showCallModal={() => { this.setState({ callModal: true }) }}
         />
       )
