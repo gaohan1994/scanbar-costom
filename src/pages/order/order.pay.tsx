@@ -166,7 +166,13 @@ class Page extends Taro.Component<Props, State> {
                         
                         
                     }
-                    
+                    if(orderPayType === 7){
+                        Taro.showToast({
+                            title: '储值支付成功',
+                            icon: 'success',
+                            duration: 2000
+                        })
+                    }
                     this.setState({
                         isOnClick: true
                     })
