@@ -28,6 +28,9 @@ const customInterceptor = (chain) => {
     } 
     else if (res.data && res.data.code === 'unauthorized') {
       Taro.setStorage({ key: 'CentermOAuthTokenCostom', data: '' });
+      if(process.env.TARO_ENV === 'h5'){
+        Taro.navigateTo({url: '/pages/login/login.userinfo'})
+      }
       return res.data;
     }
     else if (res.statusCode === HTTP_STATUS.SUCCESS) {

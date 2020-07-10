@@ -147,25 +147,6 @@ class Page extends Taro.Component<Props, State> {
                 })
                 console.log('payment', payment);
                 if (payment.code === ResponseCode.success || payment.errMsg === "requestPayment:ok") {
-                    productSdk.cashierOrderCallback(this.props.dispatch, result.data, orderPayType);
-                    if(process.env.TARO_ENV === 'h5') {
-                        Taro.redirectTo({
-                            url: `/pages/order/order.detail?id=${result.data.order.orderNo || result.data.orderNo}`
-                        });
-                    } else {
-                        Taro.navigateTo({
-                            url: '/pages/orderList/order'
-                        }).catch((error) => {
-                            /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
-                            const {order} = result.data;
-                            Taro.redirectTo({
-                                url: `/pages/order/order.detail?id=${order.orderNo}`
-                            });
-                            // Taro.switchTab({url: '/pages/orderList/order'})
-                        })
-                        
-                        
-                    }
                     if(orderPayType === 7){
                         Taro.showToast({
                             title: '储值支付成功',
@@ -173,9 +154,32 @@ class Page extends Taro.Component<Props, State> {
                             duration: 2000
                         })
                     }
-                    this.setState({
-                        isOnClick: true
-                    })
+                    setTimeout(function(){
+                        productSdk.cashierOrderCallback(dispatch, result.data, orderPayType);
+                    
+                        if(process.env.TARO_ENV === 'h5') {
+                            Taro.redirectTo({
+                                url: `/pages/order/order.detail?id=${result.data.order.orderNo || result.data.orderNo}`
+                            });
+                        } else {
+                            Taro.navigateTo({
+                                url: '/pages/orderList/order'
+                            }).catch((error) => {
+                                /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
+                                const {order} = result.data;
+                                Taro.redirectTo({
+                                    url: `/pages/order/order.detail?id=${order.orderNo}`
+                                });
+                                // Taro.switchTab({url: '/pages/orderList/order'})
+                            })
+                            
+                            
+                        }
+                        
+                        this.setState({
+                            isOnClick: true
+                        })
+                    }, 1000);
                     return;
                 } else {
                     if(payment.msg === '余额不足') {
@@ -406,6 +410,7 @@ class Page extends Taro.Component<Props, State> {
                             DeliveryFee={DeliveryFee}
                             productList={payOrderProductList}
                             payOrderDetail={payOrderDetail}
+                            productSDKObj={productSDKObj}
                             // onRef={onRefProductPayListView}
                         />
                     ) : (
@@ -413,6 +418,7 @@ class Page extends Taro.Component<Props, State> {
                             DeliveryFee={DeliveryFee}
                             payOrderDetail={payOrderDetail}
                             productList={payOrderProductList}
+                            productSDKObj={productSDKObj}
                             // onRef={onRefProductPayListView}
                         />
                     )

@@ -25,12 +25,15 @@ type Props = {
   activityList: any;
   isPay?: true;
   memberInfo: any;
+  payOrderProductList?: any;
   padding?: boolean;
   type?: number;
   payOrderDetail: any;
   isDetail?: boolean;
   DeliveryFee: any;
   pointConfig: any
+  productCartSelectedIndex?: any;
+  productCartList?: any;
   orderDetail: OrderInterface.OrderDetail;
   showCallModal?: () => void;
   onRef?: (param) => void
@@ -263,7 +266,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const {countTotal} = this;
     const {price} = countTotal();
     const pointPrice = DeliveryFee && payOrderDetail.deliveryType === 1 ? numeral(price).value() - DeliveryFee : numeral(price).value();
-    const PointsPre = memberInfo.points * pointConfig.deductRate < pointPrice ? memberInfo.points * pointConfig.deductRate : pointPrice;
+    const PointsPre = numeral(numeral(memberInfo.points * pointConfig.deductRate < pointPrice ? memberInfo.points * pointConfig.deductRate : pointPrice).format('0.00')).value();
     const MathPointsPre = Math.ceil(PointsPre / pointConfig.deductRate);
     return (
       <View>
@@ -479,12 +482,37 @@ class ProductPayListView extends Taro.Component<Props, State> {
       discountPrice
     }
   }
+  countTotalPrice = () => {
+    const {payOrderDetail, orderDetail, payOrderProductList, DeliveryFee } = this.props;
+    const { order } = orderDetail;
+    let total = 0;
+    payOrderProductList.forEach((val) => {
+        total += val.price * val.sellNum;
+    })
+    if(((payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1)
+    || (order && order.deliveryType !== undefined && order.deliveryType === 1))){
+        total += DeliveryFee;
+    }
+    return total;
+}
   private renderTotal = () => {
-    const { memberInfo, pointConfig, DeliveryFee, payOrderDetail} = this.props;
+    const { memberInfo, pointConfig, DeliveryFee, payOrderDetail, payOrderProductList, productSDKObj, activityList } = this.props;
     // const { order } = orderDetail;
     const {pointSet} = this.state;
-    const {countTotal} = this;
-    const {price, discountPrice} = countTotal();
+    const {countTotal, countTotalPrice} = this;
+    const {price} = countTotal();
+    let tarnsPrice = payOrderProductList && payOrderProductList.length > 0
+    ? numeral(
+        productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList) +
+        (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
+        (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
+    ).format('0.00')
+    : '0.00';
+    if(productSDKObj.pointsTotal){
+        tarnsPrice = numeral(numeral(tarnsPrice).value() - productSDKObj.pointsTotal).format('0.00');
+    }
+    let discountPriceFoot = countTotalPrice() - numeral(tarnsPrice).value();
+
     let newPrice = price;
     if(pointSet === true){
       const money = memberInfo.points * pointConfig.deductRate;
@@ -503,6 +531,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
         }
       }
     }
+    console.log('discountPriceFoot', discountPriceFoot, productSDKObj)
     // let price =
     //   numeral(
     //     productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
@@ -529,7 +558,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
         <View className={`${cssPrefix}-row-content-item`}>
           <View />
           <View className={`${cssPrefix}-row-tran`}>
-            <Text className={`${cssPrefix}-row-tran`}>{`已优惠￥ ${discountPrice}`}</Text>
+            <Text className={`${cssPrefix}-row-tran`}>{`已优惠￥ ${numeral(discountPriceFoot).format('0.00')}`}</Text>
             <Text className={`${cssPrefix}-row-tran ${cssPrefix}-row-tran-margin`}>{`合计：`}</Text>
             <Text className={`${cssPrefix}-row-tran-price`}>￥</Text>
             <Text className={`${cssPrefix}-row-tran-price ${cssPrefix}-row-tran-big `}>{newPrice.split('.')[0]}</Text>
@@ -544,9 +573,11 @@ class ProductPayListView extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => {
   return {
+    productCartList: state.productSDK.productCartList,
+    productCartSelectedIndex: state.productSDK.productCartSelectedIndex,
+    payOrderProductList: state.productSDK.payOrderProductList,
     orderDetail: getOrderDetail(state),
     activityList: state.merchant.activityList,
-    productSDKObj: state.productSDK,
     couponList: getAbleToUseCouponList(state),
     memberInfo: getMemberInfo(state),
     pointConfig: getPointConfig(state),
