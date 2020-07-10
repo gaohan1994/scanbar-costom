@@ -263,8 +263,8 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const {countTotal} = this;
     const {price} = countTotal();
     const pointPrice = DeliveryFee && payOrderDetail.deliveryType === 1 ? numeral(price).value() - DeliveryFee : numeral(price).value();
-    const PointsPre = memberInfo.points * pointConfig.deductRate < pointPrice ? memberInfo.points : pointPrice;
-    const MathPointsPre = Math.ceil(PointsPre)
+    const PointsPre = memberInfo.points * pointConfig.deductRate < pointPrice ? memberInfo.points * pointConfig.deductRate : pointPrice;
+    const MathPointsPre = Math.ceil(PointsPre / pointConfig.deductRate);
     return (
       <View>
         {totalActivityMoney !== 0 && !isDetail && (
