@@ -1,4 +1,4 @@
-@import '../../../styles/theme.less';
+@import "../../../styles/theme.less";
 
 @prefix: product-detail-component;
 
@@ -6,7 +6,6 @@
 @swiper-height: 650px;
 
 .@{prefix} {
-
   &-swiper {
     width: @swiper-width;
     height: @swiper-height;
@@ -21,32 +20,32 @@
   &-detail {
     display: flex;
     flex-direction: column;
-    background-color: rgba(245,245,245,1);;
+    background-color: rgba(245, 245, 245, 1);
     &-box {
       position: relative;
       .padding(30px);
       background-color: #fff;
       &-bor {
-        &::after{
+        &::after {
           .border1px;
         }
       }
     }
     &-name {
       width: 100%;
-      font-size:36px;
-      font-weight:500;
-      color:rgba(51,51,51,1);
-      line-height:48px;
+      font-size: 36px;
+      font-weight: 500;
+      color: rgba(51, 51, 51, 1);
+      line-height: 48px;
       .clamp(2);
     }
     &-tip {
       width: 100%;
-      font-size:24px;
+      font-size: 24px;
       line-height: 24px;
       height: 24px;
-      font-weight:500;
-      color:rgba(153,153,153,1);
+      font-weight: 500;
+      color: rgba(153, 153, 153, 1);
       .margin(10px, t);
       .clamp();
     }
@@ -57,12 +56,13 @@
     }
 
     &-inventory {
-      .act-item(#FC4E44);
+      .act-item(#fc4e44);
       .margin(23px, t);
-      border: 1px #FC4E44 solid;
+      border: 1px #fc4e44 solid;
     }
 
     &-price {
+      position: relative;
       .margin(23px, t) !important;
       font-size: 38px !important;
       &-big {
@@ -75,10 +75,17 @@
         font-size: 22px !important;
       }
       &-title {
-        font-size:24px;
-        font-weight:500;
-        color:rgba(102,102,102,1);
+        font-size: 24px;
+        font-weight: 500;
+        color: rgba(102, 102, 102, 1);
       }
+    }
+
+    &-add {
+      position: absolute;
+      right: 0px;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
     &-act {
@@ -86,9 +93,9 @@
       flex-direction: row;
       align-items: flex-start;
       &-title {
-        font-size:24px;
-        font-weight:500;
-        color:rgba(179,179,179,1);
+        font-size: 24px;
+        font-weight: 500;
+        color: rgba(179, 179, 179, 1);
         .margin(20px, r);
       }
       &-boxs {
@@ -100,20 +107,20 @@
         .flex(center, flex-start, row);
       }
       &-discount {
-        .act-item-bg(#FF893B, rgba(255,240,226,1));
+        .act-item-bg(#ff893b, rgba(255, 240, 226, 1));
         .margin(14px, r);
       }
       &-reduce {
-        .act-item-bg(#FC4E44, rgba(255,235,235,1));
+        .act-item-bg(#fc4e44, rgba(255, 235, 235, 1));
         .margin(14px, r);
       }
       &-bor {
         .margin(16px, b);
       }
       &-text {
-        font-size:24px;
-        font-weight:500;
-        color:rgba(51,51,51,1);
+        font-size: 24px;
+        font-weight: 500;
+        color: rgba(51, 51, 51, 1);
       }
     }
   }
@@ -128,26 +135,26 @@
       .margin(17px, b);
     }
     &-title {
-      font-size:30px;
-      font-weight:500;
-      color:rgba(102,102,102,1);
+      font-size: 30px;
+      font-weight: 500;
+      color: rgba(102, 102, 102, 1);
       .margin(34px, b);
     }
     &-subtitle {
-      font-size:24px;
-      font-weight:500;
-      color:rgba(179,179,179,1);
-      .margin(24px, r)
+      font-size: 24px;
+      font-weight: 500;
+      color: rgba(179, 179, 179, 1);
+      .margin(24px, r);
     }
     &-text {
-      font-size:24px;
-      font-weight:500;
-      color:rgba(51,51,51,1);
+      font-size: 24px;
+      font-weight: 500;
+      color: rgba(51, 51, 51, 1);
     }
   }
 
   &-cart {
-    border-top: 1px solid rgba(227,227,227,1);;
+    border-top: 1px solid rgba(227, 227, 227, 1);
     position: fixed;
     bottom: 0;
     left: 0;
@@ -167,41 +174,40 @@
         .margin(40px, l);
       }
       &-icon {
-        width:46px;
-        height:46px;
+        width: 46px;
+        height: 46px;
         .bg;
-        background-image: url('//net.huanmusic.com/scanbar-c/icon_detail_cart.png');
+        background-image: url("//net.huanmusic.com/scanbar-c/icon_detail_cart.png");
       }
       &-text {
-        font-size:22px;
-        font-weight:500;
-        color:rgba(102,102,102,1);
+        font-size: 22px;
+        font-weight: 500;
+        color: rgba(102, 102, 102, 1);
         .margin(8px, t);
       }
     }
 
     &-right {
-
       &-button {
         &-pay {
           width: 240px !important;
         }
-        width:344px;
-        height:80px;
-        background:rgba(42,134,252,1);
-        border-radius:40px;
+        width: 344px;
+        height: 80px;
+        background: rgba(42, 134, 252, 1);
+        border-radius: 40px;
         .flex(center, center);
-        font-size:32px;
-        font-weight:500;
-        color:rgba(255,255,255,1);
+        font-size: 32px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 1);
       }
       &-empty {
-        background:rgba(204,204,204,1) !important;
+        background: rgba(204, 204, 204, 1) !important;
       }
 
       &-stepper {
-        width:66px !important; 
-        height:66px !important; 
+        width: 66px !important;
+        height: 66px !important;
       }
       &-text {
         min-width: 100px !important;

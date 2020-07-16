@@ -10,11 +10,7 @@
     .padding(30px, lr);
     .padding(3px, t);
     position: relative;
-    background: linear-gradient(
-      180deg,
-      rgba(42, 134, 252, 1),
-      rgba(54, 195, 255, 1)
-    );
+    background: linear-gradient(180deg, #2a86fc, rgba(54, 195, 255, 1));
     // .bg;
     // background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_home_shang.png);
 
@@ -68,7 +64,7 @@
       right: 30px;
       .flex(center, center, row);
       width: 690px;
-      height: 54px;
+      height: 60px;
       background: rgba(255, 255, 255, 0.2);
       border-radius: 27px;
       &-icon {
@@ -243,6 +239,21 @@
       .padding(30px, tb);
       .padding(24px, lr);
 
+      &-phone {
+        position: absolute;
+        right: 0px;
+        bottom: 0px;
+        .padding(28px, l);
+        border-left: 1px solid rgba(204, 204, 204, 1);
+
+        &-icon {
+          width: 44px;
+          height: 44px;
+          .bg;
+          background-image: url("//net.huanmusic.com/scanbar-c/icon_shop_phone.png");
+        }
+      }
+
       &-pos {
         position: absolute;
         // top: 30px;
@@ -285,6 +296,7 @@
 
       &-activity {
         .padding(10px, lr);
+        .margin(8px, r);
         height: 30px;
         border: 1px solid rgba(252, 78, 68, 1);
         border-radius: 10px;
@@ -309,8 +321,9 @@
       }
 
       &-stant {
-        font-size: 20px;
-        line-height: 20px;
+        position: relative;
+        font-size: 24px;
+        line-height: 24px;
         color: rgba(153, 153, 153, 1);
         .clamp;
         .margin(26px, t);
@@ -329,6 +342,7 @@
       background: rgba(248, 248, 250, 1);
       border-radius: 27px;
       .flex(center, flex-start, row);
+      font-size: 28px;
       &-icon {
         .margin(30px, lr);
         width: 30px;
@@ -339,7 +353,26 @@
     }
 
     &-member {
+      .margin(30px, r);
       .flex(center, center, row);
+      &-icon {
+        width: 30px;
+        height: 28px;
+        .bg;
+        background-image: url("//net.huanmusic.com/scanbar-c/icon_vipmember.png");
+      }
+      &-title {
+        font-size: 30px;
+        color: rgba(194, 158, 78, 1);
+        .margin(8px, l);
+        .margin(16px, r);
+      }
+      &-more {
+        width: 13px;
+        height: 24px;
+        .bg;
+        background-image: url("//net.huanmusic.com/scanbar-c/icon_into_vip.png");
+      }
     }
   }
 }

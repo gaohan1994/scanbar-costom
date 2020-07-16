@@ -22,10 +22,11 @@ function UserCard(props) {
   });
 
   const onCardClick = card => {
-    const { setCurrentMerchantDetail } = props;
-    setCurrentMerchantDetail(card);
+    // const { setCurrentMerchantDetail } = props;
+    // setCurrentMerchantDetail(card);
+    this.$preload({ merchant: card, entry: "card" });
     Taro.navigateTo({
-      url: `/pages/index/home`
+      url: `/pages/user/user.card.detail`
     });
   };
 

@@ -15,6 +15,7 @@ export declare namespace MerchantInterface {
     isAttentioned: boolean;
     businessStartTime: string;
     businessEndTime: string;
+    servicePhone: string;
   }
   interface Activity {
     activityDetailList?: Array<{

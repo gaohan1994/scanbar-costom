@@ -1,10 +1,10 @@
-import Taro from '@tarojs/taro';
-import { View, Image, ScrollView, Text } from '@tarojs/components';
-import classnames from 'classnames';
-import { AtTabs } from 'taro-ui';
-import './tabs.choose.less';
+import Taro from "@tarojs/taro";
+import { View, Image, ScrollView, Text } from "@tarojs/components";
+import classnames from "classnames";
+import { AtTabs } from "taro-ui";
+import "./tabs.choose.less";
 
-const cssPrefix = 'tabs-choose';
+const cssPrefix = "tabs-choose";
 type Props = {
   tabs: any[];
   position?: string;
@@ -19,19 +19,20 @@ type State = {
 };
 
 class TabsChoose extends Taro.Component<Props, State> {
-
   static options: Taro.ComponentOptions = {
     addGlobalClass: true
   };
 
   static defaultProps = {
-    tabs: [{ id: 1, title: '全部品类' }],
-    onClose: () => {/** */ }
+    tabs: [{ id: 1, title: "全部品类" }],
+    onClose: () => {
+      /** */
+    }
   };
 
   readonly state: State = {
     visible: false,
-    current: 0,
+    current: 0
   };
 
   componentWillReceiveProps(nextProps: Props) {
@@ -40,7 +41,7 @@ class TabsChoose extends Taro.Component<Props, State> {
     }
   }
 
-  public onClickHandle = (value) => {
+  public onClickHandle = value => {
     const { onChange, tabs } = this.props;
     this.setState({ current: value }, () => {
       if (onChange) {
@@ -48,16 +49,16 @@ class TabsChoose extends Taro.Component<Props, State> {
       }
     });
     this.onChangeVisible(false);
-  }
+  };
 
   public onChangeVisible = (visible?: boolean) => {
     this.setState(prevState => {
       return {
         ...prevState,
-        visible: typeof visible === 'boolean' ? visible : !prevState.visible
+        visible: typeof visible === "boolean" ? visible : !prevState.visible
       };
     });
-  }
+  };
 
   public onContentItemClick = (type: any) => {
     const { tabs } = this.props;
@@ -65,10 +66,10 @@ class TabsChoose extends Taro.Component<Props, State> {
     if (index !== -1) {
       this.onClickHandle(index);
     }
-  }
+  };
 
   render() {
-    const { tabs, } = this.props;
+    const { tabs } = this.props;
     const { current } = this.state;
     return (
       <View className={`${cssPrefix} ${cssPrefix}-pos`}>
@@ -81,20 +82,21 @@ class TabsChoose extends Taro.Component<Props, State> {
               scrollIntoView={`tab${current}`}
             >
               <View className={`${cssPrefix}-header-list-container`}>
-                {
-                  tabs && tabs.length > 0 && tabs.map((tab, index) => {
+                {tabs &&
+                  tabs.length > 0 &&
+                  tabs.map((tab, index) => {
                     return (
                       <View
                         id={`tab${index}`}
                         onClick={() => this.onContentItemClick(tab)}
                         className={classnames(`${cssPrefix}-header-list-item`, {
                           [`item-current`]: current === index
-                        })}>
+                        })}
+                      >
                         <Text>{tab.name}</Text>
                       </View>
                     );
-                  })
-                }
+                  })}
               </View>
             </ScrollView>
             {this.renderCorner()}
@@ -112,23 +114,20 @@ class TabsChoose extends Taro.Component<Props, State> {
         className={`${cssPrefix}-header-corner`}
         onClick={() => this.onChangeVisible()}
       >
-        {
-          visible === true ? (
-            <Image
-              src="//net.huanmusic.com/weapp/icon_packup_gray.png"
-              className={`${cssPrefix}-header-corner-image`}
-            />
-          ) : (
-              <Image
-                src="//net.huanmusic.com/weapp/icon_packup_gray.png"
-                className={`${cssPrefix}-header-corner-image ${cssPrefix}-header-corner-image-down`}
-              />
-            )
-        }
-
+        {visible === true ? (
+          <Image
+            src="//net.huanmusic.com/weapp/icon_packup_gray.png"
+            className={`${cssPrefix}-header-corner-image`}
+          />
+        ) : (
+          <Image
+            src="//net.huanmusic.com/weapp/icon_packup_gray.png"
+            className={`${cssPrefix}-header-corner-image ${cssPrefix}-header-corner-image-down`}
+          />
+        )}
       </View>
     );
-  }
+  };
 
   private renderTabsContent = () => {
     const { tabs } = this.props;
@@ -137,22 +136,23 @@ class TabsChoose extends Taro.Component<Props, State> {
       return (
         <View className={`${cssPrefix}-content-mask`}>
           <View className={`${cssPrefix}-content`}>
-            {
-              tabs && tabs.length && tabs.map((tab, index) => {
+            {tabs &&
+              tabs.length &&
+              tabs.map((tab, index) => {
                 return (
                   <View
                     key={tab.id}
                     className={classnames(`${cssPrefix}-content-item`, {
                       [`item-current`]: current === index
-                    }
-                    )}
+                    })}
                     onClick={() => this.onContentItemClick(tab)}
                   >
-                    {tab.name.length < 5 ? tab.name : (tab.name as string).slice(0, 5)}
+                    {tab.name.length < 5
+                      ? tab.name
+                      : (tab.name as string).slice(0, 5)}
                   </View>
                 );
-              })
-            }
+              })}
           </View>
           <View
             className={`${cssPrefix}-content-mask-touch`}
@@ -162,7 +162,7 @@ class TabsChoose extends Taro.Component<Props, State> {
       );
     }
     return <View />;
-  }
+  };
 }
 
 export default TabsChoose;

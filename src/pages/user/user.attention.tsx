@@ -28,41 +28,9 @@ function UserCard(props) {
     fetchData();
   });
 
-  const onItemClick = merchant => {
-    const { setCurrentMerchantDetail } = props;
-    setCurrentMerchantDetail(merchant);
-    Taro.navigateTo({
-      url: `/pages/index/home`
-    });
-  };
-
   return (
     <View className="container">
       <MerchantListView data={merchants} />
-      {/* {merchants &&
-        merchants.length > 0 &&
-        merchants.map((item: any) => {
-          return (
-            <View
-              className={`${cssprefix}-card-item`}
-              onClick={() => onItemClick(item)}
-            >
-              <View className={`${cssprefix}-card-item-avatar`} />
-              <View className={`${cssprefix}-card-item-detail`}>
-                <View className={`${cssprefix}-card-item-title`}>
-                  {item.name}
-                </View>
-                <View className={`${cssprefix}-card-item-number`}>
-                  {item.cardNo}
-                </View>
-              </View>
-              <View className={`${cssprefix}-card-item-vip`}>
-                {item.levelName}
-              </View>
-              <View className={`${cssprefix}-card-item-icon`}>去购物</View>
-            </View>
-          );
-        })} */}
     </View>
   );
 }

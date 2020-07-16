@@ -248,19 +248,12 @@ class Index extends Component<any> {
 
   render() {
     const { currentType, loading, showActivity, obtainCouponList } = this.state;
-    const {
-      productList,
-      productType,
-      advertisement,
-      userinfo,
-      memberInfo,
-      currentMerchantDetail
-    } = this.props;
+    const { productList, productType, currentMerchantDetail } = this.props;
     const isNew = this.CouponisNew(obtainCouponList);
     return (
       <View className={`container ${cssPrefix}`}>
         {showActivity && <MerchantCard merchant={currentMerchantDetail} />}
-        <MerchantSearch />
+        <MerchantSearch merchant={currentMerchantDetail} />
         {/* <View className={`${cssPrefix}-activity`}>
           <Banner advertisement={advertisement} />
         </View> */}

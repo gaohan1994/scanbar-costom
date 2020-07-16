@@ -9,12 +9,13 @@ import { ProductAction } from "../../actions";
 
 import ProductSwiper from "./component/swiper";
 import ProductDetail from "./component/detail";
-import ProductCart from "./component/cart";
+// import ProductCart from "./component/cart";
 import { AppReducer } from "../../reducers";
 import { jsonToQueryString } from "../../constants";
 import { getMemberInfo } from "../../reducers/app.user";
 import { getMerchantActivityList } from "../../reducers/app.merchant";
 import { getProductCartList } from "../../common/sdk/product/product.sdk.reducer";
+import CartBar from "../../component/cart/cart";
 
 class Page extends Taro.Component<any> {
   config: Config = {
@@ -64,7 +65,6 @@ class Page extends Taro.Component<any> {
 
   render() {
     const { productDetail, memberInfo, activityList } = this.props;
-    const { id } = this.$router.params;
     return (
       <View className="container">
         <ProductSwiper
@@ -79,9 +79,7 @@ class Page extends Taro.Component<any> {
           activityList={activityList}
           product={productDetail}
         />
-        {productDetail && productDetail.id && `${productDetail.id}` === id && (
-          <ProductCart product={productDetail} />
-        )}
+        <CartBar />
       </View>
     );
   }

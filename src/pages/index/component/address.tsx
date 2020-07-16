@@ -58,7 +58,7 @@ class Comp extends Taro.Component<Props, State> {
             className={`${prefix}-search-icon`}
             src="//net.huanmusic.com/scanbar-c/icon_search.png"
           />
-          <View className={`${prefix}-search-text`}>请输入商品名称</View>
+          <View className={`${prefix}-search-text`}>请输入店铺名称</View>
         </View>
       </View>
     );

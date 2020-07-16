@@ -1,11 +1,15 @@
 import Taro from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
+import { connect } from "@tarojs/redux";
 import "./index.less";
 import "../../../component/product/product.less";
 import { ProductInterface } from "../../../constants/index";
 import numeral from "numeral";
 import productSdk from "../../../common/sdk/product/product.sdk";
 import ProductShare from "./share";
+import { AppReducer } from "src/reducers";
+import classnames from "classnames";
+import { getProductCartList } from "../../../common/sdk/product/product.sdk.reducer";
 
 const cssPrefix = "component-product";
 const prefix = "product-detail-component";
@@ -14,6 +18,9 @@ type Props = {
   activityList: any;
   memberInfo: any;
   product: ProductInterface.ProductInfo;
+  productInCart?: ProductCartInterface.ProductCartInfo;
+  dispatch: any;
+  productSDK: any;
 };
 
 class Page extends Taro.Component<Props> {
@@ -21,8 +28,19 @@ class Page extends Taro.Component<Props> {
     product: {}
   };
 
+  public manageProduct = (type: string) => {
+    const { product, dispatch, productSDK } = this.props;
+    productSdk.manage(dispatch, productSDK, { type, product });
+  };
+
   public renderPrice = () => {
-    const { product, memberInfo } = this.props;
+    const {
+      product,
+      memberInfo,
+      dispatch,
+      productSDK,
+      productInCart
+    } = this.props;
     const priceNum =
       product && product.price ? numeral(product.price).value() : 0;
     const price = numeral(priceNum).format("0.00");
@@ -46,12 +64,57 @@ class Page extends Taro.Component<Props> {
             {price}
           </Text>
         )}
+        {product && product.number > 0 ? (
+          <View className={`${prefix}-detail-add`}>
+            {productInCart && productInCart.id > 0 && (
+              <View className={`${cssPrefix}-stepper-container`}>
+                <View
+                  className={classnames(
+                    `${cssPrefix}-stepper-button ${prefix}-cart-right-stepper`,
+                    `${cssPrefix}-stepper-button-reduce`
+                  )}
+                  onClick={() =>
+                    this.manageProduct(productSdk.productCartManageType.REDUCE)
+                  }
+                />
+                <Text
+                  className={`${cssPrefix}-stepper-text ${prefix}-cart-right-text`}
+                >
+                  {productInCart.sellNum}
+                </Text>
+                <View
+                  className={classnames(
+                    `${cssPrefix}-stepper-button ${prefix}-cart-right-stepper`,
+                    `${cssPrefix}-stepper-button-add`
+                  )}
+                  onClick={() =>
+                    this.manageProduct(productSdk.productCartManageType.ADD)
+                  }
+                />
+              </View>
+            )}
+            {!productInCart && (
+              <View
+                className={`${prefix}-cart-right-button`}
+                onClick={() =>
+                  this.manageProduct(productSdk.productCartManageType.ADD)
+                }
+              >
+                加入购物车
+              </View>
+            )}
+          </View>
+        ) : (
+          <View className={`${prefix}-detail-add ${prefix}-detail-add-disable`}>
+            {"售罄"}
+          </View>
+        )}
       </View>
     );
   };
 
   render() {
-    const { product, memberInfo,activityList } = this.props;
+    const { product, memberInfo, activityList } = this.props;
     return (
       <View className={`${prefix}-detail`}>
         <ProductShare />
@@ -92,7 +155,11 @@ class Page extends Taro.Component<Props> {
                       {item.type === 1 ? "打折" : "特价"}
                     </View>
                     <View className={`${prefix}-detail-act-text`}>
-                      {productSdk.getDiscountString(memberInfo,activityList, item)}
+                      {productSdk.getDiscountString(
+                        memberInfo,
+                        activityList,
+                        item
+                      )}
                     </View>
                   </View>
                 );
@@ -125,4 +192,16 @@ class Page extends Taro.Component<Props> {
   }
 }
 
-export default Page;
+const select = (state: AppReducer.AppState, ownProps: Props) => {
+  const { product } = ownProps;
+  const productList = getProductCartList(state);
+  const productInCart =
+    product !== undefined && productList.find(p => p.id === product.id);
+  return {
+    product,
+    productSDK: state.productSDK,
+    productInCart
+  };
+};
+
+export default connect(select)(Page as any);

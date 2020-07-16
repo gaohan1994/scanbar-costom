@@ -125,7 +125,7 @@ class MerchantComponent extends Taro.Component<Props, State> {
                       [`${cssPrefix}-batchDiscount-text`]: !isDiscount
                     })}
                   >
-                    {item}
+                    {`${item}元优惠券`}
                   </Text>
                 </View>
               );

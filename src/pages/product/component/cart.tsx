@@ -1,4 +1,4 @@
-import Taro, { clearStorage } from "@tarojs/taro";
+import Taro from "@tarojs/taro";
 import { View, Text } from "@tarojs/components";
 import "./index.less";
 import "../../../component/product/product.less";
@@ -10,6 +10,7 @@ import { AppReducer } from "../../../reducers";
 import { ProductCartInterface } from "../../../common/sdk/product/product.sdk";
 import { Dispatch } from "redux";
 import { getProductCartList } from "../../../common/sdk/product/product.sdk.reducer";
+import ProductStepper from "./stepper";
 
 const cssPrefix = "component-product";
 const prefix = "product-detail-component";
@@ -90,6 +91,7 @@ class Cart extends Taro.Component<Props> {
   };
 
   render() {
+    const { product } = this.props;
     return (
       <View className={`${prefix}-cart`}>
         <View className={`${prefix}-cart-box`}>
@@ -104,7 +106,8 @@ class Cart extends Taro.Component<Props> {
             />
             <View className={`${prefix}-cart-left-text`}>购物车</View>
           </View>
-          {this.renderStepper()}
+          <ProductStepper product={product} />
+          {/* {this.renderStepper()} */}
         </View>
       </View>
     );

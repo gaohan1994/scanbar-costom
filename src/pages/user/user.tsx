@@ -9,7 +9,6 @@ import { ResponseCode, UserInterface } from "../../constants";
 import { UserAction } from "../../actions";
 import { getUserinfo, getMemberInfo } from "../../reducers/app.user";
 import { connect } from "@tarojs/redux";
-import numeral from "numeral";
 import { Dispatch } from "redux";
 import { getCurrentMerchantDetail } from "../../reducers/app.merchant";
 

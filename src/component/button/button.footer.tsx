@@ -1,8 +1,8 @@
-import Taro from '@tarojs/taro';
-import { View, Text } from '@tarojs/components';
-import { AtButton } from 'taro-ui';
+import Taro from "@tarojs/taro";
+import { View, Text } from "@tarojs/components";
+import { AtButton } from "taro-ui";
 import "../../pages/style/product.less";
-import classnames from 'classnames';
+import classnames from "classnames";
 
 export type ButtonProps = {
   onPress: () => void;
@@ -10,44 +10,46 @@ export type ButtonProps = {
   type?: string;
 };
 
-type Props = { 
+type Props = {
   className?: string;
   buttons: ButtonProps[];
+  border?: boolean;
 };
 
 class ButtonFooter extends Taro.Component<Props> {
-
   static options = {
     addGlobalClass: true
   };
 
-  render () {
-    const { className, buttons } = this.props;
+  render() {
+    const { className, buttons, border = true } = this.props;
     return (
-      <View className={classnames(`product-add-buttons`, className)}>
-        {
-          buttons && buttons.map((button) => {
+      <View
+        className={classnames(`product-add-buttons`, className)}
+        style={`${!!border ? "" : "border-top: 0px"}`}
+      >
+        {buttons &&
+          buttons.map(button => {
             return (
-              <View 
+              <View
                 key={button.title}
                 className={classnames({
                   [`product-add-buttons-button`]: buttons.length > 1,
-                  [`product-add-buttons-one`]: buttons.length === 1,
+                  [`product-add-buttons-one`]: buttons.length === 1
                 })}
               >
-                <AtButton 
+                <AtButton
                   className={classnames({
-                    [`theme-button`]: button.type !== 'cancel',
-                    [`theme-button-cancel`]: button.type === 'cancel',
+                    [`theme-button`]: button.type !== "cancel",
+                    [`theme-button-cancel`]: button.type === "cancel"
                   })}
                   onClick={button.onPress}
                 >
-                  <Text className="theme-button-text" >{button.title}</Text>
+                  <Text className="theme-button-text">{button.title}</Text>
                 </AtButton>
               </View>
             );
-          })
-        }
+          })}
       </View>
     );
   }

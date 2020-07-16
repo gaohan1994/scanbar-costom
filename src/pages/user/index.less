@@ -384,6 +384,15 @@ page {
     }
   }
   &-card {
+    &-bg {
+      height: 240px;
+      background: linear-gradient(
+        180deg,
+        rgba(42, 134, 252, 1),
+        rgba(54, 195, 255, 1),
+        rgba(255, 255, 255, 1)
+      );
+    }
     &-item {
       display: flex;
       flex-direction: row;
@@ -425,6 +434,13 @@ page {
         left: 72px;
         font-size: 30px;
         color: rgba(138, 102, 78, 1);
+        &-detail {
+          position: absolute;
+          top: 40px;
+          right: 0px;
+          font-size: 26px;
+          color: rgba(255, 248, 202, 1);
+        }
       }
       &-icon {
         position: absolute;

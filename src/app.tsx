@@ -5,7 +5,6 @@ import Index from "./pages/index";
 import "./styles/reset.less";
 import configStore from "./store";
 import "taro-ui/dist/style/index.scss"; // 引入组件样式 - 方式一
-import getBaseUrl from "./common/request/base.url";
 
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
@@ -37,10 +36,12 @@ class App extends Component {
       "pages/user/user",
       "pages/user/user.set",
       "pages/user/user.coupon",
+      "pages/user/user.coupon.new",
       "pages/user/user.code",
       // "pages/test/test",
       "pages/cart/cart",
       "pages/user/user.card",
+      "pages/user/user.card.detail",
       "pages/user/user.attention"
       // "pages/user/user.couponCenter",
       // 'pages/address/address.list',
@@ -109,12 +110,12 @@ class App extends Component {
           selectedIconPath: "./assets/tab-bar/icon_nav_order_selected.png",
           text: "订单"
         },
-        {
-          pagePath: "pages/cart/cart",
-          iconPath: "./assets/tab-bar/icon_nav_cart.png",
-          selectedIconPath: "./assets/tab-bar/icon_nav_cart_selected.png",
-          text: "购物车"
-        },
+        // {
+        //   pagePath: "pages/cart/cart",
+        //   iconPath: "./assets/tab-bar/icon_nav_cart.png",
+        //   selectedIconPath: "./assets/tab-bar/icon_nav_cart_selected.png",
+        //   text: "购物车"
+        // },
         {
           pagePath: "pages/user/user",
           iconPath: "./assets/tab-bar/icon_nav_mine.png",
