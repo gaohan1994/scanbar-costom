@@ -2,7 +2,7 @@
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-04 09:02:08
  * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-01 14:12:09
+ * @Last Modified time: 2020-07-17 09:48:08
  *
  * @todo 商品列表
  */
@@ -28,6 +28,9 @@ type Props = {
   bottomSpector?: boolean;
   isHome?: boolean;
   onScroll?: (e: any) => any;
+  emptyString?: string;
+  emptyImg?: string;
+  emptyCss?: string;
 };
 
 class MerchantListView extends Taro.Component<Props> {
@@ -76,7 +79,10 @@ class MerchantListView extends Taro.Component<Props> {
       isRenderFooter,
       bottomSpector,
       isHome,
-      onScroll
+      onScroll,
+      emptyString,
+      emptyImg,
+      emptyCss
     } = this.props;
     return (
       <ScrollView
@@ -101,9 +107,11 @@ class MerchantListView extends Taro.Component<Props> {
             })
           ) : (
             <Empty
-              img={"//net.huanmusic.com/scanbar-c/v1/img_commodity.png"}
-              css="index"
-              text={"还没有商品"}
+              img={
+                emptyImg || "//net.huanmusic.com/scanbar-c/v1/img_commodity.png"
+              }
+              css={emptyCss || "index"}
+              text={emptyString || "还没有商品"}
             />
           )
         ) : (

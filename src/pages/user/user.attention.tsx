@@ -30,10 +30,19 @@ function UserCard(props) {
 
   return (
     <View className="container">
-      <MerchantListView data={merchants} />
+      <MerchantListView
+        data={merchants}
+        emptyString="还没有收藏的店铺"
+        emptyImg="//net.huanmusic.com/scanbar-c/img_collection.png"
+        emptyCss="ued"
+      />
     </View>
   );
 }
+
+UserCard.config = {
+  navigationBarTitleText: "我的收藏"
+};
 
 const mapState = () => {
   return {};

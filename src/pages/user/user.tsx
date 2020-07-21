@@ -21,7 +21,7 @@ const Rows = [
   {
     title: "我的收藏",
     url: "/pages/user/user.attention",
-    icon: "//net.huanmusic.com/weapp/customer/icon_mine_location.png"
+    icon: "//net.huanmusic.com/scanbar-c/icon_mine_collection.png"
   },
   {
     title: "设置",

@@ -53,6 +53,13 @@ class MerchantComponent extends Taro.Component<Props, State> {
           // onClick={this.onContentClick.bind(this)}
         >
           <View className={`${cssPrefix}-content-cover`}>
+            {!!merchant.isNew && (
+              <View className={`${cssPrefix}-content-cover-new`} />
+            )}
+            {!merchant.status && (
+              <View className={`${cssPrefix}-content-cover-close`} />
+            )}
+
             {merchant.pictures && merchant.pictures !== "" ? (
               <View
                 className={`${cssPrefix}-content-cover-image`}
@@ -60,7 +67,7 @@ class MerchantComponent extends Taro.Component<Props, State> {
               />
             ) : (
               <Image
-                src="//net.huanmusic.com/scanbar-c/v1/pic_nopicture.png"
+                src="//net.huanmusic.com/scanbar-c/icon_shop_default.png"
                 className={`${cssPrefix}-content-cover-image`}
               />
             )}
