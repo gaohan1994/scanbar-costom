@@ -8,7 +8,10 @@ import merchantAction from "../../actions/merchant.action";
 
 const cssprefix = "user";
 
+
+
 function UserCard(props) {
+
   const [cards, setCards] = useState([]);
   useDidShow(() => {
     const fetchData = async () => {
@@ -40,7 +43,16 @@ function UserCard(props) {
               className={`${cssprefix}-card-item`}
               onClick={() => onCardClick(card)}
             >
-              <View className={`${cssprefix}-card-item-avatar`} />
+              {
+                card.logo && card.logo.length > 0
+                  ? (
+                    <View className={`${cssprefix}-card-item-avatar`} style={`background-image:url(${card.logo})`} />
+                  )
+                  : (
+                    <View className={`${cssprefix}-card-item-avatar`} />
+                  )
+              }
+
               <View className={`${cssprefix}-card-item-detail`}>
                 <View className={`${cssprefix}-card-item-title`}>
                   {card.name}
@@ -59,6 +71,10 @@ function UserCard(props) {
     </View>
   );
 }
+
+UserCard.config = {
+  navigationBarTitleText: "会员卡"
+};
 
 const mapState = () => {
   return {};

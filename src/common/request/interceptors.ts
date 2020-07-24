@@ -1,6 +1,8 @@
 import Taro from "@tarojs/taro";
 import { HTTP_STATUS } from "./config";
 import { ResponseCode } from "../../constants/index";
+import { store } from "../../app";
+import { getUserinfo } from '../../reducers/app.user';
 
 const customInterceptor = chain => {
   const requestParams = chain.requestParams;
@@ -25,7 +27,16 @@ const customInterceptor = chain => {
         title: "请先登录",
         icon: "none"
       });
-      Taro.navigateTo({ url: "/pages/sign/login" });
+      const state = store.getState();
+      const userinfo = getUserinfo(state);
+      if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
+        Taro.navigateTo({ url: "/pages/login/login.userinfo" });
+        return res.data;
+      }
+      if (userinfo.phone === undefined || userinfo.phone.length === 0) {
+        Taro.navigateTo({ url: "/pages/login/login" });
+        return res.data;
+      }
       return res.data;
     } else if (res.statusCode === HTTP_STATUS.SUCCESS) {
       return res.data;

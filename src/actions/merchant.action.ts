@@ -1,8 +1,8 @@
 /*
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-03 17:19:06
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-07-07 14:59:31
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-07-23 14:44:17
  */
 import {
   MerchantService,
@@ -31,7 +31,7 @@ class MerchantAction {
 
   public getOrderedMerchant = dispatch => async params => {
     const result = await requestHttp.get(
-      `/merchantInfo/getNearbyMerchant${jsonToQueryString(params)}`
+      `/merchantInfo/getOrderedMerchant${jsonToQueryString(params)}`
     );
     if (result.code === ResponseCode.success) {
       dispatch({
@@ -63,7 +63,7 @@ class MerchantAction {
       invariant(!!merchant, "请传入要设置的店铺");
       Taro.showLoading();
       const result = await requestHttp.get(
-        `/merchantInfo/detail/${merchant.id}`
+        `/merchantInfo/moreDetail/${merchant.id}`
       );
       Taro.hideLoading();
       console.log("result", result);
@@ -231,6 +231,45 @@ class MerchantAction {
     );
     return result;
   };
+
+  public merchantEmptySearchList = async (dispatch) => {
+    dispatch({
+      type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_SEARCH_LIST,
+      payload: { rows: [], field: { pageNum: 1 }, total: 0 }
+    });
+  }
+
+  /**
+ * @todo 获取搜素商品列表列表
+ *
+ * @memberof MerchantAction
+ */
+  public merchantSearchList = async (dispatch, params: any) => {
+    const result = await requestHttp.get(
+      `/merchantInfo/search/${params.name}`,
+      params
+    );
+    if (result.code === ResponseCode.success) {
+      dispatch({
+        type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_SEARCH_LIST,
+        payload: { rows: result.data.rows, field: params, total: result.data.total }
+      });
+      return { success: true, result: result.data };
+    } else {
+      return { success: false, result: result.msg };
+    }
+  }
+
+  public merchantMoreInfo = async ( merchantId: number) => {
+    const result = await requestHttp.get(
+      `/merchantInfo/moreDetail/${merchantId}`,
+    );
+    if (result.code === ResponseCode.success) {
+      return { success: true, result: result.data };
+    } else {
+      return { success: false, result: result.msg };
+    }
+  }
 }
 
 export default new MerchantAction();

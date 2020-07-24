@@ -239,6 +239,13 @@
       .padding(30px, tb);
       .padding(24px, lr);
 
+      &-scrollview {
+        display: flex;
+        flex: 1;
+        margin-top: 20px;
+        margin-bottom: 30px;
+      }
+
       &-phone {
         position: absolute;
         right: 0px;
@@ -282,42 +289,162 @@
       }
 
       &-right {
-        .flex(flex-start, flex-start, column);
+        .flex(flex-start, space-between, column);
         .margin(17px, l);
         flex: 1;
         height: 100%;
       }
 
       &-activitys {
-        .margin(20px, t);
+        // .margin(20px, t);
         display: flex;
         flex-direction: row;
+        align-items: center;
+        max-width: 500px;
+        overflow: hidden;
       }
 
       &-activity {
         .padding(10px, lr);
         .margin(8px, r);
+        display: flex;
+        flex-direction: row;
+        flex: 1;
         height: 30px;
         border: 1px solid rgba(252, 78, 68, 1);
         border-radius: 10px;
         font-size: 20px;
         color: rgba(252, 78, 68, 1);
+        white-space: nowrap;
+      }
+
+      &-coupon {
+        height: 30px;
+        display: flex;
+        .margin(8px, r);
+        
+        &-item {
+          height: 30px;
+          .padding(8px, lr);
+          flex-direction: row;
+          color: #FF893B;
+          font-size: 20px;
+          line-height: 20px;
+          background-color: #FFEFE1;
+          border-radius: 4px;
+          .flex(center, center, row);
+          white-space: nowrap;
+
+          &-left {
+            .padding(0px, lr);
+          }
+
+          &-symbol {
+            font-size: 18px;
+            line-height: 20px;
+          }
+
+          &-price {
+            font-size: 24px;
+            .margin(2px, l);
+            line-height: 24px;
+          }
+        }
+
+        &-border {
+          .padding(10px, lr);
+          .flex(flex-end, center, row);
+          height: 24px;
+          border-right: 1px dashed rgba(255,137,59,.7);
+        }
+      }
+
+      &-discount {
+        display: flex;
+        flex: 1;
+        flex-direction: row;
+        align-items: center;
+        .padding(10px, tb);
+
+        &-symbol {
+          width: 56px;
+          height: 26px;
+          .flex(center, center, row);
+          color: #FB4D43;
+          font-size: 20px;
+          line-height: 20px;
+          background-color: #FFEBEB;
+          border-radius: 10px;
+        }
+        
+        &-row {
+          display: flex;
+          flex-direction: row;
+          flex-wrap: wrap;
+          .margin(10px, l);
+        }
+
+        &-content {
+          color: #333333;
+          font-size: 24px;
+        }
+        
+        &-item {
+          display: flex;
+          justify-content: center;
+          width: 100%;
+        }
       }
 
       &-avatar {
         width: 124px;
         height: 124px;
         .bg;
-        background: rgba(255, 255, 255, 1);
+        // background: rgba(255, 255, 255, 1);
+        background-image: url(//net.huanmusic.com/scanbar-c/icon_shop_default.png);
+        background-color: rgba(255, 255, 255, 1);
         border: 1px solid rgba(229, 229, 229, 1);
         border-radius: 10px;
       }
 
       &-title {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         height: 36px;
-        font-size: 36px;
-        font-weight: bold;
-        color: rgba(51, 51, 51, 1);
+        &-text {
+          font-size: 36px;
+          font-weight: bold;
+          max-width: 400px;
+          color: rgba(51, 51, 51, 1);
+          display: -webkit-box;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          line-clamp: 1;
+          -webkit-line-clamp: 1;
+          -webkit-box-orient: vertical;
+
+          &-more {
+            max-width: 450px;
+            line-clamp: 2;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+          }
+        }
+
+        &-more {
+          height: 124px;
+          align-items: flex-start;
+        }
+        
+      }
+
+      &-expand {
+        width: 18px;
+        height: 10px;
+        .bg;
+        background-image: url("//net.huanmusic.com/scanbar-c/icon_expand_light.png");
+        margin-left: 18px;
       }
 
       &-stant {

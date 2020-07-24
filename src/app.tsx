@@ -36,7 +36,6 @@ class App extends Component {
       "pages/user/user",
       "pages/user/user.set",
       "pages/user/user.coupon",
-      "pages/user/user.coupon.new",
       "pages/user/user.code",
       // "pages/test/test",
       "pages/cart/cart",
@@ -52,7 +51,7 @@ class App extends Component {
     subPackages: [
       {
         root: "pages/product/",
-        pages: ["product.detail", "product.search"]
+        pages: ["product.detail", "product.search", "merchant.search"]
       },
       {
         root: "pages/order/",

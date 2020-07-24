@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan
  * @Date: 2019-11-08 10:01:17
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-24 11:01:53
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-07-23 15:41:41
  *
  * @todo [用户相关的接口]
  * ```js
@@ -98,11 +98,37 @@ class UserService {
     return result;
   };
   public getMemberInfo = async (
-    merchantId: string
+    merchantId: number
   ): Promise<HTTPInterface.ResponseResultBase<any>> => {
     const result = await requestHttp.get(
       `/api/memberInfo/getMemberInfo/${merchantId}`
     );
+    return result;
+  };
+  public obtainMerchantCoupon = async (merchantId: number): Promise<
+    HTTPInterface.ResponseResultBase<any>
+  > => {
+    const result = await requestHttp.get(`/api/coupon/obtainCoupon/${merchantId}`);
+    return result;
+  };
+  public getMyAvailableCoupon = async (
+    params?: any
+  ): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(
+      `/api/coupon/getMyAvailableCoupon${jsonToQueryString(params)}`
+    );
+    return result;
+  };
+  public countMyMemberCardAndCoupon = async ( ): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(
+      `/api/memberInfo/countMyMemberCardAndCoupon`
+    );
+    return result;
+  };
+  public obtainCoupons = async (
+    params: any
+  ): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.post("/api/coupon/obtainCoupons", params);
     return result;
   };
 }

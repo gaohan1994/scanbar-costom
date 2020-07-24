@@ -1,13 +1,15 @@
 import Taro from "@tarojs/taro";
-import { View, Button } from "@tarojs/components";
+import { Button } from "@tarojs/components";
+import './index.less';
+
+const cssPrefix = "product-detail-component";
 
 function ProductShare() {
+  
   return (
-    <View>
-      <Button openType="share" style="background: #fff">
-        微信好友
-      </Button>
-    </View>
+    <Button openType="share" className={`${cssPrefix}-share`}>
+
+    </Button >
   );
 }
 

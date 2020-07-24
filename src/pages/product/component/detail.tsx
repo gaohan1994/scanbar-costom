@@ -5,7 +5,7 @@ import "./index.less";
 import "../../../component/product/product.less";
 import { ProductInterface } from "../../../constants/index";
 import numeral from "numeral";
-import productSdk from "../../../common/sdk/product/product.sdk";
+import productSdk, { ProductCartInterface } from "../../../common/sdk/product/product.sdk";
 import ProductShare from "./share";
 import { AppReducer } from "src/reducers";
 import classnames from "classnames";

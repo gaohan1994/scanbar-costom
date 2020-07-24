@@ -7,7 +7,7 @@ import invariant from "invariant";
 import { LoginManager } from "../../common/sdk";
 import { ResponseCode, UserInterface } from "../../constants";
 import { UserAction } from "../../actions";
-import { getUserinfo, getMemberInfo } from "../../reducers/app.user";
+import { getUserinfo, getMemberCount } from "../../reducers/app.user";
 import { connect } from "@tarojs/redux";
 import { Dispatch } from "redux";
 import { getCurrentMerchantDetail } from "../../reducers/app.merchant";
@@ -36,21 +36,20 @@ interface Props {
   dispatch: Dispatch;
   currentMerchantDetail: any;
   userinfo: UserInterface.UserInfo;
-  memberInfo: UserInterface.MemberInfo;
+  memberCount: UserInterface.MemberCount;
 }
 interface State {
   getUserinfoModal: boolean;
-  loginModal: boolean;
 }
 class User extends Taro.Component<Props, State> {
   state = {
     getUserinfoModal: false as any,
-    loginModal: false as any
   };
 
   config: Config = {
     navigationBarTitleText: "我的"
   };
+
   async componentWillMount() {
     try {
       await LoginManager.getUserInfo(this.props.dispatch);
@@ -62,16 +61,11 @@ class User extends Taro.Component<Props, State> {
     }
   }
   async componentDidShow() {
-    const { userinfo, currentMerchantDetail } = this.props;
+    const { userinfo } = this.props;
     if (userinfo.phone && userinfo.phone.length > 0) {
-      UserAction.getMemberInfo(this.props.dispatch, currentMerchantDetail);
+      UserAction.countMyMemberCardAndCoupon(this.props.dispatch);
     }
   }
-
-  public address = async () => {
-    const result = await WeixinSDK.chooseAddress();
-    console.log(result);
-  };
 
   public onRowClick = (row: any) => {
     if (row.title === "我的地址") {
@@ -94,12 +88,10 @@ class User extends Taro.Component<Props, State> {
     try {
       const { userinfo } = this.props;
       if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
-        // this.setState({ getUserinfoModal: true });
         Taro.navigateTo({ url: "/pages/login/login.userinfo" });
         return;
       }
       if (userinfo.phone === undefined || userinfo.phone.length === 0) {
-        // this.setState({ loginModal: true });
         Taro.navigateTo({ url: "/pages/login/login" });
         return;
       }
@@ -163,7 +155,7 @@ class User extends Taro.Component<Props, State> {
   };
 
   render() {
-    const { userinfo, memberInfo, currentMerchantDetail } = this.props;
+    const { userinfo, currentMerchantDetail, memberCount } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-bg`} />
@@ -180,74 +172,67 @@ class User extends Taro.Component<Props, State> {
                   className={`${cssPrefix}-user-image`}
                 />
               ) : (
-                <Image
-                  src="//net.huanmusic.com/weapp/icon_mine_touxiang.png"
-                  className={`${cssPrefix}-user-image`}
-                />
-              )}
+                  <Image
+                    src="//net.huanmusic.com/weapp/icon_mine_touxiang.png"
+                    className={`${cssPrefix}-user-image`}
+                  />
+                )}
               <View className={`${cssPrefix}-user-box`}>
                 {userinfo &&
-                userinfo.nickname &&
-                userinfo.nickname.length > 0 ? (
-                  <View className={`${cssPrefix}-user-name`}>
-                    {userinfo.nickname}
-                    {memberInfo &&
-                      memberInfo.levelName &&
-                      memberInfo.levelName.length > 0 && (
-                        <View className={`${cssPrefix}-user-member`}>
-                          {memberInfo.levelName}
-                        </View>
-                      )}
+                  userinfo.nickname &&
+                  userinfo.nickname.length > 0 ? (
+                    <View className={`${cssPrefix}-user-name`}>
+                      {userinfo.nickname}
+                    </View>
+                  ) : (
+                    <View
+                      className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
+                    >
+                      点击获取微信头像和昵称
                   </View>
-                ) : (
-                  <View
-                    className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
-                  >
-                    点击获取微信头像和昵称
-                  </View>
-                )}
+                  )}
                 <View className={`${cssPrefix}-user-phone`}>
                   {userinfo.phone}
                 </View>
               </View>
             </Button>
           ) : (
-            <View className={`${cssPrefix}-user`}>
-              {userinfo && userinfo.avatar && userinfo.avatar.length > 0 ? (
-                <Image
-                  src={userinfo.avatar}
-                  className={`${cssPrefix}-user-image`}
-                />
-              ) : (
-                <Image
-                  src="//net.huanmusic.com/weapp/icon_mine_vip.png"
-                  className={`${cssPrefix}-user-image`}
-                />
-              )}
-              <View className={`${cssPrefix}-user-box`}>
-                <View
-                  className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
-                  onClick={() => {
-                    userinfo &&
-                    userinfo.nickname &&
-                    userinfo.nickname.length > 0
-                      ? Taro.navigateTo({ url: "/pages/login/login" })
-                      : Taro.navigateTo({
+              <View className={`${cssPrefix}-user`}>
+                {userinfo && userinfo.avatar && userinfo.avatar.length > 0 ? (
+                  <Image
+                    src={userinfo.avatar}
+                    className={`${cssPrefix}-user-image`}
+                  />
+                ) : (
+                    <Image
+                      src="//net.huanmusic.com/weapp/icon_mine_vip.png"
+                      className={`${cssPrefix}-user-image`}
+                    />
+                  )}
+                <View className={`${cssPrefix}-user-box`}>
+                  <View
+                    className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
+                    onClick={() => {
+                      userinfo &&
+                        userinfo.nickname &&
+                        userinfo.nickname.length > 0
+                        ? Taro.navigateTo({ url: "/pages/login/login" })
+                        : Taro.navigateTo({
                           url: "/pages/login/login.userinfo"
                         });
-                    if (process.env.TARO_ENV === "h5") {
-                      localStorage.setItem(
-                        "mearchantName",
-                        currentMerchantDetail.name
-                      );
-                    }
-                  }}
-                >
-                  点击登录
+                      if (process.env.TARO_ENV === "h5") {
+                        localStorage.setItem(
+                          "mearchantName",
+                          currentMerchantDetail.name
+                        );
+                      }
+                    }}
+                  >
+                    点击登录
+                </View>
                 </View>
               </View>
-            </View>
-          )}
+            )}
           <View className={`${cssPrefix}-member`}>
             <View
               onClick={() => {
@@ -256,7 +241,7 @@ class User extends Taro.Component<Props, State> {
               className={`${cssPrefix}-member-item`}
             >
               <View className={`${cssPrefix}-member-item-vip`} />
-              <Text>会员卡 4</Text>
+              <Text>{`会员卡 ${memberCount.memberCardNum || 0}`}</Text>
             </View>
             <View
               className={`${cssPrefix}-member-item ${cssPrefix}-member-item-discount`}
@@ -265,7 +250,7 @@ class User extends Taro.Component<Props, State> {
               }}
             >
               <View className={`${cssPrefix}-member-item-coupon`} />
-              <Text>{`优惠券 ${memberInfo.couponNum}`}</Text>
+              <Text>{`优惠券 ${memberCount.couponNum || 0}`}</Text>
             </View>
           </View>
 
@@ -275,7 +260,7 @@ class User extends Taro.Component<Props, State> {
                 <View
                   style={`${
                     item.title === "我的地址" ? "margin-bottom: 0px" : ""
-                  }`}
+                    }`}
                   className={`${cssPrefix}-rows-item`}
                   key={item.title}
                   onClick={() => this.onRowClick(item)}
@@ -308,8 +293,8 @@ class User extends Taro.Component<Props, State> {
 
 const select = (state: any) => ({
   userinfo: getUserinfo(state),
-  memberInfo: getMemberInfo(state),
-  currentMerchantDetail: getCurrentMerchantDetail(state)
+  currentMerchantDetail: getCurrentMerchantDetail(state),
+  memberCount: getMemberCount(state)
 });
 
 export default connect(select)(User);

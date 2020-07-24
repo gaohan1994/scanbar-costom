@@ -44,13 +44,13 @@ class MerchantComponent extends Taro.Component<Props, State> {
     const { merchant } = this.props;
     return (
       <View
-        className={classnames(`${cssPrefix}-border`)}
+        className={classnames(`${cssPrefix}-padding`)}
         style="background: #fff"
         onClick={() => this.onMerchantClick()}
       >
         <View
           className={`${cssPrefix}-content`}
-          // onClick={this.onContentClick.bind(this)}
+        // onClick={this.onContentClick.bind(this)}
         >
           <View className={`${cssPrefix}-content-cover`}>
             {!!merchant.isNew && (
@@ -60,17 +60,17 @@ class MerchantComponent extends Taro.Component<Props, State> {
               <View className={`${cssPrefix}-content-cover-close`} />
             )}
 
-            {merchant.pictures && merchant.pictures !== "" ? (
+            {merchant.logo && merchant.logo !== "" ? (
               <View
                 className={`${cssPrefix}-content-cover-image`}
-                style={`background-image: url(${merchant.pictures[0]})`}
+                style={`background-image: url(${merchant.logo})`}
               />
             ) : (
-              <Image
-                src="//net.huanmusic.com/scanbar-c/icon_shop_default.png"
-                className={`${cssPrefix}-content-cover-image`}
-              />
-            )}
+                <Image
+                  src="//net.huanmusic.com/scanbar-c/icon_shop_default.png"
+                  className={`${cssPrefix}-content-cover-image`}
+                />
+              )}
           </View>
           {this.renderDetail()}
         </View>
@@ -81,33 +81,22 @@ class MerchantComponent extends Taro.Component<Props, State> {
   private renderDetail = () => {
     const { merchant } = this.props;
     return (
-      <View className={classnames(`${cssPrefix}-content-detail`)}>
+      <View className={classnames(`${cssPrefix}-content-detail ${cssPrefix}-border`)}>
         <View>
           <View className={`${cssPrefix}-title`}>{merchant.name || " "}</View>
           <View className={`${cssPrefix}-tips`}>
-            {`起送￥${numeral(merchant.deliveryThreshold).format("0.00")}`}
+            {`起送￥${numeral(merchant && merchant.deliveryThreshold ? merchant.deliveryThreshold : 0).format("0.00")}`}
             <View className={`${cssPrefix}-tips-discount`}>
               {merchant.distanceShow}
             </View>
           </View>
         </View>
-        {merchant.activityInfo && (
+        {merchant && merchant.activityInfo && (
           <View className={`${cssPrefix}-activity`}>
             {merchant.activityInfo.map(item => {
-              const isDiscount = true;
               return (
-                <View
-                  className={classnames({
-                    [`${cssPrefix}-discount`]: isDiscount,
-                    [`${cssPrefix}-batchDiscount`]: !isDiscount
-                  })}
-                >
-                  <Text
-                    className={classnames({
-                      [`${cssPrefix}-discount-text`]: isDiscount,
-                      [`${cssPrefix}-batchDiscount-text`]: !isDiscount
-                    })}
-                  >
+                <View className={`${cssPrefix}-merchant-activity`} >
+                  <Text className={`${cssPrefix}-merchant-activity-text`} >
                     {item}
                   </Text>
                 </View>
@@ -115,23 +104,12 @@ class MerchantComponent extends Taro.Component<Props, State> {
             })}
           </View>
         )}
-        {merchant.coupons && (
+        {merchant && merchant.coupons && (
           <View className={`${cssPrefix}-activity`}>
             {merchant.coupons.map(item => {
-              const isDiscount = false;
               return (
-                <View
-                  className={classnames({
-                    [`${cssPrefix}-discount`]: isDiscount,
-                    [`${cssPrefix}-batchDiscount`]: !isDiscount
-                  })}
-                >
-                  <Text
-                    className={classnames({
-                      [`${cssPrefix}-discount-text`]: isDiscount,
-                      [`${cssPrefix}-batchDiscount-text`]: !isDiscount
-                    })}
-                  >
+                <View className={`${cssPrefix}-merchant-coupon`} >
+                  <Text className={`${cssPrefix}-merchant-coupon-text`} >
                     {`${item}元优惠券`}
                   </Text>
                 </View>

@@ -2,23 +2,26 @@ import Taro, { Config } from '@tarojs/taro'
 import { View, ScrollView, Image } from '@tarojs/components'
 import './index.less';
 import "../../component/card/form.card.less";
-import TabsSwitch from '../../component/tabs/tabs.switch';
+import '../style/product.less';
 import { connect } from '@tarojs/redux';
 import { getCouponList, getUserinfo } from '../../reducers/app.user';
-import { UserAction } from '../../actions';
-import { UserInterface, MerchantInterface, UserInterfaceMap } from '../../constants';
+import { UserAction, MerchantAction } from '../../actions';
+import { UserInterface, MerchantInterface } from '../../constants';
 import Empty from '../../component/empty';
-import CouponItem from '../../component/coupon/coupon.item';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
-import numeral from 'numeral';
 import { Dispatch } from 'redux';
-import classNames from 'classnames';
+import { ResponseCode } from '../../constants/index';
+import dayJs from 'dayjs';
+import UserCouponItem from './user.coupon.item';
 
 interface Props {
   dispatch: Dispatch;
   couponList: UserInterface.CouponsItem[];
   userinfo: UserInterface.UserInfo;
   currentMerchantDetail: MerchantInterface.MerchantDetail;
+  setCurrentMerchantDetail: (
+    merchant: MerchantInterface.AlianceMerchant
+  ) => void;
 }
 interface State {
   currentType: number;
@@ -45,78 +48,25 @@ class Page extends Taro.Component<Props, State> {
 
   async componentDidMount() {
     const params = {
-      status: 0,
       pageSize: 10,
       pageNum: 1,
     }
     Taro.showLoading();
-    const result = await UserAction.getMemberCoupons(this.props.dispatch, params);
-    this.setState({
-      total: result.data.total
-    });
+    const result = await UserAction.getMyAvailableCoupon(this.props.dispatch, params);
+    if (result.code === ResponseCode.success) {
+      this.setState({
+        total: result.data.total
+      });
+    } else {
+      Taro.showToast({
+        title: result.msg || '获取可用优惠券失败！',
+        icon: 'none'
+      });
+    }
     Taro.hideLoading();
   }
 
-  public onChangeTab = async (tabNum: number) => {
-    const {dispatch} = this.props;
-    await dispatch({
-      type: UserInterfaceMap.reducerInterface.RECEIVE_COUPONS,
-      payload: {
-        couponList: []
-      }
-    });
-    this.setState({
-      currentType: tabNum,
-      pageSize: 10,
-      pageNum: 1,
-    }, async () => {
-      this.setState({ openList: [] })
-      if (tabNum === 1) {
-        // 已使用
-        const params = {
-          status: 1,
-          pageSize: 10,
-          pageNum: 1,
-        }
-        Taro.showLoading();
-        const result =await UserAction.getMemberCoupons(this.props.dispatch,params);
-        this.setState({
-          total: result.data.total
-        });
-        Taro.hideLoading();
-      } else if (tabNum === 0) {
-        // 未使用
-        const params = {
-          status: 0,
-          pageSize: 10,
-          pageNum: 1,
-        }
-        Taro.showLoading();
-        
-        const result = await UserAction.getMemberCoupons(this.props.dispatch,params);
-        this.setState({
-          total: result.data.total
-        });
-        Taro.hideLoading();
-      } else {
-        // 已过期
-        const params = {
-          status: 0,
-          pageSize: 10,
-          pageNum: 1,
-        }
-        Taro.showLoading();
-        
-        const result = await UserAction.getMemberExpiredCoupons(this.props.dispatch,params);
-        this.setState({
-          total: result.data.total
-        });
-        Taro.hideLoading();
-      }
-    });
-  }
-
-  public onChangeCouponOpen = (item: UserInterface.CouponsItem, e: any) => {
+  public onChangeCouponOpen = (item: any, e: any) => {
     if (e.stopPropagation) {
       e.stopPropagation();
     }
@@ -143,217 +93,79 @@ class Page extends Taro.Component<Props, State> {
     return false;
   }
 
-  public navTo = () => {
-    Taro.navigateBack({ delta: 10 });
-    Taro.switchTab({
-      url: `/pages/index/index`
+  public navToUse = (item: any) => {
+    this.props.setCurrentMerchantDetail({ id: item.merchantId } as any);
+    Taro.navigateTo({
+      url: `/pages/index/home`
     });
   }
 
-
-  public navToCenter = () => {
-    Taro.navigateTo({url: '/pages/user/user.couponCenter'});
-  }
-  /**
-   * @todo 未使用的优惠券要筛选分出本门店可用以及本门店不可用的两个列表
-   *
-   * @memberof Page
-   */
-  public getFilterCouponList = () => {
-    const { couponList, currentMerchantDetail } = this.props;
-    let ableToUseCouponList: any[] = [];
-    let unableToUseCouponList: any[] = [];
-    for (let i = 0; i < couponList.length; i++) {
-      const { merchantIds } = couponList[i];
-      const merchantIdsArr = merchantIds.split(',');
-      let container = false;
-      for (let j = 0; j < merchantIdsArr.length; j ++) {
-        if (currentMerchantDetail.id === numeral(merchantIdsArr[j]).value()) {
-          container = true;
-          break;
-        }
-      }
-      if (container) {
-        ableToUseCouponList.push(couponList[i]);
-      } else {
-        unableToUseCouponList.push({...couponList[i], ableToUse: false, disableReason: '当前门店不可用'});
-      }
+  public loadData = async () => {
+    const params = {
+      pageSize: 10,
+      pageNum: this.state.pageNum + 1,
     }
-    return (
-      { ableToUseCouponList, unableToUseCouponList }
-    );
+    Taro.showLoading();
+    const result = await UserAction.getMyAvailableCouponMore(this.props.dispatch, params);
+    this.setState({
+      total: result.data.total,
+      pageNum: this.state.pageNum + 1,
+    });
+    Taro.hideLoading();
   }
-  loadData = async () => {
 
-    if (this.state.currentType === 1) {
-      // 已使用
-      const params = {
-        status: 1,
-        pageSize: 10,
-        pageNum: this.state.pageNum + 1,
-      }
-      Taro.showLoading();
-      const result = await UserAction.getMemberCouponsMore(this.props.dispatch,params);
-      this.setState({
-        total: result.data.total,
-        pageNum: this.state.pageNum + 1,
-      });
-      Taro.hideLoading();
-    } else if (this.state.currentType === 0) {
-      // 未使用
-      const params = {
-        status: 0,
-        pageSize: 10,
-        pageNum: this.state.pageNum + 1,
-      }
-      Taro.showLoading();
-      const result =  await UserAction.getMemberCouponsMore(this.props.dispatch,params);
-      this.setState({
-        total: result.data.total,
-        pageNum: this.state.pageNum + 1,
-      });
-      Taro.hideLoading();
-    } else {
-      // 已过期
-      const params = {
-        status: 0,
-        pageSize: 10,
-        pageNum: this.state.pageNum + 1,
-      }
-      Taro.showLoading();
-      const result = await UserAction.getMemberExpiredCouponsMore(this.props.dispatch,params);
-      this.setState({
-        total: result.data.total,
-        pageNum: this.state.pageNum + 1,
-      });
-      Taro.hideLoading();
-    }
-  }
+
   render() {
     const { couponList } = this.props;
-    const { currentType, total } = this.state;
-    const {navToCenter} = this;
-    let filterCouponList: any = { ableToUseCouponList: [], unableToUseCouponList: [] };
-    if (currentType === 0) {
-      filterCouponList = this.getFilterCouponList();
-    }
-
+    const { total } = this.state;
     return (
       <View className={`container user`} >
-        <View className={`${cssPrefix}-tabs`}>
-          {this.renderTabs()}
-        </View>
-        <Image
-          onClick={() => {navToCenter(); }}
-          className={
-            classNames({
-              [`${cssPrefix}-bannerEmpty`]: process.env.TARO_ENV === 'weapp' && couponList && couponList.length === 0,
-              [`${cssPrefix}-banner`]: process.env.TARO_ENV === 'weapp' && couponList && couponList.length > 0,
-              [`${cssPrefix}-bannerH5`]: process.env.TARO_ENV === 'h5' && couponList && couponList.length > 0,
-              [`${cssPrefix}-bannerEmptyH5`]: process.env.TARO_ENV === 'h5' && couponList && couponList.length === 0,
-            })}
-          src='//net.huanmusic.com/scanbar-c/v2/img_coupon_banner.png'
-        />
-        {
-          couponList && couponList.length > 0
-            ? (
-              <ScrollView
-                scrollY={true}
-                className={`${cssPrefix}-scrollview`}
-                style={process.env.TARO_ENV === 'weapp' ? {display:'flex'} : {}}
-                onScrollToLower={couponList.length < total ? this.loadData: () => {/** */}}
-              >
-                {
-                  currentType !== 0 && couponList.map((item: any) => {
-                    return (
-                      <View className={`${cssPrefix}-scrollview-item`} key={item.id}>
-                        <CouponItem
-                          data={item}
-                          isOpen={this.isOpen(item)}
-                          onChangeCouponOpen={this.onChangeCouponOpen}
-                          gotoUse={this.navTo}
-                          unableToUse={true}
-                          type={currentType}
-                        />
-                      </View>
-                    )
-                  })
-                }
-                {
-                  currentType === 0 && filterCouponList.ableToUseCouponList.length > 0 && filterCouponList.ableToUseCouponList.map((item: any) => {
-                    return (
-                      <View className={`${cssPrefix}-scrollview-item`} key={item.id}>
-                        <CouponItem
-                          data={item}
-                          isOpen={this.isOpen(item)}
-                          onChangeCouponOpen={this.onChangeCouponOpen}
-                          gotoUse={this.navTo}
-                          unableToUse={false}
-                        />
-                      </View>
-                    )
-                  })
-                }
-                {
-                  currentType === 0 && filterCouponList.unableToUseCouponList.length > 0 && filterCouponList.unableToUseCouponList.map((item: any) => {
-                    return (
-                      <View className={`${cssPrefix}-scrollview-item`} key={item.id}>
-                        <CouponItem
-                          data={item}
-                          isOpen={this.isOpen(item)}
-                          onChangeCouponOpen={this.onChangeCouponOpen}
-                          gotoUse={this.navTo}
-                          unableToUse={true}
-                        />
-                      </View>
-                    )
-                  })
-                }
-                <View className={`${cssPrefix}-scrollview-bottom`}>已经到底了</View>
-              </ScrollView>
-            )
-            : (
-              <Empty
-                img='//net.huanmusic.com/scanbar-c/v2/img_coupon.png'
-                text='还没有优惠券'
-              />
-            )}
+        <ScrollView
+          scrollY={true}
+          className={`${cssPrefix}-scrollview ${cssPrefix}-scrollview-full`}
+          onScrollToLower={couponList.length < total ? this.loadData : () => {/** */ }}
+        >
+          {
+            Array.isArray(couponList) && couponList.length > 0
+              ? couponList.map((item, index) => {
+                return (
+                  <View key={`coupon${index}`} className={`${cssPrefix}-scrollview-item`}>
+                    <UserCouponItem
+                      item={item}
+                      isOpen={this.isOpen(item)}
+                      onChangeCouponOpen={this.onChangeCouponOpen}
+                      goToUse={this.navToUse}
+                    />
+                  </View>
 
+                )
+              })
+              : (
+                <Empty
+                  img='//net.huanmusic.com/scanbar-c/v2/img_coupon.png'
+                  text="还没优惠券"
+                />
+              )
+          }
+          <View className={`product-list-bottom`}>已经到底啦</View>
+          <View style="height: 50px" />
+        </ScrollView>
       </View>
     );
   }
-
-  private renderTabs = () => {
-    const { currentType } = this.state;
-    const discountTypes = [
-      {
-        id: 0,
-        title: '未使用'
-      },
-      {
-        id: 1,
-        title: '已使用',
-      },
-      {
-        id: 2,
-        title: '已过期',
-      },
-    ];
-    return (
-      <TabsSwitch
-        current={currentType}
-        tabs={discountTypes}
-        onChangeTab={this.onChangeTab}
-      />
-    )
-  }
 }
 
+const mapDispatch = dispatch => {
+  return {
+    setCurrentMerchantDetail: MerchantAction.setCurrentMerchantDetail(dispatch)
+  };
+};
 
 const select = (state: any) => ({
-  couponList: getCouponList(state),
+
   userinfo: getUserinfo(state),
+  couponList: getCouponList(state),
   currentMerchantDetail: getCurrentMerchantDetail(state),
 });
 
-export default connect(select)(Page);
+export default connect(select, mapDispatch)(Page as any);

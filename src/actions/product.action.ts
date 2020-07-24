@@ -2,13 +2,14 @@
  * @Author: centerm.gaozhiying 
  * @Date: 2020-03-03 17:44:36 
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-18 17:04:23
+ * @Last Modified time: 2020-07-21 15:32:42
  */
 import { ResponseCode, ProductInterfaceMap, ProductInterface, ProductService } from '../constants/index';
 // import { store } from '../app';
 import Taro from '@tarojs/taro';
 
 const CentermProductSearchKey = 'CentermProductSearchKeyC';
+const CentermMerchantSearchKey = 'CentermMerchantSearchKeyC';
 
 class ProductAction {
 
@@ -100,10 +101,10 @@ class ProductAction {
    *
    * @memberof ProductAction
    */
-  public setSearchRecord = (list: string[]) => {
+  public setSearchRecord = (list: string[], type?: string) => {
     return new Promise((resolve) => {
       Taro
-        .setStorage({ key: CentermProductSearchKey, data: JSON.stringify(list) })
+        .setStorage({ key: type === 'MERCHANT' ? CentermMerchantSearchKey : CentermProductSearchKey, data: JSON.stringify(list) })
         .then(() => {
           resolve({ success: true, list, msg: '' });
         })
@@ -116,10 +117,10 @@ class ProductAction {
    *
    * @memberof ProductAction
    */
-  public getSearchRecord = (): Promise<any> => {
+  public getSearchRecord = (type?: string): Promise<any> => {
     return new Promise((resolve) => {
       Taro
-        .getStorage({ key: CentermProductSearchKey })
+        .getStorage({ key: type === 'MERCHANT' ? CentermMerchantSearchKey : CentermProductSearchKey })
         .then(data => {
           if (data.data !== '') {
             resolve({ success: true, result: JSON.parse(data.data), msg: '' });

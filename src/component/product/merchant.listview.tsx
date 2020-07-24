@@ -1,8 +1,8 @@
 /*
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-04 09:02:08
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-07-17 09:48:08
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-07-21 16:42:59
  *
  * @todo 商品列表
  */
@@ -14,8 +14,7 @@ import { AtActivityIndicator } from "taro-ui";
 import classnames from "classnames";
 import merge from "lodash.merge";
 import Empty from "../empty";
-import { CommonEventFunction } from "@tarojs/components/types/common";
-import { MerchantInterface } from "src/constants";
+import { MerchantInterface } from "../../constants";
 
 const cssPrefix = "product";
 
@@ -28,9 +27,11 @@ type Props = {
   bottomSpector?: boolean;
   isHome?: boolean;
   onScroll?: (e: any) => any;
+  onScrollToLower?: (e: any) => any;
   emptyString?: string;
   emptyImg?: string;
   emptyCss?: string;
+  hasMore?: boolean;
 };
 
 class MerchantListView extends Taro.Component<Props> {
@@ -48,11 +49,6 @@ class MerchantListView extends Taro.Component<Props> {
     productList: [],
     isRenderFooter: true,
     bottomSpector: true
-  };
-
-  public onScroll = (event: CommonEventFunction) => {
-    const { detail } = event;
-    console.log("detail: ", detail);
   };
 
   /**
@@ -78,11 +74,12 @@ class MerchantListView extends Taro.Component<Props> {
       data,
       isRenderFooter,
       bottomSpector,
-      isHome,
       onScroll,
       emptyString,
       emptyImg,
-      emptyCss
+      emptyCss,
+      hasMore,
+      onScrollToLower
     } = this.props;
     return (
       <ScrollView
@@ -90,36 +87,37 @@ class MerchantListView extends Taro.Component<Props> {
         scrollIntoView={this.state.scrollIntoView}
         className={classnames(
           `${cssPrefix}-list-right ${
-            process.env.TARO_ENV === "h5" ? `${cssPrefix}&-h5-height` : ""
+          process.env.TARO_ENV === "h5" ? `${cssPrefix}&-h5-height` : ""
           }`,
           className
         )}
         onScroll={onScroll}
+        onScrollToLower={onScrollToLower}
       >
         {!loading ? (
-          data && data.length > 0 ? (
-            data.map(product => {
+          Array.isArray(data) === true && data.length > 0 ? (
+            (data || []).map(merchant => {
               return (
-                <View id={`data${product.id}`} key={product.id}>
-                  <MerchantComponent merchant={product} />
+                <View id={`data${merchant.id}`} key={merchant.id}>
+                  <MerchantComponent merchant={merchant} />
                 </View>
               );
             })
           ) : (
-            <Empty
-              img={
-                emptyImg || "//net.huanmusic.com/scanbar-c/v1/img_commodity.png"
-              }
-              css={emptyCss || "index"}
-              text={emptyString || "还没有商品"}
-            />
-          )
+              <Empty
+                img={
+                  emptyImg || "//net.huanmusic.com/scanbar-c/v1/img_commodity.png"
+                }
+                css={emptyCss || "index"}
+                text={emptyString || "没有相关门店"}
+              />
+            )
         ) : (
-          <View className="container">
-            <AtActivityIndicator mode="center" />
-          </View>
-        )}
-        {isRenderFooter && data && data.length > 0 && (
+            <View className="container">
+              <AtActivityIndicator mode="center" />
+            </View>
+          )}
+        {hasMore !== true && isRenderFooter && data && data.length > 0 && (
           <View className={`${cssPrefix}-list-bottom`}>已经到底啦</View>
         )}
         {bottomSpector && <View style="height: 100px" />}

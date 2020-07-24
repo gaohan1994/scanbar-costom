@@ -87,19 +87,10 @@ class Index extends Component<any> {
   };
 
   public init = async (firstTime?: boolean): Promise<void> => {
-    const { dispatch, address, currentMerchantDetail } = this.props;
+    const { dispatch } = this.props;
     try {
-      MerchantAction.merchantList(dispatch);
       await LoginManager.getUserInfo(dispatch);
-      WeixinSdk.initAddress(dispatch, address);
-      const { userinfo, currentMerchantDetail } = this.props;
-      // if (firstTime && userinfo.phone && userinfo.phone.length > 0) {
-      //   UserAction.getMemberInfo(dispatch);
-      //   const res = await UserAction.obtainCoupon();
-      //   if (res.code == ResponseCode.success) {
-      //     this.setState({ obtainCouponList: res.data.rows });
-      //   }
-      // }
+      const { currentMerchantDetail } = this.props;
       const productTypeResult = await ProductAction.productInfoType(dispatch, {
         merchantId:
           currentMerchantDetail && currentMerchantDetail.id
@@ -119,7 +110,6 @@ class Index extends Component<any> {
       const addMemberResult = await MerchantAction.addMember(
         currentMerchantDetail
       );
-
       UserAction.getMemberInfo(dispatch, currentMerchantDetail);
     } catch (error) {
       Taro.showToast({
@@ -221,7 +211,7 @@ class Index extends Component<any> {
     return { isNew, hasGet };
   };
   public GetobtainCoupons = async (list: any) => {
-    const { dispatch } = this.props;
+    const { dispatch, currentMerchantDetail } = this.props;
     const couponIdList = list.map(val => val.couponId);
     try {
       const param = {
@@ -229,7 +219,7 @@ class Index extends Component<any> {
       };
       const res = await UserAction.GetobtainCoupons(param);
       if (res.code == ResponseCode.success) {
-        UserAction.getMemberInfo(dispatch);
+        UserAction.getMemberInfo(dispatch, currentMerchantDetail);
         Taro.showToast({
           title: "领取成功",
           icon: "success"
@@ -272,34 +262,34 @@ class Index extends Component<any> {
           <View className={`${cssPrefix}-list-right`}>
             <View className={`${cssPrefix}-list-right-types`}>
               {currentType &&
-              currentType.subCategory &&
-              currentType.subCategory.length > 0 ? (
-                <View className={`${cssPrefix}-list-right-types-secondary`}>
-                  <TabsChoose
-                    tabs={this.getTabs(currentType.subCategory)}
-                    onChange={type => {
-                      this.fetchData(type);
-                    }}
-                    currentType={currentType}
-                  />
-                </View>
-              ) : (
-                <View
-                  className={`${cssPrefix}-list-right-header product-component-section-header-height`}
-                >
-                  <View className={`${cssPrefix}-list-right-header-bge`} />
-                  <Text className={`${cssPrefix}-list-right-header-text`}>
-                    {currentType.name}
-                  </Text>
-                </View>
-              )}
+                currentType.subCategory &&
+                currentType.subCategory.length > 0 ? (
+                  <View className={`${cssPrefix}-list-right-types-secondary`}>
+                    <TabsChoose
+                      tabs={this.getTabs(currentType.subCategory)}
+                      onChange={type => {
+                        this.fetchData(type);
+                      }}
+                      currentType={currentType}
+                    />
+                  </View>
+                ) : (
+                  <View
+                    className={`${cssPrefix}-list-right-header product-component-section-header-height`}
+                  >
+                    <View className={`${cssPrefix}-list-right-header-bge`} />
+                    <Text className={`${cssPrefix}-list-right-header-text`}>
+                      {currentType.name}
+                    </Text>
+                  </View>
+                )}
             </View>
             <ProductListView
               loading={loading}
               productList={productList}
               className={`${cssPrefix}-list-right-container`}
               onScroll={this.onScroll}
-              // onScrollToLower={this.onScrollToLower}
+            // onScrollToLower={this.onScrollToLower}
             />
           </View>
         </View>

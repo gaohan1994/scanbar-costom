@@ -28,6 +28,8 @@ export declare namespace IUserStore {
     status: number;
     totalAmount: number;
     totalTimes: number;
+    obtainMoney: number;
+    obtainPoints: number;
   }
 
   interface IUserCardState {

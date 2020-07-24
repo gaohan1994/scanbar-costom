@@ -2,7 +2,7 @@
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-04 09:02:08
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-03-10 15:32:33
+ * @Last Modified time: 2020-07-21 14:22:22
  *
  * @todo 商品列表
  */
@@ -16,7 +16,6 @@ import { AtActivityIndicator } from "taro-ui";
 import classnames from "classnames";
 import merge from "lodash.merge";
 import Empty from "../empty";
-import { CommonEventFunction } from "@tarojs/components/types/common";
 
 const cssPrefix = "product";
 
@@ -48,11 +47,6 @@ class ProductListView extends Taro.Component<Props> {
     productList: [],
     isRenderFooter: true,
     bottomSpector: true
-  };
-
-  public onScroll = (event: CommonEventFunction) => {
-    const { detail } = event;
-    console.log("detail: ", detail);
   };
 
   /**

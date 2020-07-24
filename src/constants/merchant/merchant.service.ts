@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan
  * @Date: 2019-11-08 10:01:17
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-24 13:43:02
+ * @Last Modified by: centerm.gaozhiyingerm.gaozhiying
+ * @Last Modified time: 2020-07-24 10:51:13
  *
  * @todo [商户相关的接口]
  */
@@ -17,7 +17,7 @@ class MerchantService {
     id: any
   ): Promise<HTTPInterface.ResponseArray<any>> => {
     const result = await requestHttp.get(
-      `/customer/activityInfo/list/${BASE_PARAM.institutionCode}/${id}`
+      `/api/activityInfo/list/${BASE_PARAM.institutionCode}/${id}`
     );
     return result;
   };

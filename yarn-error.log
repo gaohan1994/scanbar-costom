@@ -1,30 +1,23 @@
 Arguments: 
-  /usr/local/bin/node /Users/Gao/.yarn/bin/yarn.js add src/common/sdk/product/product.sdk --silent --no-progress
+  /usr/local/bin/node /usr/local/bin/yarn add src/actions --silent --no-progress
 
 PATH: 
-  /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar-costom/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/Gao/Desktop/macdesktop/scanbar-costom/node_modules/.bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bin:/usr/local/mongodb/bind:/usr/local/mongodb/bind:/usr/local/mongodb/bin:/Users/Gao/.yarn/bin:/Users/Gao/.config/yarn/global/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Tomcat/bin:/Users/Gao/Library/Android/sdk/tools:/Users/Gao/Library/Android/sdk/platform-tools:
+  /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/var/folders/4f/6b2f75j50ll6tj5tk43fzjw40000gn/T/yarn--1595552431912-0.46217674336656045:/Users/gaozhiying/Project/Taro/scanbar-costom/node_modules/.bin:/Users/gaozhiying/.config/yarn/link/node_modules/.bin:/usr/local/libexec/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/lib/node_modules/npm/bin/node-gyp-bin:/usr/local/bin/node_modules/npm/bin/node-gyp-bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3/bin:/Users/gaozhiying/.rvm/gems/ruby-2.6.3@global/bin:/Users/gaozhiying/.rvm/rubies/ruby-2.6.3/bin:/Library/Java/JavaVirtualMachines/jdk1.8.0_40.jdk/Contents/Home/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin:/Library/Apple/bin:.:/Users/gaozhiying/.rvm/bin:/Library/android-sdk-macosx/tools:/Library/android-sdk-macosx/platform-tools
 
 Yarn version: 
-  1.15.2
+  1.17.3
 
 Node version: 
-  12.4.0
+  12.18.2
 
 Platform: 
   darwin x64
 
 Trace: 
-  Error: https://registry.npm.taobao.org/src%2fcommon/sdk/product/product.sdk: [not_found] document not found
-      at Request.params.callback [as _callback] (/Users/Gao/.yarn/lib/cli.js:66058:18)
-      at Request.self.callback (/Users/Gao/.yarn/lib/cli.js:129541:22)
-      at Request.emit (events.js:200:13)
-      at Request.<anonymous> (/Users/Gao/.yarn/lib/cli.js:130513:10)
-      at Request.emit (events.js:200:13)
-      at Gunzip.<anonymous> (/Users/Gao/.yarn/lib/cli.js:130435:12)
-      at Object.onceWrapper (events.js:288:20)
-      at Gunzip.emit (events.js:205:15)
-      at endReadableNT (_stream_readable.js:1154:12)
-      at processTicksAndRejections (internal/process/task_queues.js:84:9)
+  Error: https://github.com/src/actions: ETIMEDOUT
+      at Timeout._onTimeout (/usr/local/lib/node_modules/yarn/lib/cli.js:141124:19)
+      at listOnTimeout (internal/timers.js:549:17)
+      at processTimers (internal/timers.js:492:7)
 
 npm manifest: 
   {
@@ -9705,10 +9698,10 @@ Lockfile:
     resolved "https://registry.npmjs.org/taro-code/-/taro-code-2.2.0.tgz#308b4c786fc6377edb13b37c778f2edc519aba8d"
     integrity sha512-dlT/2xvdFjR7uSuNY9F/1UHreYeZE571itModcSVcKQaJF9kMzRJY50eEMmULRqrBBA2+B6oYeguZcfdcE1cIQ==
   
-  taro-ui@^2.2.4:
-    version "2.2.4"
-    resolved "https://registry.npm.taobao.org/taro-ui/download/taro-ui-2.2.4.tgz#96a486432e86d6d0d1eda70383c47c3284f5e8e6"
-    integrity sha1-lqSGQy6G1tDR7acDg8R8MoT16OY=
+  taro-ui@^2.3.4:
+    version "2.3.4"
+    resolved "https://registry.npm.taobao.org/taro-ui/download/taro-ui-2.3.4.tgz#a7a2cdd67b2b4a49d10c351d89def4d28b9bb192"
+    integrity sha1-p6LN1nsrSknRDDUdid700oubsZI=
     dependencies:
       "@types/react" "^16.7.3"
       bind-decorator "^1.0.11"

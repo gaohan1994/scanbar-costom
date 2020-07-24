@@ -2,17 +2,15 @@ import Taro from "@tarojs/taro";
 import { View, Image } from "@tarojs/components";
 import "./index.less";
 import "../../../component/product/product.less";
-import { MerchantInterface, UserInterface } from "../../../constants";
+import { UserInterface } from "../../../constants";
 import { connect } from "@tarojs/redux";
 import { AppReducer } from "../../../reducers";
-import { getCurrentMerchantDetail } from "../../../reducers/app.merchant";
 import { getIndexAddress } from "../../../reducers/app.user";
 
 const prefix = "index-component-address";
 
 type Props = {
   indexAddress: UserInterface.Address;
-  currentMerchantDetail: MerchantInterface.MerchantDetail;
 };
 
 type State = {};
@@ -25,7 +23,7 @@ class Comp extends Taro.Component<Props, State> {
   };
 
   render() {
-    const { indexAddress, currentMerchantDetail } = this.props;
+    const { indexAddress } = this.props;
 
     const address =
       indexAddress && indexAddress.address
@@ -50,7 +48,7 @@ class Comp extends Taro.Component<Props, State> {
           className={`${prefix}-search`}
           onClick={() => {
             Taro.navigateTo({
-              url: `/pages/product/product.search`
+              url: `/pages/product/merchant.search`
             });
           }}
         >
@@ -68,7 +66,6 @@ class Comp extends Taro.Component<Props, State> {
 const select = (state: AppReducer.AppState) => {
   return {
     indexAddress: getIndexAddress(state),
-    currentMerchantDetail: getCurrentMerchantDetail(state)
   };
 };
 

@@ -45,9 +45,14 @@
     .padding(30px, l);
   }
 
+  &-padding {
+    // border-bottom: 1px solid @product-border-color;
+    .padding(30px, lr);
+  }
+
   &-border {
     border-bottom: 1px solid @product-border-color;
-    .padding(30px, lr);
+    .padding(28px, b);
   }
 
   &-last {
@@ -93,8 +98,8 @@
         top: 0;
         left: 0;
         .bg;
-        width: 28px;
-        height: 28px;
+        width: 61px;
+        height: 29px;
         background-image: url("//net.huanmusic.com/scanbar-c/icon_newshop.png");
       }
       &-close {
@@ -136,6 +141,7 @@
     &-detail {
       .margin(10px, l);
       .margin(10px, t);
+      height: 182px;
       display: flex;
       flex: 1;
       min-height: 150px;
@@ -185,7 +191,7 @@
 
   &-tips {
     position: relative;
-    .margin(9px, t);
+    .margin(19px, t);
     font-size: 22px;
     height: 22px;
     line-height: 22px;
@@ -380,6 +386,27 @@
 
       &-add {
         .background-image("//net.huanmusic.com/scanbar-c/bt_increase_l.png");
+      }
+    }
+  }
+
+  &-merchant {
+    &-activity {
+      .item(transparent, #FC4E44);
+      border:1px solid rgba(252,78,68,1);
+      height: 27px;
+
+      &-text {
+        .item-text;
+      }
+    }
+
+    &-coupon {
+      .item(rgba(255,240,226,1), #FF893B);
+      height: 27px;
+
+      &-text {
+        .item-text;
       }
     }
   }

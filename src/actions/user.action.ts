@@ -1,8 +1,8 @@
 /*
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-03 17:13:16
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-07-07 14:21:14
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-07-23 15:50:17
  */
 import requestHttp from "../common/request/request.http";
 import {
@@ -13,6 +13,7 @@ import {
   jsonToQueryString
 } from "../constants";
 import { store } from "../app";
+import { MerchantInterface } from '../constants';
 
 class UserAction {
   /**
@@ -215,7 +216,7 @@ class UserAction {
    *
    * @memberof UserAction
    */
-  public getMemberInfo = async (dispatch, currentMerchantDetail) => {
+  public getMemberInfo = async (dispatch: any, currentMerchantDetail: MerchantInterface.MerchantDetail) => {
     const result = await UserService.getMemberInfo(currentMerchantDetail.id);
     if (result.code === ResponseCode.success) {
       dispatch({
@@ -247,6 +248,60 @@ class UserAction {
     }
     return {};
   };
+
+  public obtainMerchantCoupon = async (merchantId: number) => {
+    const result = await UserService.obtainMerchantCoupon(merchantId);
+    return result;
+  };
+
+  public getMyAvailableCoupon = async (
+    dispatch,
+    params?: any
+  ) => {
+    const result = await UserService.getMyAvailableCoupon(params);
+    if (result.code === ResponseCode.success) {
+      dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_COUPONS,
+        payload: {
+          couponList: result.data.rows
+        }
+      });
+    }
+    return result;
+  }
+
+  public getMyAvailableCouponMore = async (
+    dispatch,
+    params?: any
+  ) => {
+    const result = await UserService.getMyAvailableCoupon(params);
+    if (result.code === ResponseCode.success) {
+      dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_COUPONS_MORE,
+        payload: {
+          couponList: result.data.rows
+        }
+      });
+    }
+    return result;
+  }
+
+  public countMyMemberCardAndCoupon = async (params: any) => {
+    const result = await UserService.obtainCoupons(params);
+    if (result.code === ResponseCode.success) {
+      return {
+        success: true,
+        result: result.data
+      }
+    } else {
+      return {
+        success: false,
+        result: result.msg
+      }
+    }
+  };
+
+  public 
 }
 
 export default new UserAction();

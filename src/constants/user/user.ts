@@ -1,8 +1,8 @@
 /*
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-03 17:10:08
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-16 10:14:26
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-07-23 16:02:18
  */
 
 export declare namespace UserInterface {
@@ -144,6 +144,11 @@ export declare namespace UserInterface {
     username: string;
     couponNum: number;
   }
+
+  interface MemberCount {
+    couponNum: number;
+    memberCardNum: number;
+  }
   namespace ReducerTypes {
     type RECEIVE_USERINFO = string;
     type RECEIVE_ADDRESS_LIST = string;
@@ -151,6 +156,7 @@ export declare namespace UserInterface {
     type RECEIVE_MEMBER_INFO = string;
     type RECEIVE_COUPONS_CENTER = string;
     type RECEIVE_COUPONS_MORE = string;
+    type RECEIVE_MEMBER_COUNT = string;
   }
 
   interface UserInterfaceMap {
@@ -161,6 +167,7 @@ export declare namespace UserInterface {
       RECEIVE_ADDRESS_LIST: ReducerTypes.RECEIVE_ADDRESS_LIST;
       RECEIVE_COUPONS: ReducerTypes.RECEIVE_COUPONS;
       RECEIVE_COUPONS_MORE: ReducerTypes.RECEIVE_COUPONS_MORE;
+      RECEIVE_MEMBER_COUNT: ReducerTypes.RECEIVE_MEMBER_COUNT;
     };
   }
 }
@@ -172,7 +179,8 @@ class UserInterfaceMap implements UserInterface.UserInterfaceMap {
     RECEIVE_COUPONS_CENTER: "RECEIVE_COUPONS_CENTER",
     RECEIVE_ADDRESS_LIST: "RECEIVE_ADDRESS_LIST",
     RECEIVE_COUPONS_MORE: "RECEIVE_COUPONS_MORE",
-    RECEIVE_COUPONS: "RECEIVE_COUPONS"
+    RECEIVE_COUPONS: "RECEIVE_COUPONS",
+    RECEIVE_MEMBER_COUNT: "RECEIVE_MEMBER_COUNT"
   };
 }
 

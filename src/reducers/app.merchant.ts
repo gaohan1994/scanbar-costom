@@ -15,6 +15,7 @@ export declare namespace MerchantReducer {
         field: any;
       };
     }
+
     interface ReceiveMerchantDetail {
       type: MerchantInterface.ReducerTypes.RECEIVE_MERCHANT_DETAIL;
       payload: MerchantInterface.MerchantDetail;
@@ -47,6 +48,8 @@ export declare namespace MerchantReducer {
     activityList: any[];
     alianceTotal: number;
     alianceList: MerchantInterface.MerchantDetail[];
+    merchantSearchList: MerchantInterface.MerchantDetail[];
+    merchantSearchTotal: number;
   }
 
   type Action =
@@ -66,7 +69,9 @@ export const initState: MerchantReducer.State = {
   advertisement: [],
   activityList: [],
   alianceTotal: -1,
-  alianceList: []
+  alianceList: [],
+  merchantSearchList: [],
+  merchantSearchTotal: 0,
 };
 
 export default function merchant(
@@ -91,6 +96,24 @@ export default function merchant(
         alianceTotal: total
       };
     }
+    case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_SEARCH_LIST: {
+      const { payload } = action;
+      const { field, total, rows } = payload;
+      const { pageNum = 1 } = field;
+      if (pageNum === 1) {
+        return {
+          ...state,
+          merchantSearchList: rows,
+          merchantSearchTotal: total
+        };
+      }
+      return {
+        ...state,
+        merchantSearchList: state.alianceList.concat(rows),
+        merchantSearchTotal: total
+      };
+    }
+
 
     case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ACTIVITYLIST: {
       const { payload } = action;
@@ -127,12 +150,12 @@ export default function merchant(
     }
     case MerchantInterfaceMap.reducerInterface
       .RECEIVE_CURRENT_MERCHANT_DETAIL: {
-      const { payload } = action as any;
-      return {
-        ...state,
-        currentMerchantDetail: payload
-      };
-    }
+        const { payload } = action as any;
+        return {
+          ...state,
+          currentMerchantDetail: payload
+        };
+      }
     case MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ADVERTISEMENT: {
       const { payload } = action as any;
       return {
@@ -166,3 +189,9 @@ export const getMerchantAdvertisement = (state: AppReducer.AppState) =>
 
 export const getMerchantActivityList = (state: AppReducer.AppState) =>
   state.merchant.activityList;
+
+export const getMerchantSearchList = (state: AppReducer.AppState) =>
+  state.merchant.merchantSearchList;
+
+export const getMerchantSearchTotal = (state: AppReducer.AppState) =>
+  state.merchant.merchantSearchTotal;
