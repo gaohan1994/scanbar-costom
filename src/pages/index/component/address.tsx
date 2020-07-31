@@ -11,6 +11,7 @@ const prefix = "index-component-address";
 
 type Props = {
   indexAddress: UserInterface.Address;
+  initDit: () => void;
 };
 
 type State = {};
@@ -23,7 +24,7 @@ class Comp extends Taro.Component<Props, State> {
   };
 
   render() {
-    const { indexAddress } = this.props;
+    const { indexAddress, initDit } = this.props;
 
     const address =
       indexAddress && indexAddress.address
@@ -34,13 +35,13 @@ class Comp extends Taro.Component<Props, State> {
 
     return (
       <View className={`${prefix}`}>
-        <View className={`${prefix}-title`} onClick={() => this.onNavAddress()}>
-          <Image
-            className={`${prefix}-title-icon`}
-            src="//net.huanmusic.com/scanbar-c/icon_location.png"
-          />
-          <View className={`${prefix}-title-text`}>
-            {address || "晋安区金鸡山小区"}
+        <View 
+          className={`${prefix}-title  ${process.env.TARO_ENV === 'h5' ? `${prefix}-title-h5` : ''}`}
+          onClick={address ? () => this.onNavAddress() : () => {initDit();}}
+        >
+          <Image className={`${prefix}-title-icon`} src='//net.huanmusic.com/scanbar-c/icon_location.png' />
+          <View className={`${prefix}-title-text${process.env.TARO_ENV === 'h5' ? '-h5' : ''}`}>
+            {address ? address : '点击重新获取定位'}
           </View>
           <View className={`${prefix}-icon`} />
         </View>

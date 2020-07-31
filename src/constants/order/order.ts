@@ -54,6 +54,8 @@ export declare namespace OrderInterface {
     totalNum: number;
     transAmount: number;
     transFlag: number;
+    deliveryStatus: number;
+    afterSaleStatus: number;
     transType: number;
     createTime: string;
     planDeliveryTime: string;
@@ -68,6 +70,7 @@ export declare namespace OrderInterface {
     lastRefundStatus: number;
     ableRefund: boolean;
     couponDiscount: number;
+    pointDiscount: any;
   }
 
   interface RefundOrderItem {
@@ -181,6 +184,8 @@ export declare namespace OrderInterface {
   type RECEIVE_ORDER_COUNT = string;
   type RECEIVE_ORDER_ALL_STATUS = string;
   type RECEIVE_ABLE_TO_USE_COUPONS = string;
+  type RECEIVE_POINTCONFIG = string;
+  type RECEIVE_DELIVERYFEE = string;
 
   type ReducerInterface = {
     CHANGR_CURRENT_TYPE: CHANGR_CURRENT_TYPE;
@@ -189,6 +194,8 @@ export declare namespace OrderInterface {
     RECEIVE_ORDER_COUNT: RECEIVE_ORDER_COUNT;
     RECEIVE_ORDER_ALL_STATUS: RECEIVE_ORDER_ALL_STATUS;
     RECEIVE_ABLE_TO_USE_COUPONS: RECEIVE_ABLE_TO_USE_COUPONS;
+    RECEIVE_POINTCONFIG: RECEIVE_POINTCONFIG;
+    RECEIVE_DELIVERYFEE: RECEIVE_DELIVERYFEE;
   };
 
   interface OrderInterfaceMapImp {
@@ -205,7 +212,9 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
     RECEIVE_ORDER_DETAIL: "RECEIVE_ORDER_DETAIL",
     RECEIVE_ORDER_COUNT: "RECEIVE_ORDER_COUNT",
     RECEIVE_ORDER_ALL_STATUS: "RECEIVE_ORDER_ALL_STATUS",
-    RECEIVE_ABLE_TO_USE_COUPONS: "RECEIVE_ABLE_TO_USE_COUPONS"
+    RECEIVE_ABLE_TO_USE_COUPONS: "RECEIVE_ABLE_TO_USE_COUPONS",
+    RECEIVE_POINTCONFIG: 'RECEIVE_POINTCONFIG',
+    RECEIVE_DELIVERYFEE: 'RECEIVE_DELIVERYFEE',
   };
 
   public orderList = (params?: OrderInterface.OrderListFetchFidle) => {
@@ -235,6 +244,14 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
   public orderRefundCancel = (params: OrderInterface.OrderDetailFetchField) => {
     return `/order/cancelRefund/${params.orderNo}`;
   };
+
+  public getPointConfig = (merchantId: number) => {
+    return `/api/merchant/point/config/detail/${merchantId}`;
+  }
+
+  public getDeliveryFee = (param) => {
+    return `/api/cashier/getDeliveryFee${jsonToQueryString(param)}`;
+  }
 }
 
 export default new OrderInterfaceMap();

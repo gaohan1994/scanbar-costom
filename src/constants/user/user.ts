@@ -149,6 +149,33 @@ export declare namespace UserInterface {
     couponNum: number;
     memberCardNum: number;
   }
+
+  interface CardDetail {
+    enableMemberPrice: boolean;
+    identified: boolean;
+    avatar: string;
+    cardNo: string;
+    createTime: string;
+    levelName: string;
+    merchantName: string;
+    phoneNumber: string;
+    sex: string;
+    updateTime: string;
+    couponNum: number;
+    accumulativeMoney: number;
+    accumulativePoints: number;
+    id: number;
+    levelId: number;
+    memberDiscount: number;
+    merchantId: number;
+    overage: number;
+    points: number;
+    status: number;
+    totalAmount: number;
+    totalTimes: number;
+    obtainMoney: number;
+    obtainPoints: number;
+  }
   namespace ReducerTypes {
     type RECEIVE_USERINFO = string;
     type RECEIVE_ADDRESS_LIST = string;

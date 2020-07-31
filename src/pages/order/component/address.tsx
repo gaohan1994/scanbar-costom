@@ -37,6 +37,7 @@ type Props = {
   timeSelectClick?: () => void;
   currentTime?: string;
   changeTabCallback?: () => void;
+  onRefProductPayListViewObj?: any;
 }
 
 type State = {
@@ -60,7 +61,7 @@ class Comp extends Taro.Component<Props, State> {
   }
 
   public changeTab = (tab) => {
-    const { changeTabCallback, dispatch } = this.props;
+    const { changeTabCallback, dispatch, onRefProductPayListViewObj } = this.props;
     this.setState({
       currentTab: tab.id
     }, async () => {
@@ -72,6 +73,14 @@ class Comp extends Taro.Component<Props, State> {
       } else {
         await productSdk.preparePayOrderDetail({ deliveryType: 1 }, dispatch)
       }
+      if(onRefProductPayListViewObj){
+        onRefProductPayListViewObj.changePointSet();
+      }
+      const points = {
+        pointsTotalSell: 0, 
+        pointsTotal: 0, 
+      }
+      productSdk.preparePayOrderPoints(points, dispatch);
       if (changeTabCallback) {
         changeTabCallback();
       }
@@ -140,6 +149,7 @@ class Comp extends Taro.Component<Props, State> {
             pre={true}
             showEdit={false}
             showArrow={true}
+            isPay={true}
           />
           <View className={`${prefix}-detail-row ${prefix}-detail-row-border `}>
             <View className={`${prefix}-detail-row-title`}>自提时间</View>
@@ -171,6 +181,7 @@ class Comp extends Taro.Component<Props, State> {
               showEdit={false}
               showArrow={true}
               onClick={() => this.onAddAddress()}
+              isPay={true}
             />
           </View>
         ) : (

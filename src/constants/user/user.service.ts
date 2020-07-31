@@ -33,10 +33,10 @@ class UserService {
     return result;
   };
 
-  public addressList = async (): Promise<
+  public addressList = async (param: any): Promise<
     HTTPInterface.ResponseResultBase<UserInterface.Address[]>
   > => {
-    const result = await requestHttp.get("/api/address/list");
+    const result = await requestHttp.get(`/api/address/list${jsonToQueryString(param)}`);
     return result;
   };
 
@@ -111,6 +111,12 @@ class UserService {
     const result = await requestHttp.get(`/api/coupon/obtainCoupon/${merchantId}`);
     return result;
   };
+  public obtainMerchantCoupons = async (
+    params: any
+  ): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.post("/api/coupon/obtainCoupons", params);
+    return result;
+  };
   public getMyAvailableCoupon = async (
     params?: any
   ): Promise<HTTPInterface.ResponseResultBase<any>> => {
@@ -125,12 +131,7 @@ class UserService {
     );
     return result;
   };
-  public obtainCoupons = async (
-    params: any
-  ): Promise<HTTPInterface.ResponseResultBase<any>> => {
-    const result = await requestHttp.post("/api/coupon/obtainCoupons", params);
-    return result;
-  };
+  
 }
 
 export default new UserService();

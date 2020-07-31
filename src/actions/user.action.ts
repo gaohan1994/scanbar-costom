@@ -2,7 +2,7 @@
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-03 17:13:16
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-07-23 15:50:17
+ * @Last Modified time: 2020-07-29 10:42:45
  */
 import requestHttp from "../common/request/request.http";
 import {
@@ -39,8 +39,8 @@ class UserAction {
    *
    * @memberof UserAction
    */
-  public addressList = async dispatch => {
-    const result = await UserService.addressList();
+  public addressList = async (dispatch: any, param: any) => {
+    const result = await UserService.addressList(param);
     if (result.code === ResponseCode.success) {
       dispatch({
         type: UserInterfaceMap.reducerInterface.RECEIVE_ADDRESS_LIST,
@@ -229,8 +229,8 @@ class UserAction {
     return result;
   };
 
-  public getMyMemberCard = async () => {
-    const result = await requestHttp.get(`/memberInfo/getMyMemberCard`);
+  public getMyMemberCard = async (param: any) => {
+    const result = await requestHttp.get(`/memberInfo/getMyMemberCard`, param);
     return result;
   };
 
@@ -251,7 +251,32 @@ class UserAction {
 
   public obtainMerchantCoupon = async (merchantId: number) => {
     const result = await UserService.obtainMerchantCoupon(merchantId);
-    return result;
+    if (result.code === ResponseCode.success) {
+      return {
+        success: true,
+        result: result.data
+      }
+    } else {
+      return {
+        success: false,
+        result: result.msg
+      }
+    }
+  };
+
+  public obtainMerchantCoupons = async (params: any) => {
+    const result = await UserService.obtainMerchantCoupons(params);
+    if (result.code === ResponseCode.success) {
+      return {
+        success: true,
+        result: result.data
+      }
+    } else {
+      return {
+        success: false,
+        result: result.msg
+      }
+    }
   };
 
   public getMyAvailableCoupon = async (
@@ -286,22 +311,18 @@ class UserAction {
     return result;
   }
 
-  public countMyMemberCardAndCoupon = async (params: any) => {
-    const result = await UserService.obtainCoupons(params);
+  public countMyMemberCardAndCoupon = async (dispatch: any) => {
+    const result = await UserService.countMyMemberCardAndCoupon();
     if (result.code === ResponseCode.success) {
-      return {
-        success: true,
-        result: result.data
-      }
-    } else {
-      return {
-        success: false,
-        result: result.msg
-      }
+      dispatch({
+        type: UserInterfaceMap.reducerInterface.RECEIVE_MEMBER_COUNT,
+        payload: {
+          memberCount: result.data
+        }
+      });
     }
+    return result;
   };
-
-  public 
 }
 
 export default new UserAction();

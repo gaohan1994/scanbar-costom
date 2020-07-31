@@ -44,7 +44,12 @@ class OrderService {
     });
     return result;
   }
-
+  public getDeliveryFee = async (param): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(OrderInterfaceMap.getDeliveryFee(param));
+  }
+  public getPointConfig = async (merchantId: number): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.get(OrderInterfaceMap.getPointConfig(merchantId));
+  }
 }
 
 export default new OrderService();

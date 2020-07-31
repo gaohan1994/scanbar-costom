@@ -6,15 +6,13 @@ import './index.less'
 import '../style/product.less'
 import { ProductAction, MerchantAction } from '../../actions'
 import productAction from '../../actions/product.action'
-import { getProductSearchList } from '../../reducers/app.product'
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer'
-import productSdk from '../../common/sdk/product/product.sdk'
 import HeaderInput from '../../component/header/header.input'
 import ButtonCostom from '../../component/button/button'
 import { BASE_PARAM } from '../../common/util/config';
-import WeixinSdk from "../../common/sdk/weixin/weixin";
 import MerchantListView from '../../component/product/merchant.listview'
 import { getMerchantSearchList, getMerchantSearchTotal } from '../../reducers/app.merchant';
+import { getIndexAddress } from '../../reducers/app.user'
 
 const cssPrefix = 'product';
 const prefix = 'page-search'
@@ -27,7 +25,6 @@ class Index extends Component<any> {
     value: '',
     searchRecordList: [] as any[],
     searchFlag: false,
-    address: {} as any,
   };
 
   /**
@@ -45,8 +42,6 @@ class Index extends Component<any> {
     this.setState({ value: '' });
     page = 1;
     MerchantAction.merchantEmptySearchList(this.props.dispatch);
-    const address: any = await WeixinSdk.initAddress(this.props.dispatch);
-    this.setState({ address });
     const res = await ProductAction.getSearchRecord('MERCHANT');
     if (res.success) {
       this.setState({ searchRecordList: res.result });
@@ -86,7 +81,8 @@ class Index extends Component<any> {
   }
 
   public fetchData = async () => {
-    const { value, address } = this.state;
+    const { value } = this.state;
+    const { address } = this.props;
     if (!value) {
       Taro.showToast({
         title: '请输入要搜索的店铺名称',
@@ -129,7 +125,7 @@ class Index extends Component<any> {
   }
 
   render() {
-    const { merchantList, productCartList, merchantTotal } = this.props;
+    const { merchantList, merchantTotal } = this.props;
     const hasMore = merchantList.length < merchantTotal;
     const { value, searchFlag } = this.state;
     return (
@@ -149,7 +145,7 @@ class Index extends Component<any> {
         }
 
         {/* <Cart /> */}
-        {value !== '' && productCartList && productCartList.length > 0 && (
+        {/* {value !== '' && productCartList && productCartList.length > 0 && (
           <View
             className={`${prefix}-cart`}
             onClick={() => {
@@ -162,7 +158,7 @@ class Index extends Component<any> {
               {productSdk.getProductNumber(productCartList)}
             </View>
           </View>
-        )}
+        )} */}
       </View>
     )
   }
@@ -173,6 +169,7 @@ class Index extends Component<any> {
     return (
       <View className={`${prefix}-header`}>
         <HeaderInput
+          focus={true}
           placeholder="请输入店铺名称名称"
           value={value}
           onInput={this.onValueChange}
@@ -234,6 +231,7 @@ const select = (state) => {
     merchantList: getMerchantSearchList(state),
     merchantTotal: getMerchantSearchTotal(state),
     productCartList: getProductCartList(state),
+    address: getIndexAddress(state)
   }
 }
 

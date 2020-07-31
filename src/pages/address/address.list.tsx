@@ -4,18 +4,22 @@ import { View } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
 import { AppReducer } from '../../reducers'
-import { getAddressList } from '../../reducers/app.user'
+import { getAddressList, getIndexAddress } from '../../reducers/app.user'
 import { UserInterface } from '../../constants'
 import AddressItem from '../../component/address/item'
 import ButtonFooter from '../../component/button/button.footer'
 import productSdk from '../../common/sdk/product/product.sdk'
 import Empty from '../../component/empty'
-import { UserAction } from '../../actions'
+import { UserAction, OrderAction } from '../../actions'
 import { Dispatch } from 'redux';
+import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
+import { BASE_PARAM } from '../../common/util/config'
 
 type Props = {
   dispatch: Dispatch;
   addressList: UserInterface.Address[];
+  indexAddress: any;
+  currentMerchantDetail: any;
 }
 
 type State = {
@@ -32,22 +36,29 @@ class Page extends Taro.Component<Props, State> {
     entry: ''
   }
 
-  componentWillMount () {
+  componentWillMount() {
     const { entry } = this.$router.params;
     if (entry) {
       this.setState({ entry })
     }
   }
 
-  componentDidShow () {
-    UserAction.addressList(this.props.dispatch);
+  componentDidShow() {
+    const { indexAddress, dispatch } = this.props;
+    UserAction.addressList(dispatch, indexAddress);
   }
 
-  public onAddressClick = (address: UserInterface.Address) => {
+  public onAddressClick = async (address: UserInterface.Address) => {
     const { entry } = this.state;
-    const { dispatch} = this.props;
+    const { dispatch, currentMerchantDetail } = this.props;
     if (entry === 'order.pay') {
       productSdk.preparePayOrderAddress(address, dispatch);
+      const param = {
+        latitude:  address.latitude,
+        longitude: address.longitude,
+        merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
+      }
+      const result = await OrderAction.getDeliveryFee(dispatch, param);
       Taro.navigateBack({})
       return;
     }
@@ -57,12 +68,12 @@ class Page extends Taro.Component<Props, State> {
     })
   }
 
-  render () {
+  render() {
     const { addressList } = this.props;
     return (
       <View className='container'>
         {addressList && addressList.length > 0 ? addressList.map((address, index) => {
-          return(
+          return (
             <AddressItem
               key={`address${index}`}
               address={address}
@@ -75,11 +86,11 @@ class Page extends Taro.Component<Props, State> {
             />
           )
         }) : (
-          <Empty
-            img='//net.huanmusic.com/scanbar-c/v1/img_location.png'
-            text='还没有地址，快去新增吧'
-          />
-        )}
+            <Empty
+              img='//net.huanmusic.com/scanbar-c/v1/img_location.png'
+              text='还没有地址，快去新增吧'
+            />
+          )}
 
         <ButtonFooter
           buttons={[{
@@ -98,7 +109,9 @@ class Page extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState) => {
   return {
-    addressList: getAddressList(state)
+    addressList: getAddressList(state),
+    indexAddress: getIndexAddress(state),
+    currentMerchantDetail: getCurrentMerchantDetail(state),
   }
 }
-export default connect(select)(Page);
+export default connect(select)(Page as any);

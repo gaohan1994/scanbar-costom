@@ -126,7 +126,7 @@ class Index extends Component<any> {
         }
 
         {/* <Cart /> */}
-        {value !== '' && productCartList && productCartList.length > 0 && (
+        {/* {value !== '' && productCartList && productCartList.length > 0 && (
           <View
             className={`${prefix}-cart`}
             onClick={() => {
@@ -139,7 +139,7 @@ class Index extends Component<any> {
               {productSdk.getProductNumber(productCartList)}
             </View>
           </View>
-        )}
+        )} */}
       </View>
     )
   }
@@ -150,6 +150,7 @@ class Index extends Component<any> {
     return (
       <View className={`${prefix}-header`}>
         <HeaderInput
+          focus={true}
           placeholder="请输入商品名称"
           value={value}
           onInput={this.onValueChange}

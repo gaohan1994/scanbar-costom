@@ -31,6 +31,7 @@ export interface FormRowProps {
   hasBorder?: boolean;          // 是否有底部border
   extraThumb?: string;          // 右边图片
   onClick?: () => any;          // 点击事件
+  isRemark?: boolean;           // 是不是备注
   extraThumbClick?: () => any;  // 右边图片点击事件
   className?: any;              // 外部className
   buttons?: ListRowButton[];    // ListRow 的右侧按钮
@@ -62,6 +63,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
     hasBorder: true,
     extraText: '',
     extraThumb: '',
+    isRemark: false,
     extraTextStyle: 'black',
     infoColor: '333333',
     extraTextBold: '',
@@ -107,6 +109,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
       extraTextColor,
       inputCursorSpacing,
       extraTextSize,
+      isRemark,
       children,
     } = this.props;
 
@@ -155,8 +158,9 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
                   `component-form-${extraTextStyle}`, {
                   'component-form-bold': extraTextBold === 'bold',
                   [`component-form-size-${extraTextSize}`]: !!extraTextSize,
+                  'component-form-remarkTxt': isRemark
                 })}
-                style={`${!!extraTextColor ? `color: ${extraTextColor};` : ''}`}
+                style={`${!!extraTextColor ? `color: ${extraTextColor};-webkit-box-orient: vertical;` : '-webkit-box-orient: vertical;'}`}
               >
                 {extraText}
               </View>
@@ -173,7 +177,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
                   className={classnames('component-list-row-input')}
                   name={inputName || 'form.row.name'}
                   value={inputValue} 
-                  onChange={inputOnChange}
+                  onChange={inputOnChange ? inputOnChange : () => {}}
                   type={inputType}
                   placeholder={inputPlaceHolder}
                   border={false}

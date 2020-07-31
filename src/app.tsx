@@ -33,15 +33,15 @@ class App extends Component {
       // 'pages/order/order.detail',
       // 'pages/order/order.cancel',
       // 'pages/order/order.refund',
-      "pages/user/user",
-      "pages/user/user.set",
-      "pages/user/user.coupon",
-      "pages/user/user.code",
+      "pages/userPage/user",
+      // "pages/user/user.set",
+      // "pages/user/user.coupon",
+      // "pages/user/user.code",
       // "pages/test/test",
-      "pages/cart/cart",
-      "pages/user/user.card",
-      "pages/user/user.card.detail",
-      "pages/user/user.attention"
+      // "pages/cart/cart",
+      // "pages/user/user.card",
+      // "pages/user/user.card.detail",
+      // "pages/user/user.attention"
       // "pages/user/user.couponCenter",
       // 'pages/address/address.list',
       // 'pages/address/address.add',
@@ -65,12 +65,16 @@ class App extends Component {
           "order.refund.schedule"
         ]
       },
-      // {
-      //   root: 'pages/user/',
-      //   pages: [
-      //     'user.set',
-      //   ]
-      // },
+      {
+        root: "pages/user/",
+        pages: [
+          "user.set",
+          "user.coupon",
+          "user.card",
+          "user.card.detail",
+          "user.attention"
+        ]
+      },
       {
         root: "pages/address/",
         pages: [
@@ -95,7 +99,7 @@ class App extends Component {
       color: "#ACACAC",
       selectedColor: "#2EAAF8",
       backgroundColor: "#ffffff",
-      borderStyle: "black",
+      // borderStyle: "black",
       list: [
         {
           pagePath: "pages/index/index",
@@ -116,7 +120,7 @@ class App extends Component {
         //   text: "购物车"
         // },
         {
-          pagePath: "pages/user/user",
+          pagePath: "pages/userPage/user",
           iconPath: "./assets/tab-bar/icon_nav_mine.png",
           selectedIconPath: "./assets/tab-bar/icon_nav_mine_selected.png",
           text: "我的"

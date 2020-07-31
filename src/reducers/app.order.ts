@@ -55,6 +55,20 @@ export declare namespace OrderReducer {
         ableToUseCouponList: UserInterface.CouponsItem[]
       }
     }
+
+    interface PointConfigReducer {
+      type: OrderInterface.RECEIVE_POINTCONFIG;
+      payload: {
+        pointConfig: any;
+      };
+    }
+
+    interface DeliveryFeeReducer {
+      type: OrderInterface.RECEIVE_DELIVERYFEE;
+      payload: {
+        DeliveryFee: any;
+      };
+    }
   }
 
   interface State {
@@ -65,6 +79,8 @@ export declare namespace OrderReducer {
     orderAllStatus: any[];
     currentType: number;
     ableToUseCouponList: UserInterface.CouponsItem[];
+    pointConfig: any;
+    DeliveryFee: any;
   }
 
   type Action =
@@ -84,6 +100,8 @@ const initState: OrderReducer.State = {
   orderAllStatus: [],
   currentType: 0,
   ableToUseCouponList: [],
+  pointConfig: {},
+  DeliveryFee: 0,
 };
 
 export default function orderReducer(
@@ -151,6 +169,22 @@ export default function orderReducer(
         ableToUseCouponList: payload.ableToUseCouponList
       };
     }
+    case OrderInterfaceMap.reducerInterfaces.RECEIVE_DELIVERYFEE: {
+      const { payload } = action as unknown as OrderReducer.Reducers.DeliveryFeeReducer;
+      const { DeliveryFee } = payload;
+      return {
+        ...state,
+        DeliveryFee: DeliveryFee
+      };
+    }
+    case OrderInterfaceMap.reducerInterfaces.RECEIVE_POINTCONFIG: {
+      const { payload } = action as unknown as OrderReducer.Reducers.PointConfigReducer;
+      const { pointConfig } = payload;
+      return {
+        ...state,
+        pointConfig: pointConfig
+      };
+    }
     default: {
       return {
         ...state
@@ -172,3 +206,7 @@ export const getOrderCount = (state: AppReducer.AppState) => state.order.orderCo
 export const getOrderAllStatus = (state: AppReducer.AppState) => state.order.orderAllStatus;
 
 export const getAbleToUseCouponList = (state: AppReducer.AppState) => state.order.ableToUseCouponList;
+
+export const getPointConfig = (state: AppReducer.AppState) => state.order.pointConfig;
+
+export const getDeliveryFee = (state: AppReducer.AppState) => state.order.DeliveryFee;

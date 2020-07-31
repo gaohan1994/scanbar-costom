@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan
  * @Date: 2019-11-22 11:12:09
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-06-24 13:52:36
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-07-30 17:10:12
  *
  * @todo 购物车、下单模块sdk
  * ```ts
@@ -144,6 +144,7 @@ export declare namespace ProductCartInterface {
   type RECEIVE_ORDER_PAY_ADDRESS = string;
   type RECEIVE_ORDER_PAY_DETAIL = string;
   type MANAGE_CART_PRODUCT_REMOVE = string;
+  type RECEIVE_ORDER_PAY_POINTS = string;
 
   type ReducerInterface = {
     SELECT_INDEX: string;
@@ -155,6 +156,7 @@ export declare namespace ProductCartInterface {
     RECEIVE_ORDER_PAY: RECEIVE_ORDER_PAY;
     RECEIVE_ORDER_PAY_DETAIL: RECEIVE_ORDER_PAY_DETAIL;
     RECEIVE_ORDER_PAY_ADDRESS: RECEIVE_ORDER_PAY_ADDRESS;
+    RECEIVE_ORDER_PAY_POINTS: RECEIVE_ORDER_PAY_POINTS;
   };
 
   type ProductCartAdd = string;
@@ -170,6 +172,7 @@ export declare namespace ProductCartInterface {
     type: ProductCartAdd | ProductCartReduce | ProductCartEmpty;
     product: ProductInterface.ProductInfo | ProductCartInfo;
     num?: number;
+    merchantId?: number;
   }
 }
 
@@ -191,10 +194,11 @@ class ProductSDK {
     MANAGE_CART_PRODUCT_REMOVE: "MANAGE_CART_PRODUCT_REMOVE",
     RECEIVE_ORDER_PAY: "RECEIVE_ORDER_PAY",
     RECEIVE_ORDER_PAY_ADDRESS: "RECEIVE_ORDER_PAY_ADDRESS",
-    RECEIVE_ORDER_PAY_DETAIL: "RECEIVE_ORDER_PAY_DETAIL"
+    RECEIVE_ORDER_PAY_DETAIL: "RECEIVE_ORDER_PAY_DETAIL",
+    RECEIVE_ORDER_PAY_POINTS: "RECEIVE_ORDER_PAY_POINTS",
   };
 
-  constructor() {}
+  constructor() { }
 
   public refreshCartNumber = productCartList => {
     const total = this.getProductNumber(productCartList);
@@ -405,24 +409,6 @@ class ProductSDK {
     productCartList,
     productList?: ProductCartInterface.ProductCartInfo[]
   ): number => {
-    //
-    //         // const products = productList !== undefined ? productList : store.getState().productSDK.productCartList;
-    // // const activityList = store.getState().merchant.activityList;
-    // const filterProductList = this.filterByActivity(products, activityList);
-    // let activityMoney: number = 0;
-
-    // filterProductList.forEach((activityItem) => {
-    //     const { activity, productList } = activityItem;
-    //     let subTotal: number = 0;
-    //     productList.forEach((product) => {
-    //         subTotal += this.getProductItemPrice(product, memberInfo) * product.sellNum;
-    //     })
-    //     const subActivityMoney = this.getProductActivityPrice(subTotal, activity);
-    //     if (subTotal !== subActivityMoney) {
-    //         activityMoney = subTotal - subActivityMoney;
-    //     }
-    // })
-    // return activityMoney;
     const products = productList !== undefined ? productList : productCartList;
     const filterProductList = this.filterByActivity(products, activityList);
     let activityMoney: number = 0;
@@ -476,70 +462,56 @@ class ProductSDK {
   };
 
   /**
-   * @todo 获取优惠信息
-   *
-   * @memberof ProductSDK
-   */
-  public getDiscountString = (
-    memberInfo,
-    activityList: any,
-    product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo
-  ) => {
+    * @todo 获取优惠信息
+    *
+    * @memberof ProductSDK
+    */
+  public getDiscountString = (memberInfo, activityList: any, product: ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo, type?: any) => {
     // const memberInfo = store.getState().user.memberInfo;
     const { enableMemberPrice } = memberInfo;
     if (!Array.isArray(activityList) || !activityList.length) {
-      if (!enableMemberPrice || product.memberPrice === product.price)
-        return "";
-      return "会员专享";
+      if (!enableMemberPrice || product.memberPrice === product.price) return '';
+      return '会员专享';
     }
     const activity = activityList[0];
-    const memberFlag =
-      !!enableMemberPrice && activity.discountPrice > product.memberPrice;
+    const memberFlag = !!enableMemberPrice && activity.discountPrice > product.memberPrice;
     switch (activity.type) {
       case 1:
         return memberFlag
-          ? "会员专享"
-          : `${activity.discountAmount}折${
-              activity.limitNum && activity.limitNum > 0
-                ? ` 限${activity.limitNum}件`
-                : ``
-            }`;
+          ? '会员专享'
+          : `${activity.discountAmount}折${activity.limitNum && activity.limitNum > 0 ? ` 限${activity.limitNum}件` : ``}`;
       case 2:
-        return memberFlag
-          ? "会员专享"
-          : `优惠${activity.discountAmount}元${
-              activity.limitNum && activity.limitNum > 0
-                ? ` 限${activity.limitNum}件`
-                : ``
-            }`;
+        return memberFlag ? '会员专享' : `优惠${activity.discountAmount}元${activity.limitNum && activity.limitNum > 0 ? ` 限${activity.limitNum}件` : ``}`;
       case 3:
-        if (!activity.rule) return "";
+        if (!activity.rule) return '';
         const rules = JSON.parse(activity.rule);
-        if (
-          !Array.isArray(rules) ||
-          !rules.length ||
-          !rules[0].threshold ||
-          !rules[0].threshold
-        ) {
-          return "";
+        if (!Array.isArray(rules) || !rules.length || !rules[0].threshold || !rules[0].threshold) {
+          return '';
         }
-        return `满${rules[0].threshold}元减${rules[0].discount}元`;
+        if (type === 'all') {
+          const str = rules.map(val => `满${val.threshold}减${val.discount}`)
+          return str.join('；');
+        } else {
+          return `满${rules[0].threshold}减${rules[0].discount}`
+        }
+
       case 4:
-        if (!activity.rule) return "";
+        if (!activity.rule) return '';
         const ruleList = JSON.parse(activity.rule);
-        if (
-          !Array.isArray(ruleList) ||
-          !ruleList.length ||
-          !ruleList[0].threshold ||
-          !ruleList[0].threshold
-        ) {
-          return "";
+        if (!Array.isArray(ruleList) || !ruleList.length || !ruleList[0].threshold || !ruleList[0].threshold) {
+          return '';
         }
-        return `满${ruleList[0].threshold}件打${ruleList[0].discount}折`;
+        if (type === 'all') {
+          const strList = ruleList.map(val => `满${val.threshold}件打${val.discount}折`)
+          return strList.join('；');
+        } else {
+          return `满${ruleList[0].threshold}件打${ruleList[0].discount}折`;
+        }
+
       default:
         return ``;
     }
-  };
+  }
 
   /**
    * @todo 把下单地址存到order.pay redux中
@@ -567,6 +539,22 @@ class ProductSDK {
       payload: params
     });
   };
+
+  /**
+     * @todo 把积分扣除金额存到order.pay redux中
+     *
+     * @memberof ProductSDK
+     */
+  public preparePayOrderPoints = async (points: any, dispatch) => {
+    dispatch({
+      type: this.reducerInterface.RECEIVE_ORDER_PAY_POINTS,
+      payload: {
+        pointsTotalSell: points.pointsTotalSell,
+        pointsTotal: points.pointsTotal,
+      }
+
+    })
+  }
 
   /**
    * @todo 把要下单的数据传到order.pay redux中
@@ -603,76 +591,69 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public getProductInterfacePayload = (
-    currentMerchantDetail,
-    activityList,
-    memberInfo,
-    productCartList,
-    products?: ProductCartInterface.ProductCartInfo[],
-    address?: any,
-    payOrderDetail?: any
-  ): ProductCartInterface.ProductPayPayload => {
+  public getProductInterfacePayload = (currentMerchantDetail, activityList, memberInfo, productCartList, products: ProductCartInterface.ProductCartInfo[], address: any, payOrderDetail: any, pointsTotal: any, points: any, DeliveryFee: any, payType: any): ProductCartInterface.ProductPayPayload => {
     // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;  UserInterface.Address
     const productList = products !== undefined ? products : productCartList;
     // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
-    let order: Partial<ProductCartInterface.ProductOrderPayload> = {
+    const transAmountNow = this.getProductTransPrice(activityList, memberInfo, productCartList, productList) + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0);
+    // Partial<ProductCartInterface.ProductOrderPayload>
+    console.log(currentMerchantDetail, 'currentMerchantDetail');
+    let order: any = {
       deliveryInfo: {
-        address:
-          payOrderDetail.deliveryType === 1
-            ? (address && address.address) || ""
-            : "",
+        address: payOrderDetail.deliveryType === 1 ? address && address.address ? `${address.address} ${address.houseNumber}` : '' : '',
         deliveryType: payOrderDetail.deliveryType || 0,
-        deliveryFee: payOrderDetail.deliveryType === 1 ? 3.5 : 0,
-        planDeliveryTime: payOrderDetail.planDeliveryTime || ""
+        deliveryFee: payOrderDetail.deliveryType === 1 ? DeliveryFee : 0,
+        planDeliveryTime: payOrderDetail.planDeliveryTime || '',
       },
+      deliveryPhone: '',
       remark: payOrderDetail.remark || "",
-      payType: 8,
-      merchantId:
-        currentMerchantDetail && currentMerchantDetail.id
-          ? currentMerchantDetail.id
-          : BASE_PARAM.MCHID,
-      //   discount: 0,
+      payType: payType,
+      merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
+      discount: 0,
+      points: pointsTotal ? points : null,
       orderSource: 7,
-      totalAmount:
-        this.getProductsOriginPrice(productList) +
-        (payOrderDetail.deliveryType === 1 ? 3.5 : 0),
+      totalAmount: this.getProductsOriginPrice(productList) + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0),
       totalNum: this.getProductNumber(productList),
-      transAmount:
-        this.getProductTransPrice(
-          activityList,
-          memberInfo,
-          productCartList,
-          productList
-        ) + (payOrderDetail.deliveryType === 1 ? 3.5 : 0)
-    };
+      transAmount: transAmountNow
+    }
 
     if (payOrderDetail.deliveryType === 1) {
-      order.deliveryInfo = {
-        ...(order.deliveryInfo as ProductCartInterface.DeliveryInfo),
-        receiver: (address && address.contact) || "",
-        receiverPhone: (address && address.phone) || ""
-      };
+      order = {
+        ...order,
+        deliveryInfo: {
+          ...order.deliveryInfo,
+          receiver: address && address.contact || "",
+          receiverPhone: address && address.phone || '',
+        }
+
+      }
     }
 
     if (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id) {
-      const transAmount =
-        this.getProductTransPrice(activityList, memberInfo, productCartList) +
-        (payOrderDetail.deliveryType === 1 ? 3.5 : 0) -
+      const transAmount = this.getProductTransPrice(activityList, memberInfo, productCartList) +
+        (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
         (payOrderDetail.selectedCoupon.couponVO.discount || 0);
       order = {
         ...order,
-        transAmount: transAmount,
+        transAmount: Math.round(transAmount * 100) / 100,
         couponList: [payOrderDetail.selectedCoupon.couponCode]
-      };
-    }
+      }
 
+    }
+    if (pointsTotal) {
+      const transAmount = order.transAmount - pointsTotal;
+      order = {
+        ...order,
+        transAmount: Math.round(transAmount * 100) / 100,
+      }
+    }
     const payload: ProductCartInterface.ProductPayPayload = {
       order: order as any,
-      productInfoList: productList.map(item => {
+      productInfoList: productList.map((item) => {
         /**
          * @todo [默认会员价，有就用会员价，没有就用普通价格]
          */
-        const itemPrice: number = this.getProductItemPrice(item, memberInfo);
+        const itemPrice: number = item.memberPrice !== undefined ? item.memberPrice : item.price;
         return {
           productId: item.id,
           productName: item.name,
@@ -682,41 +663,21 @@ class ProductSDK {
           transAmount: itemPrice * item.sellNum,
           unitPrice: itemPrice
         } as ProductCartInterface.ProductInfoPayload;
-      })
+      }),
     };
-    return payload;
-  };
 
-  public requestPayment = async (
-    orderNo: string,
-    fail?: (res: any) => void
-  ) => {
-    const params = {
+    return payload;
+  }
+
+  public requestPayment = async (orderNo: string, payType: any, fail?: (res: any) => void) => {
+    let payload = {
       orderNo,
-      openId: store.getState().user.userinfo.openId,
-      orderSource: 7
+      payType: payType
     };
-    const result = await requestHttp.post(`/api/cashier/pay`, params);
-    if (result.code === ResponseCode.success && result.data.status !== false) {
-      return new Promise(resolve => {
-        const payload = JSON.parse(result.data.param);
-        delete payload.appId;
-        const paymentPayload = {
-          ...payload,
-          success: res => {
-            resolve(res);
-          },
-          fail: error => {
-            resolve(error);
-          }
-        };
-        Taro.requestPayment(paymentPayload);
-        // if(process.env.TARO_ENV === 'h5'){
-        //     const data = result.data;
-        //     const url = data.codeUrl.replace('-app', '-customer')
-        //     window.location.href = url;
-        // } else {
-        //     const payload = JSON.parse(result.data.param);
+    const result = await requestHttp.post(`/api/cashier/pay`, payload);
+    if (result.code === ResponseCode.success && payType !== 7 && result.data.param) {
+      return new Promise(async (resolve) => {
+        // const payload = JSON.parse(result.data.param);
         //     delete payload.appId;
         //     const paymentPayload = {
         //         ...payload,
@@ -727,13 +688,32 @@ class ProductSDK {
         //             resolve(error)
         //         }
         //     };
-        //     console.log('paymentPayload: ', paymentPayload)
         //     Taro.requestPayment(paymentPayload);
-        // }
-      });
+
+        if (process.env.TARO_ENV === 'h5') {
+
+          const data = result.data;
+          const url = data.codeUrl.replace('-app', '-customer')
+          window.location.href = url;
+        } else {
+          const payload = JSON.parse(result.data.param);
+          delete payload.appId;
+          const paymentPayload = {
+            ...payload,
+            success: (res) => {
+              resolve(res)
+            },
+            fail: (error) => {
+              resolve(error)
+            }
+          };
+          Taro.requestPayment(paymentPayload);
+
+        }
+      })
     }
     return result;
-  };
+  }
 
   public isCartProduct(
     product: ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo
@@ -755,16 +735,22 @@ class ProductSDK {
     product:
       | ProductInterface.ProductInfo
       | ProductCartInterface.ProductCartInfo,
-    num?: number
+    num?: number,
+    merchantId?: number
   ) => {
     Taro.showToast({
       title: "加入购物车"
     });
-    const {
+    let {
       merchant: { currentMerchantDetail }
     } = store.getState();
+    if (merchantId) {
+      currentMerchantDetail = { id: merchantId } as any;
+    }
     const productCartList =
-      productSDK.productCartList[currentMerchantDetail.id];
+      productSDK.productCartList && productSDK.productCartList[currentMerchantDetail.id]
+        ? productSDK.productCartList[currentMerchantDetail.id]
+        : [];
     const index = productCartList.findIndex(p => p.id === product.id);
     let limitNum = -1;
     if (product.activityInfos) {
@@ -872,9 +858,13 @@ class ProductSDK {
     product:
       | ProductInterface.ProductInfo
       | ProductCartInterface.ProductCartInfo,
-    num?: number
+    num?: number,
+    merchantId?: number
   ) => {
-    const { currentMerchantDetail } = store.getState().merchant;
+    let { currentMerchantDetail } = store.getState().merchant;
+    if (merchantId) {
+      currentMerchantDetail = { id: merchantId } as any;
+    }
     const reducer: ProductSDKReducer.ProductManageCart = {
       type: this.reducerInterface.MANAGE_CART_PRODUCT,
       payload: {
@@ -909,13 +899,15 @@ class ProductSDK {
    *
    * @memberof ProductSDK
    */
-  public empty = (dispatch, products?: ProductInterface.ProductInfo[]) => {
-    const { currentMerchantDetail } = store.getState().merchant;
+  public empty = (dispatch, merchantId?: number) => {
+    let { currentMerchantDetail } = store.getState().merchant;
+    if (typeof merchantId === 'number') {
+      currentMerchantDetail = { id: merchantId } as any;
+    }
     dispatch({
       type: this.reducerInterface.MANAGE_EMPTY_CART,
       payload: {
         currentMerchantDetail,
-        productList: products
       }
     } as ProductSDKReducer.Reducers.EmptyCart);
 
@@ -923,7 +915,7 @@ class ProductSDK {
       type: this.reducerInterface.SELECT_INDEX,
       payload: {
         type: "empty",
-        products
+        products: []
       }
     });
   };
@@ -938,13 +930,13 @@ class ProductSDK {
     productSDK,
     params: ProductCartInterface.ProductSDKManageInterface
   ) => {
-    const { product, type, num } = params;
+    const { product, type, num, merchantId } = params;
     if (type === this.productCartManageType.EMPTY) {
-      this.empty(dispatch);
+      this.empty(dispatch, merchantId);
     } else if (type === this.productCartManageType.ADD) {
-      this.add(dispatch, productSDK, product, num);
+      this.add(dispatch, productSDK, product, num || 1, merchantId);
     } else {
-      this.reduce(dispatch, productSDK, product, num);
+      this.reduce(dispatch, productSDK, product, num || 1, merchantId);
     }
     this.storageProductCartList();
   };
@@ -974,25 +966,37 @@ class ProductSDK {
   };
 
   /**
+     * @todo [清空购物车]
+     * @todo [清空下单信息]
+     */
+  public cashierOrderCallbackOnly = async (dispatch, result: OrderInterface.OrderDetail, orderPayType: any) => {
+    this.empty(dispatch);
+    this.preparePayOrder(dispatch, [], [])
+    this.preparePayOrderAddress({} as any, dispatch)
+    this.preparePayOrderDetail({} as any, dispatch)
+  }
+
+  /**
    * @todo [清空购物车]
    * @todo [清空下单信息]
    */
-  public cashierOrderCallback = async (
-    dispatch,
-    result: OrderInterface.OrderDetail
-  ) => {
-    this.empty(dispatch, result.orderDetailList as any);
-    this.preparePayOrder(dispatch, [], []);
-    this.preparePayOrderAddress({} as any, dispatch);
-    this.preparePayOrderDetail({} as any, dispatch);
-    const { order } = result;
+  public cashierOrderCallback = async (dispatch, result: OrderInterface.OrderDetail, orderPayType: any) => {
+    const { order, orderNo } = result;
     Taro.showLoading();
-    await ProductService.cashierQueryStatus({ orderNo: order.orderNo });
+    if (orderPayType !== 7) {
+      const res = await ProductService.cashierQueryStatus({ orderNo: order.orderNo || orderNo });
+    }
+    
     Taro.hideLoading();
+    this.empty(dispatch);
+    this.preparePayOrder(dispatch, [], [])
+    this.preparePayOrderAddress({} as any, dispatch)
+    this.preparePayOrderDetail({} as any, dispatch)
+
     Taro.redirectTo({
-      url: `/pages/order/order.detail?id=${order.orderNo}`
+      url: `/pages/order/order.detail?id=${order.orderNo || orderNo}`
     });
-  };
+  }
 
   public storageProductCartList = () => {
     // const productCartList = store.getState().productSDK.productCartList;

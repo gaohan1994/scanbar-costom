@@ -18,7 +18,7 @@ import { LoginManager } from "../../common/sdk";
 const cssPrefix = 'order';
 
 let pageNum: number = 1;
-const pageSize: number = 20;
+const pageSize: number = 10;
 
 interface Props {
   dispatch: Dispatch;
@@ -107,11 +107,12 @@ class Order extends Taro.Component<Props, State> {
     try {
       let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === 'number' ? page : pageNum,
-        pageSize: 20,
+        pageSize: pageSize,
         ...orderAction.getFetchType(currentType)
       };
-
+      Taro.showLoading();
       const result = await OrderAction.orderList(dispatch, payload);
+      Taro.hideLoading();
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       if (typeof page === 'number') {
         pageNum = page;
@@ -247,4 +248,4 @@ const select = (state: any) => ({
   productSDK: state.productSDK,
 });
 
-export default connect(select)(Order);
+export default connect(select)(Order as any);

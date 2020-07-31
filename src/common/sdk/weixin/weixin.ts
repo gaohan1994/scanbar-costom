@@ -96,9 +96,12 @@ class WeixinSDK {
   public getLocation = async (
     dispatch
   ): Promise<{ success: boolean; result: any; msg: string }> => {
+    // const authRes: any = await this.checkAuth("userLocation");
+    // if (authRes.success) {
     const that = this;
     return new Promise(resolve => {
       if (process.env.TARO_ENV === "weapp") {
+
         // 微信小程序逻辑
         Taro.getLocation({
           success: res => {
@@ -130,7 +133,9 @@ class WeixinSDK {
             });
           },
           fail: error => {
-            resolve({ success: false, result: undefined, msg: error.message });
+            // 'getLocation:fail:ERROR_NOCELL&WIFI_LOCATIONSWITCHOFF'
+            // 'getLocation:fail auth deny'
+            resolve({ success: false, result: undefined, msg: error.msg });
           }
         });
       }
@@ -138,7 +143,7 @@ class WeixinSDK {
         // H5 逻辑
         wx.getLocation({
           type: "wgs84", // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
-          success: function(res) {
+          success: function (res) {
             // var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
             // var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
             // var speed = res.speed; // 速度，以米/每秒计
@@ -215,6 +220,31 @@ class WeixinSDK {
         });
       }
     });
+    // } else {
+    //   // Taro.showModal({
+    //   //   content: '检测到您没打开位置权限，是否去设置打开？',
+    //   //   confirmText: "确认",
+    //   //   cancelText: "取消",
+    //   //   success: function(res) {
+    //   //     console.log(res);
+    //   //     //点击“确认”时打开设置页面
+    //   //     if (res.confirm) {
+    //   //       Taro.openSetting({
+    //   //         success: (res) => {}
+    //   //       })
+    //   //     } else {
+    //   //       console.log('用户点击取消')
+    //   //     }
+    //   //   }
+    //   // });
+    //   return new Promise(resolve => {
+    //     resolve({
+    //       success: false,
+    //       result: undefined,
+    //       msg: "未授权获取位置信息"
+    //     });
+    //   });
+    // }
   };
 
   public changeCostomIndexAddress = (
@@ -242,7 +272,7 @@ class WeixinSDK {
       }
       const result = await this.getLocation(dispatch);
       console.log("result", result);
-      invariant(!!result.success, result.msg || "获取地理位置失败");
+      invariant(!!result.success, result.msg || '获取位置失败, 请开启手机定位');
       const payload = {
         address: result.result.address,
         latitude: result.result.location.lat,

@@ -3,12 +3,12 @@ export declare namespace MerchantInterface {
     activityInfo: string[];
     address: string;
     coupons: any[];
-    isNew: number;
+    isNew: boolean;
     deliveryThreshold: string;
     distanceShow: string;
     name: string;
     logo: string;
-    status: true;
+    status: boolean;
     minDiscount: number;
     distance: number;
     id: number;
@@ -131,6 +131,7 @@ export declare namespace MerchantInterface {
     type RECEIVE_MERCHANT_ADVERTISEMENT = string;
     type RECEIVE_MERCHANT_ACTIVITYLIST = string;
     type RECEIVE_MERCHANT_SEARCH_LIST = string;
+    type SET_PAYTYPE = string;
   }
 
   interface MerchantInterfaceMap {
@@ -142,6 +143,7 @@ export declare namespace MerchantInterface {
       RECEIVE_MERCHANT_ADVERTISEMENT: ReducerTypes.RECEIVE_MERCHANT_ADVERTISEMENT;
       RECEIVE_MERCHANT_ACTIVITYLIST: ReducerTypes.RECEIVE_MERCHANT_ACTIVITYLIST;
       RECEIVE_MERCHANT_SEARCH_LIST: ReducerTypes.RECEIVE_MERCHANT_SEARCH_LIST;
+      SET_PAYTYPE: ReducerTypes.SET_PAYTYPE;
     };
 
     merchantInfoDetail: string;
@@ -158,6 +160,7 @@ class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
     RECEIVE_MERCHANT_ACTIVITYLIST: "RECEIVE_MERCHANT_ACTIVITYLIST",
     RECEIVE_MERCHANT_ALIANCE_LIST: "RECEIVE_MERCHANT_ALIANCE_LIST",
     RECEIVE_MERCHANT_SEARCH_LIST: "RECEIVE_MERCHANT_SEARCH_LIST",
+    SET_PAYTYPE: 'SET_PAYTYPE',
   };
   public merchantInfoDetail = "/merchantInfo/detail";
   public merchantList = "/merchantInfo/merchantList";

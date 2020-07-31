@@ -175,7 +175,7 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
         <AtTimeline
           pending
           items={items}
-          className={process.env.TARO_ENV === 'h5' ? `${detailCssPrefix}-card-AtTimeline` : ''}
+          className={process.env.TARO_ENV === 'h5' ? `${detailCssPrefix}-card-AtTimeline-h5` : `${detailCssPrefix}-card-AtTimeline`}
         >
         </AtTimeline>
       </View>

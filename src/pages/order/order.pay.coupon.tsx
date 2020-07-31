@@ -1,13 +1,11 @@
 import Taro, { Config } from '@tarojs/taro'
-import { View, Image, Text, ScrollView } from '@tarojs/components'
+import { View, Text, ScrollView } from '@tarojs/components'
 import '../user/index.less';
 import "../../component/card/form.card.less";
-import classnames from 'classnames';
 import { getAbleToUseCouponList } from '../../reducers/app.order';
 import { UserInterface } from '../../constants';
 import Empty from '../../component/empty';
 import { connect } from '@tarojs/redux';
-import dayJs from 'dayjs';
 import productSdk from '../../common/sdk/product/product.sdk';
 import CouponItem from '../../component/coupon/coupon.item';
 import { Dispatch } from 'redux';
@@ -178,4 +176,4 @@ const select = (state: any) => ({
   payOrderDetail: state.productSDK.payOrderDetail,
 });
 
-export default connect(select)(Page);
+export default connect(select)(Page as any);

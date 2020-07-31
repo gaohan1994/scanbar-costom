@@ -46,7 +46,7 @@
       height: 24px;
       font-weight: 500;
       color: rgba(153, 153, 153, 1);
-      .margin(10px, t);
+      .margin(10px, tb);
       .clamp();
     }
 
@@ -86,12 +86,33 @@
       right: 0px;
       top: 50%;
       transform: translateY(-50%);
+
+      &-normal {
+        width: 240px;
+        height: 66px;
+        background: rgba(42,134,252,1);
+        border-radius: 40px;
+        .flex(center, center);
+        font-size: 32px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 1);
+      }
+
+      &-disable {
+        background: rgba(204,204,204,1);
+        border-radius: 40px;
+      }
     }
 
     &-act {
       display: flex;
       flex-direction: row;
       align-items: flex-start;
+
+      &-margin {
+        .margin(20px, b);
+      }
+
       &-title {
         font-size: 24px;
         font-weight: 500;
@@ -206,12 +227,12 @@
       }
 
       &-stepper {
-        width: 66px !important;
-        height: 66px !important;
+        width: 58px !important;
+        height: 58px !important;
       }
       &-text {
         min-width: 100px !important;
-        font-size: 40px !important;
+        font-size: 36px !important;
       }
     }
   }
@@ -225,5 +246,6 @@
     background-color: transparent;
     .bg;
     background-image: url(//net.huanmusic.com/scanbar-c/v1/icon_details_share.png);
+    border-radius: 0px !important;
   }
 }

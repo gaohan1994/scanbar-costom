@@ -57,7 +57,7 @@ class OrderCancel extends Taro.Component<Props, State> {
       order: {
         orderNo: order.orderNo,
         orderSource: order.orderSource,
-        transAmount: order.transAmount,
+        transAmount: order.transAmount - (order.deliveryFee || 0),
         refundByPreOrder: true,
         remark: remark
       },
@@ -121,14 +121,14 @@ class OrderCancel extends Taro.Component<Props, State> {
             value={remark}
             onInput={({ detail: { value } }) => this.changeRemark(value)}
             placeholder='请输入说明'
-            maxlength={300}
+            maxlength={50}
           />
 
           <View className={`${cssPrefix}-input-corner`}>
-            {`${remark.length}/300`}
+            {`${remark.length}/50`}
           </View>
         </View>
-        <View className={`${cssPrefix}-footer`} style={process.env.TARO_ENV === 'weapp' ? {display: 'block'} : {}}>
+        <View className={`${cssPrefix}-footer`} style={process.env.TARO_ENV === 'weapp' ? { display: 'block' } : {}}>
           <AtButton
             className={classnames(`${cssPrefix}-footer-button`, {
               [`theme-button`]: true,
@@ -206,4 +206,4 @@ const select = (state: AppReducer.AppState) => ({
 });
 
 
-export default connect(select)(OrderCancel);
+export default connect(select)(OrderCancel as any);

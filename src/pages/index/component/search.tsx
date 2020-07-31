@@ -1,8 +1,8 @@
 /*
  * @Author: Ghan
  * @Date: 2020-06-02 10:42:16
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-07-16 15:24:31
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-07-30 15:57:19
  */
 import Taro from "@tarojs/taro";
 import { View } from "@tarojs/components";
@@ -29,8 +29,8 @@ function Search(props: Props) {
   };
 
   return (
-    <View className={`${prefix}`} onClick={() => onNavtoSearch()}>
-      <View className={`${prefix}-input`}>
+    <View className={`${prefix}`}>
+      <View className={`${prefix}-input`} onClick={() => onNavtoSearch()} >
         <View className={`${prefix}-input-icon`} />
         <View style="color:rgba(204,204,204,1);">搜索店内商品</View>
       </View>

@@ -235,6 +235,10 @@
       }
     }
 
+    &-margin {
+      .margin(20px, t);
+    }
+
     &-bottom {
       width: 100%;
       .flex(center, center, row);
@@ -262,6 +266,42 @@
         color: @base-font-color;
         font-weight: bold;
       }
+    }
+
+      &-attention {
+        height: 100%;
+
+        &-margin {
+          display: flex;
+          flex: 1;
+          height: 20px;
+          background-color: white;
+        }
+      }
+  }
+
+  &-point-select {
+    width: 60px;
+    position: relative;
+    // .padding(30px, r);
+    &-item {
+      position: absolute;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      width:34px;
+      height:34px;
+      .bg;
+    }
+    &-normal {
+      background-image: url('//net.huanmusic.com/weapp//bt_unavailable.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
+    }
+    &-active {
+      background-image: url('//net.huanmusic.com/weapp//bt_selected.png');
+      background-size: 100% 100%;
+      background-repeat: no-repeat;
     }
   }
 
@@ -517,7 +557,7 @@
     &-pos {
       margin: auto;
       .margin(6px, t);
-      width: 90% !important;
+      // width: 90% !important;
       background-color: #f2f2f2;
     }
 
@@ -694,7 +734,7 @@
       width: 100%;
       height: 92px;
       .flex(center, space-between, row);
-      border-bottom: #e3e3e3 1px solid;
+      border-bottom: 1px solid rgba(227,227,227,.5);
       padding: 0 32px;
 
       &-item {
@@ -765,7 +805,7 @@
     }
 
     &-border {
-      border-bottom: 1px solid #e3e3e3;
+      border-bottom: 1px solid rgba(227,227,227,.5);
     }
 
     &-normal {
@@ -859,6 +899,7 @@
       height: 26px;
       .flex(center, center, row);
       font-size: 20px;
+      border-radius: 10px;
 
       &-title {
         color: #333333;
@@ -911,7 +952,7 @@
         .flex(center, space-between, row);
         .padding(30px, lr);
         .padding(35px, tb);
-        border-top: #e3e3e3 1px solid;
+        border-top: 1px solid rgba(227, 227, 227, .5);
       }
 
       &-price {

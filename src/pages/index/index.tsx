@@ -1,15 +1,14 @@
 import Taro, { Component, Config } from "@tarojs/taro";
-import { View } from "@tarojs/components";
+import { View, ScrollView } from "@tarojs/components";
 import { connect } from "@tarojs/redux";
 import { AtActivityIndicator } from "taro-ui";
 import "./index.less";
 import "../style/product.less";
-import MerchantListView from "../../component/product/merchant.listview";
 import IndexAddress from "./component/address";
 import Banner from "./component/banner";
 import { MerchantAction } from "../../actions";
 import {
-  MerchantInterface, UserInterface
+  MerchantInterface, UserInterface, ResponseCode
 } from "../../constants";
 import WeixinSdk from "../../common/sdk/weixin/weixin";
 import {
@@ -21,6 +20,9 @@ import { getUserinfo, getMemberInfo, getIndexAddress } from "../../reducers/app.
 import Tabs from "./component/tab";
 import { AppReducer } from "src/reducers";
 import { BASE_PARAM } from "../../common/util/config";
+import classnames from "classnames";
+import Empty from "../../component/empty";
+import MerchantComponent from "../../component/product/merchant";
 
 const cssPrefix = "product";
 
@@ -35,8 +37,8 @@ type Props = {
   merchantList: MerchantInterface.AlianceMerchant[];
   merchantTotal: any;
   address: UserInterface.Address;
-  getNearbyMerchant: (params: any) => void;
-  getOrderedMerchant: (params: any) => void;
+  getNearbyMerchant: (params: any) => any;
+  getOrderedMerchant: (params: any) => any;
 };
 class Index extends Component<Props, any> {
   readonly state = {
@@ -50,7 +52,8 @@ class Index extends Component<Props, any> {
     isOpen: false,
     showActivity: true,
     couponModalShow: false,
-    obtainCouponList: []
+    obtainCouponList: [],
+    type: 'nearby'
   };
 
   common = {
@@ -72,6 +75,7 @@ class Index extends Component<Props, any> {
 
   async componentDidMount() {
     try {
+      await this.initAddress();
       this.init();
     } catch (error) {
       Taro.showToast({
@@ -83,28 +87,24 @@ class Index extends Component<Props, any> {
   }
 
   async componentDidShow() {
-    // const { userinfo } = this.props;
-    // if (userinfo.phone && userinfo.phone.length > 0) {
-    //   UserAction.getMemberInfo();
-    //   const res = await UserAction.obtainCoupon();
-    //   if (res.code == ResponseCode.success) {
-    //     this.setState({ obtainCouponList: res.data.rows })
-    //   }
-    // }
-    this.init();
+    this.init(this.state.type, false);
   }
 
   public initAddress = async () => {
     /**
      * @todo 判断当前
      */
+    await LoginManager.getUserInfo(this.props.dispatch);
+    await WeixinSdk.initAddress(this.props.dispatch);
   };
 
-  public init = async (type?: string): Promise<void> => {
+  public init = async (type?: string, showLoading?: boolean): Promise<void> => {
+    const { address } = this.props;
     try {
-      this.setState({ loading: true });
-      await LoginManager.getUserInfo(this.props.dispatch);
-      const address: any = await WeixinSdk.initAddress(this.props.dispatch);
+      if (showLoading !== false) {
+        this.setState({ loading: true });
+      }
+      MerchantAction.advertisement(this.props.dispatch);
       page = 1;
       // invariant(!!address.longitude, "请先定位");
       await this.fetchData(type || 'nearby', address);
@@ -123,13 +123,20 @@ class Index extends Component<Props, any> {
       type === "recommand"
         ? this.props.getOrderedMerchant
         : this.props.getNearbyMerchant;
-    await fetchFunction({
+    if (page !== 1) {
+      Taro.showLoading();
+    }
+    const res = await fetchFunction({
       pageNum: page,
-      pageSize: 20,
+      pageSize: 10,
       longitude: address.longitude || 119,
       latitude: address.latitude || 26,
       institutionCode: BASE_PARAM.institutionCode
     });
+    Taro.hideLoading();
+    if (res.code === ResponseCode.success) {
+      page++;
+    }
   }
 
   /**
@@ -138,6 +145,12 @@ class Index extends Component<Props, any> {
    * @memberof Index
    */
   public onTabChange = tab => {
+    page = 1;
+    if (tab.id === 0) {
+      this.setState({ type: 'nearby' });
+    } else {
+      this.setState({ type: 'recommand' });
+    }
     this.init(tab.id === 0 ? "nearby" : "recommand");
   };
 
@@ -151,32 +164,16 @@ class Index extends Component<Props, any> {
 
   render() {
     const { loading, showActivity } = this.state;
-    const { advertisement, merchantList, merchantTotal } = this.props;
-    const hasMore = merchantList.length < merchantTotal;
+    const { advertisement } = this.props;
     return (
       <View className={`container ${cssPrefix}`}>
-        <IndexAddress />
-        {showActivity && (
+        <IndexAddress initDit={this.initAddress}/>
+        {showActivity && advertisement.length > 0 && (
           <View className={`${cssPrefix}-activity`}>
             <Banner advertisement={advertisement} />
           </View>
         )}
         <Tabs onChange={tab => this.onTabChange(tab)}>
-          {/* {!!loading ? (
-            <View className="loading">
-              <AtActivityIndicator mode="center" />
-            </View>
-          ) : (
-              <View className={`${cssPrefix}-list-container-costom`}>
-                <View className={`${cssPrefix}-list-right`}>
-                  <MerchantListView
-                    loading={loading}
-                    data={merchantList}
-                    // className={`${cssPrefix}-list-right-container`}
-                  />
-                </View>
-              </View>
-            )} */}
         </Tabs>
         {!!loading ? (
           <View className="loading">
@@ -185,12 +182,52 @@ class Index extends Component<Props, any> {
         ) : (
             <View className={`${cssPrefix}-list-container-costom`}>
               <View className={`${cssPrefix}-list-right`}>
-                <MerchantListView data={merchantList} onScrollToLower={this.onScrollToLower} hasMore={hasMore}/>
+                {
+                  this.renderMerchantList()
+                }
               </View>
             </View>
           )}
       </View>
     );
+  }
+
+  renderMerchantList() {
+    const { merchantList, merchantTotal } = this.props;
+    const hasMore = merchantList.length < merchantTotal;
+    return (
+      <ScrollView
+        scrollY={true}
+        className={classnames(
+          `${cssPrefix}-list-right ${cssPrefix}-list-margin ${
+          process.env.TARO_ENV === "h5" ? `${cssPrefix}&-h5-height` : ""
+          }`,
+        )}
+        onScrollToLower={this.onScrollToLower}
+      >
+        {
+          Array.isArray(merchantList) === true && merchantList.length > 0 ? (
+            (merchantList || []).map((merchant) => {
+              return (
+                <View id={`data${merchant.id}`} key={merchant.id}>
+                  <MerchantComponent merchant={merchant} border={true} />
+                </View>
+              );
+            })
+          ) : (
+              <Empty
+                img="//net.huanmusic.com/scanbar-c/v1/img_commodity.png"
+                css={"index"}
+                text={"没有相关门店"}
+              />
+            )
+        }
+        {hasMore !== true && merchantList && merchantList.length > 0 && (
+          <View className={`${cssPrefix}-list-bottom`}>已经到底啦</View>
+        )}
+        <View style="height: 100rpx" />
+      </ScrollView>
+    )
   }
 }
 

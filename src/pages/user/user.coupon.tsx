@@ -1,5 +1,5 @@
 import Taro, { Config } from '@tarojs/taro'
-import { View, ScrollView, Image } from '@tarojs/components'
+import { View, ScrollView } from '@tarojs/components'
 import './index.less';
 import "../../component/card/form.card.less";
 import '../style/product.less';
@@ -11,7 +11,6 @@ import Empty from '../../component/empty';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 import { Dispatch } from 'redux';
 import { ResponseCode } from '../../constants/index';
-import dayJs from 'dayjs';
 import UserCouponItem from './user.coupon.item';
 
 interface Props {
@@ -120,36 +119,46 @@ class Page extends Taro.Component<Props, State> {
     const { total } = this.state;
     return (
       <View className={`container user`} >
-        <ScrollView
-          scrollY={true}
-          className={`${cssPrefix}-scrollview ${cssPrefix}-scrollview-full`}
-          onScrollToLower={couponList.length < total ? this.loadData : () => {/** */ }}
-        >
-          {
-            Array.isArray(couponList) && couponList.length > 0
-              ? couponList.map((item, index) => {
-                return (
-                  <View key={`coupon${index}`} className={`${cssPrefix}-scrollview-item`}>
-                    <UserCouponItem
-                      item={item}
-                      isOpen={this.isOpen(item)}
-                      onChangeCouponOpen={this.onChangeCouponOpen}
-                      goToUse={this.navToUse}
-                    />
-                  </View>
+        {
+          Array.isArray(couponList) && couponList.length > 0
+            ? (
+              <ScrollView
+                scrollY={true}
+                className={`${cssPrefix}-scrollview ${cssPrefix}-scrollview-full`}
+                onScrollToLower={couponList.length < total ? this.loadData : () => {/** */ }}
+              >
+                {
+                  couponList.map((item, index) => {
+                    return (
+                      <View key={`coupon${index}`} className={`${cssPrefix}-scrollview-item`}>
+                        <UserCouponItem
+                          item={item}
+                          isOpen={this.isOpen(item)}
+                          onChangeCouponOpen={this.onChangeCouponOpen}
+                          goToUse={this.navToUse}
+                        />
+                      </View>
 
-                )
-              })
-              : (
+                    )
+                  })
+                }
+                {
+                  couponList.length >= total && couponList.length !== 0 && (
+                    <View className={`product-list-bottom`}>已经到底啦</View>
+                  )
+                }
+                <View style="height: 50px" />
+              </ScrollView>
+            )
+            : (
+              <View className='user-empty'>
                 <Empty
                   img='//net.huanmusic.com/scanbar-c/v2/img_coupon.png'
                   text="还没优惠券"
                 />
-              )
-          }
-          <View className={`product-list-bottom`}>已经到底啦</View>
-          <View style="height: 50px" />
-        </ScrollView>
+              </View>
+            )
+        }
       </View>
     );
   }
@@ -162,7 +171,6 @@ const mapDispatch = dispatch => {
 };
 
 const select = (state: any) => ({
-
   userinfo: getUserinfo(state),
   couponList: getCouponList(state),
   currentMerchantDetail: getCurrentMerchantDetail(state),

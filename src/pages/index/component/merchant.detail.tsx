@@ -2,24 +2,21 @@
  * @Author: Ghan
  * @Date: 2020-06-02 10:42:16
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-07-24 09:41:01
+ * @Last Modified time: 2020-07-30 17:05:21
  */
 import Taro from "@tarojs/taro";
-import { View, ScrollView, Text } from '@tarojs/components';
+import { View, ScrollView, Image } from '@tarojs/components';
 import "./index.less";
 import '../../../component/coupon/index.less';
 import { MerchantInterface } from "../../../constants";
 import merchantAction from "../../../actions/merchant.action";
 import invariant from "invariant";
 import { ResponseCode } from "../../../constants/index";
-import classnames from 'classnames';
-import dayJs from 'dayjs';
 import { connect } from "@tarojs/redux";
-import { UserAction } from "../../../actions";
+import CouponItem from "./coupon.item";
+import classNames from "classnames";
 
 const prefix = "index-component-card";
-const cssPrefix = 'coupon';
-
 
 type Props = {
   merchant: MerchantInterface.AlianceMerchant;
@@ -73,9 +70,9 @@ class MerchantDetailCard extends Taro.Component<Props, State> {
         /**
          * 收藏完之后更新
          */
-        this.props.setCurrentMerchantDetail(merchant);
+        await this.props.setCurrentMerchantDetail(merchant);
         Taro.showToast({
-          title: "取消收藏"
+          title: "取消收藏",
         });
         return;
       }
@@ -87,9 +84,9 @@ class MerchantDetailCard extends Taro.Component<Props, State> {
       /**
        * 收藏完之后更新
        */
-      this.props.setCurrentMerchantDetail(merchant);
+      await this.props.setCurrentMerchantDetail(merchant);
       Taro.showToast({
-        title: "已收藏"
+        title: "已收藏",
       });
       return;
     } catch (error) {
@@ -119,59 +116,38 @@ class MerchantDetailCard extends Taro.Component<Props, State> {
   }
 
   getActivityInfo = (origionData: any) => {
-    let activityInfo = {};
+    let activityInfo: any[] = [];
     const activityInfoVOS = origionData;
     for (let i = 0; i < activityInfoVOS.length; i++) {
       let item = activityInfoVOS[i];
-      let rule = JSON.parse(item.rule);
-      item.rule = rule;
-      if (typeof activityInfo[item.type] !== 'undefined') {
-        let array = activityInfo[item.type];
-        for (let j = 0; j < item.rule.length; j++) {
-          let itemSplice = { ...item, rule: item.rule[j] };
-          array.push(itemSplice);
-        }
-        activityInfo[item.type] = array;
-      } else {
-        let array: any[] = [];
-        for (let j = 0; j < item.rule.length; j++) {
-          let itemSplice = { ...item, rule: item.rule[j] };
-          array.push(itemSplice);
-        }
-        activityInfo[item.type] = array;
+      let rule = item.rule
+      if (typeof item.rule === 'string') {
+        rule = JSON.parse(item.rule);
       }
+      item.rule = rule;
+      // if (typeof activityInfo[item.type] !== 'undefined') {
+      //   let array = activityInfo[item.type];
+      //   for (let j = 0; j < item.rule.length; j++) {
+      //     let itemSplice = { ...item, rule: item.rule[j] };
+      //     array.push(itemSplice);
+      //   }
+      //   activityInfo[item.type] = array;
+      // } else {
+      //   let array: any[] = [];
+      //   for (let j = 0; j < item.rule.length; j++) {
+      //     let itemSplice = { ...item, rule: item.rule[j] };
+      //     array.push(itemSplice);
+      //   }
+      //   activityInfo[item.type] = array;
+      // }
+      activityInfo.push(item);
     }
     return activityInfo;
   }
 
-  obtainCoupon = async (item: any) => {
-    const { setCurrentMerchantDetail, merchant } = this.props;
-    if (item.isObtain) {
-      this.hideCoupon();
-    } else {
-      const params = {
-        couponIdList: [item.id]
-      }
-      const res = await UserAction.countMyMemberCardAndCoupon(params);
-      if (res.result) {
-        setCurrentMerchantDetail(merchant);
-        Taro.showToast({
-          title: "领取优惠券成功",
-          icon: 'none'
-        })
-      } else {
-        Taro.showToast({
-          title: res.result || "领取优惠券失败",
-          icon: 'none'
-        })
-      }
-    }
-  }
-
-
   render() {
     const { merchant } = this.props;
-    const { showCouponMore, showMerchantMore, activityInfo } = this.state;
+    const { showCouponMore, showMerchantMore } = this.state;
     return (
       <View>
         {showMerchantMore || showCouponMore ? (
@@ -186,14 +162,33 @@ class MerchantDetailCard extends Taro.Component<Props, State> {
                   onClick={this.merchantLike}
                 />
                 <View className={`${prefix}-detail-top`}>
-                  <View className={`${prefix}-detail-avatar`} />
+                  <View className={`${prefix}-detail-cover`}>
+                    {!!merchant.isNew && (
+                      <View className={`${prefix}-detail-cover-new`} />
+                    )}
+                    {merchant.status === false && (
+                      <View className={`${prefix}-detail-cover-close`} />
+                    )}
+
+                    {merchant.logo && merchant.logo !== "" ? (
+                      <View
+                        className={`${prefix}-detail-cover-image`}
+                        style={`background-image: url(${merchant.logo})`}
+                      />
+                    ) : (
+                        <Image
+                          src="//net.huanmusic.com/scanbar-c/icon_shop_default.png"
+                          className={`${prefix}-detail-cover-image`}
+                        />
+                      )}
+                  </View>
 
                   <View className={`${prefix}-detail-right`}>
-                    <View className={`${prefix}-detail-title`}>
+                    <View className={`${prefix}-detail-title`} onClick={() => this.showMerchant()}>
                       <View className={`${prefix}-detail-title-text`}>
                         {merchant.name}
                       </View>
-                      <View className={`${prefix}-detail-expand`} onClick={() => this.showMerchant()} />
+                      <View className={`${prefix}-detail-expand`} />
                     </View>
 
                     {merchant && Array.isArray(merchant.topActivityInfos) && merchant.topActivityInfos.length > 0 && (
@@ -212,7 +207,7 @@ class MerchantDetailCard extends Taro.Component<Props, State> {
                     )}
                     {
                       merchant && Array.isArray(merchant.couponVOS) && merchant.couponVOS.length > 0 && (
-                        <View className={`${prefix}-detail-activitys`}>
+                        <View className={`${prefix}-detail-activitys`} onClick={() => this.showCoupon()}>
                           {merchant.couponVOS.map((item, index) => {
                             if (index > 2) {
                               return <View />
@@ -225,13 +220,19 @@ class MerchantDetailCard extends Taro.Component<Props, State> {
                                     <View className={`${prefix}-detail-coupon-item-price`}>{item.discount}</View>
                                   </View>
                                 </View>
-                                <View className={`${prefix}-detail-coupon-item`} onClick={() => this.showCoupon()}>
+                                <View
+                                  // className={`${prefix}-detail-coupon-item ${prefix}-detail-coupon-obtained`}
+                                  className={classNames(`${prefix}-detail-coupon-item`, {
+                                    [`${prefix}-detail-coupon-obtained`]: item.isObtained
+                                  })}
+                                  onClick={() => this.showCoupon()}
+                                >
                                   {item.isObtained ? '已领' : '领取'}
                                 </View>
                               </View>
                             );
                           })}
-                          <View className={`${prefix}-detail-expand`} onClick={() => this.showCoupon()} />
+                          <View className={`${prefix}-detail-expand`} />
                         </View>
                       )
                     }
@@ -249,7 +250,7 @@ class MerchantDetailCard extends Taro.Component<Props, State> {
   }
 
   renderMoreInfo() {
-    const { merchant } = this.props;
+    const { merchant, setCurrentMerchantDetail } = this.props;
     const { showCouponMore, showMerchantMore, activityInfo } = this.state;
     return (
       <View className={`${prefix}-wrap`}>
@@ -263,7 +264,26 @@ class MerchantDetailCard extends Taro.Component<Props, State> {
               onClick={this.merchantLike}
             />
             <View className={`${prefix}-detail-top`}>
-              <View className={`${prefix}-detail-avatar`} />
+              <View className={`${prefix}-detail-cover`}>
+                {!!merchant.isNew && (
+                  <View className={`${prefix}-detail-cover-new`} />
+                )}
+                {!merchant.status && (
+                  <View className={`${prefix}-detail-cover-close`} />
+                )}
+
+                {merchant.logo && merchant.logo !== "" ? (
+                  <View
+                    className={`${prefix}-detail-cover-image`}
+                    style={`background-image: url(${merchant.logo})`}
+                  />
+                ) : (
+                    <Image
+                      src="//net.huanmusic.com/scanbar-c/icon_shop_default.png"
+                      className={`${prefix}-detail-cover-image`}
+                    />
+                  )}
+              </View>
 
               <View className={`${prefix}-detail-right`}>
                 <View className={`${prefix}-detail-title ${prefix}-detail-title-more`}>
@@ -310,7 +330,12 @@ class MerchantDetailCard extends Taro.Component<Props, State> {
                         merchant.couponVOS.map(item => {
                           return (
                             <View className={`${prefix}-detail-discount-item`}>
-                              {this.renderCouponItem(item)}
+                              <CouponItem
+                                data={item}
+                                setCurrentMerchantDetail={setCurrentMerchantDetail}
+                                merchant={merchant}
+                                hideCoupon={this.hideCoupon}
+                              />
                             </View>
                           )
                         })
@@ -319,20 +344,20 @@ class MerchantDetailCard extends Taro.Component<Props, State> {
                     {merchant && Array.isArray(merchant.activityInfoVOS) && merchant.activityInfoVOS.length > 0 && (
                       <View>
                         <View className={`${prefix}-tip`}>优惠</View>
-                        <View>
+                        <View >
                           {
-                            activityInfo && Object.keys(activityInfo).sort().map(function (key: any) {
+                            activityInfo.map((item: any) => {
                               return (
-                                <View className={`${prefix}-detail-discount`} key={key}>
+                                <View className={`${prefix}-detail-discount`} key={item.name}>
                                   <View className={`${prefix}-detail-discount-symbol`}>
-                                    {key === '3' ? `满减` : ``}
+                                    {item.name}
                                   </View>
                                   <View className={`${prefix}-detail-discount-row`}>
                                     {
-                                      activityInfo[key].map((item: any, index: number) => {
+                                      item.rule.map((ele: any, index: number) => {
                                         return (
                                           <View className={`${prefix}-detail-discount-content`}>
-                                            {`满${item.rule.threshold}减${item.rule.discount}${(index !== activityInfo[key].length - 1) ? '，' : ''}`}
+                                            {`满${ele.threshold}减${ele.discount}${(index !== item.rule.length - 1) ? '，' : ''}`}
                                           </View>
                                         )
                                       })
@@ -360,41 +385,6 @@ class MerchantDetailCard extends Taro.Component<Props, State> {
         </View>
       </View>
     );
-  }
-
-  renderCouponItem(data: any) {
-    return (
-      <View className={`${cssPrefix}-item`} style="margin-top: 0px;">
-        <View className={classnames(`${cssPrefix}-item-top`)} style="margin-bottom: -10rpx;">
-          <View className={`${cssPrefix}-item-top-left`}>
-            <Text className={`${cssPrefix}-item-top-left-price`}>
-              {data.discount || 0}
-              <Text className={`${cssPrefix}-item-top-left-sign`}>¥</Text>
-            </Text>
-            <Text className={`${cssPrefix}-item-top-left-info`}>满{data.threshold || 0}可用</Text>
-          </View>
-          <View className={`${cssPrefix}-item-top-right`}>
-            <Text className={classnames(`${cssPrefix}-item-top-right-info`)}>全品类可用</Text>
-            <View className={`${cssPrefix}-item-top-right-row`}>
-              <Text className={classnames(`${cssPrefix}-item-top-right-time`)}>
-                {data.obtainEndTime ? `截止至${dayJs(data.obtainEndTime).format('MM/DD')}` : '无限期'}
-              </Text>
-            </View>
-          </View>
-
-          <View className={classnames(`${cssPrefix}-item-top-button`, {
-            [`${cssPrefix}-item-text-grey`]: false,
-            [`${cssPrefix}-item-border-grey`]: false,
-            [`${cssPrefix}-item-top-button-isGet`]: !data.isObtain,
-          })}
-            onClick={() => this.obtainCoupon(data)}
-          >
-            {data.isObtain ? '去使用' : '领取'}
-          </View>
-
-        </View>
-      </View>
-    )
   }
 }
 

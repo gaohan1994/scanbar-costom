@@ -1,14 +1,12 @@
 import Taro, { useState, useDidShow, useRouter } from "@tarojs/taro";
 import { View } from "@tarojs/components";
-import userAction from "../../actions/user.action";
-import { ResponseCode } from "../../constants/index";
+import { ResponseCode, UserInterface } from "../../constants/index";
 import "./index.less";
 import { connect } from "@tarojs/redux";
-import { getMemberInfo } from "./constant/api";
 import { MerchantInterface } from "src/constants";
 import merchantAction from "../../actions/merchant.action";
-import { IUserStore } from "./types";
 import ButtonFooter from "../../component/button/button.footer";
+import { UserAction } from "../../actions";
 
 const cssprefix = "user";
 
@@ -17,11 +15,11 @@ type Props = {
 };
 
 function UserCard(props: Props) {
-  const [cardDetail, setCardDetail] = useState({} as IUserStore.CardDetail);
+  const [cardDetail, setCardDetail] = useState({} as UserInterface.CardDetail);
   const router = useRouter();
   let entry = null;
   if (router.preload && router.preload.entry) {
-    entry = router.preload as any;
+    entry = router.preload.entry as any;
   }
 
   useDidShow(() => {
@@ -35,12 +33,18 @@ function UserCard(props: Props) {
     }
     const { merchant } = router.preload as any;
     const fetchData = async () => {
-      const result = await getMemberInfo(`${merchant.id}`);
+      Taro.showLoading();
+      const result = await UserAction.getMemberInfo(this.props.dispatch, { id: merchant.id } as any);
+      Taro.hideLoading();
       if (result.code === ResponseCode.success) {
         setCardDetail(result.data);
+      } else {
+        Taro.showToast({
+          title: result.msg,
+          icon: 'none'
+        })
       }
     };
-
     fetchData();
   });
 
@@ -99,8 +103,11 @@ function UserCard(props: Props) {
             <View className={`${cssprefix}-card-item-interest-symbol`} />
             <View className={`${cssprefix}-card-item-interest-title`}>会员权益</View>
           </View>
-
-          <View className={`${cssprefix}-card-item-interest-content`}>1.每消费{cardDetail.obtainMoney}元，积攒{cardDetail.obtainPoints}积分 </View>
+          {
+            cardDetail.obtainMoney && cardDetail.obtainPoints && (
+              <View className={`${cssprefix}-card-item-interest-content`}>1.每消费{cardDetail.obtainMoney}元，积攒{cardDetail.obtainPoints}积分 </View>
+            )
+          }
         </View>
 
         {

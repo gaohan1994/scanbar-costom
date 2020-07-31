@@ -7,7 +7,6 @@ import merchant, { MerchantReducer } from "./app.merchant";
 import productSDK, {
   ProductSDKReducer
 } from "../common/sdk/product/product.sdk.reducer";
-import userReducer from "../pages/user/reducer/index";
 
 export declare namespace AppReducer {
   interface AppState {
@@ -27,5 +26,4 @@ export default combineReducers({
   order,
   merchant,
   user,
-  userReducer
 });

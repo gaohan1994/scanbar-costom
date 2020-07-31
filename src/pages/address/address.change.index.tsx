@@ -4,7 +4,7 @@ import { View, Image } from '@tarojs/components'
 import { connect } from '@tarojs/redux'
 import '../style/product.less'
 import { AppReducer } from '../../reducers'
-import { getAddressList, getCurrentPostion } from '../../reducers/app.user'
+import { getAddressList, getCurrentPostion, getIndexAddress } from '../../reducers/app.user'
 import { UserInterface } from '../../constants'
 import AddressItem from '../../component/address/item'
 import ButtonFooter from '../../component/button/button.footer';
@@ -23,6 +23,7 @@ type Props = {
   dispatch: Dispatch
   addressList: UserInterface.Address[];
   currentPostion: UserInterface.Address;
+  indexAddress: any;
 }
 type State = {
   getUserinfoModal: boolean;
@@ -41,7 +42,8 @@ class Page extends Taro.Component<Props, State> {
   }
 
   componentDidShow() {
-    UserAction.addressList(this.props.dispatch);
+    const { dispatch, indexAddress } = this.props;
+    UserAction.addressList(dispatch, indexAddress);
   }
 
   public onAddressClick = (address: UserInterface.Address) => {
@@ -53,6 +55,14 @@ class Page extends Taro.Component<Props, State> {
     try {
       Taro.showLoading();
       const result = await WeixinSdk.getLocation(this.props.dispatch);
+      if (result.success) {
+        const param = {
+          address: result.result.address,
+          latitude: result.result.location.lat,
+          longitude: result.result.location.lng
+        }
+        WeixinSdk.changeCostomIndexAddress(param as any, this.props.dispatch);
+      }
       Taro.hideLoading();
       invariant(!!result.success, result.msg || ' ')
     } catch (error) {
@@ -64,7 +74,7 @@ class Page extends Taro.Component<Props, State> {
   }
 
   public onAdd = async () => {
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     const result = await LoginManager.getUserInfo(dispatch);
     if (result.success) {
       const userinfo = result.result;
@@ -143,6 +153,7 @@ const select = (state: AppReducer.AppState) => {
   return {
     addressList: getAddressList(state),
     currentPostion: getCurrentPostion(state),
+    indexAddress: getIndexAddress(state),
   }
 }
-export default connect(select)(Page);
+export default connect(select)(Page as any);

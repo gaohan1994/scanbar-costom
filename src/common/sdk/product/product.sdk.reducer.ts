@@ -16,20 +16,22 @@ export declare namespace ProductSDKReducer {
   interface State {
     productCartList: {
       [key: string]:
-        | ProductInterface.ProductInfo[]
-        | ProductCartInterface.ProductCartInfo[];
+      | ProductInterface.ProductInfo[]
+      | ProductCartInterface.ProductCartInfo[];
     };
     productCartSelectedIndex: Array<number>;
     payOrderProductList: Array<ProductCartInterface.ProductCartInfo>;
     payOrderDetail: any;
     payOrderAddress: UserInterface.Address;
+    pointsTotal: number;
+    pointsTotalSell: number;
   }
 
   interface ManageCartPayloadBase {
     product: ProductInterface.ProductInfo;
     type:
-      | ProductCartInterface.ProductCartAdd
-      | ProductCartInterface.ProductCartReduce;
+    | ProductCartInterface.ProductCartAdd
+    | ProductCartInterface.ProductCartReduce;
     num?: number;
     currentMerchantDetail: MerchantInterface.MerchantDetail;
   }
@@ -101,7 +103,9 @@ const initState: ProductSDKReducer.State = {
     deliveryType: 0,
     remark: ""
   },
-  payOrderAddress: {} as any
+  payOrderAddress: {} as any,
+  pointsTotal: 0,
+  pointsTotalSell: 0,
 };
 
 export default function productSDKReducer(
@@ -222,26 +226,9 @@ export default function productSDKReducer(
     }
     case productSdk.reducerInterface.MANAGE_EMPTY_CART: {
       const {
-        payload: { currentMerchantDetail, productList }
+        payload: { currentMerchantDetail }
       } = action as ProductSDKReducer.Reducers.EmptyCart;
 
-      // const productCartList: Array<ProductCartInterface.ProductCartInfo> = merge(
-      //   [],
-      //   state.productCartList[currentMerchantDetail.id]
-      // );
-
-      // const nextCartProductList = !!productList
-      //   ? productCartList.filter(cartProduct => {
-      //       /**
-      //        * @todo 留下非购买的商品
-      //        * @param {cartProduct} 购物车中的商品
-      //        * @param {buyProduct} 购买的商品
-      //        */
-      //       return !productList.some(
-      //         buyProduct => buyProduct.id === cartProduct.id
-      //       );
-      //     })
-      //   : [];
       const nextCartProductList = [];
       console.log("nextCartProductList", nextCartProductList);
       return {
@@ -274,7 +261,7 @@ export default function productSDKReducer(
         if (index === -1) {
           newProductCartList.push({
             ...product,
-            sellNum: num || 1
+            sellNum: typeof num === 'number' ? num : 1
           });
           return {
             ...state,
@@ -284,7 +271,7 @@ export default function productSDKReducer(
             }
           };
         } else {
-          newProductCartList[index].sellNum += num || 1;
+          newProductCartList[index].sellNum += (typeof num === 'number' ? num : 1);
           return {
             ...state,
             productCartList: {
@@ -300,7 +287,7 @@ export default function productSDKReducer(
             productCartList
           );
           const currentItem = newProductCartList[index];
-          const reduceNum = num || 1;
+          const reduceNum = typeof num === 'number' ? num : 1;
           if (currentItem.sellNum === reduceNum) {
             newProductCartList.splice(index, 1);
             return {
@@ -347,6 +334,15 @@ export default function productSDKReducer(
         ...state
       };
     }
+    case productSdk.reducerInterface.RECEIVE_ORDER_PAY_POINTS: {
+      const { payload: { pointsTotalSell, pointsTotal } } = action as any;
+
+      return {
+        ...state,
+        pointsTotal: pointsTotal,
+        pointsTotalSell: pointsTotalSell,
+      };
+    }
 
     default: {
       return {
@@ -361,7 +357,7 @@ export const getProductCartList = (state: AppReducer.AppState) => {
   if (!!state.merchant.currentMerchantDetail.id) {
     return (
       state.productSDK.productCartList[
-        state.merchant.currentMerchantDetail.id
+      state.merchant.currentMerchantDetail.id
       ] || []
     );
   }

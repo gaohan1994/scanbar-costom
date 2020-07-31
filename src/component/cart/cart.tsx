@@ -1,8 +1,8 @@
 /**
  * @Author: Ghan
  * @Date: 2019-11-05 15:10:38
- * @Last Modified by: Ghan
- * @Last Modified time: 2020-07-16 17:05:15
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-07-28 16:47:36
  *
  * @todo [购物车组件]
  */
@@ -22,14 +22,15 @@ import numeral from "numeral";
 import CartLayout from "./cart.layout";
 import Badge from "../badge/badge";
 import { getProductCartList } from "../../common/sdk/product/product.sdk.reducer";
+import { getMemberInfo } from "../../reducers/app.user";
 
 const cssPrefix = "cart";
 
 interface CartBarProps {
   productCartList: Array<ProductCartInterface.ProductCartInfo>;
   changeWeightProduct:
-    | ProductCartInterface.ProductCartInfo
-    | ProductInterface.ProductInfo;
+  | ProductCartInterface.ProductCartInfo
+  | ProductInterface.ProductInfo;
   nonBarcodeProduct: Partial<
     ProductCartInterface.ProductCartInfo | ProductInterface.ProductInfo
   >;
@@ -39,6 +40,8 @@ interface CartBarProps {
   sort?: string;
   shareToken: boolean;
   shareProduct: ProductInterface.ProductInfo;
+  memberInfo: any;
+  productSDKObj: any;
 }
 
 interface CartBarState {
@@ -79,7 +82,8 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       | ProductCartInterface.ProductCartReduce,
     product: ProductCartInterface.ProductCartInfo
   ) => {
-    productSdk.manage((this.props as any).dispatch, {}, { type, product });
+    // productSdk.manage((this.props as any).dispatch, {}, { type, product });
+    productSdk.manage((this.props as any).dispatch, this.props.productSDKObj, {type, product});
   };
 
   public onPayHandle = () => {
@@ -108,20 +112,6 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
 
   public setText = (): string => {
     return "结算";
-  };
-
-  public deleteProductItem = (
-    product: ProductCartInterface.ProductCartInfo
-  ) => {
-    Taro.showModal({
-      title: "提示",
-      content: "确认从购物车中删除该商品吗",
-      success: confirm => {
-        if (confirm.confirm) {
-          productSdk.deleteProductItem(product, this.props.sort);
-        }
-      }
-    });
   };
 
   public emptyCart = () => {
@@ -157,7 +147,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       <View>
         {this.renderContent()}
         <View className="cart">
-          <View className="cart-bg">
+          <View className={`cart-bg cart-border`}>
             {this.renderCartLeft()}
             {this.renderCartRight()}
           </View>
@@ -179,11 +169,11 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
   }
 
   private renderCartLeft = () => {
-    const { productCartList } = this.props;
+    const { productCartList, memberInfo } = this.props;
     let cartPrice: number = 0;
     productCartList.map(item => {
       cartPrice +=
-        productSdk.getProductItemPrice(item, {} as any) * item.sellNum;
+        productSdk.getProductItemPrice(item, memberInfo) * item.sellNum;
     });
     return (
       <View style="width: 100%; height: 100%">
@@ -204,12 +194,12 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
               </Badge>
             </View>
           ) : (
-            <Image
-              src="//net.huanmusic.com/scanbar-c/icon_cart_grey.png"
-              className="cart-icon-image cart-icon"
-              onClick={() => this.onChangeCartListVisible()}
-            />
-          )}
+              <Image
+                src="//net.huanmusic.com/scanbar-c/icon_cart_grey.png"
+                className="cart-icon-image cart-icon"
+                onClick={() => this.onChangeCartListVisible()}
+              />
+            )}
           <View
             className={classnames(`${cssPrefix}-left-price`, {
               [`${cssPrefix}-left-price-active`]: productCartList.length > 0,
@@ -240,7 +230,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
 
   private renderContent = () => {
     const { cartListVisible } = this.state;
-    const { productCartList } = this.props;
+    const { productCartList, memberInfo } = this.props;
     return (
       <CartLayout
         isOpened={cartListVisible}
@@ -252,6 +242,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
       >
         {productCartList.length > 0 &&
           productCartList.map(product => {
+            const price = productSdk.getProductItemPrice(product, memberInfo)
             return (
               <View key={product.id}>
                 <View
@@ -268,7 +259,7 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                     <View className={`${cssPrefix}-product-container-normal`}>
                       <Text
                         className={`${cssPrefix}-product-container-price`}
-                      >{`￥${product.changePrice || product.price}`}</Text>
+                      >{`￥${price}`}</Text>
                     </View>
                     <View className={`${cssPrefix}-product-stepper`}>
                       <View
@@ -276,12 +267,13 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                           `component-product-stepper-button`,
                           `component-product-stepper-button-reduce`
                         )}
-                        onClick={() =>
+                        onClick={(e: any) => {
+                          e.stopPropagation();
                           this.manageProduct(
                             productSdk.productCartManageType.REDUCE,
                             product
                           )
-                        }
+                        }}
                       />
                       <Text
                         className={`component-product-stepper-text component-product-stepper-text-cart`}
@@ -293,12 +285,13 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
                           `component-product-stepper-button`,
                           `component-product-stepper-button-add`
                         )}
-                        onClick={() =>
+                        onClick={(e: any) => {
+                          e.stopPropagation();
                           this.manageProduct(
                             productSdk.productCartManageType.ADD,
                             product
                           )
-                        }
+                        }}
                       />
                     </View>
                   </View>
@@ -322,8 +315,11 @@ class CartBar extends Taro.Component<CartBarProps, CartBarState> {
 
 const select = (state: AppReducer.AppState, ownProps: CartBarProps) => {
   const productCartList = getProductCartList(state);
+  const memberInfo = getMemberInfo(state);
   return {
-    productCartList
+    productCartList,
+    memberInfo,
+    productSDKObj: state.productSDK,
   };
 };
 

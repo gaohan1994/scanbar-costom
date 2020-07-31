@@ -21,6 +21,31 @@
 
   &-item {
     position: relative;
+    &-select {
+      width: 60px;
+      position: relative;
+      // .padding(30px, r);
+      &-item {
+        position: absolute;
+        top: 50%;
+        right: 30px;
+        transform: translateY(-50%);
+        width:34px;
+        height:34px;
+        z-index: 99;
+        .bg;
+      }
+      &-normal {
+        background-image: url('//net.huanmusic.com/weapp//bt_unavailable.png');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+      }
+      &-active {
+        background-image: url('//net.huanmusic.com/weapp//bt_selected.png');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+      }
+    }
     &-top {
       &::before {
         .bordertop;
@@ -34,21 +59,30 @@
     &-box {
       display: flex;
       flex-direction: row;
+      width: 100%;
     }
     .padding(30px);
     .flex(flex-start, center, column);
     &-title {
+      &-big {
+        font-size:38px !important;
+        font-weight: normal;
+        max-width: 567px;
+      }
       font-size:30px;
       font-weight:500;
       color:rgba(51,51,51,1);
-      width: 540px;
+      width: 100%;
       .clamp(2);
       .flex(flex-start, flex-start, row);
+    }
+    &-detail-h5 {
+      .margin(2px, t) !important;
     }
     &-detail {
       display: flex;
       flex-direction: row;
-      .margin(18px, t);
+      .margin(10px, t);
       &-bot {
         .margin(0px, t) !important;
         .margin(18px, b);
@@ -68,9 +102,9 @@
       font-weight:500;
       color:rgba(252,146,42,1);
       .margin(10px, r);
-      .margin(10px, t);
+      .margin(4px, t);
       white-space: nowrap;
-
+      padding-top: 6px;
       &-1 {
         background:#E1EEFF;
         color:#2A86FC
@@ -147,7 +181,37 @@
       font-size:30px;
       font-weight:500;
       width: 460px;
-      color:rgba(102,102,102,1);
+      color: #666666 !important;
+
+      &-Popover {
+        position: absolute;
+        top: -90px;
+        border: 2px solid #cccccc;
+        background: #fff;
+        font-size: 30px;
+        color: #999999;
+        padding: 10px 20px;
+        border-radius: 10px;
+        z-index: 99;
+        width:250px;
+        line-height: 60px;
+        height:80px;
+        border:2px solid #cccccc;
+        background-color:#FFF;
+      }
+      &-Popover:before, &-Popover:after{
+        content:"";display:block;
+        border-width:19px;
+        position:absolute; bottom:-38px;
+        border-style:solid dashed dashed;
+        border-color:#cccccc transparent transparent;
+        font-size:0;
+        line-height:0;
+      }
+      &-Popover:after{
+          bottom:-33px;
+          border-color:#FFF transparent transparent;
+      }
       &-place {
         font-size:30px;
         font-weight:500;
@@ -180,7 +244,7 @@
         .padding(24px, lr);
         border:2px solid rgba(204,204,204,1);
         border-radius:10px;
-
+        height: 50px !important;
         font-size:26px;
         font-weight:500;
         color:rgba(153,153,153,1);

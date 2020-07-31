@@ -12,6 +12,7 @@ const cssPrefix = "component-product";
 interface Props {
   merchant: MerchantInterface.AlianceMerchant;
   onClick?: any;
+  border: boolean;
   setCurrentMerchantDetail: (
     merchant: MerchantInterface.AlianceMerchant
   ) => void;
@@ -56,7 +57,7 @@ class MerchantComponent extends Taro.Component<Props, State> {
             {!!merchant.isNew && (
               <View className={`${cssPrefix}-content-cover-new`} />
             )}
-            {!merchant.status && (
+            {merchant.status === false && (
               <View className={`${cssPrefix}-content-cover-close`} />
             )}
 
@@ -79,9 +80,11 @@ class MerchantComponent extends Taro.Component<Props, State> {
   }
 
   private renderDetail = () => {
-    const { merchant } = this.props;
+    const { merchant, border } = this.props;
     return (
-      <View className={classnames(`${cssPrefix}-content-detail ${cssPrefix}-border`)}>
+      <View className={classnames(`${cssPrefix}-content-detail ${cssPrefix}-content-detail-pb`, {
+        [`${cssPrefix}-border`]: border
+      })}>
         <View>
           <View className={`${cssPrefix}-title`}>{merchant.name || " "}</View>
           <View className={`${cssPrefix}-tips`}>

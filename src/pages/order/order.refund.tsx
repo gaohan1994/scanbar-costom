@@ -244,11 +244,11 @@ class OrderRefund extends Taro.Component<Props, State> {
             value={remark}
             onInput={({ detail: { value } }) => this.changeRemark(value)}
             placeholder='请输入退货说明'
-            maxlength={300}
+            maxlength={50}
           />
 
           <View className={`${cssPrefix}-input-corner`}>
-            {`${remark.length}/300`}
+            {`${remark.length}/50`}
           </View>
         </View>
         {this.renderProductList()}
@@ -298,7 +298,7 @@ class OrderRefund extends Taro.Component<Props, State> {
               items.map((item, index) => {
                 return (
                   <View className={classnames(`${cssPrefix}-modal-list-item`, {
-                    [`${cssPrefix}-modal-list-item-border`]: index !== (item.length - 1)
+                    [`${cssPrefix}-modal-list-item-border`]: index !== (items.length - 1)
                   })}
                     onClick={() => { this.onSelected(item, index) }}
                   >
@@ -383,4 +383,4 @@ const select = (state: AppReducer.AppState) => ({
 });
 
 
-export default connect(select)(OrderRefund);
+export default connect(select)(OrderRefund as any);

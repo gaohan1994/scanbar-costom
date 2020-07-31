@@ -7,10 +7,10 @@ import classnames from 'classnames';
 
 const cssPrefix = 'product';
 
-type Props = { 
+type Props = {
   className?: string;
   currentMenu: ProductInterface.ProductType | OrderInterface.DateItem;
-  menu: ProductInterface.ProductType[] | OrderInterface.DateItem[];
+  menu: any[]; // ProductInterface.ProductType[] | OrderInterface.DateItem[];
   onClick: ((menu: ProductInterface.ProductType) => void) | ((menu: any) => void);
   onTouchMove?: (e: any) => any;
 };
@@ -26,25 +26,25 @@ class ProductMenu extends Taro.Component<Props> {
     onClick: undefined,
   };
 
-  render () {
+  render() {
     const { className, menu, currentMenu, onClick, onTouchMove } = this.props;
     return (
-      <ScrollView 
+      <ScrollView
         scrollY={true}
         className={classnames(`${cssPrefix}-list-left`, className)}
-        onTouchMove={onTouchMove}
-      > 
+        onTouchMove={onTouchMove ? onTouchMove : () => { }}
+      >
         {this.props.children}
         {
           menu && menu.length > 0
             ? menu.map((type) => {
               return (
-                <View 
+                <View
                   key={type.id}
                   className={classnames(`${cssPrefix}-list-left-item`, {
-                    [`${cssPrefix}-list-left-item-active`]:  type.id === currentMenu.id
+                    [`${cssPrefix}-list-left-item-active`]: type.id === currentMenu.id
                   })}
-                  onClick={() =>onClick(type)}
+                  onClick={() => onClick(type)}
                 >
                   {type.id === currentMenu.id && (
                     <View className={`${cssPrefix}-list-left-item-active-bge`} />
@@ -55,7 +55,7 @@ class ProductMenu extends Taro.Component<Props> {
             })
             : <View />
         }
-      </ScrollView>  
+      </ScrollView>
     );
   }
 }

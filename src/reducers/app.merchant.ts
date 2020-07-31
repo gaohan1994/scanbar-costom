@@ -50,6 +50,7 @@ export declare namespace MerchantReducer {
     alianceList: MerchantInterface.MerchantDetail[];
     merchantSearchList: MerchantInterface.MerchantDetail[];
     merchantSearchTotal: number;
+    orderPayType: any;
   }
 
   type Action =
@@ -72,6 +73,7 @@ export const initState: MerchantReducer.State = {
   alianceList: [],
   merchantSearchList: [],
   merchantSearchTotal: 0,
+  orderPayType: process.env.TARO_ENV === 'h5' ? 2 : 8,
 };
 
 export default function merchant(
@@ -163,7 +165,13 @@ export default function merchant(
         advertisement: payload
       };
     }
-
+    case MerchantInterfaceMap.reducerInterface.SET_PAYTYPE: {
+      const { payload: {orderPayType} } = action;
+      return {
+        ...state,
+        orderPayType: orderPayType
+      };
+    }
     default: {
       return {
         ...state
@@ -195,3 +203,5 @@ export const getMerchantSearchList = (state: AppReducer.AppState) =>
 
 export const getMerchantSearchTotal = (state: AppReducer.AppState) =>
   state.merchant.merchantSearchTotal;
+
+export const getOrderPayType = (state: AppReducer.AppState) => state.merchant.orderPayType;

@@ -4,6 +4,8 @@ import { ResponseCode } from "../../constants/index";
 import { store } from "../../app";
 import { getUserinfo } from '../../reducers/app.user';
 
+let timer: any = null;
+
 const customInterceptor = chain => {
   const requestParams = chain.requestParams;
 
@@ -30,11 +32,22 @@ const customInterceptor = chain => {
       const state = store.getState();
       const userinfo = getUserinfo(state);
       if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
-        Taro.navigateTo({ url: "/pages/login/login.userinfo" });
+        if (timer === null || (Date.now() - timer) > 1000) {
+          timer = Date.now();
+          const routes = Taro.getCurrentPages();
+          if (routes[routes.length - 1].route !== "pages/login/login.userinfo") {
+            Taro.navigateTo({ url: "/pages/login/login.userinfo" });
+          }
+        }
         return res.data;
       }
       if (userinfo.phone === undefined || userinfo.phone.length === 0) {
-        Taro.navigateTo({ url: "/pages/login/login" });
+        if (timer === null || (Date.now() - timer) > 1000) {
+          const routes = Taro.getCurrentPages();
+          if (routes[routes.length - 1].route !== "pages/login/login") {
+            Taro.navigateTo({ url: "/pages/login/login" });
+          }
+        }
         return res.data;
       }
       return res.data;

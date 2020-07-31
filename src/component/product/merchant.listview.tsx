@@ -2,7 +2,7 @@
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-04 09:02:08
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-07-21 16:42:59
+ * @Last Modified time: 2020-07-28 18:01:58
  *
  * @todo 商品列表
  */
@@ -32,6 +32,8 @@ type Props = {
   emptyImg?: string;
   emptyCss?: string;
   hasMore?: boolean;
+  entry?: string;
+  style?: string;
 };
 
 class MerchantListView extends Taro.Component<Props> {
@@ -79,27 +81,30 @@ class MerchantListView extends Taro.Component<Props> {
       emptyImg,
       emptyCss,
       hasMore,
-      onScrollToLower
+      onScrollToLower,
+      entry,
+      style
     } = this.props;
     return (
       <ScrollView
         scrollY={true}
         scrollIntoView={this.state.scrollIntoView}
         className={classnames(
-          `${cssPrefix}-list-right ${
+          `${cssPrefix}-list-right ${cssPrefix}-list-margin ${
           process.env.TARO_ENV === "h5" ? `${cssPrefix}&-h5-height` : ""
           }`,
           className
         )}
-        onScroll={onScroll}
-        onScrollToLower={onScrollToLower}
+        onScroll={onScroll ? onScroll : () => {}}
+        onScrollToLower={onScrollToLower ? onScrollToLower : () => {}}
+        style={style}
       >
         {!loading ? (
           Array.isArray(data) === true && data.length > 0 ? (
-            (data || []).map(merchant => {
+            (data || []).map((merchant, index) => {
               return (
                 <View id={`data${merchant.id}`} key={merchant.id}>
-                  <MerchantComponent merchant={merchant} />
+                  <MerchantComponent merchant={merchant} border={!(data.length - 1 === index && entry === 'attention')}/>
                 </View>
               );
             })

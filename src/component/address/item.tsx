@@ -15,6 +15,7 @@ type Props = {
   onClick?: any;
   showArrow?: boolean;
   onEditClick?: any;
+  isPay?: any;
 }
 
 class Item extends Taro.Component<Props> {
@@ -26,7 +27,7 @@ class Item extends Taro.Component<Props> {
   }
 
   render() {
-    const { address, pre = false, onClick = undefined, isBorder = true, showEdit = true, showArrow = false } = this.props;
+    const { address, isPay = false, pre = false, onClick = undefined, isBorder = true, showEdit = true, showArrow = false } = this.props;
     const showFlag = address && address.flag ? (address.flag === 0 || address.flag === 1 || address.flag === 2) : false;
     return (
       <View
@@ -46,7 +47,7 @@ class Item extends Taro.Component<Props> {
           </View>
         )}
         <View className={`${prefix}-box`}>
-          <View className={`${prefix}-title`}>
+          <View className={`${prefix}-title ${isPay === true ? `${prefix}-title-big` : ''}`}>
             {showFlag && (
               <Text
                 className={classNames(`${prefix}-bge`, `${prefix}-bge-${address.flag}`)}

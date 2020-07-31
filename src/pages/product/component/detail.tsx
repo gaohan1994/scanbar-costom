@@ -7,9 +7,10 @@ import { ProductInterface } from "../../../constants/index";
 import numeral from "numeral";
 import productSdk, { ProductCartInterface } from "../../../common/sdk/product/product.sdk";
 import ProductShare from "./share";
-import { AppReducer } from "src/reducers";
+import { AppReducer } from "../../../reducers";
 import classnames from "classnames";
 import { getProductCartList } from "../../../common/sdk/product/product.sdk.reducer";
+import { getMemberInfo } from "../../../reducers/app.user";
 
 const cssPrefix = "component-product";
 const prefix = "product-detail-component";
@@ -18,7 +19,7 @@ type Props = {
   activityList: any;
   memberInfo: any;
   product: ProductInterface.ProductInfo;
-  productInCart?: ProductCartInterface.ProductCartInfo;
+  productList: ProductCartInterface.ProductCartInfo[];
   dispatch: any;
   productSDK: any;
 };
@@ -37,9 +38,7 @@ class Page extends Taro.Component<Props> {
     const {
       product,
       memberInfo,
-      dispatch,
-      productSDK,
-      productInCart
+      productList
     } = this.props;
     const priceNum =
       product && product.price ? numeral(product.price).value() : 0;
@@ -48,6 +47,9 @@ class Page extends Taro.Component<Props> {
       productSdk.getProductItemDiscountPrice(product, memberInfo)
     ).value();
     const discountPrice = numeral(discountPriceNum).format("0.00");
+    const productInCart =
+    product !== undefined && productList.find(p => p.id === product.id);
+
     return (
       <View className={`${cssPrefix}-normal ${prefix}-detail-price`}>
         <Text className={`${cssPrefix}-price-bge`}>￥</Text>
@@ -56,7 +58,7 @@ class Page extends Taro.Component<Props> {
         </Text>
         <Text className={`${cssPrefix}-price-bge ${cssPrefix}-price-pos`}>{`.${
           discountPrice.split(".")[1]
-        }`}</Text>
+          }`}</Text>
         {priceNum !== discountPriceNum && (
           <Text
             className={`${cssPrefix}-price-origin ${prefix}-detail-price-gory`}
@@ -95,7 +97,7 @@ class Page extends Taro.Component<Props> {
             )}
             {!productInCart && (
               <View
-                className={`${prefix}-cart-right-button`}
+                className={`${prefix}-detail-add ${prefix}-detail-add-normal`}
                 onClick={() =>
                   this.manageProduct(productSdk.productCartManageType.ADD)
                 }
@@ -105,22 +107,25 @@ class Page extends Taro.Component<Props> {
             )}
           </View>
         ) : (
-          <View className={`${prefix}-detail-add ${prefix}-detail-add-disable`}>
-            {"售罄"}
-          </View>
-        )}
+            <View className={`${prefix}-detail-add ${prefix}-detail-add-normal ${prefix}-detail-add-disable`}>
+              {"售罄"}
+            </View>
+          )}
       </View>
     );
   };
 
   render() {
-    const { product, memberInfo, activityList } = this.props;
+    const { product, memberInfo } = this.props;
+    const activityList = product && Array.isArray(product.activityInfos) ? product.activityInfos : [];
+    const singleActiveList = activityList.filter(val => val.type === 1 || val.type === 2);
+    const batchActiveList = activityList.filter(val => val.type === 3 || val.type === 4);
     return (
       <View className={`${prefix}-detail`}>
         <ProductShare />
         <View className={`${prefix}-detail-box ${prefix}-detail-box-bor`}>
           <View className={`${prefix}-detail-name`}>{product.name}</View>
-          <View className={`${prefix}-detail-tip`}>{product.name}</View>
+          <View className={`${prefix}-detail-tip`}>{product.description || product.name}</View>
           <View className={`${prefix}-detail-items`}>
             {product &&
               product.saleNumber &&
@@ -134,40 +139,61 @@ class Page extends Taro.Component<Props> {
 
           {this.renderPrice()}
         </View>
-        <View className={`${prefix}-detail-box ${prefix}-detail-act`}>
-          {product &&
-          product.activityInfos &&
-          product.activityInfos.length > 0 ? (
-            <View className={`${prefix}-detail-act-title`}>活动</View>
-          ) : (
-            <View className={`${prefix}-detail-act-title`}>活动：无</View>
-          )}
-          <View className={`${prefix}-detail-act-boxs`}>
+        <View className={`${prefix}-detail-box`}>
+          <View className={`${prefix}-detail-act ${prefix}-detail-act-margin`}>
             {product &&
               product.activityInfos &&
-              product.activityInfos.length > 0 &&
-              product.activityInfos.map(item => {
-                return (
-                  <View
-                    className={`${prefix}-detail-act-box ${prefix}-detail-act-bor`}
-                  >
-                    <View className={`${prefix}-detail-act-discount`}>
-                      {item.type === 1 ? "打折" : "特价"}
-                    </View>
-                    <View className={`${prefix}-detail-act-text`}>
-                      {productSdk.getDiscountString(
-                        memberInfo,
-                        activityList,
-                        item
-                      )}
-                    </View>
+              product.activityInfos.length > 0 ? (
+                <View className={`${prefix}-detail-act-title`}>活动</View>
+              ) : (
+                <View className={`${prefix}-detail-act-title`}>活动</View>
+              )}
+            {product &&
+              product.activityInfos &&
+              product.activityInfos.length > 0 ? (
+                null
+              ) : (
+                <View className={`${prefix}-detail-act-box`}>
+                  <View className={`${prefix}-detail-act-text`}>
+                    无
                   </View>
-                );
-              })}
-            {/* <View className={`${prefix}-detail-act-box`}>
-              <View className={`${prefix}-detail-act-reduce`}>满减</View>
-              <View className={`${prefix}-detail-act-text`}>满100减20，满200减45</View>
-            </View> */}
+                </View>
+              )}
+            <View className={`${prefix}-detail-act-boxs`}>
+              {product &&
+                product.activityInfos &&
+                product.activityInfos.length > 0 &&
+                product.activityInfos.map(item => {
+                  if (item.type === 3) {
+
+                    return (
+                      <View className={`${prefix}-detail-act-box`}>
+                        <View className={`${prefix}-detail-act-reduce`}>满减</View>
+                        <View className={`${prefix}-detail-act-text`}>
+                          {productSdk.getDiscountString(memberInfo, batchActiveList, item, 'all')}
+                        </View>
+
+                      </View>
+                    );
+                  }
+                  return (
+                    <View
+                      className={`${prefix}-detail-act-box ${prefix}-detail-act-bor`}
+                    >
+                      <View className={`${prefix}-detail-act-discount`}>
+                        {item.type === 1 ? "打折" : item.type === 2 ? "特价" : ''}
+                      </View>
+                      <View className={`${prefix}-detail-act-text`}>
+                        {productSdk.getDiscountString(memberInfo, singleActiveList, item)}
+                      </View>
+                    </View>
+                  );
+                })}
+            </View>
+          </View>
+          <View className={`${prefix}-detail-act`}>
+            <View className={`${prefix}-detail-act-title`}>配送</View>
+            <View className={`${prefix}-detail-act-text`}>商家自配</View>
           </View>
         </View>
 
@@ -192,15 +218,11 @@ class Page extends Taro.Component<Props> {
   }
 }
 
-const select = (state: AppReducer.AppState, ownProps: Props) => {
-  const { product } = ownProps;
-  const productList = getProductCartList(state);
-  const productInCart =
-    product !== undefined && productList.find(p => p.id === product.id);
+const select = (state: AppReducer.AppState) => {
   return {
-    product,
     productSDK: state.productSDK,
-    productInCart
+    productList: getProductCartList(state),
+    memberInfo: getMemberInfo(state)
   };
 };
 

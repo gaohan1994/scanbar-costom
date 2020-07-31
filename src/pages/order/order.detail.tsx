@@ -6,7 +6,7 @@ import { getOrderDetail, getOrderAllStatus, getCurrentType } from '../../reducer
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
 import invariant from 'invariant';
-import { OrderAction, ProductAction } from '../../actions';
+import { OrderAction } from '../../actions';
 import { ResponseCode, OrderInterface } from '../../constants';
 import "../../pages/style/product.less";
 import numeral from 'numeral';
@@ -153,7 +153,7 @@ class OrderDetail extends Taro.Component<Props, State> {
 
   public onPay = async (order: OrderInterface.OrderInfo) => {
     const { orderNo } = order;
-    const payment = await productSdk.requestPayment(orderNo)
+    const payment = await productSdk.requestPayment(orderNo, order.payType)
     if (payment.code === ResponseCode.success) {
       const { params: { id } } = this.$router;
       this.init(id);
@@ -194,51 +194,17 @@ class OrderDetail extends Taro.Component<Props, State> {
     );
   }
 
-  public orderOneMore = async (order: OrderInterface.OrderDetail) => {
-    const { orderDetailList } = order;
-    const {dispatch, productSDKObj} = this.props;
-    if (orderDetailList && orderDetailList.length > 0) {
-      for (let i = 0; i < orderDetailList.length; i++) {
-        const res = await ProductAction.productInfoDetail(this.props.dispatch, { id: orderDetailList[i].productId });
-        if (res.code === ResponseCode.success) {
-          productSdk.manage(dispatch, productSDKObj, {
-            type: productSdk.productCartManageType.ADD,
-            product: res.data,
-            num: orderDetailList[i].num,
-          });
-          setTimeout(() => {
-            Taro.navigateBack({ delta: 10 });
-            Taro.switchTab({
-              url: `/pages/cart/cart`
-            });
-          }, 1000);
-        } else {
-          if (res.msg) {
-            Taro.showToast({
-              title: res.msg,
-              icon: 'none'
-            });
-          } else {
-            Taro.showToast({
-              title: '获取商品失败',
-              icon: 'none'
-            });
-          }
-        }
-      }
-    }
-  }
-
   onConfirm = async () => {
     const { orderDetail } = this.props;
     const { order } = orderDetail;
+
     const parmas = {
-      merchantId: order.merchantId
+      id: order.merchantId
     };
-    const res = await merchantAction.merchantDetail(this.props.dispatch, parmas);
-    if (res.code === ResponseCode.success) {
-      if (res.data && res.data.customerMallConfig && res.data.customerMallConfig.servicePhone) {
-        this.onCall(res.data.customerMallConfig.servicePhone);
+    const res = await merchantAction.getMerchantMoreDetail(parmas);
+    if (res.success) {
+      if (res.result && res.result.servicePhone) {
+        this.onCall(res.result.servicePhone);
       }
     } else {
       Taro.showToast({
@@ -310,7 +276,7 @@ class OrderDetail extends Taro.Component<Props, State> {
                   src='//net.huanmusic.com/weapp/customer/img_waitting.png'
                 />
               )
-              : res.title === '已取消' || res.title === '商家拒绝了退货申请' || res.title === '您撤销了退货申请'
+              : res.title === '已取消' || res.title === '商家拒绝了退货申请' || res.title === '您撤销了退货申请' || res.title === '交易关闭'
                 ? (
                   <Image
                     className={`${cssPrefix}-card-status-img1`}
@@ -346,7 +312,7 @@ class OrderDetail extends Taro.Component<Props, State> {
             )
         }
 
-        <View className={`${cssPrefix}-card-status-button`} style={process.env.TARO_ENV === 'h5' ? {marginBottom: '10px'} : {}}>
+        <View className={`${cssPrefix}-card-status-button`} style={process.env.TARO_ENV === 'h5' ? { marginBottom: '10px' } : {}}>
           <OrderButtons dispatch={dispatch} productSDKObj data={orderDetail} orderAllStatus={orderAllStatus} currentType={currentType} />
         </View>
       </View>
@@ -374,7 +340,7 @@ class OrderDetail extends Taro.Component<Props, State> {
       <View className={`${cssPrefix}-card ${cssPrefix}-card-logistics`}>
         <View className={`${cssPrefix}-card-logistics-item`}>
           <Image
-            src='//net.huanmusic.com/weapp/icon_order_time.png'
+            src='//net.huanmusic.com/scanbar-c/icon_order_time.png'
             className={`${cssPrefix}-card-logistics-item-img`}
           />
 
@@ -386,7 +352,7 @@ class OrderDetail extends Taro.Component<Props, State> {
               {
                 order && order.deliveryType == 0
                   ? (order && order.planDeliveryTime || '未设置')
-                  : order && order.planDeliveryTime &&  order.planDeliveryTime.length > 0
+                  : order && order.planDeliveryTime && order.planDeliveryTime.length > 0
                     ? order && order.planDeliveryTime
                     : '立即送出'
               }
@@ -405,13 +371,13 @@ class OrderDetail extends Taro.Component<Props, State> {
             order && order.deliveryType == 0
               ? (
                 <Image
-                  src='//net.huanmusic.com/weapp/icon_order_shop.png'
+                  src='//net.huanmusic.com/scanbar-c/icon_order_shop.png'
                   className={`${cssPrefix}-card-logistics-item-img`}
                 />
               )
               : (
                 <Image
-                  src='//net.huanmusic.com/weapp/icon_order_location.png'
+                  src='//net.huanmusic.com/scanbar-c/icon_order_location.png'
                   className={`${cssPrefix}-card-logistics-item-img`}
                 />
               )
@@ -467,6 +433,7 @@ class OrderDetail extends Taro.Component<Props, State> {
       return (
         <ProductPayListView
           productList={orderDetailList}
+          isDetail={true}
           type={1}
           padding={false}
           showCallModal={() => { this.setState({ callModal: true }) }}
@@ -548,4 +515,5 @@ const select = (state: AppReducer.AppState) => ({
   currentType: getCurrentType(state),
 });
 
-export default connect(select)(OrderDetail);
+
+export default connect(select)(OrderDetail as any);

@@ -11,7 +11,6 @@ import CartBar from "../../component/cart/cart";
 import invariant from "invariant";
 import { ProductAction, MerchantAction, UserAction } from "../../actions";
 import { ResponseCode, ProductInterface } from "../../constants";
-import WeixinSdk from "../../common/sdk/weixin/weixin";
 import TabsChoose from "../../component/tabs/tabs.choose";
 import {
   getMerchantAdvertisement,
@@ -57,7 +56,7 @@ class Index extends Component<any> {
    * 提示和声明 navigationBarTextStyle: 'black' | 'white' 类型冲突, 需要显示声明类型
    */
   config: Config = {
-    navigationBarTitleText: "首页"
+    navigationBarTitleText: ""
   };
 
   componentDidMount() {
@@ -107,10 +106,13 @@ class Index extends Component<any> {
         this.changeCurrentType(firstType);
       }
 
-      const addMemberResult = await MerchantAction.addMember(
+      await MerchantAction.addMember(
         currentMerchantDetail
       );
-      UserAction.getMemberInfo(dispatch, currentMerchantDetail);
+      const getMemberInfo = await UserAction.getMemberInfo(dispatch, currentMerchantDetail);
+      if (getMemberInfo.code === ResponseCode.success) {
+        UserAction.obtainMerchantCoupon(currentMerchantDetail.id)
+      }
     } catch (error) {
       Taro.showToast({
         title: error.message,

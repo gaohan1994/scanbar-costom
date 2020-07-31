@@ -13,10 +13,9 @@
 
   &-card {
     position: relative;
-    width: 90%;
     height: 448px;
     background-color: #fff;
-    margin: auto;
+    margin: 30px;
     margin-top: 30px;
     border-radius: 10px;
     padding-top: 34px;
@@ -75,7 +74,7 @@
       padding-left: 18px;
       padding-bottom: 33px;
       justify-content: space-between;
-      border-bottom: 1px solid #E3E3E3;
+      border-bottom: 1px solid rgba(227,227,227,.5);
 
       &-products {
         display: flex;
@@ -133,8 +132,16 @@
       &-info {
         display: flex;
         flex-direction: column;
-        margin-right: 49px;
-        margin-top: 40px;
+        // margin-right: 49px;
+        // margin-top: 40px;
+        width: calc(100% - 495px);
+        align-items: center;
+        justify-content: center;
+
+        &-container {
+          display: flex;
+          flex-direction: column;
+        }
 
         &-price {
           color: #333333;

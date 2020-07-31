@@ -1,7 +1,7 @@
 import Taro, { Config } from "@tarojs/taro";
 import { View, Button, Image, Text } from "@tarojs/components";
 import WeixinSDK from "../../common/sdk/weixin/weixin";
-import "./index.less";
+import "../user/index.less";
 import "../../component/card/form.card.less";
 import invariant from "invariant";
 import { LoginManager } from "../../common/sdk";
@@ -11,23 +11,28 @@ import { getUserinfo, getMemberCount } from "../../reducers/app.user";
 import { connect } from "@tarojs/redux";
 import { Dispatch } from "redux";
 import { getCurrentMerchantDetail } from "../../reducers/app.merchant";
+import classNames from "classnames";
 
 const Rows = [
-  {
-    title: "我的地址",
-    url: "/pages/address/address.list",
-    icon: "//net.huanmusic.com/weapp/customer/icon_mine_location.png"
-  },
-  {
-    title: "我的收藏",
-    url: "/pages/user/user.attention",
-    icon: "//net.huanmusic.com/scanbar-c/icon_mine_collection.png"
-  },
-  {
-    title: "设置",
-    url: "/pages/user/user.set",
-    icon: "//net.huanmusic.com/weapp/customer/icon_mine_set.png"
-  }
+  [
+    {
+      title: "我的地址",
+      url: "/pages/address/address.list",
+      icon: "//net.huanmusic.com/weapp/customer/icon_mine_location.png"
+    },
+    {
+      title: "我的收藏",
+      url: "/pages/user/user.attention",
+      icon: "//net.huanmusic.com/scanbar-c/icon_mine_collection.png"
+    },
+  ],
+  [
+    {
+      title: "设置",
+      url: "/pages/user/user.set",
+      icon: "//net.huanmusic.com/weapp/customer/icon_mine_set.png"
+    }
+  ]
 ];
 
 const cssPrefix = "user";
@@ -205,7 +210,7 @@ class User extends Taro.Component<Props, State> {
                   />
                 ) : (
                     <Image
-                      src="//net.huanmusic.com/weapp/icon_mine_vip.png"
+                      src="//net.huanmusic.com/weapp/icon_mine_touxiang.png"
                       className={`${cssPrefix}-user-image`}
                     />
                   )}
@@ -255,32 +260,45 @@ class User extends Taro.Component<Props, State> {
           </View>
 
           <View className={`${cssPrefix}-rows`}>
-            {Rows.map((item: any) => {
+            {Rows.map((item: any, i) => {
               return (
                 <View
-                  style={`${
-                    item.title === "我的地址" ? "margin-bottom: 0px" : ""
-                    }`}
-                  className={`${cssPrefix}-rows-item`}
-                  key={item.title}
-                  onClick={() => this.onRowClick(item)}
+                  className={`${cssPrefix}-rows-items`}
+                  key={`rows${i}`}
                 >
-                  <View className={`${cssPrefix}-rows-item-left`}>
-                    <Image
-                      className={`${cssPrefix}-rows-item-left-icon`}
-                      src={item.icon}
-                    />
-                    <Text className={`${cssPrefix}-rows-item-left-title`}>
-                      {item.title}
-                    </Text>
-                  </View>
-                  <Image
-                    className={`${cssPrefix}-rows-item-right-icon`}
-                    src="//net.huanmusic.com/weapp/icon_commodity_into.png"
-                  />
-                  {item.title === "我的地址" && (
+                  {
+                    item.map((ele, index) => {
+                      return (
+                        <View
+                          className={classNames(`${cssPrefix}-rows-item`, {
+                            [`${cssPrefix}-rows-border`]: index !== item.length - 1,
+                            [`${cssPrefix}-rows-item-radius-top`]: index === 0,
+                            [`${cssPrefix}-rows-item-radius-bottom`]: index === item.length - 1,
+                          })}
+                          onClick={() => this.onRowClick(ele)}
+                          key={ele.title}
+                        >
+                          <View className={`${cssPrefix}-rows-item-left`}>
+                            <Image
+                              className={`${cssPrefix}-rows-item-left-icon`}
+                              src={ele.icon}
+                            />
+                            <Text className={`${cssPrefix}-rows-item-left-title`}>
+                              {ele.title}
+                            </Text>
+                          </View>
+                          <Image
+                            className={`${cssPrefix}-rows-item-right-icon`}
+                            src="//net.huanmusic.com/weapp/icon_commodity_into.png"
+                          />
+                        </View>
+                      )
+                    })
+                  }
+
+                  {/* {item.title === "我的地址" && (
                     <View className={`${cssPrefix}-rows-item-border`} />
-                  )}
+                  )} */}
                 </View>
               );
             })}
@@ -297,4 +315,4 @@ const select = (state: any) => ({
   memberCount: getMemberCount(state)
 });
 
-export default connect(select)(User);
+export default connect(select)(User as any);

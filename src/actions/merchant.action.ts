@@ -2,7 +2,7 @@
  * @Author: centerm.gaozhiying
  * @Date: 2020-03-03 17:19:06
  * @Last Modified by: centerm.gaozhiying
- * @Last Modified time: 2020-07-23 14:44:17
+ * @Last Modified time: 2020-07-28 11:18:07
  */
 import {
   MerchantService,
@@ -26,7 +26,11 @@ class MerchantAction {
       `/memberInfo/add/${currentMerchantDetail.id}`,
       {}
     );
-    return result;
+    if (result.code === ResponseCode.success) {
+      return { success: true, result: result.data };
+    } else {
+      return { success: false, result: result.msg };
+    }
   };
 
   public getOrderedMerchant = dispatch => async params => {
@@ -57,6 +61,23 @@ class MerchantAction {
       payload: { ...merchant, ...result.data }
     });
   };
+
+  public getMerchantMoreDetail = async (merchant: any) => {
+    const result = await requestHttp.get(
+      `/merchantInfo/moreDetail/${merchant.id}`
+    );
+    if (result.code === ResponseCode.success) {
+      return {
+        success: true,
+        result: result.data
+      }
+    } else {
+      return {
+        success: false,
+        result: result.msg
+      }
+    }
+  }
 
   public setCurrentMerchantDetail = dispatch => async merchant => {
     try {
@@ -173,7 +194,7 @@ class MerchantAction {
             val => val.id === BASE_PARAM.MCHID
           )[0] || { merchantId: BASE_PARAM.MCHID }
         });
-        this.advertisement(dispatch, { merchantId: BASE_PARAM.MCHID });
+        this.advertisement(dispatch);
       }
     }
     return result;
@@ -198,11 +219,8 @@ class MerchantAction {
     return result;
   };
 
-  public advertisement = async (
-    dispatch,
-    params: MerchantInterface.merchantDetailFetchField
-  ) => {
-    const result = await MerchantService.advertisement(params);
+  public advertisement = async (dispatch) => {
+    const result = await MerchantService.advertisement();
     if (result.code === ResponseCode.success) {
       dispatch({
         type:
@@ -260,7 +278,7 @@ class MerchantAction {
     }
   }
 
-  public merchantMoreInfo = async ( merchantId: number) => {
+  public merchantMoreInfo = async (merchantId: number) => {
     const result = await requestHttp.get(
       `/merchantInfo/moreDetail/${merchantId}`,
     );

@@ -51,11 +51,9 @@ class MerchantService {
     return result;
   };
 
-  public advertisement = async (
-    params: MerchantInterface.merchantDetailFetchField
-  ): Promise<HTTPInterface.ResponseResultBase<any>> => {
+  public advertisement = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
     const result = await requestHttp.get(
-      `${MerchantInterfaceMap.advertisement}/${params.merchantId}`
+      `${MerchantInterfaceMap.advertisement}/${BASE_PARAM.institutionCode}`
     );
     return result;
   };

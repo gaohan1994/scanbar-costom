@@ -6,6 +6,7 @@ import { AtButton } from 'taro-ui';
 import { LoginManager } from '../../common/sdk';
 import { Dispatch } from 'redux';
 import { connect } from '@tarojs/redux';
+import classNames from 'classnames';
 
 
 const Rows = [
@@ -22,7 +23,7 @@ const Rows = [
 ];
 
 const cssPrefix = 'user';
-class Page extends Taro.Component<{dispatch: Dispatch}> {
+class Page extends Taro.Component<{ dispatch: Dispatch }> {
 
   config: Config = {
     navigationBarTitleText: '设置'
@@ -39,7 +40,7 @@ class Page extends Taro.Component<{dispatch: Dispatch}> {
   }
 
   public logout = async () => {
-    const {dispatch} = this.props;
+    const { dispatch } = this.props;
     const res = await LoginManager.logout(dispatch);
     if (res.success) {
       Taro.showToast({
@@ -61,12 +62,16 @@ class Page extends Taro.Component<{dispatch: Dispatch}> {
     return (
       <View className={`container ${cssPrefix}`} >
         <View className={`${cssPrefix}-container`}>
-          <View className={`${cssPrefix}-rows`}>
+          <View className={`${cssPrefix}-rows ${cssPrefix}-rows-items`}>
             {
-              Rows.map((item: any) => {
+              Rows.map((item: any, index: number) => {
                 return (
                   <View
-                    className={`${cssPrefix}-rows-item`}
+                    className={classNames(`${cssPrefix}-rows-item`, {
+                      [`${cssPrefix}-rows-border`]: index !== Rows.length - 1,
+                      [`${cssPrefix}-rows-item-radius-top`]: index === 0,
+                            [`${cssPrefix}-rows-item-radius-bottom`]: index === item.length - 1,
+                    })}
                     key={item.title}
                     onClick={() => this.onRowClick(item)}>
                     <View className={`${cssPrefix}-rows-item-left`}>
@@ -100,4 +105,4 @@ class Page extends Taro.Component<{dispatch: Dispatch}> {
 const select = (state: any) => ({
 });
 
-export default connect(select)(Page);
+export default connect(select)(Page as any);

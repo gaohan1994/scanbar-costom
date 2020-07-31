@@ -64,17 +64,17 @@ class Page extends Taro.Component <Props, State> {
     const {remark } = this.state;
     return (
       <View className={`${prefix}`}>
-        <View className={`${prefix}-input`}>
+       <View className={`${prefix}-input`}>
           <Textarea
             className={`${prefix}-input-text`}
             value={remark}
             onInput={({detail: {value}}) => this.changeRemark(value)}
             placeholder='请输入备注'
-            maxlength={300}
+            maxlength={50}
           />
 
           <View className={`${prefix}-input-corner`}>
-            {`${remark.length}/300`}
+            {`${remark.length}/50`}
           </View>
         </View>
         <View className={`${prefix}-title`}>快捷输入</View>
@@ -93,7 +93,7 @@ class Page extends Taro.Component <Props, State> {
           })}
         </View>
 
-        <View className={`${prefix}-box product-add-buttons-one`}>
+        <View className={`product-add-buttons-one ${prefix}-box`}>
           <AtButton
             className='theme-button'
             onClick={() => this.onSubmit()}
@@ -110,4 +110,4 @@ const select = (state: AppReducer.AppState) => ({
   payOrderDetail: getPayOrderDetail(state)
 })
 
-export default connect(select)(Page);
+export default connect(select)(Page as any);

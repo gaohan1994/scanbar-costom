@@ -1,15 +1,16 @@
 import Taro from "@tarojs/taro";
 import { View, Image, Text } from "@tarojs/components";
 import "./order.less";
-import { OrderInterface, ResponseCode } from "../../constants";
+import { OrderInterface, ResponseCode, MerchantInterface } from "../../constants";
 import numeral from "numeral";
 import { OrderAction, ProductAction } from "../../actions";
 import classnames from "classnames";
 import invariant from "invariant";
 import productSdk from "../../common/sdk/product/product.sdk";
 import orderAction from "../../actions/order.action";
-import OrderButtons from "./order.buttons";
 import { Dispatch } from "redux";
+import merchantAction from "../../actions/merchant.action";
+import { connect } from "@tarojs/redux";
 
 const cssPrefix = "component-order-item";
 
@@ -19,6 +20,9 @@ type Props = {
   data: OrderInterface.OrderDetail;
   orderAllStatus: any[];
   currentType?: number;
+  setCurrentMerchantDetail: (
+    merchant: MerchantInterface.AlianceMerchant
+  ) => void;
 };
 type State = {};
 
@@ -75,7 +79,7 @@ class OrderItem extends Taro.Component<Props, State> {
 
   public onPay = async (order: OrderInterface.OrderInfo) => {
     const { orderNo } = order;
-    const payment = await productSdk.requestPayment(orderNo);
+    const payment = await productSdk.requestPayment(orderNo, order.payType);
     if (payment.code === ResponseCode.success) {
       Taro.navigateTo({
         url: `/pages/order/order.detail?id=${orderNo}`
@@ -89,7 +93,7 @@ class OrderItem extends Taro.Component<Props, State> {
   };
 
   public orderOneMore = async (order: OrderInterface.OrderDetail) => {
-    const { orderDetailList } = order;
+    const { orderDetailList, order: orderInfo } = order;
     const { dispatch, productSDKObj } = this.props;
     if (orderDetailList && orderDetailList.length > 0) {
       for (let i = 0; i < orderDetailList.length; i++) {
@@ -102,11 +106,15 @@ class OrderItem extends Taro.Component<Props, State> {
             product: res.data,
             num: orderDetailList[i].num
           });
-          setTimeout(() => {
-            Taro.switchTab({
-              url: `/pages/cart/cart`
-            });
-          }, 1000);
+          // setTimeout(() => {
+          //   Taro.switchTab({
+          //     url: `/pages/cart/cart`
+          //   });
+          // }, 1000);
+          this.props.setCurrentMerchantDetail({ id: orderInfo.merchantId } as MerchantInterface.AlianceMerchant);
+          Taro.navigateTo({
+            url: `/pages/index/home`
+          });
         } else {
           if (res.msg) {
             Taro.showToast({
@@ -120,54 +128,6 @@ class OrderItem extends Taro.Component<Props, State> {
             });
           }
         }
-      }
-    }
-  };
-
-  public getOrderButtons = (
-    params: OrderInterface.OrderDetail,
-    time?: number
-  ) => {
-    if (time && time === -1) {
-      return [{ title: "再来一单", function: this.orderOneMore }];
-    }
-
-    const { order } = params;
-
-    if (order && order.transFlag !== undefined) {
-      switch (order.transFlag) {
-        case 0:
-          return [
-            { title: "去支付", function: this.onPay },
-            { title: "再来一单", function: this.orderOneMore }
-          ];
-        case 1:
-          return {
-            title: "已完成",
-            detail: "订单已完成，感谢您的信任"
-          };
-        case 2:
-          return {
-            title: "交易关闭",
-            detail: "超时未支付或您已取消，订单已关闭"
-          };
-        case 10:
-          return {
-            title: "待发货",
-            detail: "商品待商家配送，请耐心等待"
-          };
-        case 12:
-          return {
-            title: "待收货",
-            detail: "商品待商家配送，请耐心等待"
-          };
-        case 11:
-          return {
-            title: "待自提",
-            detail: "请去门店自提商品"
-          };
-        default:
-          return ["再来一单"];
       }
     }
   };
@@ -188,10 +148,12 @@ class OrderItem extends Taro.Component<Props, State> {
       <View className={`${cssPrefix}-card`}>
         <View
           className={classnames(`${cssPrefix}-card-status`, {
-            [`${cssPrefix}-card-status-red`]: res.title === "待支付",
+            [`${cssPrefix}-card-status-red`]:
+              res.title === "待支付" || res.title === "等待商家处理" || res.title === "商家拒绝退货",
             [`${cssPrefix}-card-status-orange`]:
-              res.title === "待收货" || res.title === "待自提",
-            [`${cssPrefix}-card-status-blue`]: res.title === "已退货"
+              res.title === "待收货" || res.title === "待自提" || res.title === "待发货"
+              || res.title === "商家同意退货" || res.title === "您已撤销退货申请",
+            [`${cssPrefix}-card-status-blue`]: res.title === "退货成功"
           })}
         >
           {res.title}
@@ -228,17 +190,17 @@ class OrderItem extends Taro.Component<Props, State> {
                       style={`background-image: url(${product.picUrl})`}
                     />
                   ) : (
-                    // <Image
-                    //   src="//net.huanmusic.com/scanbar-c/v1/pic_nopicture.png"
-                    //   className={`${cssPrefix}-card-center-product-pic`}
-                    // />
-                    <View className={`${cssPrefix}-card-center-product-pic`} />
-                  )}
+                      // <Image
+                      //   src="//net.huanmusic.com/scanbar-c/v1/pic_nopicture.png"
+                      //   className={`${cssPrefix}-card-center-product-pic`}
+                      // />
+                      <View className={`${cssPrefix}-card-center-product-pic`} />
+                    )}
 
                   <Text
                     className={`${cssPrefix}-card-center-product-text${
                       process.env.TARO_ENV === "h5" ? "-h5" : ""
-                    }`}
+                      }`}
                   >
                     {product.productName}
                   </Text>
@@ -248,12 +210,14 @@ class OrderItem extends Taro.Component<Props, State> {
           </View>
 
           <View className={`${cssPrefix}-card-center-info`}>
-            {order && order.transAmount !== undefined
-              ? this.renderPrice(order.transAmount)
-              : this.renderPrice(0)}
-            <Text className={`${cssPrefix}-card-center-info-total`}>
-              共{order.totalNum}件
+            <View className={`${cssPrefix}-card-center-info-container`}>
+              {order && order.transAmount !== undefined
+                ? this.renderPrice(order.transAmount)
+                : this.renderPrice(0)}
+              <Text className={`${cssPrefix}-card-center-info-total`}>
+                共{order.totalNum}件
             </Text>
+            </View>
           </View>
         </View>
         <View className={`${cssPrefix}-card-button`}>
@@ -278,21 +242,27 @@ class OrderItem extends Taro.Component<Props, State> {
               </View>
             </View>
           ) : (
-            <View className={`${cssPrefix}-card-button`}>
-              <View
-                className={`${cssPrefix}-card-button-common ${cssPrefix}-card-button-again`}
-                onClick={() => {
-                  this.orderOneMore(data);
-                }}
-              >
-                再来一单
+              <View className={`${cssPrefix}-card-button`}>
+                <View
+                  className={`${cssPrefix}-card-button-common ${cssPrefix}-card-button-again`}
+                  onClick={() => {
+                    this.orderOneMore(data);
+                  }}
+                >
+                  再来一单
               </View>
-            </View>
-          )}
+              </View>
+            )}
         </View>
       </View>
     );
   }
 }
 
-export default OrderItem;
+const mapDispatch = dispatch => {
+  return {
+    setCurrentMerchantDetail: merchantAction.setCurrentMerchantDetail(dispatch)
+  };
+};
+
+export default connect(() => ({}), mapDispatch)(OrderItem as any);

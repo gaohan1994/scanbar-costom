@@ -28,7 +28,7 @@ class HeaderInput extends Taro.Component<Props> {
   };
 
   render () {
-    const { value, onInput, placeholder, isRenderInputRight, inputRightClick, className } = this.props;
+    const { value, onInput, placeholder, isRenderInputRight, inputRightClick, className, focus } = this.props;
     return (
       <View className={`${cssPrefix}-header`}>
         <View className={classnames(`${memberPrefix}-main-header-search`, className)}>
@@ -39,6 +39,7 @@ class HeaderInput extends Taro.Component<Props> {
             value={value}
             onInput={onInput}
             placeholderClass={`${memberPrefix}-main-header-search-input-holder`}
+            focus={focus}
           />
           {isRenderInputRight && value !== '' && (
             <View 

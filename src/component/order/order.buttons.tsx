@@ -1,7 +1,7 @@
 import Taro from '@tarojs/taro';
-import { View, Image, Text } from '@tarojs/components';
+import { View, Text } from '@tarojs/components';
 import './order.less';
-import { OrderInterface, ResponseCode } from '../../constants';
+import { OrderInterface, ResponseCode, MerchantInterface } from '../../constants';
 import numeral from 'numeral';
 import { OrderAction, ProductAction } from '../../actions';
 import classnames from 'classnames'
@@ -9,6 +9,8 @@ import invariant from 'invariant';
 import productSdk from '../../common/sdk/product/product.sdk';
 import orderAction from '../../actions/order.action';
 import { Dispatch } from 'redux';
+import { connect } from '@tarojs/redux';
+import merchantAction from '../../actions/merchant.action';
 
 const cssPrefix = 'component-order-item';
 
@@ -18,6 +20,9 @@ type Props = {
   data: OrderInterface.OrderDetail;
   orderAllStatus: any[];
   currentType?: number;
+  setCurrentMerchantDetail: (
+    merchant: MerchantInterface.AlianceMerchant
+  ) => void;
 };
 type State = {};
 
@@ -69,7 +74,7 @@ class OrderButtons extends Taro.Component<Props, State> {
 
   public onPay = async (order: OrderInterface.OrderInfo) => {
     const { orderNo } = order;
-    const payment = await productSdk.requestPayment(orderNo)
+    const payment = await productSdk.requestPayment(orderNo, order.payType)
 
     if (payment.code === ResponseCode.success) {
       Taro.navigateTo({
@@ -84,22 +89,27 @@ class OrderButtons extends Taro.Component<Props, State> {
   }
 
   public orderOneMore = async (order: OrderInterface.OrderDetail) => {
-    const { orderDetailList } = order;
-    const {productSDKObj, dispatch} = this.props;
+    const { orderDetailList, order: orderInfo } = order;
+    const { productSDKObj, dispatch } = this.props;
     if (orderDetailList && orderDetailList.length > 0) {
       for (let i = 0; i < orderDetailList.length; i++) {
         const res = await ProductAction.productInfoDetail(dispatch, { id: orderDetailList[i].productId });
         if (res.code === ResponseCode.success) {
-          productSdk.manage( dispatch, productSDKObj, {
+          productSdk.manage(dispatch, productSDKObj, {
             type: productSdk.productCartManageType.ADD,
             product: res.data,
             num: orderDetailList[i].num,
+            merchantId: orderInfo.merchantId
           });
-          setTimeout(() => {
-            Taro.switchTab({
-              url: `/pages/cart/cart`
-            });
-          }, 1000);
+          // setTimeout(() => {
+          //   Taro.switchTab({
+          //     url: `/pages/cart/cart`
+          //   });
+          // }, 1000);
+          this.props.setCurrentMerchantDetail({ id: orderInfo.merchantId } as MerchantInterface.AlianceMerchant);
+          Taro.navigateTo({
+            url: `/pages/index/home`
+          });
         } else {
           if (res.msg) {
             Taro.showToast({
@@ -157,116 +167,167 @@ class OrderButtons extends Taro.Component<Props, State> {
     }
 
     const { order } = params;
+    const res = OrderAction.orderStatus({} as any, params);
 
-    if (order && order.transFlag !== undefined) {
-      if (order.lastRefundStatus) {
-        switch (order.lastRefundStatus) {
-          case 5:  // 退货中
-            return [
-              // { title: '撤销申请', function: () => this.orderRefundCancel(order) },
-              { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-            ];
-          case 6:  // 拒绝退货
-            if (order.ableRefund === true) {
-              return [
-                { title: '申请退货', function: () => { this.orderRefund() } },
-                { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-              ];
-            }
-            return [
-              { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-            ];
-          case 7:  // 已退货
-            if (order.ableRefund === true) {
-              return [
-                { title: '申请退货', function: () => { this.orderRefund() } },
-                { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-              ];
-            }
-            return [
-              { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-            ];
-          case 8:  // 申请退货
-            return [
-              { title: '撤销申请', function: () => { this.orderRefundCancel(params) } },
-              { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-            ];
-          case 9:  // 买家取消退货
-            if (order.ableRefund === true) {
-              return [
-                { title: '申请退货', function: () => { this.orderRefund() } },
-                { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-              ];
-            }
-            return [
-              { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-            ];
-          case 13:  // 申请取消订单
-            return [
-              { title: '撤销申请', function: () => { this.orderRefundCancel(params, 1) } },
-              { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-            ];
-          case 14:  // 撤销取消订单
-            if (order.ableRefund === true) {
-              return [
-                { title: '申请退货', function: () => { this.orderRefund() } },
-                { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-              ];
-            }
-            return [
-              { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-            ];
-          default:
-            () => { }
+    switch (res.title) {
+      case '待支付':
+        return [
+          { title: '取消订单', function: () => this.orderClose(order) },
+          { title: '去支付', function: () => this.onPay(order), color: 'blue' },
+        ];
+      case '待发货':
+      case '待自提':
+      case '您已撤销取消订单申请':
+      case '商家拒绝了取消订单':
+        if (order.ableRefund === true) {
+          return [
+            { title: '取消订单', function: () => this.orderCancel() },
+            { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+          ];
         }
-      }
-
-      switch (order.transFlag) {
-        case 0:
+        return [
+          { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+        ];
+      case '待收货':
+      case '您已撤销退货申请':
+      case '商家拒绝退货':
+      case '退货成功':
+        if (order.ableRefund === true) {
           return [
-            { title: '取消订单', function: () => this.orderClose(order) },
-            { title: '去支付', function: () => this.onPay(order), color: 'blue' },
-          ];
-        case 1:
-        case 12:
-          if (order.ableRefund === true) {
-            return [
-              { title: '申请退货', function: () => { this.orderRefund() } },
-              { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-            ];
-          }
-          return [
+            { title: '申请退货', function: () => { this.orderRefund() } },
             { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
           ];
-        case 10:
-        case 11:
-          if (order.ableRefund === true) {
-            return [
-              { title: '取消订单', function: () => this.orderCancel() },
-              { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-            ];
-          }
-          return [
-            { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
-          ];
-        case 13:  // 申请取消订单
+        }
+        return [
+          { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+        ];
+      case '等待商家处理':
+        if (res.detail === '取消订单申请已提交，等待商家处理') {
           return [
             { title: '撤销申请', function: () => { this.orderRefundCancel(params, 1) } },
             { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
           ];
-        default:
+        } else {
           return [
+            { title: '撤销申请', function: () => { this.orderRefundCancel(params) } },
             { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
           ];
-      }
+        }
+      default:
+        return [
+          { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+        ];
     }
+
+    // if (order && order.transFlag !== undefined) {
+    //   if (order.lastRefundStatus) {
+    //     switch (order.lastRefundStatus) {
+    //       case 5:  // 退货中
+    //         return [
+    //           // { title: '撤销申请', function: () => this.orderRefundCancel(order) },
+    //           { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //         ];
+    //       case 6:  // 拒绝退货
+    //         if (order.ableRefund === true) {
+    //           return [
+    //             { title: '申请退货', function: () => { this.orderRefund() } },
+    //             { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //           ];
+    //         }
+    //         return [
+    //           { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //         ];
+    //       case 7:  // 已退货
+    //         if (order.ableRefund === true) {
+    //           return [
+    //             { title: '申请退货', function: () => { this.orderRefund() } },
+    //             { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //           ];
+    //         }
+    //         return [
+    //           { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //         ];
+    //       case 8:  // 申请退货
+    //         return [
+    //           { title: '撤销申请', function: () => { this.orderRefundCancel(params) } },
+    //           { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //         ];
+    //       case 9:  // 买家取消退货
+    //         if (order.ableRefund === true) {
+    //           return [
+    //             { title: '申请退货', function: () => { this.orderRefund() } },
+    //             { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //           ];
+    //         }
+    //         return [
+    //           { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //         ];
+    //       case 13:  // 申请取消订单
+    //         return [
+    //           { title: '撤销申请', function: () => { this.orderRefundCancel(params, 1) } },
+    //           { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //         ];
+    //       case 14:  // 撤销取消订单
+    //         if (order.ableRefund === true) {
+    //           return [
+    //             { title: '申请退货', function: () => { this.orderRefund() } },
+    //             { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //           ];
+    //         }
+    //         return [
+    //           { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //         ];
+    //       default:
+    //         () => { }
+    //     }
+    //   }
+
+    //   switch (order.transFlag) {
+    //     case 0:
+    //       return [
+    //         { title: '取消订单', function: () => this.orderClose(order) },
+    //         { title: '去支付', function: () => this.onPay(order), color: 'blue' },
+    //       ];
+    //     case 1:
+    //     case 12:
+    //       if (order.ableRefund === true) {
+    //         return [
+    //           { title: '申请退货', function: () => { this.orderRefund() } },
+    //           { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //         ];
+    //       }
+    //       return [
+    //         { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //       ];
+    //     case 10:
+    //     case 11:
+    //       if (order.ableRefund === true) {
+    //         return [
+    //           { title: '取消订单', function: () => this.orderCancel() },
+    //           { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //         ];
+    //       }
+    //       return [
+    //         { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //       ];
+    //     case 13:  // 申请取消订单
+    //       return [
+    //         { title: '撤销申请', function: () => { this.orderRefundCancel(params, 1) } },
+    //         { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //       ];
+    //     default:
+    //       return [
+    //         { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+    //       ];
+    //   }
+    // }
     return [
       { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
     ];
   }
 
   render() {
-    const { data, orderAllStatus } = this.props;
+    const { data } = this.props;
 
     const buttons: any[] = this.getOrderButtons(data);
 
@@ -322,4 +383,10 @@ class OrderButtons extends Taro.Component<Props, State> {
   }
 }
 
-export default OrderButtons;
+const mapDispatch = dispatch => {
+  return {
+    setCurrentMerchantDetail: merchantAction.setCurrentMerchantDetail(dispatch)
+  };
+};
+
+export default connect(() => ({}), mapDispatch)(OrderButtons as any);
