@@ -74,6 +74,7 @@ class OrderDetail extends Taro.Component<Props, State> {
       const result = await OrderAction.orderDetail(this.props.dispatch, { orderNo: id });
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       const { orderDetail, orderAllStatus } = this.props;
+      console.log('detaile', orderDetail)
       const status = OrderAction.orderStatus(orderAllStatus, orderDetail);
       if (status.title === '待支付') {
         const second = dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).diff(dayjs(orderDetail.order.createTime), 'second');
@@ -292,7 +293,11 @@ class OrderDetail extends Taro.Component<Props, State> {
   private renderStatusCard() {
     const { time } = this.state;
     const { orderDetail, orderAllStatus, currentType, dispatch, productSDKObj } = this.props;
-    const res = OrderAction.orderStatus(orderAllStatus, orderDetail, time);
+    console.log('renderStatusCard', orderDetail)
+    let res: any = {};
+    if(orderDetail.orderNo) {
+      res = OrderAction.orderStatus(orderAllStatus, orderDetail, time);
+    }
     return (
       <View className={`${cssPrefix}-card ${cssPrefix}-card-status`}>
         {
@@ -470,6 +475,7 @@ class OrderDetail extends Taro.Component<Props, State> {
           type={1}
           isDetail={true}
           padding={false}
+          DeliveryFee={orderDetail.order.deliveryFee}
           productSDKObj={productSDKObj}
           showCallModal={() => { this.setState({ callModal: true }) }}
         />

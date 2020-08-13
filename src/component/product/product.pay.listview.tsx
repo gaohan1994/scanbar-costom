@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro';
-import { View, Text, Image, Radio } from '@tarojs/components';
+import { View, Text, Image } from '@tarojs/components';
 import productSdk, { ProductCartInterface } from '../../common/sdk/product/product.sdk';
 import "../card/form.card.less";
 import "../../pages/style/product.less";
@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import numeral from 'numeral';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
-import { getOrderDetail, getAbleToUseCouponList, getPointConfig, getDeliveryFee } from '../../reducers/app.order';
+import { getOrderDetail, getAbleToUseCouponList, getPointConfig } from '../../reducers/app.order';
 import { OrderInterface, UserInterface } from '../../constants';
 import { getMemberInfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
@@ -257,11 +257,11 @@ class ProductPayListView extends Taro.Component<Props, State> {
     return total;
   }
   private renderDisount = () => {
-    const { payOrderDetail, type, orderDetail, productSDKObj, memberInfo, pointConfig, activityList, isDetail, dispatch, DeliveryFee } = this.props;
+    const { payOrderDetail, type, orderDetail, productCartList, memberInfo, pointConfig, activityList, isDetail, dispatch, DeliveryFee } = this.props;
     const { order, orderActivityInfoList } = orderDetail;
     const {pointSet} = this.state;
     const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
-    const totalActivityMoney = productSdk.getProductTotalActivityPrice(activityList, memberInfo, productSDKObj.productCartList);
+    const totalActivityMoney = productSdk.getProductTotalActivityPrice(activityList, memberInfo, productCartList);
     const orderActivityInfoListTotal = this.getorderActivityInfoListTotal(orderActivityInfoList);
     const {countTotal} = this;
     const {price} = countTotal();
@@ -454,18 +454,18 @@ class ProductPayListView extends Taro.Component<Props, State> {
     )
   }
   private countTotal = () => {
-    const { payOrderDetail, type, orderDetail, activityList, memberInfo, pointConfig, productSDKObj, DeliveryFee } = this.props;
+    const { payOrderDetail, type, orderDetail, activityList, memberInfo, productCartList, DeliveryFee } = this.props;
     const { order } = orderDetail;
     let price =
       numeral(
-        productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
+        productSdk.getProductTransPrice(activityList, memberInfo, productCartList) +
         (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
         (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
       ).format('0.00');
     let discountPrice =
       numeral(
-        productSdk.getProductsOriginPrice(productSDKObj.productCartList) -
-        productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
+        productSdk.getProductsOriginPrice(productCartList) -
+        productSdk.getProductTransPrice(activityList, memberInfo, productCartList) +
         (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
       ).format('0.00');
     if (type && type === 1) {
@@ -496,14 +496,14 @@ class ProductPayListView extends Taro.Component<Props, State> {
     return total;
 }
   private renderTotal = () => {
-    const { memberInfo, pointConfig, DeliveryFee, payOrderDetail, payOrderProductList, productSDKObj, activityList } = this.props;
+    const { memberInfo, pointConfig, DeliveryFee, payOrderDetail, productCartList, payOrderProductList, productSDKObj, activityList } = this.props;
     // const { order } = orderDetail;
     const {pointSet} = this.state;
     const {countTotal, countTotalPrice} = this;
     const {price} = countTotal();
     let tarnsPrice = payOrderProductList && payOrderProductList.length > 0
     ? numeral(
-        productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList) +
+        productSdk.getProductTransPrice(activityList, memberInfo, productCartList, payOrderProductList) +
         (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
         (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
     ).format('0.00')
@@ -534,14 +534,14 @@ class ProductPayListView extends Taro.Component<Props, State> {
     console.log('discountPriceFoot', discountPriceFoot, productSDKObj)
     // let price =
     //   numeral(
-    //     productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
+    //     productSdk.getProductTransPrice(activityList, memberInfo, productCartList) +
     //     (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
     //     (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
     //   ).format('0.00');
     // let discountPrice =
     //   numeral(
-    //     productSdk.getProductsOriginPrice(productSDKObj.productCartList) -
-    //     productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
+    //     productSdk.getProductsOriginPrice(productCartList) -
+    //     productSdk.getProductTransPrice(activityList, memberInfo, productCartList) +
     //     (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
     //   ).format('0.00');
     // if (type && type === 1) {
@@ -582,6 +582,7 @@ const select = (state: AppReducer.AppState) => {
     memberInfo: getMemberInfo(state),
     pointConfig: getPointConfig(state),
     payOrderDetail:　getPayOrderDetail(state),
+    productSDKObj: state.productSDK,
   }
 }
 export default connect(select)(ProductPayListView as any);

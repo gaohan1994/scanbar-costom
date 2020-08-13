@@ -175,7 +175,12 @@ class OrderItem extends Taro.Component<Props, State> {
   render() {
     const { data, orderAllStatus, currentType } = this.props;
     const { order, orderDetailList } = data;
-    const res = OrderAction.orderStatus(orderAllStatus, data);
+    console.log('this,.props', this.props);
+    let res: any = {};
+    if(data.order){
+      res = OrderAction.orderStatus(orderAllStatus, data);
+    }
+   
     let products: any[] = [];
 
     if (orderDetailList && orderDetailList.length > 3) {

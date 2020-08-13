@@ -138,6 +138,7 @@ class Order extends Taro.Component<Props, State> {
     const { orderList, orderListTotal, orderAllStatus, currentType, userinfo, dispatch, productSDK } = this.props;
     const hasMore = orderList.length < orderListTotal;
     // const { getUserinfoModal, loginModal } = this.state;
+    console.log('list');
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-tabs`}>
