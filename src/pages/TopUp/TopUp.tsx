@@ -2,13 +2,14 @@
  * @param {http://localhost:3000/list} 
  */
 import Taro, { Config } from '@tarojs/taro'
-import { View, Button, Image, Text } from '@tarojs/components'
+import { View, Button, Image } from '@tarojs/components'
 import './index.less';
 import { ResponseCode } from '../../constants';
 import { UserAction } from '../../actions';
 import { getUserinfo, getMemberInfo, getRechangeRule } from '../../reducers/app.user';
 import { connect } from '@tarojs/redux';
 import numeral from 'numeral';
+import img_jine from '../../assets/img_jine.png';
 import { Dispatch } from 'redux';
 
 const BlockchainBdPrefix = 'jxc-h5-top';
@@ -55,7 +56,6 @@ class TopUp extends Taro.Component<Props, State> {
   async store () {
     const {key, entry, id} = this.state;
     const {init} = this;
-    const {dispatch} = this.props;
     const self = this;
     const param = {
       "authCode": "",
@@ -132,25 +132,40 @@ class TopUp extends Taro.Component<Props, State> {
           </View>
         </View>
         <View className={`${BlockchainBdPrefix}-content`}>
-        <View className='at-row at-row--wrap'>
-            {
-              rechangeRule.map((val, index) => {
-                return (
-                    <View onClick={() => {this.setState({key: val}); }} className='at-col at-col-6'>
-                    <View className={`${BlockchainBdPrefix}-content-item ${val.id === key.id ? `${BlockchainBdPrefix}-content-item-true` : ''}`}>
-                      <View className={`${BlockchainBdPrefix}-content-item-sell ${val.faceValue !== val.sellingPrice ? `${BlockchainBdPrefix}-content-item-money-border` : `${BlockchainBdPrefix}-content-item-sell-border`}`}>{val.faceValue}元</View>
-                      {val.faceValue !== val.sellingPrice  ? (<View className={`${BlockchainBdPrefix}-content-item-money`}>售价{val.sellingPrice}元</View>) : null}
-                      
-                    </View>
-                    </View>
-                );
-              })
-            }
+          {
+            rechangeRule.length > 0 ? (
+              <View className='at-row at-row--wrap' >
+                  {
+                    rechangeRule.map((val, index) => {
+                      return (
+                          <View onClick={() => {this.setState({key: val}); }} className='at-col at-col-6'>
+                          <View className={`${BlockchainBdPrefix}-content-item ${val.id === key.id ? `${BlockchainBdPrefix}-content-item-true` : ''}`}>
+                            <View className={`${BlockchainBdPrefix}-content-item-sell ${val.faceValue !== val.sellingPrice ? `${BlockchainBdPrefix}-content-item-money-border` : `${BlockchainBdPrefix}-content-item-sell-border`}`}>{val.faceValue}元</View>
+                            {val.faceValue !== val.sellingPrice  ? (<View className={`${BlockchainBdPrefix}-content-item-money`}>售价{val.sellingPrice}元</View>) : null}
+                            
+                          </View>
+                          </View>
+                      );
+                    })
+                  }
+              </View>
+            ) : (
+              <View className='at-row at-row--wrap' >
+                <Image className={`${BlockchainBdPrefix}-empty`} src={img_jine} />
+                <View className={`${BlockchainBdPrefix}-empty-text`}>商户暂未设置充值金额</View>
+                <View className={`${BlockchainBdPrefix}-empty-text`}>请联系商户</View>
+              </View>
+            )
+          }
+        
         </View>
-        </View>
-        <View className={`${BlockchainBdPrefix}-buttons`}>
-            <Button className={`${BlockchainBdPrefix}-buttons-btn`} onClick={this.store}>立即充值</Button>
-        </View>
+        {
+          rechangeRule.length > 0  ? (
+            <View className={`${BlockchainBdPrefix}-buttons`} style={rechangeRule.length > 6 ? {position: 'relative'} : {}}>
+                <Button className={`${BlockchainBdPrefix}-buttons-btn`} onClick={this.store}>立即充值</Button>
+            </View>
+          ) : null
+        }
        
       </View>
     );

@@ -38,6 +38,8 @@ export declare namespace OrderInterface {
 
   interface OrderInfo {
     pointDiscount: any;
+    deliveryStatus: any;
+    afterSaleStatus: any;
     detail: string;
     merchantName: string;
     orderNo: string;
@@ -121,6 +123,7 @@ export declare namespace OrderInterface {
     clinchTime: string;
     refundingTime: string;
     transFlag: number;
+    originOrderNo: string;
   }
 
   interface OrderListFetchFidle extends HTTPInterface.FetchField {

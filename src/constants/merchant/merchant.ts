@@ -68,6 +68,7 @@ export declare namespace MerchantInterface {
     name: string;
     phoneNumber: string;
     prop: number;
+    storedCard: boolean;
   }
 
   interface CustomerMallConfig {

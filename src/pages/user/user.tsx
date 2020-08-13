@@ -176,6 +176,7 @@ class User extends Taro.Component<Props, State> {
 
     render() {
         const { userinfo, memberInfo, currentMerchantDetail, couponListCenter } = this.props;
+        console.log(currentMerchantDetail, 'user');
         return (
             <View className={`container ${cssPrefix}`}>
                 <View className={`${cssPrefix}-bg`} />
@@ -266,7 +267,16 @@ class User extends Taro.Component<Props, State> {
                         > </View>
                     </View>
                     <View className={`${cssPrefix}-member`}>
-                        <View className={`${cssPrefix}-member-item`} onClick={() => { this.navTo('/pages/TopUp/TopUp?entry=nolmal', true) }}>
+                        <View className={`${cssPrefix}-member-item`} onClick={() => { 
+                            if (currentMerchantDetail.storedCard) {
+                                this.navTo('/pages/TopUp/TopUp?entry=nolmal', true)
+                            } else {
+                                Taro.showToast({
+                                    title: '该门店暂未开通储值，请联系商户',
+                                    duration: 2000
+                                });
+                            }
+                             }}>
                             <Text className={`${cssPrefix}-member-item-number`}>￥{numeral(memberInfo.overage || 0).format('0.00')}</Text>
                             <Text>储值余额</Text>
                         </View>

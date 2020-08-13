@@ -238,7 +238,7 @@ class Comp extends Taro.Component<Props, State> {
   }
   render() {
     const { currentTab } = this.state;
-
+    const {currentMerchantDetail} = this.props;
     return (
       <View
         className={classnames(`${prefix}`, {
@@ -291,7 +291,16 @@ class Comp extends Taro.Component<Props, State> {
               })}
             />
           </View>
-          <View onClick={() => {this.setState({payType: 7})}} className={`${prefix}${process.env.TARO_ENV === 'h5' ? '-h5wx' : '-wx'}-pay ${prefix}${process.env.TARO_ENV === 'h5' ? '-h5wx' : '-wx'}-pay-border`}>
+          <View onClick={() => {
+            if (currentMerchantDetail.storedCard) {
+              this.setState({payType: 7})
+            } else {
+                Taro.showToast({
+                    title: '该门店暂未开通储值，请联系商户',
+                    duration: 2000
+                });
+            }
+            }} className={`${prefix}${process.env.TARO_ENV === 'h5' ? '-h5wx' : '-wx'}-pay ${prefix}${process.env.TARO_ENV === 'h5' ? '-h5wx' : '-wx'}-pay-border`}>
             <Image src={'//net.huanmusic.com/weapp/icon_payment_chuzhi.png'} className={`${prefix}${process.env.TARO_ENV === 'h5' ? '-h5wx' : '-wx'}-pay-image`}/>
             <View>储值支付</View> 
             <View 
