@@ -63,6 +63,7 @@ class TopUp extends Taro.Component<Props, State> {
       "rechargeRuleId": key.id,
       "totalAmount": key.faceValue,
       "transAmount": key.sellingPrice,
+      "orderSource": process.env.TARO_ENV === 'weapp' ? 3 : 6,
     };
     const result: any = await UserAction.cashierStore(param);
     if (result.code === ResponseCode.success) {
@@ -136,7 +137,7 @@ class TopUp extends Taro.Component<Props, State> {
             rechangeRule.length > 0 ? (
               <View className='at-row at-row--wrap' >
                   {
-                    rechangeRule.map((val, index) => {
+                    rechangeRule.map((val) => {
                       return (
                           <View onClick={() => {this.setState({key: val}); }} className='at-col at-col-6'>
                           <View className={`${BlockchainBdPrefix}-content-item ${val.id === key.id ? `${BlockchainBdPrefix}-content-item-true` : ''}`}>
