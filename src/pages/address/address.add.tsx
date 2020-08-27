@@ -144,7 +144,6 @@ class Page extends Taro.Component<Props, State> {
   render () {
     const { memberInfo  } = this.props;
     const { address, detail, contact, phone } = this.state;
-    console.log(this.state)
     return (
       <View className='container'>
         <Row

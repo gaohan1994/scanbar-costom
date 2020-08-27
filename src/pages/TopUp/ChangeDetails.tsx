@@ -39,7 +39,6 @@ class ChangeDetails extends Taro.Component<Props, State> {
   }
   init() {
     // /api/order/balanceChange/list
-    console.log('getBalanceChange')
     const {dispatch} = this.props;
     const param = {
       pageNum: this.state.pageNum,

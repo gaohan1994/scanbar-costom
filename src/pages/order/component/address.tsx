@@ -1,11 +1,11 @@
 import Taro from '@tarojs/taro'
-import { View, Image } from '@tarojs/components'
+import { View, Image, Picker } from '@tarojs/components'
 import './index.less'
 import '../../../component/product/product.less'
 import classnames from 'classnames'
 import { AtActionSheet, AtActionSheetItem, AtFloatLayout } from 'taro-ui';
 import { MerchantInterface, UserInterface } from '../../../constants'
-import { connect } from '@tarojs/redux'
+import { connect } from '@tarojs/redux';
 import productSdk from '../../../common/sdk/product/product.sdk';
 import { AppReducer } from '../../../reducers'
 import numeral from 'numeral'
@@ -27,7 +27,30 @@ const tabs = [
     id: 1
   }
 ];
+function getRabge (type){
+  if(type === 1) {
+    let a: any = [];
+    for (let index: any = 0; index < 20; index++) {
+      if(index+1 < 10){
+        a.push(`0${index+1}车`);
+      } else {
+        a.push(`${index+1}车`);
+      }
+    }
+    return a;
+  } else {
 
+    let b: any = [];
+      for (let index: any = 0; index < 50; index++) {
+        if(index+1 < 10){
+          b.push(`0${index+1}`);
+        } else {
+          b.push(index+1);
+        }
+      } 
+      return b
+  }
+}
 const prefix = 'order-component-address'
 
 type Props = {
@@ -51,7 +74,15 @@ type State = {
   currentTab: number;
   choosePayWay: boolean;
   payType: any;
+  selector: any,
+  selectorChecked: any,
+  selectorCheckedValue: any,
 }
+
+const a: any = getRabge(1);
+const b: any = getRabge(2);
+
+const c = ['A', 'B', 'C', 'D', 'E', 'F', '上铺', '中铺', '下铺'];
 
 class Comp extends Taro.Component<Props, State> {
 
@@ -59,6 +90,9 @@ class Comp extends Taro.Component<Props, State> {
     currentTab: 0,
     choosePayWay: false,
     payType: 8,
+    selector: [a, b, c],
+    selectorChecked: [],
+    selectorCheckedValue: ''
   }
 
   async componentDidMount() {
@@ -121,8 +155,20 @@ class Comp extends Taro.Component<Props, State> {
       choosePayWay: false,
     })
   }
+  public onChange (e, self: any) {
+    // 
+    const car = a[e.detail.value[0]];
+    const num = b[e.detail.value[1]];
+    const leg = c[e.detail.value[2]];
+    self.setState({
+      selectorChecked: e.detail.value,
+      selectorCheckedValue: `${car} ${num}${leg}`
+    })
+    productSdk.preparePayOrderAddress({address: `${car} ${num}${leg}`}, self.props.dispatch);
+  }
   public renderDetail = () => {
     const { currentTab } = this.state;
+    const { onChange } = this;
     const { payOrderAddress, timeSelectClick, merchantDistance, currentTime, currentMerchantDetail, isPay, onAddressClick, orderPayType } = this.props;
     const locations = currentMerchantDetail.location ? currentMerchantDetail.location.split(',') : [];
     const addressNew = locations.join('') + currentMerchantDetail.address;
@@ -181,30 +227,24 @@ class Comp extends Taro.Component<Props, State> {
     }
     return (
       <View className={`${prefix}-detail`}>
-        {payOrderAddress.address ? (
-          <View>
-            <AddressItem
-              isPay={isPay}
-              currentMerchantDetail={currentMerchantDetail}
-              address={payOrderAddress}
-              showEdit={false}
-              showArrow={true}
-              onClick={() => this.onAddAddress()}
-            />
-          </View>
-        ) : (
-            <View className={`${prefix}-detail-empty`}>
-              <View
-                className={`${prefix}-detail-button`}
-                onClick={() => this.onAddAddress()}
-              >
-                <Image className={`${prefix}-detail-button-icon`} src='//net.huanmusic.com/scanbar-c/icon_add.png' />
-                <View className={`${prefix}-detail-button-text`}>选择收货地址</View>
+        <View className={`${prefix}-detail-row`} >
+          <View className={`${prefix}-detail-row-title  ${prefix}-detail-row-border`}>车厢座位</View>
+          
+          <Picker mode='multiSelector' range={this.state.selector} onChange={(e) => {this.onChange(e, this)}}>
+            <View className='picker'>
+              <View className={classnames(`${prefix}-detail-row-title`)}>
+                      <View className={classnames(`${prefix}-detail-row-title-txt ${prefix}-detail-row-main`)}>
+                      {this.state.selectorCheckedValue || '请选择'}
+                    </View>
+                    <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
               </View>
             </View>
-          )}
+          </Picker>
+            
+           
+        </View>
         <View className={`${prefix}-detail-row ${prefix}-detail-row-border `}>
-          <View className={`${prefix}-detail-row-title`}>配送时间</View>
+          <View className={`${prefix}-detail-row-title`}>送餐时间</View>
           <View>
             <View
               className={classnames(`${prefix}-detail-row-title`, {
@@ -216,7 +256,7 @@ class Comp extends Taro.Component<Props, State> {
                 timeSelectClick ? timeSelectClick() : () => { };
               }}
             >
-              {currentTime || '立即送出'}
+              {currentTime || '30分钟内'}
           </View>
             <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
           </View>
@@ -245,7 +285,7 @@ class Comp extends Taro.Component<Props, State> {
           [`${prefix}-pad`]: true
         })}
       >
-        <View className={`${prefix}-tabs`}>
+        {/* <View className={`${prefix}-tabs`}>
           <View className={`${prefix}-tabs-bg`} />
           {tabs.map((tab) => {
             return (
@@ -263,7 +303,7 @@ class Comp extends Taro.Component<Props, State> {
               </View>
             )
           })}
-        </View>
+        </View> */}
         {this.renderDetail()}
         {/* <PickerComponent /> */}
         {/* <AtFloatLayout

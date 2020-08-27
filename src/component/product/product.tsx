@@ -150,10 +150,10 @@ class ProductComponent extends Taro.Component<Props, State> {
                         {product.saleNumber <= 0 && (
                             <View className={`${cssPrefix}-content-cover-empty`}>补货中</View>
                         )}
-                        {product.pictures && product.pictures !== '' ? (
+                        {product.pic && product.pic !== '' ? (
                             <View
                                 className={`${cssPrefix}-content-cover-image`}
-                                style={`background-image: url(${product.pictures[0]})`}
+                                style={`background-image: url(${product.pic})`}
                             />
                         ) : (
                             <Image

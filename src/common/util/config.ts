@@ -4,4 +4,5 @@ const MCHIDFist = localStorage && localStorage.getItem('MCHIDFist') && localStor
 export const BASE_PARAM = {
     MCHID: merchant && process.env.TARO_ENV === 'h5' ? parseInt(merchant) : 1,
     MCHIDFist: MCHIDFist && process.env.TARO_ENV === 'h5' ? parseInt(MCHIDFist) : 1,
+    default: 92,
 };

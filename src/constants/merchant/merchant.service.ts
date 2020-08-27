@@ -15,6 +15,7 @@
 import requestHttp from "../../common/request/request.http";
 import { HTTPInterface, jsonToQueryString } from '../index';
 import MerchantInterfaceMap, { MerchantInterface } from "./merchant";
+import {BASE_PARAM} from '../../common/util/config';
 
 class MerchantService {
 
@@ -24,7 +25,7 @@ class MerchantService {
   }
 
   public merchantList = async (param: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
-    const result = await requestHttp.get(`${MerchantInterfaceMap.merchantList}${jsonToQueryString(param)}`);
+    const result = await requestHttp.get(`${MerchantInterfaceMap.merchantList}?merchantId=${BASE_PARAM.default}`);
     return result;
   }
 

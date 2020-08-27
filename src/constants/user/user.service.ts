@@ -71,7 +71,7 @@ class UserService {
     return result;
   }
   public getMemberInfo = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {
-    const result = await requestHttp.get(`/api/memberInfo/getMemberInfo`);
+    const result = await requestHttp.get(`/memberInfo/getMemberInfo`);
     return result;
   }
   public getRechargeRule = async (): Promise<HTTPInterface.ResponseResultBase<any>> => {

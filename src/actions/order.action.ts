@@ -46,7 +46,7 @@ class OrderAction {
       const reducer: OrderReducer.Reducers.PointConfigReducer = {
         type: OrderInterfaceMap.reducerInterfaces.RECEIVE_POINTCONFIG,
         payload: {
-          pointConfig: result.data
+          pointConfig: result.data || {}
         }
       };
       dispatch(reducer);
@@ -202,7 +202,7 @@ class OrderAction {
         }
       case 2:
         return {
-          deliveryStatus: 0
+          deliveryStatus: 1
         }
       case 3:
         return {
@@ -400,8 +400,8 @@ class OrderAction {
       };
     } else if (order.transFlag === 1 && order.deliveryStatus === 1) {
       return {
-        title: "待自提",
-        detail: "请去门店自提商品"
+        title: "待送餐",
+        detail: "商品待乘务员配送，请耐心等待"
       };
     } else if (order.transFlag === 1 && order.deliveryStatus === 2) {
       return {

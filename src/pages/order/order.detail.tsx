@@ -16,6 +16,7 @@ import CostomModal from '../../component/login/modal';
 import merchantAction from '../../actions/merchant.action';
 import ProductPayListView from '../../component/product/product.pay.listview'
 import OrderButtons from '../../component/order/order.buttons';
+import icon_order_location from '../../assets/icon_order_location.png';
 import { Dispatch } from 'redux';
 
 const cssPrefix = 'order-detail';
@@ -74,7 +75,6 @@ class OrderDetail extends Taro.Component<Props, State> {
       const result = await OrderAction.orderDetail(this.props.dispatch, { orderNo: id });
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       const { orderDetail, orderAllStatus } = this.props;
-      console.log('detaile', orderDetail)
       const status = OrderAction.orderStatus(orderAllStatus, orderDetail);
       if (status.title === '待支付') {
         const second = dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).diff(dayjs(orderDetail.order.createTime), 'second');
@@ -293,7 +293,6 @@ class OrderDetail extends Taro.Component<Props, State> {
   private renderStatusCard() {
     const { time } = this.state;
     const { orderDetail, orderAllStatus, currentType, dispatch, productSDKObj } = this.props;
-    console.log('renderStatusCard', orderDetail)
     let res: any = {};
     if(orderDetail.orderNo) {
       res = OrderAction.orderStatus(orderAllStatus, orderDetail, time);
@@ -308,7 +307,7 @@ class OrderDetail extends Taro.Component<Props, State> {
                 src='//net.huanmusic.com/weapp/customer/img_payment.png'
               />
             )
-            : res.title === '待自提' || res.title === '待收货' || res.title === '商家同意退货'
+            : res.title === '待送餐' || res.title === '待收货' || res.title === '商家同意退货'
               ? (
                 <Image
                   className={`${cssPrefix}-card-status-img1`}
@@ -385,7 +384,7 @@ class OrderDetail extends Taro.Component<Props, State> {
 
           <View className={`${cssPrefix}-card-logistics-item-info`}>
             <Text className={`${cssPrefix}-card-logistics-item-info-title`}>
-              {order && order.deliveryType == 0 ? '到店自提时间' : '配送时间'}
+              {order && order.deliveryType == 0 ? '送餐时间' : '配送时间'}
             </Text>
             <Text className={`${cssPrefix}-card-logistics-item-info-content`}>
               {
@@ -407,21 +406,24 @@ class OrderDetail extends Taro.Component<Props, State> {
             })}
         >
           {
-            order && order.deliveryType == 0
-              ? (
-                <Image
-                  src='//net.huanmusic.com/weapp/icon_order_shop.png'
-                  className={`${cssPrefix}-card-logistics-item-img`}
-                />
-              )
-              : (
-                <Image
-                  src='//net.huanmusic.com/weapp/icon_order_location.png'
-                  className={`${cssPrefix}-card-logistics-item-img`}
-                />
-              )
+            // order && order.deliveryType == 0
+            //   ? (
+            //     <Image
+            //       src='//net.huanmusic.com/weapp/icon_order_shop.png'
+            //       className={`${cssPrefix}-card-logistics-item-img`}
+            //     />
+            //   )
+            //   : (
+            //     <Image
+            //       src='//net.huanmusic.com/weapp/icon_order_location.png'
+            //       className={`${cssPrefix}-card-logistics-item-img`}
+            //     />
+            //   )
           }
-
+          <Image
+            src={icon_order_location}
+            className={`${cssPrefix}-card-logistics-item-img`}
+          />
 
           <View className={`${cssPrefix}-card-logistics-item-info`}>
             <Text
@@ -432,7 +434,8 @@ class OrderDetail extends Taro.Component<Props, State> {
                   [`${cssPrefix}-card-logistics-item-info-title`]: order && order.deliveryType === 0,
                 })}
             >
-              {
+              车厢座位
+              {/* {
                 order && order.deliveryType == 0
                   ? order.merchantName && order.merchantName.length
                     ? order.merchantName
@@ -440,7 +443,7 @@ class OrderDetail extends Taro.Component<Props, State> {
                   : order && order.address && order.address.length > 0
                     ? order.address
                     : '未设置收货地址'
-              }
+              } */}
             </Text>
             <Text
               className={classnames(
@@ -449,7 +452,8 @@ class OrderDetail extends Taro.Component<Props, State> {
                   [`${cssPrefix}-card-logistics-item-info-title`]: order && order.deliveryType !== 0,
                 })}
             >
-              {
+              {order && order.address}
+              {/* {
                 order && order.deliveryType == 0
                   ? order.merchantAddress && order.merchantAddress.length > 0
                     ? order.merchantAddress
@@ -457,7 +461,7 @@ class OrderDetail extends Taro.Component<Props, State> {
                   : (order && order.receiver && order.receiver.length > 0) || (order && order.receiverPhone && order.receiverPhone.length > 0)
                     ? `${order.receiver} ${order.receiverPhone}`
                     : '未设置收货人'
-              }
+              } */}
             </Text>
           </View>
         </View>

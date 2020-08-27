@@ -27,7 +27,7 @@ class HttpRequest {
       }
     };
 
-    // console.log('token', result)
+
     const list = ['/customer/product/type/', '/customer/merchantInfo/merchantList', 
     '/customer/advertisement/getAdvertisements/', '/customer/product/list'];
 
@@ -37,6 +37,7 @@ class HttpRequest {
         haToken = false;
       }
     });
+    console.log('token______________', result,'haToken', haToken)
     if (!!result && haToken) {
       option.header.Authorization = result;
     }

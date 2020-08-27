@@ -4,7 +4,7 @@ import './index.less'
 import { connect } from '@tarojs/redux'
 import { AppReducer } from '../../../reducers'
 import { AtButton  } from 'taro-ui'
-import { UserAction } from '../../../actions'
+import { UserAction, MerchantAction } from '../../../actions'
 import { Dispatch } from 'redux';
 import { ResponseCode, MerchantInterface } from '../../../constants/index';
 import invariant from 'invariant';
@@ -12,12 +12,13 @@ import { HTTPInterface } from '../../../constants/index';
 import md5 from 'blueimp-md5';
 import { LoginManager } from '../../../common/sdk'
 import { BASE_PARAM } from '../../../common/util/config'
-import { getCurrentMerchantDetail } from '../../../reducers/app.merchant';
+import { getCurrentMerchantDetail, getMerchantList } from '../../../reducers/app.merchant';
 const prefix = 'login'
 
 type Props = {
   dispatch: Dispatch;
-  currentMerchantDetail: MerchantInterface.MerchantDetail;
+  merchantList: any;
+  currentMerchantDetail?: MerchantInterface.MerchantDetail;
 }
 type InputType = 'phone' | 'password'
 type State = {
@@ -33,6 +34,13 @@ class LoginH5 extends Taro.Component<Props, State> {
     password: '',
     count: 61,
   }
+  componentDidMount () {
+    const {dispatch, currentMerchantDetail} = this.props;
+    const params = {
+      merchantId: BASE_PARAM.MCHIDFist,
+    }
+    MerchantAction.merchantList(dispatch, params, currentMerchantDetail);
+  }
   public onNavAddress = () => {
     Taro.navigateTo({
       url: `/pages/address/address.change.index`
@@ -45,7 +53,8 @@ class LoginH5 extends Taro.Component<Props, State> {
       invariant(!!phone, '请输入手机号');
       invariant(phone.length === 11, '请输入正确的手机号');
       invariant(!!password, '请输入验证码');
-      const result: HTTPInterface.ResponseResultBase<any> = await UserAction.h5Login(this.props.dispatch, {phone, validCode: md5(password), merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,});
+      //currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
+      const result: HTTPInterface.ResponseResultBase<any> = await UserAction.h5Login(this.props.dispatch, {phone, validCode: md5(password), merchantId: BASE_PARAM.default,});
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       if (result.code === ResponseCode.success) {
         Taro.showToast({
@@ -59,16 +68,30 @@ class LoginH5 extends Taro.Component<Props, State> {
           token: '',
           phone: ''
         };
+        const userWx = localStorage.getItem('userWx');
+        if (userWx) { 
+          userinfo = {
+            ...userinfo,
+            ...JSON.parse(userWx),
+            merchantId: BASE_PARAM.default
+          };
+        }
         if (result.data) {
           userinfo = {
             ...userinfo,
             ...result.data,
-            avatar: result.data.avatar ? result.data.avatar : ''
+            merchantId: BASE_PARAM.default
           };
         }
-        const setResult: any = await LoginManager.setUserInfo(userinfo, dispatch);
-        invariant(setResult.success, setResult.msg || '存储用户信息失败');
-        Taro.navigateBack();
+        await LoginManager.setUserInfo(userinfo, dispatch);
+        await UserAction.userInfoSave(userinfo);
+        // Taro.navigateBack();
+        // Taro.navigateTo({
+        //   url: '/pages/login/loginBefore'
+        // })
+        window.location.href= `${window.location.origin}/online/#/pages/login/loginBefore`;
+        // window.location.reload();
+        // invariant(setResult.success, setResult.msg || '存储用户信息失败');
       }
     } catch (error) {
       Taro.showToast({
@@ -122,15 +145,16 @@ class LoginH5 extends Taro.Component<Props, State> {
   }
   render () {
     const {getCode} = this;
-    const {currentMerchantDetail} = this.props;
+    const {currentMerchantDetail, merchantList} = this.props;
     const mearchantName = localStorage.getItem('mearchantName');
+    const ob = merchantList.filter(val => val.id === BASE_PARAM.default)[0];
     return (
       <View className={`${prefix}_container`}>
         <View className={`${prefix}_container_bg`}>
           <View className={`${prefix}_container_bg_title`}>
             <div>欢迎登录</div>
             <div>{
-                currentMerchantDetail && currentMerchantDetail.name && currentMerchantDetail.name.length > 0 ? currentMerchantDetail.name : mearchantName ? mearchantName : '未获取到店名'
+                ob &&ob.name || '未获取到店名'
               }</div>
           </View>
           <View className={`${prefix}_container_bg_logo`}/>
@@ -164,6 +188,7 @@ class LoginH5 extends Taro.Component<Props, State> {
 const select = (state: AppReducer.AppState) => {
   return {
     currentMerchantDetail: getCurrentMerchantDetail(state),
+    merchantList: getMerchantList(state),
   }
 }
 

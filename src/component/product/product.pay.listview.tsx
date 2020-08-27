@@ -100,20 +100,20 @@ class ProductPayListView extends Taro.Component<Props, State> {
           })}
         >
           {
-            type && type === 1 && (
-              <View className={`${cssPrefix}-row-header`}>
-                <View className={`${cssPrefix}-row-header-item`}>
-                  <Text className={`${cssPrefix}-row-header-shop `}>{order.merchantName || '未知商店'}</Text>
-                </View>
-                <View className={`${cssPrefix}-row-header-item`} onClick={() => { showCallModal ? showCallModal() : () => { } }}>
-                  <Image
-                    className={`${cssPrefix}-row-header-phone`}
-                    src={'//net.huanmusic.com/weapp/icon_order_phone.png'}
-                  />
-                  <Text className={`${cssPrefix}-row-header-green`}>联系商家</Text>
-                </View>
-              </View>
-            )
+            // type && type === 1 && (
+            //   <View className={`${cssPrefix}-row-header`}>
+            //     <View className={`${cssPrefix}-row-header-item`}>
+            //       <Text className={`${cssPrefix}-row-header-shop `}>{order.merchantName || '未知商店'}</Text>
+            //     </View>
+            //     <View className={`${cssPrefix}-row-header-item`} onClick={() => { showCallModal ? showCallModal() : () => { } }}>
+            //       <Image
+            //         className={`${cssPrefix}-row-header-phone`}
+            //         src={'//net.huanmusic.com/weapp/icon_order_phone.png'}
+            //       />
+            //       <Text className={`${cssPrefix}-row-header-green`}>联系商家</Text>
+            //     </View>
+            //   </View>
+            // )
           }
           {
             type && type === 1
@@ -125,27 +125,27 @@ class ProductPayListView extends Taro.Component<Props, State> {
               })
           }
           {
-            ((payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1)
-              || (order && order.deliveryType !== undefined && order.deliveryType === 1)) && (
-              <View className={`${cssPrefix}-row-totals`}>
-                <View className={`${cssPrefix}-row-content-item`}>
-                  <Text className={`${cssPrefix}-row-voucher`}>配送费</Text>
-                  <View className={`${cssPrefix}-row-voucher-wrap`}>
-                    <Text
-                      className={
-                        `${cssPrefix}-row-content-price ${cssPrefix}-row-content-price-black`
-                      }
-                    >
-                      ￥{numeral(DeliveryFee).format('0.00')}
-                    </Text>
-                    {/* <Image
-                      className={`${cssPrefix}-card-products-header-next`}
-                      src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
-                    /> */}
-                  </View>
-                </View>
-              </View>
-            )
+            // ((payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1)
+              // || (order && order.deliveryType !== undefined && order.deliveryType === 1)) && (
+              // <View className={`${cssPrefix}-row-totals`}>
+              //   <View className={`${cssPrefix}-row-content-item`}>
+              //     <Text className={`${cssPrefix}-row-voucher`}>配送费</Text>
+              //     <View className={`${cssPrefix}-row-voucher-wrap`}>
+              //       <Text
+              //         className={
+              //           `${cssPrefix}-row-content-price ${cssPrefix}-row-content-price-black`
+              //         }
+              //       >
+              //         ￥{numeral(DeliveryFee).format('0.00')}
+              //       </Text>
+              //       {/* <Image
+              //         className={`${cssPrefix}-card-products-header-next`}
+              //         src={'//net.huanmusic.com/scanbar-c/icon_commodity_into.png'}
+              //       /> */}
+              //     </View>
+              //   </View>
+              // </View>
+            // )
           }
           {this.renderDisount()}
           {this.renderTotal()}
@@ -211,11 +211,11 @@ class ProductPayListView extends Taro.Component<Props, State> {
       >
         <View className={`${cssPrefix}-row-box`}>
           {
-            item && item.pictures && item.pictures.length > 0
+            item && item.pic && item.pic.length > 0
               ? (
                 <View
                   className={`${cssPrefix}-row-cover`}
-                  style={`background-image: url(${item.pictures[0]})`}
+                  style={`background-image: url(${item.pic})`}
                 />
               )
               : (

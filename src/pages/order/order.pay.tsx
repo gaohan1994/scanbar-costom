@@ -30,6 +30,7 @@ const cssPrefix = 'order';
 const openTime = 8;
 const closeTime = 24;
 
+
 type Props = {
     dispatch: Dispatch;
     orderPayType: any;
@@ -54,6 +55,7 @@ type State = {
     timeList: string[];
     dateList: OrderInterface.DateItem;
     isOnClick: boolean;
+    num: number;
 }
 
 class Page extends Taro.Component<Props, State> {
@@ -72,6 +74,7 @@ class Page extends Taro.Component<Props, State> {
         timeList: [],
         dateList: [] as any,
         isOnClick: true,
+        num: 1,
     }
 
     componentDidMount() {
@@ -93,10 +96,8 @@ class Page extends Taro.Component<Props, State> {
         orderAction.getPointConfig(this.props.dispatch);
     }
     componentWillReceiveProps = async (nextProps) => {
-        console.log(nextProps, 'nextProps')
         const {dispatch, payOrderAddress, currentMerchantDetail} = nextProps;
         if(payOrderAddress.id && this.state.isFirst === true) {
-            console.log(payOrderAddress.id, 'payOrderAddress.id')
             const param = {
                 latitude:  payOrderAddress.latitude,
                 longitude: payOrderAddress.longitude,
@@ -119,7 +120,7 @@ class Page extends Taro.Component<Props, State> {
             invariant(payOrderProductList.length > 0, '请选择要下单的商品')
 
             if (payOrderDetail && payOrderDetail.deliveryType === 1) {
-                invariant(payOrderAddress.id, '请选择地址');
+                invariant(payOrderAddress.address, '请选择车厢座位');
             }
             this.createOrder();
 
@@ -139,13 +140,12 @@ class Page extends Taro.Component<Props, State> {
             })
             try {
                 const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch, DeliveryFee, orderPayType, currentMerchantDetail} = this.props;
-                const payload = productSdk.getProductInterfacePayload(currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal, productSDKObj.pointsTotalSell, DeliveryFee, orderPayType);
+                const payload = productSdk.getProductInterfacePayload(currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal, productSDKObj.pointsTotalSell, DeliveryFee, orderPayType, this.state.num);
                 const result = await productSdk.cashierOrder(payload)
                 invariant(result.code === ResponseCode.success, result.msg || ' ');
                 Taro.hideLoading();
                 const payment = await productSdk.requestPayment(result.data.order.orderNo, orderPayType, (res) => {
                 })
-                console.log('payment', payment);
                 if (payment.code === ResponseCode.success || payment.errMsg === "requestPayment:ok") {
                     if(orderPayType === 7){
                         Taro.showToast({
@@ -238,14 +238,12 @@ class Page extends Taro.Component<Props, State> {
             this.setState(obj)
         } else {
             this.setState(prevState => {
-                console.log('prevState', prevState, key, value)
                 return {
                     ...prevState,
                     [key]: value
                 };
             });
         }
-        console.log('onChangeValue', key, value)
     }
 
     onShowTimeSelect = () => {
@@ -285,9 +283,9 @@ class Page extends Taro.Component<Props, State> {
         }
         if (currentDate.id === 0) {
             if (payOrderDetail.deliveryType === 1) {
-                timeList.push('立即送出');
+                timeList.push('30分钟内');
             } else {
-                timeList.push('立即自提');
+                timeList.push('30分钟内');
             }
             const currentHour = dayJs().hour();
             const currentMinute = dayJs().minute();
@@ -307,13 +305,13 @@ class Page extends Taro.Component<Props, State> {
         this.onChangeValue('timeList', timeList);
         if (
             selectTime === '' ||
-            (selectTime === '立即自提' && payOrderDetail.deliveryType === 1) ||
+            (selectTime === '30分钟内' && payOrderDetail.deliveryType === 1) ||
             (selectTime === '立即送出' && payOrderDetail.deliveryType === 0)
         ) {
             this.onChangeValue('selectTime', timeList[0]);
             this.setState({selectTime: timeList[0]}, () => {
                 const selectTimeStr =
-                    `${(timeList[0] === '立即自提' || timeList[0] === '立即送出') ? '' : (currentDate.date || '')}${timeList[0] !== '立即自提' && timeList[0] !== '立即送出' ? ' ' : ''}${timeList[0]}`;
+                    `${(timeList[0] === '30分钟内' || timeList[0] === '立即送出') ? '' : (currentDate.date || '')}${timeList[0] !== '30分钟内' && timeList[0] !== '立即送出' ? ' ' : ''}${timeList[0]}`;
                 productSdk.preparePayOrderDetail({planDeliveryTime: selectTimeStr}, dispatch);
             })
         }
@@ -340,11 +338,11 @@ class Page extends Taro.Component<Props, State> {
                     name: `今天（${date.month() + 1}月${date.date()}日）`,
                     date: `${date.month() + 1}月${date.date()}日`
                 },
-                {
-                    id: 1,
-                    name: `明天（${nextDate.month() + 1}月${nextDate.date()}日）`,
-                    date: `${nextDate.month() + 1}月${nextDate.date()}日`
-                }
+                // {
+                //     id: 1,
+                //     name: `明天（${nextDate.month() + 1}月${nextDate.date()}日）`,
+                //     date: `${nextDate.month() + 1}月${nextDate.date()}日`
+                // }
             ];
         }
         this.onChangeValue('dateList', dateList);
@@ -365,7 +363,6 @@ class Page extends Taro.Component<Props, State> {
         || (order && order.deliveryType !== undefined && order.deliveryType === 1))){
             total += DeliveryFee;
         }
-        console.log('total', total)
         return total;
     }
     onRefProductPayListView = (reset) => {
@@ -391,9 +388,13 @@ class Page extends Taro.Component<Props, State> {
         let priceDiscountPay = countTotal() - numeral(tarnsPrice).value();
     
         const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
-        console.log('orderPay', priceDiscountPay, tarnsPrice, productSDKObj);
+        const child= document.getElementById('orderConfirm');
+        if(child){
+            const parentNode = child.parentNode;
+            parentNode.style = "background: #f2f2f2;min-height: 100%;";
+        }
         return (
-            <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: 'auto'}}>
+            <View id={'orderConfirm'} className='container container-color' style={{backgroundColor: '#f2f2f2', height: 'auto'}}>
                 <View className={`${cssPrefix}-bg`}/>
                 <PickAddress
                     isPay={true}
@@ -426,8 +427,21 @@ class Page extends Taro.Component<Props, State> {
                 
                 <View className={`${cssPrefix}-remark`}>
                     <View className={`${cssPrefix}-remark-card`}>
+                      
                         <FormCard
                             items={[{
+                                title: '餐具',
+                                isCart: true,
+                                onChangeCart: (num) => {
+                                    this.setState({
+                                        num: num
+                                    })
+                                },
+                                hasBorder: true,
+                                extraTextStyle: 'maxWidth',
+                                
+                                isRemark: true
+                            }, {
                                 title: '备注',
                                 onClick: () => {
                                     Taro.navigateTo({

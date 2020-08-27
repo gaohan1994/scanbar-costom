@@ -76,13 +76,12 @@ class Page extends Taro.Component<any> {
     const { productDetail, memberInfo, activityList } = this.props;
     const { id } = this.$router.params;
     const {loading} = this.state;
-    console.log('loading', loading);
     if(!loading){
       return (
         <View className="container">
           <ProductSwiper
             images={
-              productDetail.pictures || [
+              productDetail.pictures && productDetail.pictures.length > 0 ? productDetail.pictures : productDetail.pic && [productDetail.pic]|| [
                 "//net.huanmusic.com/scanbar-c/v1/pic_default.png"
               ]
             }

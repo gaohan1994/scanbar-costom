@@ -97,6 +97,7 @@ class LoginManager {
         }
       });
       return new Promise((resolve) => {
+        console.log('CentermOAuthKey1', JSON.stringify(result))
         Taro
           .setStorage({ key: CentermOAuthKey, data: JSON.stringify(result) })
           .then(() => {
@@ -124,6 +125,7 @@ class LoginManager {
       }
     });
     return new Promise((resolve, reject) => {
+      console.log('CentermOAuthKey2')
       Taro
         .setStorage({ key: CentermOAuthKey, data: '' })
         .then(() => {
@@ -170,8 +172,12 @@ class LoginManager {
    */
   public getUserToken = (): ActionsInterface.ActionBase<string> => {
     const userinfo = Taro.getStorageSync(CentermOAuthKey);
+    // JSON.parse(userinfo).token
+    // return { success: true, result:  'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzZXNzaW9uS2V5IjoiMTAwIiwibWVyY2hhbnRJZCI6MSwib3BlbklkIjoibnVsbCIsImVtcGxveWVlSWQiOjEwMDAwMDU4LCJleHAiOjE2MDA0MTY2MDh9.25bz0YJpds3DlazvI_WKHGJGbsNuoBqc2zUChfMe3qk'};
+
     if (userinfo) {
-      return { success: true, result: JSON.parse(userinfo).token };
+      return { success: true, result: JSON.parse(userinfo).token};
+
     } else {
       return { success: false, result: '' };
     }
@@ -190,6 +196,7 @@ class LoginManager {
       }
     });
     return new Promise((resolve) => {
+      console.log('CentermOAuthKey4', JSON.stringify(userInfo))
       Taro
         .setStorage({ key: CentermOAuthKey, data: JSON.stringify(userInfo) })
         .then(() => {

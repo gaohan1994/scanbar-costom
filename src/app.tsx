@@ -80,7 +80,7 @@ class App extends Component {
       },
       {
         root: "pages/login/",
-        pages: ["login", "login.userinfo"]
+        pages: ["login", "login.userinfo", "loginBefore"]
       },
       {
         root: "pages/TopUp/",

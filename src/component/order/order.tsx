@@ -9,6 +9,7 @@ import invariant from 'invariant';
 import productSdk from '../../common/sdk/product/product.sdk';
 import orderAction from '../../actions/order.action';
 import OrderButtons from './order.buttons';
+import icon_order_gaotie from '../../assets/icon_order_gaotie.png'
 import { Dispatch } from 'redux';
 
 const cssPrefix = 'component-order-item';
@@ -163,8 +164,8 @@ class OrderItem extends Taro.Component<Props, State> {
           }
         case 11:
           return {
-            title: '待自提',
-            detail: '请去门店自提商品'
+            title: '待送餐',
+            detail: '商品待乘务员配送，请耐心等待'
           }
         default:
           return ['再来一单']
@@ -194,7 +195,7 @@ class OrderItem extends Taro.Component<Props, State> {
         <View
           className={classnames(`${cssPrefix}-card-status`, {
             [`${cssPrefix}-card-status-red`]: res.title === '待支付',
-            [`${cssPrefix}-card-status-orange`]: res.title === '待收货' || res.title === '待自提',
+            [`${cssPrefix}-card-status-orange`]: res.title === '待收货' || res.title === '待送餐',
             [`${cssPrefix}-card-status-blue`]: res.title === '已退货',
           })}
         >
@@ -203,12 +204,13 @@ class OrderItem extends Taro.Component<Props, State> {
 
         <View className={`${cssPrefix}-card-header`}>
           <Image
-            src='//net.huanmusic.com/scanbar-c//icon_order_store.png'
+            // src='//net.huanmusic.com/scanbar-c//icon_order_store.png'
+            src={icon_order_gaotie}
             className={`${cssPrefix}-card-header-icon`}
           />
           <View className={`${cssPrefix}-card-header-text`}>
             <View className={`${cssPrefix}-card-header-text-shop ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-card-header-text-shop-h5` : ''}`}>
-              {order.merchantName || '未知商店'}
+              车次 {order.merchantName || '未知'}
             </View>
             <View className={`${cssPrefix}-card-header-text-time`}>
               {order.createTime || ''}

@@ -7,12 +7,13 @@
  * @todo [fockedTaroUiListItem,增加以及修改了一些属性]
  */
 import Taro from '@tarojs/taro';
-import { View, Image } from '@tarojs/components';
+import { View, Image, Text } from '@tarojs/components';
 import classnames from 'classnames';
 import './style.scss';
+import '../product/product.less';
 import './form.card.less';
 import { AtInput } from 'taro-ui';
-
+const cssPrefix = 'component-product';
 interface ListRowButton {
   onPress: () => void;
   title: string;
@@ -21,6 +22,7 @@ interface ListRowButton {
 
 export interface FormRowProps { 
   main?: boolean;               // 左边角标
+  isCart?: boolean;
   note?: string;                // 左边小文字
   arrow?: string;               // 箭头方向
   thumb?: string;               // 图片
@@ -33,6 +35,7 @@ export interface FormRowProps {
   onClick?: () => any;          // 点击事件
   isRemark?: boolean;           // 是不是备注
   extraThumbClick?: () => any;  // 右边图片点击事件
+  onChangeCart?: (num: number) => any;
   className?: any;              // 外部className
   buttons?: ListRowButton[];    // ListRow 的右侧按钮
   isInput?: boolean;            // 是否显示输入框
@@ -50,12 +53,15 @@ export interface FormRowProps {
   maxInput?: boolean;           // 右侧450px input
 }
 
-interface FormRowState { }
+interface FormRowState { 
+  sellNum: number;
+}
 
 class FormRow extends Taro.Component<FormRowProps, FormRowState> {
 
   static defaultProps = {
     main: false,
+    isCart: false,
     note: '',
     disabled: false,
     title: '',
@@ -82,6 +88,10 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
     inputOnChange: () => { /** */ },
   };
 
+  state = {
+    sellNum: 1,
+  }
+
   render () {
     let {
       main,
@@ -91,6 +101,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
       thumb,
       disabled,
       hasBorder,
+      isCart,
       arrow,
       extraThumb,
       extraTextStyle,
@@ -106,6 +117,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
       inputValue,
       inputPlaceHolder,
       inputOnChange,
+      onChangeCart,
       extraTextColor,
       inputCursorSpacing,
       extraTextSize,
@@ -126,8 +138,9 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
 
     extraText = String(extraText);
     title = String(title);
+    const {sellNum} = this.state;
     return (
-      <View className={rootClass} onClick={onClick}>
+      <View className={rootClass} style={!hasBorder ? {borderTop: '#E3E3E3 0.02133rem solid'} : {}} onClick={onClick}>
         <View className='at-list__item-container'>
           {thumb && (
             <View className='at-list__item-thumb item-thumb'>
@@ -152,6 +165,78 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
           </View>
 
           <View className='at-list__item-extra item-extra component-list-row-extra'>
+            {
+               isCart && sellNum !== 0? (
+                <View className={`${cssPrefix}-stepper-container`}>
+                    <View
+                        className={`${cssPrefix}-stepper-touch`}
+                        // onClick={this.manageProduct.bind(this, productSdk.productCartManageType.REDUCE)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if(onChangeCart){
+                              if(sellNum === 1) {
+                                this.setState({
+                                  sellNum: 0
+                                })
+                                onChangeCart(0);
+                              } else {
+                                this.setState({
+                                  sellNum: sellNum -1
+                                })
+                                onChangeCart(sellNum - 1);
+                              }
+                            }
+                  
+                        }}
+                    >
+                        <View
+                            className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-reduce`)}
+                        />
+                    </View>
+                    <Text className={`${cssPrefix}-stepper-text`}>{sellNum}</Text>
+                    <View
+                        className={`${cssPrefix}-stepper-touch`}
+                        // onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD, {limitNum: limitNum, isAdd: productInCart && limitNum !== -1 && limitNum === productInCart.sellNum})}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if(onChangeCart){ 
+                              this.setState({
+                                sellNum: sellNum + 1
+                              })
+                              onChangeCart(sellNum + 1);
+                            }
+                          
+                        }}
+                    >
+                        <View
+                            className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
+                        />
+                    </View>
+                </View>
+            ) : null }
+            { isCart && sellNum === 0 ? 
+            (
+                <View className={`${cssPrefix}-stepper-container`}>
+                    <View
+                        className={`${cssPrefix}-stepper-touch`}
+                        // onClick={this.manageProduct.bind(this, productSdk.productCartManageType.ADD)}
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if(onChangeCart){
+                              this.setState({
+                                sellNum: 1
+                              })
+                              onChangeCart(1);
+                            }
+                        }}
+                    >
+                        <View
+                            className={classnames(`${cssPrefix}-stepper-button`, `${cssPrefix}-stepper-button-add`)}
+                        />
+                    </View>
+                </View>
+            ) : null
+            }
             {extraText && (
               <View 
                 className={classnames(

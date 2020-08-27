@@ -71,10 +71,10 @@ class Index extends Component<any> {
             if(result){
               const reqDataString = '{"' + result + '"}';
               const key = JSON.parse(reqDataString); 
-              const merchantId = localStorage.getItem('merchantId');
-              if(merchantId && parseInt(merchantId) !== parseInt(key.merchantId)){
-                LoginManager.logout(this.props.dispatch);
-              }
+            //   const merchantId = localStorage.getItem('merchantId');
+            //   if(merchantId && parseInt(merchantId) !== parseInt(key.merchantId)){
+            //     LoginManager.logout(this.props.dispatch);
+            //   }
               if(key.merchantId){
                 localStorage.setItem('merchantId', `${key.merchantId}`);
                 localStorage.setItem('MCHIDFist', `${key.merchantId}`);

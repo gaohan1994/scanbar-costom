@@ -114,7 +114,6 @@ class TopUp extends Taro.Component<Props, State> {
   public render() {
     const {rechangeRule, memberInfo} = this.props;
     const {key} = this.state;
-    console.log(rechangeRule);
     return (
       <View className={BlockchainBdPrefix}>
         <View className={`${BlockchainBdPrefix}-bg`}>

@@ -91,24 +91,26 @@ class Order extends Taro.Component<Props, State> {
         currentType: tabNum
       }
     });
-    this.fetchOrder(1);
+    this.fetchOrder(1, tabNum);
     OrderAction.orderCount(dispatch);
   }
 
   public init = async () => {
     const { currentType, dispatch } = this.props;
     pageNum = 1;
+    this.fetchOrder(1, 0)
     OrderAction.orderList(dispatch, { pageNum: pageNum++, pageSize, ...orderAction.getFetchType(currentType) });
     OrderAction.orderCount(dispatch);
   }
 
-  public fetchOrder = async (page?: number) => {
+  public fetchOrder = async (page?: number, tabNum?: any) => {
     const { currentType, dispatch } = this.props;
+    const num = tabNum === undefined ? currentType : tabNum;
     try {
       let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === 'number' ? page : pageNum,
         pageSize: 20,
-        ...orderAction.getFetchType(currentType)
+        ...orderAction.getFetchType(num)
       };
 
       const result = await OrderAction.orderList(dispatch, payload);
@@ -138,7 +140,6 @@ class Order extends Taro.Component<Props, State> {
     const { orderList, orderListTotal, orderAllStatus, currentType, userinfo, dispatch, productSDK } = this.props;
     const hasMore = orderList.length < orderListTotal;
     // const { getUserinfoModal, loginModal } = this.state;
-    console.log('list');
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-tabs`}>
@@ -215,16 +216,16 @@ class Order extends Taro.Component<Props, State> {
         title: '待支付',
         num: orderCount.initNum || 0,
       },
+      // {
+      //   title: '待发货',
+      //   num: orderCount.waitForDelivery || 0,
+      // },
+      // {
+      //   title: '待收货',
+      //   num: orderCount.inTransNum || 0,
+      // },
       {
-        title: '待发货',
-        num: orderCount.waitForDelivery || 0,
-      },
-      {
-        title: '待收货',
-        num: orderCount.inTransNum || 0,
-      },
-      {
-        title: '待自提',
+        title: '待送餐',
         num: orderCount.waitForReceiptNum || 0,
       },
     ];

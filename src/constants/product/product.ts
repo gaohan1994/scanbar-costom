@@ -35,6 +35,7 @@ export declare namespace ProductInterface {
     interface ProductInfo {
         id: number;
         sellNum: number;      //
+        pic: any;             // 主图
         cost: number;         // 进货价
         avgCost: number;      // 平均进货价
         limitNum: number;     // 库存下限预警

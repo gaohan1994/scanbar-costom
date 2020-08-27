@@ -6,7 +6,8 @@ import { MerchantInterface, UserInterface } from '../../../constants'
 import { connect } from '@tarojs/redux'
 import { AppReducer } from '../../../reducers'
 import { getCurrentMerchantDetail } from '../../../reducers/app.merchant'
-import { getIndexAddress } from '../../../reducers/app.user'
+import { getIndexAddress } from '../../../reducers/app.user';
+import icon_checi from '../../../assets/icon_checi.png';
 
 const prefix = 'index-component-address'
 
@@ -43,22 +44,25 @@ class Comp extends Taro.Component<Props, State> {
       >
         <View 
           className={`${prefix}-title  ${process.env.TARO_ENV === 'h5' ? `${prefix}-title-h5` : ''}`}
-          onClick={address ? () => this.onNavAddress() : () => {initDit();}}
+          // onClick={address ? () => this.onNavAddress() : () => {initDit();}}
         >
-          <Image className={`${prefix}-title-icon`} src='//net.huanmusic.com/scanbar-c/icon_location.png' />
+          <Image className={`${prefix}-title-icon`} src={icon_checi} />
           <View className={`${prefix}-title-text${process.env.TARO_ENV === 'h5' ? '-h5' : ''}`}>
-            {address ? address : '点击重新获取定位'}
+            {/* {address ? address : '点击重新获取定位'} */}
+            {
+                currentMerchantDetail && currentMerchantDetail.name && currentMerchantDetail.name.length > 0 ? `车次 ${currentMerchantDetail.name}` : '未获取到列车'
+              }
           </View>
-          <View className={`${prefix}-icon`} />
+          {/* <View className={`${prefix}-icon`} /> */}
         </View>
         <View className={`${prefix}-box ${process.env.TARO_ENV === 'h5' ? `${prefix}-box-h5` : ''}`}>
-          <View className={`${prefix}-merchant ${process.env.TARO_ENV === 'h5' ? `${prefix}-merchant-h5` : ''}`}>
-            <View className={`${prefix}-merchant-name`} onClick={() => {changeModalStroe(true)}}>
+          {/* <View className={`${prefix}-merchant ${process.env.TARO_ENV === 'h5' ? `${prefix}-merchant-h5` : ''}`}>
+           <View className={`${prefix}-merchant-name`} onClick={() => {changeModalStroe(true)}}>
               {
                 currentMerchantDetail && currentMerchantDetail.name && currentMerchantDetail.name.length > 0 ? currentMerchantDetail.name : '未获取到店名'
               }
             </View>
-          </View>
+          </View> */}
           <View 
             className={`${prefix}-search ${process.env.TARO_ENV === 'h5' ? `${prefix}-search-h5` : ''}`}
             onClick={() => {

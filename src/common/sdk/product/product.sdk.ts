@@ -256,7 +256,7 @@ class ProductSDK {
         // const memberInfo = store.getState().user.memberInfo;
         const enableMemberPrice = memberInfo ?　memberInfo.enableMemberPrice　: '';
         const priceNumber = product && product.price ? product.price : 0;
-        const memberPriceNumber = product && product.memberPrice ? product.memberPrice : 0;
+        const memberPriceNumber = product && product.memberPrice ? product.memberPrice : priceNumber;
         let discountPrice = priceNumber;
         if (product && product.activityInfos && product.activityInfos.length > 0) {
             for (let i = 0; i < product.activityInfos.length; i++) {
@@ -405,6 +405,9 @@ class ProductSDK {
         const { enableMemberPrice } = memberInfo;
         if (!Array.isArray(activityList) || !activityList.length) {
             if (!enableMemberPrice || product.memberPrice === product.price) return '';
+            if (!product.memberPrice) {
+                return '';
+            }
             return '会员专享';
         }
         const activity = activityList[0];
@@ -529,22 +532,23 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products: ProductCartInterface.ProductCartInfo[], address: any, payOrderDetail: any, pointsTotal: any, points: any, DeliveryFee: any, payType: any): ProductCartInterface.ProductPayPayload => {
+    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products: ProductCartInterface.ProductCartInfo[], address: any, payOrderDetail: any, pointsTotal: any, points: any, DeliveryFee: any, payType: any, num: number): ProductCartInterface.ProductPayPayload => {
         // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;  UserInterface.Address
         const productList = products !== undefined ? products : productCartList;
         // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
         const transAmountNow = this.getProductTransPrice(activityList, memberInfo, productCartList, productList) + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0);
         // Partial<ProductCartInterface.ProductOrderPayload>
-        console.log(currentMerchantDetail, 'currentMerchantDetail');
+        let remark = payOrderDetail.remark || "";
+        if(num) remark = `餐具${num}份；` + remark;
         let order: any = {
             deliveryInfo: {
-                address: payOrderDetail.deliveryType === 1 ? address && address.address ? `${address.address} ${address.houseNumber}`  : '' : '',
-                deliveryType: payOrderDetail.deliveryType || 0,
-                deliveryFee: payOrderDetail.deliveryType === 1 ? DeliveryFee : 0,
+                address: address.address || '',
+                deliveryType: 0,
+                deliveryFee: 0,
                 planDeliveryTime: payOrderDetail.planDeliveryTime || '',
             },
             deliveryPhone: '',
-            remark: payOrderDetail.remark || "",
+            remark: remark,
             payType: payType,
             merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
             discount: 0,
@@ -560,8 +564,8 @@ class ProductSDK {
                 ...order,
                 deliveryInfo: {
                     ...order.deliveryInfo,
-                    receiver: address && address.contact || "",
-                    receiverPhone: address && address.phone || '',
+                    receiver: memberInfo.username || "",
+                    receiverPhone: memberInfo.phoneNumber || '',
                 }
 
             }
@@ -613,7 +617,7 @@ class ProductSDK {
             payType: payType
         };
         const result = await requestHttp.post(`/api/cashier/pay`, payload);
-        if (result.code === ResponseCode.success && payType !== 7 && result.data.result.param) {
+        if (result.code === ResponseCode.success && payType !== 7) {
             return new Promise(async (resolve) => {
                 // const payload = JSON.parse(result.data.param);
                 //     delete payload.appId;
@@ -631,8 +635,11 @@ class ProductSDK {
                 if(process.env.TARO_ENV === 'h5'){
                 
                     const data = result.data;
-                    const url = data.codeUrl.replace('-app', '-customer')
-                    window.location.href = url;
+                    if(data && data.codeUrl){
+                        const url = data.codeUrl.replace('-app', '-customer')
+                        window.location.href = url;
+                    }
+                  
                 } else {
                     const payload = JSON.parse(result.data.result.param);
                     delete payload.appId;
