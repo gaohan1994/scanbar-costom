@@ -9,7 +9,7 @@ import { Dispatch } from 'redux';
 import { getMemberInfo, getBalanceChange } from '../../reducers/app.user';
 import { UserAction } from '../../actions';
 
-const BlockchainBdPrefix = 'jxc-h5-change';
+const BlockchainBdPrefix = process.env.TARO_ENV === 'h5' ? 'jxc-h5-change' : 'jxc-change';
 interface Props {
     dispatch: Dispatch;
     memberInfo: any;
@@ -44,7 +44,7 @@ class ChangeDetails extends Taro.Component<Props, State> {
     const param = {
       pageNum: this.state.pageNum,
       pageSize: this.state.pageSize,
-      orderByColumn: 'changeTime desc',
+      orderByColumn: 'change_time desc',
     }
     UserAction.getMemberInfo(this.props.dispatch);
     UserAction.getBalanceChange(dispatch, param)
@@ -54,7 +54,7 @@ class ChangeDetails extends Taro.Component<Props, State> {
     const params = {
       pageSize: this.state.pageSize,
       pageNum: this.state.pageNum + 1,
-      orderByColumn: 'changeTime desc',
+      orderByColumn: 'change_time desc',
     }
     Taro.showLoading();
     UserAction.getBalanceChangeMore(dispatch, params)
@@ -100,11 +100,11 @@ class ChangeDetails extends Taro.Component<Props, State> {
                 rows.map((val, index) => {
                     return (
                        <View className={`${BlockchainBdPrefix}-content-title`}>
-                            <Image className={`${BlockchainBdPrefix}-content-title-icon`} src={this.state.key === 1 ?  '//net.huanmusic.com/weapp/icon_dot_blue.png' : '//net.huanmusic.com/weapp/icon_dot_red.png'}/>
-                            <View className={`${BlockchainBdPrefix}-content-title-message`} style={index === list.length - 1 ? {border: 'none'} : {}}>
-                                <Image className={`${BlockchainBdPrefix}-content-title-message-img`} src={this.state.key === 1 ? '//net.huanmusic.com/weapp/icon_details_pay.png' : '//net.huanmusic.com/weapp/icon_details_income.png'}/>
-                                <View className={`${BlockchainBdPrefix}-content-title-message-money`}>+{100}</View>
-                                <View className={`${BlockchainBdPrefix}-content-title-message-time`}>{val.time}</View>
+                            <Image className={`${BlockchainBdPrefix}-content-title-icon`} src={val.transType === 3 ?  '//net.huanmusic.com/weapp/icon_dot_blue.png' : '//net.huanmusic.com/weapp/icon_dot_red.png'}/>
+                            <View className={`${BlockchainBdPrefix}-content-title-message`} style={index === rows.length - 1 ? {border: 'none'} : {}}>
+                                <Image className={`${BlockchainBdPrefix}-content-title-message-img`} src={val.transType !== 3  ? '//net.huanmusic.com/weapp/icon_details_pay.png' : '//net.huanmusic.com/weapp/icon_details_income.png'}/>
+                                <View className={val.transType === 3 ? `${BlockchainBdPrefix}-content-title-message-money` : `${BlockchainBdPrefix}-content-title-message-money ${BlockchainBdPrefix}-content-title-message-money-red`}>{`${val.transAmount}`.indexOf('-') === -1 ? `+${val.transAmount}` : val.transAmount}</View>
+                                <View className={`${BlockchainBdPrefix}-content-title-message-time`}>{val.changeTime}</View>
                             </View>
                        </View> 
                     );
