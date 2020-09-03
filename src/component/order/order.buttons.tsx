@@ -217,6 +217,10 @@ class OrderButtons extends Taro.Component<Props, State> {
             return [
               { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
             ];
+          case 6:  // 取消成功
+            return [
+              { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+            ];
           default:
             () => { }
         }
@@ -235,6 +239,7 @@ class OrderButtons extends Taro.Component<Props, State> {
             ];
           case 2: // 配送中
             return [
+              { title: '申请退货', function: () => { this.orderRefund() } },
               { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
             ];
           default:

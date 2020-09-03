@@ -256,7 +256,7 @@ class ProductSDK {
         // const memberInfo = store.getState().user.memberInfo;
         const enableMemberPrice = memberInfo ?　memberInfo.enableMemberPrice　: '';
         const priceNumber = product && product.price ? product.price : 0;
-        const memberPriceNumber = product && product.memberPrice ? product.memberPrice : 0;
+        const memberPriceNumber = product && product.memberPrice ? product.memberPrice : priceNumber;
         let discountPrice = priceNumber;
         if (product && product.activityInfos && product.activityInfos.length > 0) {
             for (let i = 0; i < product.activityInfos.length; i++) {
@@ -405,6 +405,9 @@ class ProductSDK {
         const { enableMemberPrice } = memberInfo;
         if (!Array.isArray(activityList) || !activityList.length) {
             if (!enableMemberPrice || product.memberPrice === product.price) return '';
+            if (!product.memberPrice) {
+                return '';
+            }
             return '会员专享';
         }
         const activity = activityList[0];
@@ -613,7 +616,7 @@ class ProductSDK {
             payType: payType
         };
         const result = await requestHttp.post(`/api/cashier/pay`, payload);
-        if (result.code === ResponseCode.success && payType !== 7 && result.data.result.param) {
+        if (result.code === ResponseCode.success && payType !== 7 && result.data.param) {
             return new Promise(async (resolve) => {
                 // const payload = JSON.parse(result.data.param);
                 //     delete payload.appId;
@@ -634,7 +637,7 @@ class ProductSDK {
                     const url = data.codeUrl.replace('-app', '-customer')
                     window.location.href = url;
                 } else {
-                    const payload = JSON.parse(result.data.result.param);
+                    const payload = JSON.parse(result.data.param);
                     delete payload.appId;
                     const paymentPayload = {
                         ...payload,
@@ -883,6 +886,8 @@ class ProductSDK {
      */
     public cashierOrderCallback = async (dispatch, result: OrderInterface.OrderDetail, orderPayType: any) => {
         const {order, orderNo} = result;
+        console.log('111', result)
+
         Taro.showLoading();
         if(orderPayType !== 7) await ProductService.cashierQueryStatus({orderNo: order.orderNo || orderNo});
         Taro.hideLoading();
@@ -890,7 +895,7 @@ class ProductSDK {
         this.preparePayOrder(dispatch, [], [])
         this.preparePayOrderAddress({} as any, dispatch)
         this.preparePayOrderDetail({} as any, dispatch)
-
+        console.log('111')
         Taro.redirectTo({
             url: `/pages/order/order.detail?id=${order.orderNo || orderNo}`
         });

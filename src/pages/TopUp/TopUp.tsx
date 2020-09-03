@@ -73,7 +73,7 @@ class TopUp extends Taro.Component<Props, State> {
               const url = data.codeUrl.replace('-app', '-customer')
               window.location.href = url;
           } else {
-              const payload = JSON.parse(result.data.result.param);
+              const payload = JSON.parse(result.data.param);
               delete payload.appId;
               const paymentPayload = {
                   ...payload,
