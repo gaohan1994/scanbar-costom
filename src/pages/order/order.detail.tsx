@@ -14,6 +14,7 @@ import dayjs from 'dayjs'
 import productSdk from '../../common/sdk/product/product.sdk';
 import CostomModal from '../../component/login/modal';
 import merchantAction from '../../actions/merchant.action';
+import icon_order_location from '../../assets/icon_order_location.png';
 import ProductPayListView from '../../component/product/product.pay.listview'
 import OrderButtons from '../../component/order/order.buttons';
 import { Dispatch } from 'redux';
@@ -416,7 +417,7 @@ class OrderDetail extends Taro.Component<Props, State> {
               )
               : (
                 <Image
-                  src='//net.huanmusic.com/weapp/icon_order_location.png'
+                  src={icon_order_location}
                   className={`${cssPrefix}-card-logistics-item-img`}
                 />
               )

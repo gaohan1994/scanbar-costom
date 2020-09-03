@@ -146,15 +146,10 @@ class Page extends Taro.Component<Props, State> {
                 const payment = await productSdk.requestPayment(result.data.order.orderNo, orderPayType, (res) => {
                 })
                 console.log('payment', payment);
-                if (payment.code === ResponseCode.success || payment.errMsg === "requestPayment:ok") {
-                    if(orderPayType === 7){
-                        Taro.showToast({
-                            title: '储值支付成功',
-                            icon: 'success',
-                            duration: 2000
-                        })
-                    }
+                const callB  = () => {
+                    
                     setTimeout(function(){
+                        console.log('test')
                         productSdk.cashierOrderCallback(dispatch, result.data, orderPayType);
                     
                         if(process.env.TARO_ENV === 'h5') {
@@ -181,35 +176,62 @@ class Page extends Taro.Component<Props, State> {
                         })
                     }, 1000);
                     return;
+                }
+                if (payment.code === ResponseCode.success || payment.errMsg === "requestPayment:ok") {
+                    if(payment.data && payment.data.msg === '余额不足') {
+                        Taro.showModal({
+                            title: "提示",
+                            content: "余额不足，是否充值？",
+                            success: function(res) {
+                                if (res.confirm) {
+                                    setTimeout(() => {
+                                        if(process.env.TARO_ENV === 'h5'){
+                                            Taro.redirectTo({
+                                                url: `/pages/TopUp/TopUp?id=${result.data.order.orderNo || result.data.orderNo}`
+                                            });
+                                        } else {
+                                            const {order} = result.data;
+                                            Taro.redirectTo({
+                                                url: `/pages/TopUp/TopUp?id=${order.orderNo}`
+                                            });
+                                        }
+            
+                                    }, 500);
+            
+                                    productSdk.cashierOrderCallbackOnly(dispatch, result.data, orderPayType);
+                                    productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, dispatch)
+                                    UserAction.getMemberInfo(dispatch);
+                                    this.setState({
+                                        isOnClick: true
+                                    })
+                                    return;
+                                } else if (res.cancel) {
+                                    callB();
+                                }
+                                
+                            },
+
+                        });
+                        
+                        
+                    }  else {
+                        if(orderPayType === 7){
+                            Taro.showToast({
+                                title: '储值支付成功',
+                                icon: 'success',
+                                duration: 2000
+                            })
+                        }
+                        callB();
+                    }
+                    
                 } else {
-                    if(payment.msg === '余额不足') {
-                        Taro.showToast({
-                            title: '余额不足请充值',
-                            icon: 'none',
-                            duration: 2000
-                        })
-                        setTimeout(() => {
-                            if(process.env.TARO_ENV === 'h5'){
-                                Taro.redirectTo({
-                                    url: `/pages/TopUp/TopUp?id=${result.data.order.orderNo || result.data.orderNo}`
-                                });
-                            } else {
-                                const {order} = result.data;
-                                Taro.redirectTo({
-                                    url: `/pages/TopUp/TopUp?id=${order.orderNo}`
-                                });
-                            }
-
-                        }, 500);
-
-                        productSdk.cashierOrderCallbackOnly(this.props.dispatch, result.data, orderPayType)
-                    } else {
-                        productSdk.cashierOrderCallbackOnly(this.props.dispatch, result.data, orderPayType)
+                   
+                    productSdk.cashierOrderCallbackOnly(this.props.dispatch, result.data, orderPayType)
                         const {order} = result.data;
                         Taro.redirectTo({
                             url: `/pages/order/order.detail?id=${order.orderNo}`
                         });
-                    }
                     productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, this.props.dispatch)
                     UserAction.getMemberInfo(this.props.dispatch);
                     this.setState({
