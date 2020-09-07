@@ -73,18 +73,70 @@ class OrderButtons extends Taro.Component<Props, State> {
     const payment = await productSdk.requestPayment(orderNo, order.payType)
 
     if (payment.code === ResponseCode.success || payment.errMsg === "requestPayment:ok") {
-      Taro.showLoading();
-      if(order.payType !== 7) await ProductService.cashierQueryStatus({orderNo: orderNo});
-      Taro.hideLoading();
-      Taro.navigateTo({
-        url: `/pages/order/order.detail?id=${orderNo}`,
-        success: (res) => {
-          console.log('success', res);
-        },
-        fail: (res) => {
-          console.log('fail', res);
-        }
-      })
+      const callB = async function () {
+        Taro.showLoading();
+        if(order.payType !== 7) await ProductService.cashierQueryStatus({orderNo: orderNo});
+        Taro.hideLoading();
+        Taro.redirectTo({
+          url: `/pages/order/order.detail?id=${orderNo}`,
+          success: (res) => {
+            console.log('success', res);
+          },
+          fail: (res) => {
+            console.log('fail', res);
+          }
+        })
+      }
+      if(payment.data && payment.data.msg === '余额不足') {
+        Taro.showModal({
+            title: "提示",
+            content: "余额不足，是否充值？",
+            success: function(res) {
+                if (res.confirm) {
+                    setTimeout(() => {
+                        if(process.env.TARO_ENV === 'h5'){
+                            Taro.redirectTo({
+                                url: `/pages/TopUp/TopUp?id=${orderNo}`
+                            });
+                        } else {
+                           
+                            Taro.redirectTo({
+                                url: `/pages/TopUp/TopUp?id=${orderNo}`
+                            });
+                        }
+
+                    }, 500);
+
+                    return;
+                } else if (res.cancel) {
+                    // callB();
+                }
+                
+            },
+
+        });
+      }  else {
+          if(order.payType === 7){
+              Taro.showToast({
+                  title: '储值支付成功',
+                  icon: 'success',
+                  duration: 2000
+              })
+          }
+          callB();
+      }
+      // Taro.showLoading();
+      // if(order.payType !== 7) await ProductService.cashierQueryStatus({orderNo: orderNo});
+      // Taro.hideLoading();
+      // Taro.navigateTo({
+      //   url: `/pages/order/order.detail?id=${orderNo}`,
+      //   success: (res) => {
+      //     console.log('success', res);
+      //   },
+      //   fail: (res) => {
+      //     console.log('fail', res);
+      //   }
+      // })
     } else {
       Taro.showToast({
         title: payment.msg,
@@ -266,7 +318,7 @@ class OrderButtons extends Taro.Component<Props, State> {
         case 3: // 订单完成
           if (order.ableRefund === true) {
             return [
-              { title: '取消订单', function: () => this.orderCancel() },
+              { title: '申请退货', function: () => { this.orderRefund() } },
               { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
             ];
           }
