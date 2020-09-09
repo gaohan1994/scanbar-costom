@@ -292,6 +292,8 @@ class OrderRefund extends Taro.Component<Props, State> {
         isOpened={isOpen}
         title={'退货原因'}
         onClose={this.hideModal}
+        className={process.env.TARO_ENV === 'h5' ? `${cssPrefix}-modal-layout-h5` : `${cssPrefix}-modal-layout`}
+
       >
         <View className={`${cssPrefix}-modal`}>
           <ScrollView scrollY={true} className={`${cssPrefix}-modal-list`}>

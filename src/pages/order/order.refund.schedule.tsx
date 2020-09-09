@@ -11,6 +11,7 @@ import classnames from 'classnames';
 import ProductRefundListView from '../../component/product/product.refund.listview';
 import numeral from 'numeral';
 import TabsSwitch from '../../component/tabs/tabs.switch';
+import icon_order_refund from '../../assets/icon_order_refund.png';
 
 interface Props {
   orderDetail: OrderInterface.OrderDetail;
@@ -147,7 +148,7 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
         >
           {this.renderSchedule()}
           {this.renderInfo()}
-          <View style={{ margin: '10px auto', width: '90%'}}>
+          <View style={{ margin: '10px auto', width: '93.3%'}}>
             {this.renderRefundProductList()}
           </View>
         </ScrollView>
@@ -193,7 +194,8 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
       <View className={`${detailCssPrefix}-card ${detailCssPrefix}-card-logistics`}>
         <View className={`${detailCssPrefix}-card-logistics-item`}>
           <Image
-            src='//net.huanmusic.com/scanbar-c/v2/icon_order_note.png'
+            // src='//net.huanmusic.com/scanbar-c/v2/icon_order_note.png'
+            src={icon_order_refund}
             className={`${detailCssPrefix}-card-logistics-item-img`}
           />
 

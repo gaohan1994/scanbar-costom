@@ -48,8 +48,12 @@ class Order extends Taro.Component<Props, State> {
 
   async componentDidMount() {
     // this.loginCheck();;
+    const {currentType} = this.props;
     try {
         await LoginManager.getUserInfo(this.props.dispatch);
+        this.fetchOrder(currentType, 1);
+        OrderAction.orderCount(this.props.dispatch);
+
     } catch (error) {
         Taro.showToast({
             title: error.message,
@@ -91,7 +95,8 @@ class Order extends Taro.Component<Props, State> {
         currentType: tabNum
       }
     });
-    this.fetchOrder(1);
+
+    this.fetchOrder(tabNum, 1);
     OrderAction.orderCount(dispatch);
   }
 
@@ -102,13 +107,13 @@ class Order extends Taro.Component<Props, State> {
     OrderAction.orderCount(dispatch);
   }
 
-  public fetchOrder = async (page?: number) => {
-    const { currentType, dispatch } = this.props;
+  public fetchOrder = async (tabNum: number, page?: number) => {
+    const { dispatch } = this.props;
     try {
       let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === 'number' ? page : pageNum,
         pageSize: 20,
-        ...orderAction.getFetchType(currentType)
+        ...orderAction.getFetchType(tabNum)
       };
 
       const result = await OrderAction.orderList(dispatch, payload);
@@ -135,10 +140,9 @@ class Order extends Taro.Component<Props, State> {
   // }
 
   render() {
-    const { orderList, orderListTotal, orderAllStatus, currentType, userinfo, dispatch, productSDK } = this.props;
+    const { orderList, orderListTotal, orderAllStatus, currentType, userinfo, dispatch, productSDK , } = this.props;
     const hasMore = orderList.length < orderListTotal;
     // const { getUserinfoModal, loginModal } = this.state;
-    console.log('list');
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-tabs`}>
@@ -152,7 +156,7 @@ class Order extends Taro.Component<Props, State> {
                 className={`${cssPrefix}-scrollview${process.env.TARO_ENV === 'h5' ? '-h5' : ''}`}
                 onScrollToLower={() => {
                   if (hasMore) {
-                    this.fetchOrder();
+                    this.fetchOrder(currentType);
                   }
                 }}
               >

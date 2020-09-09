@@ -77,12 +77,6 @@ class OrderItem extends Taro.Component<Props, State> {
         Taro.hideLoading();
         Taro.redirectTo({
           url: `/pages/order/order.detail?id=${orderNo}`,
-          success: (res) => {
-            console.log('success', res);
-          },
-          fail: (res) => {
-            console.log('fail', res);
-          }
         })
       }
       if(payment.data && payment.data.msg === '余额不足') {
@@ -227,7 +221,6 @@ class OrderItem extends Taro.Component<Props, State> {
   render() {
     const { data, orderAllStatus, currentType } = this.props;
     const { order, orderDetailList } = data;
-    console.log('this,.props', this.props);
     let res: any = {};
     if(data.order){
       res = OrderAction.orderStatus(orderAllStatus, data);

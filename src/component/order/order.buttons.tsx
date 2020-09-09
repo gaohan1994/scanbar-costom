@@ -80,10 +80,10 @@ class OrderButtons extends Taro.Component<Props, State> {
         Taro.redirectTo({
           url: `/pages/order/order.detail?id=${orderNo}`,
           success: (res) => {
-            console.log('success', res);
+            // console.log('success', res);
           },
           fail: (res) => {
-            console.log('fail', res);
+            // console.log('fail', res);
           }
         })
       }
@@ -191,7 +191,6 @@ class OrderButtons extends Taro.Component<Props, State> {
   public orderRefundCancel = async (order: OrderInterface.OrderDetail, type?: number) => {
     const { currentType, dispatch } = this.props;
     const { orderRefundIndices, orderNo } = order;
-    console.log(order);
     const payload = {
       orderNo: type === 1 ? orderNo : orderRefundIndices[0].originOrderNo
     }

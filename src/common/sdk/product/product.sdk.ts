@@ -538,7 +538,6 @@ class ProductSDK {
         // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
         const transAmountNow = this.getProductTransPrice(activityList, memberInfo, productCartList, productList) + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0);
         // Partial<ProductCartInterface.ProductOrderPayload>
-        console.log(currentMerchantDetail, 'currentMerchantDetail');
         let order: any = {
             deliveryInfo: {
                 address: payOrderDetail.deliveryType === 1 ? address && address.address ? `${address.address} ${address.houseNumber}`  : '' : '',
@@ -886,7 +885,6 @@ class ProductSDK {
      */
     public cashierOrderCallback = async (dispatch, result: OrderInterface.OrderDetail, orderPayType: any) => {
         const {order, orderNo} = result;
-        console.log('111', result)
 
         Taro.showLoading();
         if(orderPayType !== 7) await ProductService.cashierQueryStatus({orderNo: order.orderNo || orderNo});
@@ -895,7 +893,6 @@ class ProductSDK {
         this.preparePayOrder(dispatch, [], [])
         this.preparePayOrderAddress({} as any, dispatch)
         this.preparePayOrderDetail({} as any, dispatch)
-        console.log('111')
         Taro.redirectTo({
             url: `/pages/order/order.detail?id=${order.orderNo || orderNo}`
         });

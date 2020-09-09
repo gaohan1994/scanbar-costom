@@ -128,7 +128,7 @@ class FormRow extends Taro.Component<FormRowProps, FormRowState> {
     title = String(title);
     return (
       <View className={rootClass} onClick={onClick}>
-        <View className='at-list__item-container'>
+        <View className='at-list__item-container' style={{paddingTop: '.1rem'}}>
           {thumb && (
             <View className='at-list__item-thumb item-thumb'>
               <Image

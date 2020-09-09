@@ -28,15 +28,16 @@ class CostomModal extends Taro.Component<Props, State> {
   render() {
     const { isOpen, onCancle, title } = this.props
     return (
-      <AtModal isOpened={isOpen} className={`${cssPrefix}-modal`}>
+      <AtModal isOpened={isOpen} className={process.env.TARO_ENV === 'h5' ?`${cssPrefix}-modal-h5` : `${cssPrefix}-modal`}>
         <AtModalContent>
-          <View className={`${cssPrefix}-content`}>
+          <View className={process.env.TARO_ENV === 'h5' ?`${cssPrefix}-content-h5` :  `${cssPrefix}-content`}>
             {title}
           </View>
         </AtModalContent>
-        <View className={`${cssPrefix}-buttons`}>
+        <View className={process.env.TARO_ENV === 'h5' ?`${cssPrefix}-buttons-h5` : `${cssPrefix}-buttons`}>
           <Button
             className={`${cssPrefix}-button`}
+            style={process.env.TARO_ENV === 'h5' ? {marginBottom: '.4rem'} : {}}
             onClick={onCancle}
           >
             取消
@@ -44,6 +45,7 @@ class CostomModal extends Taro.Component<Props, State> {
           </Button>
           <Button
             onClick={this.onClick}
+            style={process.env.TARO_ENV === 'h5' ? {marginBottom: '.4rem'} : {}}
             className={`${cssPrefix}-button ${cssPrefix}-blue`}
           >
             确定
