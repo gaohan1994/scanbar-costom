@@ -399,7 +399,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
               <View className={`${cssPrefix}-row-content-item`}>
                 <Text className={`${cssPrefix}-row-voucher`}>积分抵现<Text className={`${cssPrefix}-row-voucher-span`}>({MathPointsPre}积分)</Text></Text>
                 <View className={`${cssPrefix}-row-content-row`}>
-                  <Text className={`${cssPrefix}-row-content-price`}>
+                  <Text className={`${cssPrefix}-row-content-price`} style={{marginRight: '-.4em'}}>
                     -¥{PointsPre}
                   </Text>
                   <View 
@@ -531,7 +531,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
         }
       }
     }
-    console.log('discountPriceFoot', discountPriceFoot, productSDKObj)
+    // console.log('discountPriceFoot', discountPriceFoot, productSDKObj)
     // let price =
     //   numeral(
     //     productSdk.getProductTransPrice(activityList, memberInfo, productCartList) +

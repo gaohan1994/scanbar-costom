@@ -86,6 +86,7 @@
       flex-direction: column;
       margin: 0 30px;
       margin-top: 22px;
+      width: 93.3% !important;
       &-AtTimeline {
         .at-timeline-item {
           height: 92px;
@@ -291,7 +292,7 @@
 
   &-remark-pay {
     background-color: #fff;
-    padding-top: 22px;
+    // padding-top: 22px;
     height: 100%;
     &-input {
       height: 350px;
@@ -302,6 +303,9 @@
       position: relative;
       margin: 30px;
       &-text {
+        -web-kit-appearance:none;
+        -moz-appearance: none;
+        outline:0;
         width: 100%;
         // height: 100%;
         height: 250px;
@@ -311,7 +315,7 @@
       }
       &-text::-webkit-input-placeholder {
         color: #b3b3b3;
-        background: #000;
+        // background: #000;
       }
       &-corner {
         display: flex;
@@ -363,6 +367,7 @@
     &-header {
       .flex(center, space-between, row);
       padding: 31px;
+      padding-bottom: 0px;
       width: 100%;
 
       &-title {
@@ -404,6 +409,9 @@
       color: #333333;
 
       &-text {
+        -web-kit-appearance:none;
+        -moz-appearance: none;
+        outline:0;
         width: 100%;
         height: 130px;
         background-color: #F7F7F7;
@@ -432,6 +440,12 @@
           .layout-header {
             .layout-header__btn-close {
               left: 18px;
+            }
+            .layout-header__btn-close::after {
+              background-color: #808080;
+            }
+            .layout-header__btn-close::before {
+              background-color: #808080;
             }
           }
         }
@@ -494,6 +508,7 @@
       height: 160px;
       .flex(center, space-between);
       // border-top: #E3E3E3 solid 1px;
+      border-top: #E3E3E3 solid 1px;
       padding: 0px 30px;
       background-color: #fff;
 
@@ -517,7 +532,7 @@
 
         &-integer {
           font-size: 50px;
-          line-height: 50x;
+          line-height: 50px;
         }
       }
     }
@@ -525,6 +540,7 @@
     &-schedule {
       &-schedule {
         padding: 30px;
+        width: 93.3% !important;
       }
 
       &-price {

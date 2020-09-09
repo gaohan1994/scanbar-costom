@@ -593,7 +593,7 @@ var Utils = {
         options.header = { "content-type": "application/json" };
         options.method = 'GET';
         options.success = function (res) {
-          console.log('wx.request(Utils.buildWxRequestConfig(options', res)
+          // console.log('wx.request(Utils.buildWxRequestConfig(options', res)
             var data = res.data;
             if (data.status === 0) {
               that.handleData(param, data, feature);
@@ -602,12 +602,12 @@ var Utils = {
             }
         };
         options.fail = function (res) {
-          console.log('wx.request(Utils.buildWxRequestConfig(options - fail', res)
+          // console.log('wx.request(Utils.buildWxRequestConfig(options - fail', res)
             res.statusCode = ERROR_CONF.WX_ERR_CODE;
             param.fail(that.buildErrorConfig(ERROR_CONF.WX_ERR_CODE, res.errMsg));
         };
         options.complete = function (res) {
-          console.log('wx.request(Utils.buildWxRequestConfig(options - complete', res)
+          // console.log('wx.request(Utils.buildWxRequestConfig(options - complete', res)
             var statusCode = +res.statusCode;
             switch(statusCode) {
                 case ERROR_CONF.WX_ERR_CODE: {

@@ -55,9 +55,7 @@ class User extends Taro.Component<Props, State> {
             await UserAction.getWaitForObtainCoupons(this.props.dispatch);
             Taro.getStorage({key: 'CentermOAuthTokenCostom'})
             .then(data => {
-                console.log('data', data);
               if (data.data === '') {
-                  console.log('CentermOAuthTokenCostom')
                 const {dispatch} = this.props;
                 LoginManager.logout(dispatch);
               }
@@ -69,9 +67,7 @@ class User extends Taro.Component<Props, State> {
             });
             Taro.getStorage({key: 'CentermOAuthTokenCostom'})
             .then(data => {
-                console.log('data', data);
               if (data.data === '') {
-                  console.log('CentermOAuthTokenCostom')
                 const {dispatch} = this.props;
                 LoginManager.logout(dispatch);
               }
@@ -176,7 +172,6 @@ class User extends Taro.Component<Props, State> {
 
     render() {
         const { userinfo, memberInfo, currentMerchantDetail, couponListCenter } = this.props;
-        console.log(currentMerchantDetail, 'user');
         return (
             <View className={`container ${cssPrefix}`}>
                 <View className={`${cssPrefix}-bg`} />
@@ -288,11 +283,11 @@ class User extends Taro.Component<Props, State> {
                             className={`${cssPrefix}-member-item ${cssPrefix}-member-item-discount`}
                             onClick={() => { this.navTo('/pages/user/user.coupon', true) }}
                         >
-                            <Text className={`${cssPrefix}-member-item-number`}>{memberInfo.couponNum || 0}</Text>
+                            <Text className={`${cssPrefix}-member-item-number`}>{memberInfo.couponNum > 99 ? '99+' : memberInfo.couponNum || 0}</Text>
                             
                             {
                                 couponListCenter.length > 0 ? (
-                                    <View className={`${cssPrefix}-member-item-pop`}>{couponListCenter.length}张可领</View>
+                                    <View className={`${cssPrefix}-member-item-pop`}>{couponListCenter.length > 99 ? '99+' : couponListCenter.length }张可领</View>
                                 ) : null
                             }
                             <Text>优惠券</Text>

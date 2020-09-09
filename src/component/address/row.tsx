@@ -106,7 +106,7 @@ class Item extends Taro.Component<Props> {
                 value={inputValue}
                 disabled={inputDisable}
                 placeholder={inputPlaceHolder}
-                onClick={!inputValue ? () => {console.log(this.props, this.state);this.setState({PopoverState: true});} : () => {}}
+                onClick={!inputValue ? () => {this.setState({PopoverState: true});} : () => {}}
                 onInput={({detail: {value}}) => inputOnChange && inputOnChange(value)}
                 className={`${prefix}-input`}
                 placeholderClass={`${prefix}-input-place`}

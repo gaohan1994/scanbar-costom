@@ -31,7 +31,7 @@ class TabsSwitch extends Taro.Component<Props, State> {
         {
           tabs && tabs.length && tabs.map((tab: any, index: number) => {
             return (
-              <View className={`${cssPrefix}-tab`} style={`width: ${750 / tabs.length}px; ${process.env.TARO_ENV === 'h5' && isCoupon === true ? '    background-color: #F2F2F2;' : ''}`}>
+              <View className={`${cssPrefix}-tab`} style={`width: ${750 / tabs.length}px; ${process.env.TARO_ENV === 'h5' ? '    background-color: #F2F2F2;' : ''}`}>
                 <View
                   key={tab.title}
                   className={classnames(`${cssPrefix}-tab-content`, {

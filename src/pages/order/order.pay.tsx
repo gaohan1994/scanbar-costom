@@ -93,10 +93,8 @@ class Page extends Taro.Component<Props, State> {
         orderAction.getPointConfig(this.props.dispatch);
     }
     componentWillReceiveProps = async (nextProps) => {
-        console.log(nextProps, 'nextProps')
         const {dispatch, payOrderAddress, currentMerchantDetail} = nextProps;
         if(payOrderAddress.id && this.state.isFirst === true) {
-            console.log(payOrderAddress.id, 'payOrderAddress.id')
             const param = {
                 latitude:  payOrderAddress.latitude,
                 longitude: payOrderAddress.longitude,
@@ -145,11 +143,9 @@ class Page extends Taro.Component<Props, State> {
                 Taro.hideLoading();
                 const payment = await productSdk.requestPayment(result.data.order.orderNo, orderPayType, (res) => {
                 })
-                console.log('payment', payment);
                 const callB  = () => {
                     
                     setTimeout(function(){
-                        console.log('test')
                         productSdk.cashierOrderCallback(dispatch, result.data, orderPayType);
                     
                         if(process.env.TARO_ENV === 'h5') {
@@ -260,14 +256,12 @@ class Page extends Taro.Component<Props, State> {
             this.setState(obj)
         } else {
             this.setState(prevState => {
-                console.log('prevState', prevState, key, value)
                 return {
                     ...prevState,
                     [key]: value
                 };
             });
         }
-        console.log('onChangeValue', key, value)
     }
 
     onShowTimeSelect = () => {
@@ -387,7 +381,6 @@ class Page extends Taro.Component<Props, State> {
         || (order && order.deliveryType !== undefined && order.deliveryType === 1))){
             total += DeliveryFee;
         }
-        console.log('total', total)
         return total;
     }
     onRefProductPayListView = (reset) => {
@@ -413,7 +406,6 @@ class Page extends Taro.Component<Props, State> {
         let priceDiscountPay = countTotal() - numeral(tarnsPrice).value();
     
         const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
-        console.log('orderPay', priceDiscountPay, tarnsPrice, productSDKObj);
         return (
             <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: 'auto'}}>
                 <View className={`${cssPrefix}-bg`}/>

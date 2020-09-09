@@ -266,7 +266,6 @@ class OrderAction {
     const { order } = params;
     // const { transFlag } = order;
     // 待发货的退款状态
-    console.log(order, 'teste');
     if (order.deliveryStatus === 0 && order.transFlag === 1 && order.afterSaleStatus === 0) {
       return {
         title: "等待商家处理",

@@ -53,7 +53,6 @@ class TopUp extends Taro.Component<Props, State> {
   }
   async pay () {
     const {param} = this.state;
-    console.log(param, 'param')
     const result: any = await UserAction.cashierStore(param);
     if (result.code === ResponseCode.success) {
       return new Promise((resolve) => {

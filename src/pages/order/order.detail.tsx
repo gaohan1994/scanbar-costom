@@ -18,6 +18,7 @@ import icon_order_location from '../../assets/icon_order_location.png';
 import ProductPayListView from '../../component/product/product.pay.listview'
 import OrderButtons from '../../component/order/order.buttons';
 import { Dispatch } from 'redux';
+import icon_order_time from '../../assets/icon_order_time.png';
 
 const cssPrefix = 'order-detail';
 
@@ -75,7 +76,6 @@ class OrderDetail extends Taro.Component<Props, State> {
       const result = await OrderAction.orderDetail(this.props.dispatch, { orderNo: id });
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       const { orderDetail, orderAllStatus } = this.props;
-      console.log('detaile', orderDetail)
       const status = OrderAction.orderStatus(orderAllStatus, orderDetail);
       if (status.title === '待支付') {
         const second = dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).diff(dayjs(orderDetail.order.createTime), 'second');
@@ -294,13 +294,12 @@ class OrderDetail extends Taro.Component<Props, State> {
   private renderStatusCard() {
     const { time } = this.state;
     const { orderDetail, orderAllStatus, currentType, dispatch, productSDKObj } = this.props;
-    console.log('renderStatusCard', orderDetail)
     let res: any = {};
     if(orderDetail.orderNo) {
       res = OrderAction.orderStatus(orderAllStatus, orderDetail, time);
     }
     return (
-      <View className={`${cssPrefix}-card ${cssPrefix}-card-status`}>
+      <View className={`${cssPrefix}-card ${cssPrefix}-card-status`} style={process.env.TARO_ENV === 'h5' ? {paddingBottom: '5.8rem'} : {}}>
         {
           res.title === '待支付' || res.title === '待发货' || res.title === '等待商家处理'
             ? (
@@ -380,7 +379,8 @@ class OrderDetail extends Taro.Component<Props, State> {
       <View className={`${cssPrefix}-card ${cssPrefix}-card-logistics`}>
         <View className={`${cssPrefix}-card-logistics-item`}>
           <Image
-            src='//net.huanmusic.com/weapp/icon_order_time.png'
+            // src='//net.huanmusic.com/weapp/icon_order_time.png'
+            src={icon_order_time}
             className={`${cssPrefix}-card-logistics-item-img`}
           />
 
