@@ -77,6 +77,7 @@ export declare namespace OrderInterface {
 
   interface RefundOrderItem {
     couponDiscount: number;
+    afterSaleStatus: any;
     createTime: string;
     discount: number;
     memberDiscount: number;
@@ -118,12 +119,14 @@ export declare namespace OrderInterface {
   }
 
   interface RefundIndices {
+    afterSaleStatus: number;
     id: string;
     createTime: string;
     clinchTime: string;
     refundingTime: string;
     transFlag: number;
     originOrderNo: string;
+    refundOrderNo: string;
   }
 
   interface OrderListFetchFidle extends HTTPInterface.FetchField {

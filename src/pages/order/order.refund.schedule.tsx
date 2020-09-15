@@ -41,22 +41,25 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
     const { refundOrderList } = orderDetail;
 
     let tabs: any[] = [];
-    const index = refundOrderList.length <= 3 ? refundOrderList.length : 3;
-    for (let i = 0; i < index; i++) {
-      // const title = i === 0 ? '第一次' : i === 1 ? '第二次' : '第三次';
-      let title = '第一次';
-      if (index === 3) {
-        title = i === 0 ? '第三次' : i === 1 ? '第二次' : '第一次';
-      } else if (index === 2) {
-        title = i === 1 ? '第一次' : '第二次';
+    if(refundOrderList){
+      const index =  refundOrderList.length <= 3 ? refundOrderList.length : 3;
+      for (let i = 0; i < index; i++) {
+        // const title = i === 0 ? '第一次' : i === 1 ? '第二次' : '第三次';
+        let title = '第一次';
+        if (index === 3) {
+          title = i === 0 ? '第三次' : i === 1 ? '第二次' : '第一次';
+        } else if (index === 2) {
+          title = i === 1 ? '第一次' : '第二次';
+        }
+        tabs.push({
+          title: title,
+          orderNo: refundOrderList[i].orderNo
+        });
       }
-      tabs.push({
-        title: title,
-        orderNo: refundOrderList[i].orderNo
-      });
     }
+    
 
-    const res = await orderAction.orderRefundDetail({ orderNo: tabs[currentTab].orderNo });
+    const res = await orderAction.orderRefundDetail({ orderNo: orderDetail.orderNo });
     if (res.code === ResponseCode.success) {
       const newTab = { ...tabs[currentTab], refundOrder: res.data };
       tabs[currentTab] = newTab;
@@ -94,19 +97,55 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
   public grtOrderRefundIndices = () => {
     const { currentTab } = this.state;
     const { orderDetail } = this.props;
-    const { orderRefundIndices } = orderDetail;
+    const { orderRefundIndices, refundOrderList, order } = orderDetail;
 
     if (orderRefundIndices === undefined || orderRefundIndices.length === 0) {
       return [];
     }
     const orderRefundIndicesItem = orderRefundIndices[currentTab];
     let items: any[] = [];
+    console.log(orderRefundIndicesItem, 'orderRefundIndicesItem', orderRefundIndicesItem.clinchTime, orderDetail);
     if (orderRefundIndicesItem.clinchTime && orderRefundIndicesItem.clinchTime.length > 0) {
-      const title = orderRefundIndicesItem.transFlag === 6
+      let title = orderRefundIndicesItem.transFlag === 6
         ? '商家拒绝您的退货申请'
         : orderRefundIndicesItem.transFlag === 9
           ? '您撤销了退货申请'
           : '成功退货';
+
+      if(refundOrderList) {
+        const refundOrderListItem : any = refundOrderList[currentTab];
+        if (refundOrderListItem.afterSaleStatus === 3) {
+          title = '您撤销了退货申请';
+        }
+        if (refundOrderListItem.afterSaleStatus === 2) {
+          title = '您撤销了取消申请';
+        }
+        if (refundOrderListItem.afterSaleStatus === 5 && order.deliveryStatus === 1) {
+          title = '商家拒绝您的取消订单申请';
+        }
+        if (refundOrderListItem.afterSaleStatus === 5 && order.deliveryStatus === 3) {
+          title = '商家拒绝您的退货申请';
+        }
+        if (refundOrderListItem.afterSaleStatus === 6) {
+          title = '成功退货';
+        }
+      } else {
+        if (order.afterSaleStatus === 3) {
+          title = '您撤销了退货申请';
+        }
+        if (order.afterSaleStatus === 2) {
+          title = '您撤销了取消申请';
+        }
+        if (order.afterSaleStatus === 5 && order.deliveryStatus === 1) {
+          title = '商家拒绝您的取消订单申请';
+        }
+        if (order.afterSaleStatus === 5 && order.deliveryStatus === 3) {
+          title = '商家拒绝您的退货申请';
+        }
+        if (order.afterSaleStatus === 6) {
+          title = '成功退货';
+        }
+      }
       items.push({
         title: title,
         content: [orderRefundIndicesItem.clinchTime],
@@ -127,6 +166,7 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
         icon: 'check-circle'
       })
     }
+    console.log('items', items);
     return items;
   }
 
