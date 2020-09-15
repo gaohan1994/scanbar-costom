@@ -192,8 +192,9 @@ class OrderButtons extends Taro.Component<Props, State> {
     const { currentType, dispatch } = this.props;
     const { orderRefundIndices, orderNo } = order;
     const payload = {
-      orderNo: type === 1 ? orderNo : orderRefundIndices[0].originOrderNo
+      orderNo: type === 1 ? orderNo : orderRefundIndices[0].refundOrderNo
     }
+    console.log('orderRefundCancel', payload)
     try {
       const res = await OrderAction.orderRefundCancel(payload);
       invariant(res.code === ResponseCode.success, '撤销申请失败');
@@ -226,7 +227,7 @@ class OrderButtons extends Taro.Component<Props, State> {
         switch (order.afterSaleStatus) {
           case 0:  // 申请取消
             return [
-              { title: '撤销申请', function: () => this.orderRefundCancel(params) },
+              { title: '撤销申请', function: () => this.orderRefundCancel(params, 1) },
               { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
             ];
           case 1:  // 申请退货

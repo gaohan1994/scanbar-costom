@@ -273,7 +273,7 @@ class OrderDetail extends Taro.Component<Props, State> {
         <ScrollView className={`${cssPrefix}-container ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-container-h5` : ''}`} scrollY={true}>
           {this.renderStatusCard()}
           {
-            orderDetail && orderDetail.refundOrderList && orderDetail.refundOrderList.length > 0 &&
+            orderDetail && orderDetail.orderRefundIndices && orderDetail.orderRefundIndices.length > 0 &&
             this.renderRefundSchedule()
           }
           {this.renderLogisticsCard()}
