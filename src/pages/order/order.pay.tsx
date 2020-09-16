@@ -385,13 +385,16 @@ class Page extends Taro.Component<Props, State> {
                 (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
             ).format('0.00')
             : '0.00';
+        if(numeral(tarnsPrice).value() < 0 ){
+            tarnsPrice = '0.00';
+        }
         if(productSDKObj.pointsTotal){
             tarnsPrice = numeral(numeral(tarnsPrice).value() - productSDKObj.pointsTotal).format('0.00');
         }
         let priceDiscountPay = countTotal() - numeral(tarnsPrice).value();
     
         const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
-        console.log('orderPay', priceDiscountPay, tarnsPrice, productSDKObj);
+        // console.log('orderPay', priceDiscountPay, tarnsPrice, productSDKObj);
         return (
             <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: 'auto'}}>
                 <View className={`${cssPrefix}-bg`}/>

@@ -268,6 +268,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const pointPrice = DeliveryFee && payOrderDetail.deliveryType === 1 ? numeral(price).value() - DeliveryFee : numeral(price).value();
     const PointsPre = numeral(numeral(memberInfo.points * pointConfig.deductRate < pointPrice ? memberInfo.points * pointConfig.deductRate : pointPrice).format('0.00')).value();
     const MathPointsPre = Math.ceil(PointsPre / pointConfig.deductRate);
+    console.log('renderDisount', price, pointPrice, PointsPre)
     return (
       <View>
         {totalActivityMoney !== 0 && !isDetail && (
@@ -468,6 +469,12 @@ class ProductPayListView extends Taro.Component<Props, State> {
         productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
         (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
       ).format('0.00');
+    if(numeral(discountPrice).value() < 0){
+      discountPrice = '0.00';
+    }
+    if(numeral(price).value() < 0){
+      price = '0.00';
+    }
     if (type && type === 1) {
       if (orderDetail && orderDetail.order) {
         price = numeral(orderDetail.order.transAmount).format('0.00');
@@ -508,6 +515,9 @@ class ProductPayListView extends Taro.Component<Props, State> {
         (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
     ).format('0.00')
     : '0.00';
+    if(numeral(tarnsPrice).value() < 0){
+      tarnsPrice = '0.00';
+    }
     if(productSDKObj.pointsTotal){
         tarnsPrice = numeral(numeral(tarnsPrice).value() - productSDKObj.pointsTotal).format('0.00');
     }

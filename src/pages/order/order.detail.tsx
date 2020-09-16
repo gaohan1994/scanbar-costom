@@ -17,6 +17,9 @@ import merchantAction from '../../actions/merchant.action';
 import ProductPayListView from '../../component/product/product.pay.listview'
 import OrderButtons from '../../component/order/order.buttons';
 import { Dispatch } from 'redux';
+import icon_order_location from '../../assets/icon_order_location.png';
+import icon_order_shop from '../../assets/icon_order_shop.png';
+
 
 const cssPrefix = 'order-detail';
 
@@ -405,13 +408,15 @@ class OrderDetail extends Taro.Component<Props, State> {
             order && order.deliveryType == 0
               ? (
                 <Image
-                  src='//net.huanmusic.com/weapp/icon_order_shop.png'
+                  // src='//net.huanmusic.com/weapp/icon_order_shop.png'
+                  src={icon_order_shop}
                   className={`${cssPrefix}-card-logistics-item-img`}
                 />
               )
               : (
                 <Image
-                  src='//net.huanmusic.com/weapp/icon_order_location.png'
+                  // src='//net.huanmusic.com/weapp/icon_order_location.png'
+                  src={icon_order_location}
                   className={`${cssPrefix}-card-logistics-item-img`}
                 />
               )

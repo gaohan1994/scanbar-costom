@@ -266,7 +266,7 @@ class ProductSDK {
                 }
             }
         }
-        if (enableMemberPrice && discountPrice > memberPriceNumber) {
+        if (enableMemberPrice && memberPriceNumber && discountPrice > memberPriceNumber) {
             discountPrice = memberPriceNumber;
         }
         return discountPrice;
@@ -571,9 +571,10 @@ class ProductSDK {
             const transAmount = this.getProductTransPrice(activityList, memberInfo, productCartList) +
                 (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
                 (payOrderDetail.selectedCoupon.couponVO.discount || 0);
+            
             order = {
                 ...order,
-                transAmount: Math.round(transAmount * 100) / 100,
+                transAmount: transAmount < 0 ? 0 : Math.round(transAmount * 100) / 100,
                 couponList: [payOrderDetail.selectedCoupon.couponCode]
             }
             
