@@ -10,6 +10,8 @@ import { getUserinfo, getMemberInfo, getRechangeRule } from '../../reducers/app.
 import { connect } from '@tarojs/redux';
 import numeral from 'numeral';
 import { Dispatch } from 'redux';
+import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
+import { BASE_PARAM } from '../../common/util/config';
 
 const BlockchainBdPrefix = 'jxc-h5-top';
 
@@ -18,6 +20,7 @@ interface Props {
     userinfo: any;
     rechangeRule: any;
     memberInfo: any;
+    currentMerchantDetail: any;
 }
 interface State {
     key: any;
@@ -43,9 +46,9 @@ class TopUp extends Taro.Component<Props, State> {
     this.setState({ id, entry})
   }
   async init(self) {
-    const { dispatch } = self.props;
+    const { dispatch,currentMerchantDetail } = self.props;
     UserAction.getMemberInfo(dispatch);
-    const result: any = await UserAction.getRechargeRule(dispatch);
+    const result: any = await UserAction.getRechargeRule(dispatch, currentMerchantDetail.id || BASE_PARAM.MCHID);
     if(result && result.data && result.data[0]) {
       self.setState({
         key: result.data[0]
@@ -55,7 +58,7 @@ class TopUp extends Taro.Component<Props, State> {
   async store () {
     const {key, entry, id} = this.state;
     const {init} = this;
-    const {dispatch} = this.props;
+    const {dispatch, currentMerchantDetail} = this.props;
     const self = this;
     const param = {
       "authCode": "",
@@ -63,6 +66,7 @@ class TopUp extends Taro.Component<Props, State> {
       "rechargeRuleId": key.id,
       "totalAmount": key.faceValue,
       "transAmount": key.sellingPrice,
+      merchantId: currentMerchantDetail.id || BASE_PARAM.MCHID,
     };
     const result: any = await UserAction.cashierStore(param);
     if (result.code === ResponseCode.success) {
@@ -160,6 +164,7 @@ const select = (state: any) => ({
   userinfo: getUserinfo(state),
   memberInfo: getMemberInfo(state),
   rechangeRule: getRechangeRule(state),
+  currentMerchantDetail: getCurrentMerchantDetail(state),
 });
 
 export default connect(select)(TopUp);

@@ -568,13 +568,16 @@ class ProductSDK {
         }
 
         if (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id) {
-            const transAmount = this.getProductTransPrice(activityList, memberInfo, productCartList) +
-                (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
+            let transAmount = this.getProductTransPrice(activityList, memberInfo, productCartList) -
                 (payOrderDetail.selectedCoupon.couponVO.discount || 0);
-            
+            if(transAmount < 0){
+                transAmount =  (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)
+            } else {
+                transAmount = transAmount + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)
+            }
             order = {
                 ...order,
-                transAmount: transAmount < 0 ? 0 : Math.round(transAmount * 100) / 100,
+                transAmount: Math.round(transAmount * 100) / 100,
                 couponList: [payOrderDetail.selectedCoupon.couponCode]
             }
             

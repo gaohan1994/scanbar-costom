@@ -380,13 +380,17 @@ class Page extends Taro.Component<Props, State> {
             : '0.00';
         let tarnsPrice = payOrderProductList && payOrderProductList.length > 0
             ? numeral(
-                productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList) +
-                (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
+                productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList)  -
                 (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
             ).format('0.00')
             : '0.00';
+
         if(numeral(tarnsPrice).value() < 0 ){
-            tarnsPrice = '0.00';
+            tarnsPrice =
+            numeral(payOrderDetail.deliveryType === 1 ? DeliveryFee : 0).format('0.00');
+        } else {
+            tarnsPrice =
+            numeral(numeral(tarnsPrice).value() + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)).format('0.00');
         }
         if(productSDKObj.pointsTotal){
             tarnsPrice = numeral(numeral(tarnsPrice).value() - productSDKObj.pointsTotal).format('0.00');

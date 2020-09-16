@@ -459,8 +459,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const { order } = orderDetail;
     let price =
       numeral(
-        productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList) +
-        (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
+        productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList)  -
         (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
       ).format('0.00');
     let discountPrice =
@@ -473,7 +472,10 @@ class ProductPayListView extends Taro.Component<Props, State> {
       discountPrice = '0.00';
     }
     if(numeral(price).value() < 0){
-      price = '0.00';
+      price = numeral(payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? DeliveryFee : 0).format('0.00')
+    } else {
+      price = numeral(numeral(price).value() + (payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)).format('0.00')
+
     }
     if (type && type === 1) {
       if (orderDetail && orderDetail.order) {
@@ -510,13 +512,16 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const {price} = countTotal();
     let tarnsPrice = payOrderProductList && payOrderProductList.length > 0
     ? numeral(
-        productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList) +
-        (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
+        productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList)  -
         (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
     ).format('0.00')
     : '0.00';
     if(numeral(tarnsPrice).value() < 0){
-      tarnsPrice = '0.00';
+      tarnsPrice = 
+      numeral(payOrderDetail.deliveryType === 1 ? DeliveryFee : 0).format('0.00');
+    } else {
+      tarnsPrice = 
+      numeral(numeral(tarnsPrice).value()  + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)).format('0.00');
     }
     if(productSDKObj.pointsTotal){
         tarnsPrice = numeral(numeral(tarnsPrice).value() - productSDKObj.pointsTotal).format('0.00');
