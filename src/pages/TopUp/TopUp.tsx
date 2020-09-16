@@ -11,6 +11,8 @@ import { connect } from '@tarojs/redux';
 import numeral from 'numeral';
 import img_jine from '../../assets/img_jine.png';
 import { Dispatch } from 'redux';
+import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
+import { BASE_PARAM } from '../../common/util/config';
 
 const BlockchainBdPrefix = 'jxc-h5-top';
 
@@ -18,6 +20,7 @@ interface Props {
     dispatch: Dispatch;
     userinfo: any;
     rechangeRule: any;
+    currentMerchantDetail: any;
     memberInfo: any;
 }
 interface State {
@@ -44,9 +47,9 @@ class TopUp extends Taro.Component<Props, State> {
     this.setState({ id, entry})
   }
   async init(self) {
-    const { dispatch } = self.props;
+    const { dispatch , currentMerchantDetail} = self.props;
     UserAction.getMemberInfo(dispatch);
-    const result: any = await UserAction.getRechargeRule(dispatch);
+    const result: any = await UserAction.getRechargeRule(dispatch, currentMerchantDetail.id || BASE_PARAM.MCHID);
     if(result && result.data && result.data[0]) {
       self.setState({
         key: result.data[0]
@@ -55,6 +58,7 @@ class TopUp extends Taro.Component<Props, State> {
   }
   async store () {
     const {key, entry, id} = this.state;
+    const {currentMerchantDetail} = this.props;
     const {init} = this;
     const self = this;
     const param = {
@@ -64,6 +68,7 @@ class TopUp extends Taro.Component<Props, State> {
       "totalAmount": key.faceValue,
       "transAmount": key.sellingPrice,
       "orderSource": process.env.TARO_ENV === 'weapp' ? 3 : 6,
+      merchantId: currentMerchantDetail.id || BASE_PARAM.MCHID
     };
     const result: any = await UserAction.cashierStore(param);
     if (result.code === ResponseCode.success) {
@@ -175,6 +180,7 @@ const select = (state: any) => ({
   userinfo: getUserinfo(state),
   memberInfo: getMemberInfo(state),
   rechangeRule: getRechangeRule(state),
+  currentMerchantDetail: getCurrentMerchantDetail(state),
 });
 
 export default connect(select)(TopUp);

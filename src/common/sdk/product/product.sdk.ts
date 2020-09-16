@@ -256,7 +256,7 @@ class ProductSDK {
         // const memberInfo = store.getState().user.memberInfo;
         const enableMemberPrice = memberInfo ?　memberInfo.enableMemberPrice　: '';
         const priceNumber = product && product.price ? product.price : 0;
-        const memberPriceNumber = product && product.memberPrice ? product.memberPrice : priceNumber;
+        const memberPriceNumber = product && product.memberPrice ? product.memberPrice : 0;
         let discountPrice = priceNumber;
         if (product && product.activityInfos && product.activityInfos.length > 0) {
             for (let i = 0; i < product.activityInfos.length; i++) {
@@ -266,7 +266,7 @@ class ProductSDK {
                 }
             }
         }
-        if (enableMemberPrice && discountPrice > memberPriceNumber) {
+        if (enableMemberPrice && memberPriceNumber && discountPrice > memberPriceNumber) {
             discountPrice = memberPriceNumber;
         }
         return discountPrice;
@@ -570,9 +570,15 @@ class ProductSDK {
         }
 
         if (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id) {
-            const transAmount = this.getProductTransPrice(activityList, memberInfo, productCartList) +
-                (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0) -
+            let transAmount = this.getProductTransPrice(activityList, memberInfo, productCartList)  -
                 (payOrderDetail.selectedCoupon.couponVO.discount || 0);
+            if(transAmount < 0){
+                transAmount = 
+                (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)
+            } else {
+                transAmount = transAmount +
+                (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)
+            }
             order = {
                 ...order,
                 transAmount: Math.round(transAmount * 100) / 100,

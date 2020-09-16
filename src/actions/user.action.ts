@@ -56,8 +56,8 @@ class UserAction {
    *
    * @memberof UserAction
    */
-  public getRechargeRule = async (dispatch) => {
-    const result = await UserService.getRechargeRule();
+  public getRechargeRule = async (dispatch, param) => {
+    const result = await UserService.getRechargeRule(param);
     if (result.code === ResponseCode.success) {
       dispatch({
         type: UserInterfaceMap.reducerInterface.RECEIVE_RECHARGERULE,
