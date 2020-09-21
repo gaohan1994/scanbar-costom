@@ -261,7 +261,7 @@ class Index extends Component<any> {
             if (firstTime) {
                 this.changeCurrentType(firstType);
             }
-            await WeixinSdk.initAddress(dispatch, address);
+     
             const param = {
                 merchantId: BASE_PARAM.MCHIDFist,
                 latitude: this.props.address.latitude,
@@ -291,6 +291,7 @@ class Index extends Component<any> {
                 //     chooseAddressModal: false,
                 // })
             }
+            await WeixinSdk.initAddress(dispatch, address);
         } catch (error) {
             Taro.showToast({
                 title: error.message,

@@ -75,34 +75,36 @@ class OrderDetail extends Taro.Component<Props, State> {
       const result = await OrderAction.orderDetail(this.props.dispatch, { orderNo: id });
       invariant(result.code === ResponseCode.success, result.msg || ' ');
       const { orderDetail, orderAllStatus } = this.props;
-      const status = OrderAction.orderStatus(orderAllStatus, orderDetail);
-      if (status.title === '待支付') {
-        const second = dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).diff(dayjs(orderDetail.order.createTime), 'second');
-        const expireMinute = orderDetail.order.expireMinute || 20;
-        const expireSecond = expireMinute * 60;
-        const restSecond = expireSecond - second;
-        if (restSecond > 0) {
-          this.setState({
-            time: restSecond
-          }, () => {
-            this.timer = setInterval(() => {
-              const { time } = this.state
-              if (time > 0) {
-                this.setState({
-                  time: time - 1
-                });
-              } else {
-                this.setState({
-                  time: - 1
-                });
-                clearInterval(this.timer);
-              }
-            }, 1000);
-          });
-        } else {
-          this.setState({
-            time: -1
-          });
+      if(orderDetail && orderDetail.order){
+        const status = OrderAction.orderStatus(orderAllStatus, orderDetail);
+        if (status.title === '待支付') {
+          const second = dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).diff(dayjs(orderDetail.order.createTime), 'second');
+          const expireMinute = orderDetail.order.expireMinute || 20;
+          const expireSecond = expireMinute * 60;
+          const restSecond = expireSecond - second;
+          if (restSecond > 0) {
+            this.setState({
+              time: restSecond
+            }, () => {
+              this.timer = setInterval(() => {
+                const { time } = this.state
+                if (time > 0) {
+                  this.setState({
+                    time: time - 1
+                  });
+                } else {
+                  this.setState({
+                    time: - 1
+                  });
+                  clearInterval(this.timer);
+                }
+              }, 1000);
+            });
+          } else {
+            this.setState({
+              time: -1
+            });
+          }
         }
       }
     } catch (error) {
@@ -272,7 +274,7 @@ class OrderDetail extends Taro.Component<Props, State> {
         <ScrollView className={`${cssPrefix}-container ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-container-h5` : ''}`} scrollY={true}>
           {this.renderStatusCard()}
           {
-            orderDetail && orderDetail.refundOrderList && orderDetail.refundOrderList.length > 0 &&
+            orderDetail && orderDetail.orderRefundIndices && orderDetail.orderRefundIndices.length > 0 &&
             this.renderRefundSchedule()
           }
           {this.renderLogisticsCard()}

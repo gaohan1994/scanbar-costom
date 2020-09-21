@@ -266,19 +266,18 @@ class OrderAction {
     const { order } = params;
     // const { transFlag } = order;
     // 待发货的退款状态
-    console.log(order, 'teste');
     if (order.deliveryStatus === 0 && order.transFlag === 1 && order.afterSaleStatus === 0) {
       return {
         title: "等待商家处理",
         detail: "取消订单申请已提交，等待商家处理"
       }
     } 
-    // else if (order.deliveryStatus === 0 && order.transFlag === 1 && order.afterSaleStatus === 2) {
-    //   return {
-    //     title: "您已撤销取消订单申请",
-    //     detail: "您已撤销取消订单申请，等待商家发货"
-    //   };
-    // }  
+    else if (order.deliveryStatus === 0 && order.transFlag === 1 && order.afterSaleStatus === 2) {
+      return {
+        title: "待发货",
+        detail: "您已撤销取消订单申请，等待商家发货"
+      };
+    }  
     else if (order.deliveryStatus === 0 && order.transFlag === 1 && order.afterSaleStatus === 4) {
       return {
         title: "商家同意取消订单",
@@ -286,7 +285,7 @@ class OrderAction {
       };
     } else if (order.deliveryStatus === 0 && order.transFlag === 1 && order.afterSaleStatus === 5) {
       return {
-        title: "商家拒绝了取消订单",
+        title: "待发货",
         detail: "商家拒绝了您的取消订单申请"
       };
     } else if (order.deliveryStatus === 0 && order.transFlag === 2 && order.afterSaleStatus === 6) {
@@ -302,12 +301,12 @@ class OrderAction {
         detail: "取消订单申请已提交，等待商家处理"
       };
     } 
-    // else if (order.deliveryStatus === 1 && order.transFlag === 1 && order.afterSaleStatus === 2) {
-    //   return {
-    //     title: "您已撤销取消订单申请",
-    //     detail: "您已撤销取消订单申请，请去门店自提商品"
-    //   };
-    // }  
+    else if (order.deliveryStatus === 1 && order.transFlag === 1 && order.afterSaleStatus === 2) {
+      return {
+        title: "待自提",
+        detail: "您已撤销取消订单申请，请去门店自提商品"
+      };
+    }  
     else if (order.deliveryStatus === 1 && order.transFlag === 1 && order.afterSaleStatus === 4) {
       return {
         title: "商家同意取消订单",
@@ -315,7 +314,7 @@ class OrderAction {
       };
     } else if (order.deliveryStatus === 1 && order.transFlag === 1 && order.afterSaleStatus === 5) {
       return {
-        title: "商家拒绝了取消订单",
+        title: "待自提",
         detail: "商家拒绝了您的取消订单申请"
       };
     } else if (order.deliveryStatus === 1 && order.transFlag === 2 && order.afterSaleStatus === 6) {
@@ -332,12 +331,12 @@ class OrderAction {
         detail: "取消退货申请已提交，等待商家处理"
       };
     } 
-    // else if (order.deliveryStatus === 2 && order.transFlag === 1 && order.afterSaleStatus === 3) {
-    //   return {
-    //     title: "您已撤销退货申请",
-    //     detail: "您已撤销退货申请"
-    //   };
-    // }  
+    else if (order.deliveryStatus === 2 && order.transFlag === 1 && order.afterSaleStatus === 3) {
+      return {
+        title: "待收货",
+        detail: "您已撤销退货申请"
+      };
+    }  
     else if (order.deliveryStatus === 2 && order.transFlag === 1 && order.afterSaleStatus === 4) {
       return {
         title: "商家同意退货",
@@ -345,7 +344,7 @@ class OrderAction {
       };
     } else if (order.deliveryStatus === 1 && order.transFlag === 1 && order.afterSaleStatus === 5) {
       return {
-        title: "商家拒绝退货",
+        title: "待收货",
         detail: "商家拒绝了您的退货申请"
       };
     } else if (order.deliveryStatus === 1 && order.transFlag === 2 && order.afterSaleStatus === 6) {
@@ -363,7 +362,7 @@ class OrderAction {
       };
     } else if (order.deliveryStatus === 3 && order.transFlag === 3 && order.afterSaleStatus === 3) {
       return {
-        title: "您已撤销退货申请",
+        title: "已完成",
         detail: "您已撤销退货申请"
       };
     }  else if (order.deliveryStatus === 3 && order.transFlag === 3 && order.afterSaleStatus === 4) {
@@ -373,7 +372,7 @@ class OrderAction {
       };
     } else if (order.deliveryStatus === 3 && order.transFlag === 3 && order.afterSaleStatus === 5) {
       return {
-        title: "商家拒绝退货",
+        title: "已完成",
         detail: "商家拒绝了您的退货申请"
       };
     } else if (order.deliveryStatus === 3 && order.transFlag === 3 && order.afterSaleStatus === 6) {

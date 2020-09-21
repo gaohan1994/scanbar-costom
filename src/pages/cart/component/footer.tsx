@@ -33,22 +33,33 @@ class Footer extends Taro.Component<Props> {
      * @time 0414
      * @todo [新增选择部分商品下单]
      */
-    const { productCartList, beforeSubmit, productCartSelectedIndex, dispatch } = this.props;
-    if (beforeSubmit) {
-      const res = await beforeSubmit();
-      if (res === false) {
-        return;
+    let Stroke : any = localStorage.getItem('Stroke');
+    if(Stroke){
+      // Stroke = JSON.parse(Stroke);
+      // Stroke.id
+      const { productCartList, beforeSubmit, productCartSelectedIndex, dispatch } = this.props;
+      if (beforeSubmit) {
+        const res = await beforeSubmit();
+        if (res === false) {
+          return;
+        }
       }
-    }
 
-    const selectProductList = productCartList.filter((product) => {
-      return productCartSelectedIndex.some((id) => id === product.id);
-    });
-    productSdk.preparePayOrder(dispatch, productCartList, selectProductList);
-    productSdk.preparePayOrderDetail({ selectedCoupon: {} }, dispatch);
-    Taro.navigateTo({
-      url: `/pages/order/order.pay`
-    })
+      const selectProductList = productCartList.filter((product) => {
+        return productCartSelectedIndex.some((id) => id === product.id);
+      });
+      productSdk.preparePayOrder(dispatch, productCartList, selectProductList);
+      productSdk.preparePayOrderDetail({ selectedCoupon: {} }, dispatch);
+      Taro.navigateTo({
+        url: `/pages/order/order.pay`
+      })
+    } else {
+      Taro.showToast({
+        title: '当前不在行程内，无法下单，请选择正确的车次以及发车时间！',
+        duration: 2000
+      })
+    }
+    
   }
 
   render () {

@@ -43,6 +43,11 @@ class MerchantService {
     const result = await requestHttp.get(`${MerchantInterfaceMap.advertisement}/${params.merchantId}`);
     return result;
   }
+  public onGetStroke = async(params: MerchantInterface.merchantDetailFetchField): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    const result = await requestHttp.get(`${MerchantInterfaceMap.onGetStroke}${jsonToQueryString(params)}`);
+    return result;
+  }
+  
 }
 
 export default new MerchantService();

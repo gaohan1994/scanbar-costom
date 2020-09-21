@@ -141,7 +141,7 @@ class OrderButtons extends Taro.Component<Props, State> {
     const { orderRefundIndices, orderNo } = order;
     console.log(order);
     const payload = {
-      orderNo: type === 1 ? orderNo : orderRefundIndices[0].originOrderNo
+      orderNo: type === 1 ? orderNo : orderRefundIndices[0].refundOrderNo
     }
     try {
       const res = await OrderAction.orderRefundCancel(payload);
@@ -169,13 +169,13 @@ class OrderButtons extends Taro.Component<Props, State> {
     }
 
     const { order } = params;
-
     if (order) {
+
       if (order.afterSaleStatus !== undefined ) {
         switch (order.afterSaleStatus) {
           case 0:  // 申请取消
             return [
-              { title: '撤销申请', function: () => this.orderRefundCancel(params) },
+              { title: '撤销申请', function: () => this.orderRefundCancel(params, 1) },
               { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
             ];
           case 1:  // 申请退货

@@ -589,6 +589,14 @@ class ProductSDK {
                 transAmount: Math.round(transAmount * 100) / 100,
             }
         }
+        let Stroke : any = localStorage.getItem('Stroke');
+        if(Stroke){
+          Stroke = JSON.parse(Stroke);
+          order = {
+            ...order,
+            strokeId: Stroke.id
+          }
+        };
         const payload: ProductCartInterface.ProductPayPayload = {
             order: order as any,
             productInfoList: productList.map((item) => {

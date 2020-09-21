@@ -143,6 +143,7 @@ class MerchantInterfaceMap implements MerchantInterface.MerchantInterfaceMap {
   public merchantList = '/customer/merchantInfo/listSubMerchant';
   // public merchantList = '/customer/merchantInfo/merchantList';
   public merchantDistance = '/customer/merchantInfo/distance';
+  public onGetStroke = '/api/stroke/getStroke';
   public advertisement = '/customer/advertisement/getAdvertisements';
 }
 

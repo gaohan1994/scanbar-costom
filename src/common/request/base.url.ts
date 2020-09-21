@@ -6,7 +6,7 @@ const getBaseUrl = (url: string) => {
     // http://xyt.51cpay.com:8891
     // BASE_URL = 'https://xyt.51cpay.com/inventory-customer';
     // BASE_URL = 'https://inventory.51cpay.com/inventory-customer';
-    // BASE_URL = 'http://172.30.202.57/inventory-customer';
+    // BASE_URL = 'http://172.30.200.172/inventory-customer';
     BASE_URL = 'http://202.101.149.132:7680/railway-customer';
   } else {
     // 生产环境

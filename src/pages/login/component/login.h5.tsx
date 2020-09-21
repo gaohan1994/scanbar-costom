@@ -35,11 +35,11 @@ class LoginH5 extends Taro.Component<Props, State> {
     count: 61,
   }
   componentDidMount () {
-    const {dispatch, currentMerchantDetail} = this.props;
-    const params = {
-      merchantId: BASE_PARAM.MCHIDFist,
-    }
-    MerchantAction.merchantList(dispatch, params, currentMerchantDetail);
+    // const {dispatch, currentMerchantDetail} = this.props;
+    // const params = {
+    //   merchantId: BASE_PARAM.MCHIDFist,
+    // }
+    // MerchantAction.merchantList(dispatch, params, currentMerchantDetail);
   }
   public onNavAddress = () => {
     Taro.navigateTo({

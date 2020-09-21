@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro'
-import { View, Input  } from '@tarojs/components'
+import { View, Input, Picker  } from '@tarojs/components'
 import './index.less'
 import { connect } from '@tarojs/redux'
 import { AppReducer } from '../../reducers'
@@ -21,6 +21,8 @@ type State = {
   car: any;
   count: any;
   modal: boolean;
+  startTime: any;
+  startTimeStr: any;
 }
 
 class LoginBefore extends Taro.Component<Props, State> {
@@ -29,7 +31,9 @@ class LoginBefore extends Taro.Component<Props, State> {
     choose: {},
     car: '',
     count: 61,
-    modal: false
+    modal: false,
+    startTime: '',
+    startTimeStr: '',
   }
   async componentDidMount () {
     const {dispatch, currentMerchantDetail }= this.props;
@@ -42,6 +46,17 @@ class LoginBefore extends Taro.Component<Props, State> {
     }
     MerchantAction.merchantList(dispatch, params, currentMerchantDetail);
     await UserAction.getMemberInfo(dispatch);
+    const myDate = new Date();
+    var year = myDate.getFullYear(); //年
+
+    var month = myDate.getMonth() + 1; //月
+
+    var day = myDate.getDate(); //日
+    const days = this.getDayStr(`${year}-${month}-${day} 00:00:00`);
+    this.setState({
+      startTime: `${year}-${month}-${day} 00:00:00`,
+      startTimeStr: `${month}月${day}日 ${days}`
+    })
   }
   public onNavAddress = () => {
     Taro.navigateTo({
@@ -91,22 +106,83 @@ class LoginBefore extends Taro.Component<Props, State> {
     this.timer = setTimeout(setTimer, 1000);  
   }
 
-  onchange = (e) => {
-    // console.log('onchange', e);
+  onSelectCar = () => {
+    const {dispatch} = this.props;
+    if (this.state.choose.id && this.state.startTime) {
+      const param = {
+        merchantId: this.state.choose.id,
+        startTime: this.state.startTime,
+      }
+      MerchantAction.onGetStroke(dispatch, param);
+      Taro.navigateTo({url: '/pages/index/index?merchantId=' + this.state.choose.id})
+    } else {
+      Taro.showToast({
+        title: '请选择日期和车次',
+        duration: 2000
+        })
+    }
+    
+  }
+  onDateChange = (e) => {
+    //
+    console.log(e.detail.value);
+    const time = e.detail.value;
+    const days = this.getDayStr(`${time} 00:00:00`);
+    const times = time.split('-')
+    this.setState({
+      startTime: `${time} 00:00:00`,
+      startTimeStr: `${times[1]}月${times[2]}日 ${days}`
+    })
+  }
+  getDayStr = (e) => {
+    const d = new Date(e);
+    const key = d.getDay();
+    let days = '';
+    switch (key) {
+      case 1:
+        days = '周一';
+        break;
+      case 2:
+        days = '周二';
+        break;
+      case 3:
+        days = '周三';
+        break;
+      case 4:
+        days = '周四';
+        break;
+      case 5:
+        days = '周五';
+        break;
+      case 6:
+        days = '周六';
+        break;
+      case 0:
+        days = '周日';
+        break;
+      default:
+        break;
+    }
+    return days;
   }
   render () {
-  
+    const {onSelectCar} = this;
     const {merchantList, dispatch} = this.props;
     const self = this;
     const list  = merchantList.filter(val => val.parentId !== 0);
+    // 08月10日 周一
     return (
       <View className={`loginbrfore`}>
         <View className={`${prefix}_containerbefore_bg`}></View>
         <View className={`${prefix}_content`}>
             <View className={`${prefix}_content_item_title`}>出发日期</View>
-            <View className={`${prefix}_content__item`}>
-                <View className={`${prefix}_content__item_txt`}>08月10日 周一</View>
-            </View>
+            <Picker mode='date' onChange={this.onDateChange}>
+              <View className={`${prefix}_content__item`}>
+                <View className={`${prefix}_content__item_txt`}>{this.state.startTimeStr}</View>
+              </View>
+            </Picker>
+            
+            
             <View className={`${prefix}_content_item_title ${prefix}_content_item_title_padding`}>订餐车次</View>
             <View className={`${prefix}_content_item_code `}>
               <View className={`${prefix}_content_item_code_i`}>
@@ -122,6 +198,7 @@ class LoginBefore extends Taro.Component<Props, State> {
                     list.map(function(item){
                       return (
                         <View className={`${prefix}_content_item_tishi_item `} onClick={() => {
+                          
                           dispatch({
                               type: MerchantInterfaceMap.reducerInterface.RECEIVE_CURRENT_MERCHANT_DETAIL,
                               payload: item
@@ -138,7 +215,7 @@ class LoginBefore extends Taro.Component<Props, State> {
               ) : null
             }
             {/* <View className={`${prefix}_content__info`}>提示：请确认您的信息已提交系统，并准确填写手机号，进行绑定。</View> */}
-            <AtButton className={`${prefix}_content__btn_true`} onClick={() => {Taro.navigateTo({url: '/pages/index/index?merchantId=' + this.state.choose.id})}}>开始点餐</AtButton>
+            <AtButton className={`${prefix}_content__btn_true`} onClick={() => {onSelectCar();}}>开始点餐</AtButton>
         </View>
       </View>
     )

@@ -106,7 +106,7 @@ class MerchantAction {
     }
     return result;
   }
-
+  
   public advertisement = async(dispatch, params: MerchantInterface.merchantDetailFetchField) => {
     const result = await MerchantService.advertisement(params);
     if (result.code === ResponseCode.success) {
@@ -114,6 +114,17 @@ class MerchantAction {
         type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ADVERTISEMENT,
         payload: result.data.rows
       });
+    }
+    return result;
+  }
+  public onGetStroke = async(dispatch, params: any) => {
+    const result = await MerchantService.onGetStroke(params);
+    if (result.code === ResponseCode.success) {
+      // dispatch({
+      //   type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ADVERTISEMENT,
+      //   payload: result.data.rows
+      // });
+      localStorage.setItem('Stroke', JSON.stringify(result.data));
     }
     return result;
   }

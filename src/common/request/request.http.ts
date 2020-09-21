@@ -29,7 +29,7 @@ class HttpRequest {
 
 
     const list = ['/customer/product/type/', '/customer/merchantInfo/merchantList', 
-    '/customer/advertisement/getAdvertisements/', '/customer/product/list'];
+    '/customer/advertisement/getAdvertisements/', '/customer/product/list', '/customer/merchantInfo/listSubMerchant'];
 
     let haToken = true;
     list.forEach(element => {

@@ -228,7 +228,18 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
     return `/api/cashier/getDeliveryFee${jsonToQueryString(param)}`;
   }
   public orderList = (params?: OrderInterface.OrderListFetchFidle) => {
-    return `/order/list${params ? jsonToQueryString(params) : ''}`;
+    let Stroke : any = localStorage.getItem('Stroke');
+    let param = {
+      ...params,
+    }
+    if(Stroke){
+      Stroke = JSON.parse(Stroke);
+      param = {
+        ...param,
+        strokeId: Stroke.id
+      }
+    }
+    return `/order/list${jsonToQueryString(param)}`;
   }
 
   public orderDetail = (params: OrderInterface.OrderDetailFetchField) => {
