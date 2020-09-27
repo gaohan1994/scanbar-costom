@@ -1,5 +1,5 @@
 import Taro from '@tarojs/taro'
-import { View, Input, Picker  } from '@tarojs/components'
+import { View, Input, Picker, Image  } from '@tarojs/components'
 import './index.less'
 import { connect } from '@tarojs/redux'
 import { AppReducer } from '../../reducers'
@@ -9,6 +9,8 @@ import { Dispatch } from 'redux';
 import { BASE_PARAM } from '../../common/util/config'
 import { getMerchantList, getCurrentMerchantDetail } from '../../reducers/app.merchant';
 import { ResponseCode, MerchantInterfaceMap } from '../../constants/index';
+import moment from 'moment';
+import icon_arrive from '../../assets/icon_arrive.png';
 const prefix = 'login'
 
 type Props = {
@@ -23,6 +25,8 @@ type State = {
   modal: boolean;
   startTime: any;
   startTimeStr: any;
+  data: any;
+  Stroke: any;
 }
 
 class LoginBefore extends Taro.Component<Props, State> {
@@ -34,6 +38,8 @@ class LoginBefore extends Taro.Component<Props, State> {
     modal: false,
     startTime: '',
     startTimeStr: '',
+    data: [],
+    Stroke:{}
   }
   async componentDidMount () {
     const {dispatch, currentMerchantDetail }= this.props;
@@ -105,16 +111,39 @@ class LoginBefore extends Taro.Component<Props, State> {
     }); 
     this.timer = setTimeout(setTimer, 1000);  
   }
-
-  onSelectCar = () => {
+  renderCar = (data) => {
+    const list: any = [];
+    const {car} = this.state;
+    data.forEach(element => {
+      if(element.rosterInfo && element.rosterInfo.rosterDetail)  {
+        const rosterDetail = JSON.parse(element.rosterInfo.rosterDetail);
+        console.log(rosterDetail)
+        rosterDetail.forEach(val => {
+          if(car === val.name){
+            list.push({
+              ...val,
+              id: element.id
+            });
+          }
+        });
+      }
+    });
+    return list;
+  }
+  onSelectCar = async (id) => {
     const {dispatch} = this.props;
-    if (this.state.choose.id && this.state.startTime) {
+    const {renderCar} = this;
+    if (id && this.state.startTime) {
       const param = {
-        merchantId: this.state.choose.id,
+        merchantId: id,
         startTime: this.state.startTime,
       }
-      MerchantAction.onGetStroke(dispatch, param);
-      Taro.navigateTo({url: '/pages/index/index?merchantId=' + this.state.choose.id})
+      const result = await MerchantAction.onGetStroke(dispatch, param);
+      const data = renderCar(result.data  && result.data.rows|| [])
+      this.setState({
+        data: data,
+        Stroke: data[0] || {}
+      })
     } else {
       Taro.showToast({
         title: '请选择日期和车次',
@@ -171,6 +200,7 @@ class LoginBefore extends Taro.Component<Props, State> {
     const self = this;
     const list  = merchantList.filter(val => val.parentId !== 0);
     // 08月10日 周一
+    console.log(this.state.Stroke);
     return (
       <View className={`loginbrfore`}>
         <View className={`${prefix}_containerbefore_bg`}></View>
@@ -208,14 +238,48 @@ class LoginBefore extends Taro.Component<Props, State> {
                             modal: false,
                             car: item.name
                           })
+                          onSelectCar(item.id);
                         }}>{item.name}</View>);
                     })
                   }
                 </View>
               ) : null
             }
+            <View className={`${prefix}_content_item_title ${prefix}_content_item_title_padding`}>行程选择</View>
+            {
+              this.state.data.map((val: any )=> {
+                return (
+                <View className={`${prefix}_content_item_code `} style={{height: 'auto', marginBottom: '10px'}} onClick={() => {
+                  this.setState({
+                    Stroke: val
+                  })
+                }}>
+                  <View className={`${prefix}_content_item_code_i ${this.state.Stroke.id === val.id ? `${prefix}_content_item_code_choose` : ''} `} style={{height: 'auto'}}>
+                    
+                    <View className={`${prefix}_content_item_code_i_item`}>{val.name}</View>
+                    <View className={`${prefix}_content_item_code_i_item`}>
+                      <View><View className={`${prefix}_content_item_code_i_item_start`}>始</View>{val.firstStation}</View>
+                      <View>{moment(val.firstStationTime).format('HH:mm')}</View>
+                      
+                    </View>
+                    <Image className={`${prefix}_content_item_code_i_img`} src={icon_arrive}></Image>
+                    <View className={`${prefix}_content_item_code_i_item`}>
+                      <View><View className={`${prefix}_content_item_code_i_item_end`}>终</View>{val.lastStation}</View>
+                      <View>{moment(val.lastStationTime).format('HH:mm')}</View>
+                    </View>
+                  </View>
+                  
+                </View>
+                )
+              })
+            }
+           
             {/* <View className={`${prefix}_content__info`}>提示：请确认您的信息已提交系统，并准确填写手机号，进行绑定。</View> */}
-            <AtButton className={`${prefix}_content__btn_true`} onClick={() => {onSelectCar();}}>开始点餐</AtButton>
+            <AtButton className={`${prefix}_content__btn_true`} onClick={() => {
+                    localStorage.setItem('Stroke', JSON.stringify(this.state.Stroke));
+
+                    Taro.navigateTo({url: '/pages/index/index?merchantId=' + this.state.choose.id})
+            }}>开始点餐</AtButton>
         </View>
       </View>
     )

@@ -237,7 +237,16 @@ class ProductInterfaceMap {
     }
 
     public productInfoList = (params?: ProductInterface.ProductInfoListFetchFidle) => {
-        return `/customer/product/list${params ? jsonToQueryString(params) : ''}`;
+        let Stroke : any = localStorage.getItem('Stroke');
+        let param: any  = {};
+        if(Stroke){
+          Stroke = JSON.parse(Stroke);
+          param = {
+            ...params,
+            strokeId: Stroke.id
+          }
+        };
+        return `/customer/product/list${jsonToQueryString(param)}`;
     }
 
     public productInfoDetail = (params: ProductInterface.ProductDetailFetchFidle) => {

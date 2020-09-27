@@ -124,7 +124,7 @@ class MerchantAction {
       //   type: MerchantInterfaceMap.reducerInterface.RECEIVE_MERCHANT_ADVERTISEMENT,
       //   payload: result.data.rows
       // });
-      localStorage.setItem('Stroke', JSON.stringify(result.data));
+      return result;
     }
     return result;
   }

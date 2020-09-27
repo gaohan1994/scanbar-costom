@@ -196,7 +196,7 @@ class OrderButtons extends Taro.Component<Props, State> {
           case 3:  // 买家取消退货
             if (order.ableRefund === true) {
               return [
-                { title: '申请退货', function: () => { this.orderRefund() } },
+                // { title: '申请退货', function: () => { this.orderRefund() } },
                 { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
               ];
             }
@@ -210,7 +210,7 @@ class OrderButtons extends Taro.Component<Props, State> {
           case 5:  // 拒绝退款
             if (order.ableRefund === true) {
               return [
-                { title: '申请退货', function: () => { this.orderRefund() } },
+                // { title: '申请退货', function: () => { this.orderRefund() } },
                 { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
               ];
             }
@@ -225,12 +225,12 @@ class OrderButtons extends Taro.Component<Props, State> {
         switch (order.deliveryStatus) {
           case 0: // 待发货
             return [
-              { title: '取消订单', function: () => this.orderCancel() },
+              // { title: '取消订单', function: () => this.orderCancel() },
               { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
             ];
           case 1: // 待自提
             return [
-              { title: '取消订单', function: () => this.orderCancel() },
+              // { title: '取消订单', function: () => this.orderCancel() },
               { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
             ];
           case 2: // 配送中
@@ -251,7 +251,7 @@ class OrderButtons extends Taro.Component<Props, State> {
         case 1: // 已完成
           if (order.ableRefund === true) {
             return [
-              { title: '申请退货', function: () => { this.orderRefund() } },
+              // { title: '申请退货', function: () => { this.orderRefund() } },
               { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
             ];
           }
@@ -261,7 +261,7 @@ class OrderButtons extends Taro.Component<Props, State> {
         case 3: // 订单完成
           if (order.ableRefund === true) {
             return [
-              { title: '取消订单', function: () => this.orderCancel() },
+              // { title: '取消订单', function: () => this.orderCancel() },
               { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
             ];
           }
