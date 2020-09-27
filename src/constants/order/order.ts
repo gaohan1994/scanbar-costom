@@ -38,6 +38,7 @@ export declare namespace OrderInterface {
 
   interface OrderInfo {
     pointDiscount: any;
+    refundStatus: any;
     deliveryStatus: any;
     afterSaleStatus: any;
     detail: string;

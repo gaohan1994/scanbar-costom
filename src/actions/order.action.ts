@@ -330,7 +330,7 @@ class OrderAction {
     // // 待收货
     else if (order.deliveryStatus === 2 && order.transFlag === 1 && order.afterSaleStatus === 1) {
       return {
-        title: "待收货",
+        title: "等待商家处理",
         detail: "取消退货申请成功"
       };
     } 
@@ -342,11 +342,18 @@ class OrderAction {
       };
     }  
     else if (order.deliveryStatus === 2 && order.transFlag === 1 && order.afterSaleStatus === 4) {
-      return {
-        title: "商家同意退货",
-        detail: "商家同意退货，请您将商品退回"
-      };
-    } else if (order.deliveryStatus === 1 && order.transFlag === 1 && order.afterSaleStatus === 5) {
+      if(order.refundStatus === 1) {
+        return {
+          title: "部分商品已成功退回",
+          detail: "退货金额已原路退回"
+        };
+      } else {
+        return {
+          title: "商家同意退货",
+          detail: "商家同意退货，请您将商品退回"
+        };
+      }
+    } else if (order.deliveryStatus === 1 && order.transFlag === 1 && order.afterSaleStatus === 5 || order.deliveryStatus === 2 && order.transFlag === 1 && order.afterSaleStatus === 5) {
       return {
         // title: "商家拒绝退货",
         title: "待收货",
@@ -382,6 +389,11 @@ class OrderAction {
         detail: "商家拒绝了您的退货申请"
       };
     } else if (order.deliveryStatus === 3 && order.transFlag === 3 && order.afterSaleStatus === 6) {
+      return {
+        title: "退货成功",
+        detail: "退货金额已原路退回"
+      };
+    } else if (order.deliveryStatus === 2 && order.transFlag === 2 && order.afterSaleStatus === 6 && order.refundStatus === 2) {
       return {
         title: "退货成功",
         detail: "退货金额已原路退回"

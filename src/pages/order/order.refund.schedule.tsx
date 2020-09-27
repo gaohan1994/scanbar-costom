@@ -59,7 +59,7 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
     }
     
 
-    const res = await orderAction.orderRefundDetail({ orderNo: orderDetail.orderNo });
+    const res = await orderAction.orderRefundDetail({ orderNo: tabs[0].orderNo });
     if (res.code === ResponseCode.success) {
       const newTab = { ...tabs[currentTab], refundOrder: res.data };
       tabs[currentTab] = newTab;
@@ -120,10 +120,10 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
         if (refundOrderListItem.afterSaleStatus === 2) {
           title = '您撤销了取消申请';
         }
-        if (refundOrderListItem.afterSaleStatus === 5 && order.deliveryStatus === 1) {
+        if (refundOrderListItem.afterSaleStatus === 5 && order.deliveryStatus === 1 || order.refundStatus === 0 && order.deliveryStatus === 2 ) {
           title = '商家拒绝您的取消订单申请';
         }
-        if (refundOrderListItem.afterSaleStatus === 5 && order.deliveryStatus === 3) {
+        if (refundOrderListItem.afterSaleStatus === 5 && order.deliveryStatus === 3 || order.refundStatus === 0 && order.deliveryStatus === 2 && order.afterSaleStatus === 5) {
           title = '商家拒绝您的退货申请';
         }
         if (refundOrderListItem.afterSaleStatus === 6) {
@@ -136,15 +136,20 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
         if (order.afterSaleStatus === 2) {
           title = '您撤销了取消申请';
         }
-        if (order.afterSaleStatus === 5 && order.deliveryStatus === 1) {
+        if (order.afterSaleStatus === 5 && order.deliveryStatus === 1 
+          || order.refundStatus === 0 && order.deliveryStatus === 2
+          || order.afterSaleStatus === 5 && order.deliveryStatus === 0) {
           title = '商家拒绝您的取消订单申请';
         }
-        if (order.afterSaleStatus === 5 && order.deliveryStatus === 3) {
+        if (order.afterSaleStatus === 5 && order.deliveryStatus === 3 || order.refundStatus === 0 && order.deliveryStatus === 2 && order.afterSaleStatus === 5) {
           title = '商家拒绝您的退货申请';
         }
         if (order.afterSaleStatus === 6) {
           title = '成功退货';
         }
+      }
+      if(refundOrderList && refundOrderList.length > 1 && title === '成功退货' && currentTab !== 0){
+        title = '商家拒绝您的退货申请';
       }
       items.push({
         title: title,
