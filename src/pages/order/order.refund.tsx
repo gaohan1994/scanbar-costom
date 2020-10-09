@@ -126,11 +126,14 @@ class OrderRefund extends Taro.Component<Props, State> {
       let productInfoList: any[] = [];
       if (orderDetailList) {
         for (let i = 0; i < orderDetailList.length; i++) {
-          productInfoList.push({
-            changeNumber: orderDetailList[i].num,
-            orderDetailId: orderDetailList[i].id,
-            ...orderDetailList[i]
-          })
+          if(orderDetailList[i].ableRefundNum > 0){
+            productInfoList.push({
+              changeNumber: orderDetailList[i].num,
+              orderDetailId: orderDetailList[i].id,
+              ...orderDetailList[i]
+            })
+          }
+          
         }
       }
       this.setState({
