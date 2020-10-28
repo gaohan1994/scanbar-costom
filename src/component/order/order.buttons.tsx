@@ -285,6 +285,10 @@ class OrderButtons extends Taro.Component<Props, State> {
             return [
               { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
             ];
+          case 7:  // 拒绝
+            return [
+              { title: '再来一单', function: () => this.orderOneMore(params), color: 'blue' },
+            ];
           default:
             () => { }
         }
