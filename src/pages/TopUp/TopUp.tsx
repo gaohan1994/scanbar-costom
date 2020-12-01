@@ -66,6 +66,7 @@ class TopUp extends Taro.Component<Props, State> {
       "rechargeRuleId": key.id,
       "totalAmount": key.faceValue,
       "transAmount": key.sellingPrice,
+      orderSource: 3,
       merchantId: currentMerchantDetail.id || BASE_PARAM.MCHID,
     };
     const result: any = await UserAction.cashierStore(param);
@@ -76,7 +77,7 @@ class TopUp extends Taro.Component<Props, State> {
               const url = data.codeUrl.replace('-app', '-customer')
               window.location.href = url;
           } else {
-              const payload = JSON.parse(result.data.result.param);
+              const payload = JSON.parse(result.data.param);
               delete payload.appId;
               const paymentPayload = {
                   ...payload,
@@ -117,7 +118,6 @@ class TopUp extends Taro.Component<Props, State> {
   public render() {
     const {rechangeRule, memberInfo} = this.props;
     const {key} = this.state;
-    console.log(rechangeRule);
     return (
       <View className={BlockchainBdPrefix}>
         <View className={`${BlockchainBdPrefix}-bg`}>

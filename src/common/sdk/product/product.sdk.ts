@@ -617,7 +617,7 @@ class ProductSDK {
             payType: payType
         };
         const result = await requestHttp.post(`/api/cashier/pay`, payload);
-        if (result.code === ResponseCode.success && payType !== 7 && result.data.result.param) {
+        if (result.code === ResponseCode.success && payType !== 7 && result.data.param) {
             return new Promise(async (resolve) => {
                 // const payload = JSON.parse(result.data.param);
                 //     delete payload.appId;
@@ -638,7 +638,7 @@ class ProductSDK {
                     const url = data.codeUrl.replace('-app', '-customer')
                     window.location.href = url;
                 } else {
-                    const payload = JSON.parse(result.data.result.param);
+                    const payload = JSON.parse(result.data.param);
                     delete payload.appId;
                     const paymentPayload = {
                         ...payload,
