@@ -69,6 +69,10 @@ class TopUp extends Taro.Component<Props, State> {
       orderSource: 3,
       merchantId: currentMerchantDetail.id || BASE_PARAM.MCHID,
     };
+    if(process.env.TARO_ENV === 'h5'){
+      param.orderSource = 6;
+    }
+    
     const result: any = await UserAction.cashierStore(param);
     if (result.code === ResponseCode.success) {
       return new Promise((resolve) => {
