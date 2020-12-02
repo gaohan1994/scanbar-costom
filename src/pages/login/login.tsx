@@ -36,6 +36,8 @@ class GetUserinfo extends Taro.Component<Props, State> {
         const {detail} = params;
         if (detail.errMsg === "getPhoneNumber:ok") {
             const codeRes = await WeixinSDK.getWeixinCode();
+            console.log(codeRes, 'w32323232');
+            
             invariant(codeRes.success, codeRes.msg || '请先登录微信');
             const payload = {
                 encryptedData: detail.encryptedData,
