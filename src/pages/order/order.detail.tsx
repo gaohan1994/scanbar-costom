@@ -298,6 +298,7 @@ class OrderDetail extends Taro.Component<Props, State> {
     if(orderDetail.orderNo) {
       res = OrderAction.orderStatus(orderAllStatus, orderDetail, time);
     }
+    
     return (
       <View className={`${cssPrefix}-card ${cssPrefix}-card-status`} style={process.env.TARO_ENV === 'h5' ? {paddingBottom: '5.8rem'} : {}}>
         {
