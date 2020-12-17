@@ -8,7 +8,7 @@ git地址：https://github.com/gaohan1994/scanbar-costom.git
 
 安装： yarn 或者 npm install
 
-启动： taro build --type weapp --watch
+启动： taro build --type weapp --watch 
 编译： taro build --type weapp
 
 ### 项目文件结构
