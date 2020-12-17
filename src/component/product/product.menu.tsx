@@ -46,11 +46,12 @@ class ProductMenu extends Taro.Component<Props> {
                     [`${cssPrefix}-list-left-item-h5`]: process.env.TARO_ENV === 'h5' ? true: false
                   })}
                   onClick={() =>onClick(type)}
+                  
                 >
                   {type.id === currentMenu.id && (
                     <View className={`${cssPrefix}-list-left-item-active-bge`} />
                   )}
-                  {type.name}
+                  <View style={{height: '2.13rem'}}>{type.name}</View>
                 </View>
               );
             })
