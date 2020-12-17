@@ -141,7 +141,8 @@
       background-color: @product-list-left-bg-color;
 
       &-item {
-        .flex(center, center, row);
+        // .flex(center, center, row);
+        text-align: center;
         position: relative;
         height: @product-list-type-height;
         color: @base-font-color;
@@ -152,6 +153,7 @@
         }
         &-h5{
           line-height: @product-list-type-height;
+          height: @product-list-type-height;
         }
         &-active {
           background-color: #ffffff;
