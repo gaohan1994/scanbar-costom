@@ -25,6 +25,7 @@ import {BASE_PARAM} from '../../../common/util/config';
 import requestHttp from '../../../common/request/request.http';
 import merge from 'lodash.merge';
 import numeral from 'numeral';
+import orderCancel from 'src/pages/order/order.cancel';
 
 export const NonActivityName = 'NonActivityName';
 
@@ -532,12 +533,13 @@ class ProductSDK {
      *
      * @memberof ProductSDK
      */
-    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products: ProductCartInterface.ProductCartInfo[], address: any, payOrderDetail: any, pointsTotal: any, points: any, DeliveryFee: any, payType: any): ProductCartInterface.ProductPayPayload => {
+    public getProductInterfacePayload = (currentMerchantDetail,activityList, memberInfo, productCartList, products: ProductCartInterface.ProductCartInfo[], address: any, payOrderDetail: any, pointsTotal: any, points: any, DeliveryFee: any, payType: any, OrderCompute: any): ProductCartInterface.ProductPayPayload => {
         // const productList = products !== undefined ? products : store.getState().productSDK.productCartList;  UserInterface.Address
         const productList = products !== undefined ? products : productCartList;
         // const currentMerchantDetail = store.getState().merchant.currentMerchantDetail;
-        const transAmountNow = this.getProductTransPrice(activityList, memberInfo, productCartList, productList) + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0);
+        // const transAmountNow = this.getProductTransPrice(activityList, memberInfo, productCartList, productList) + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0);
         // Partial<ProductCartInterface.ProductOrderPayload>
+        let transAmountNow = OrderCompute &&  OrderCompute.orderComputeBO && OrderCompute.orderComputeBO.transAmount || 0 ;
         let order: any = {
             deliveryInfo: {
                 address: payOrderDetail.deliveryType === 1 ? address && address.address ? `${address.address} ${address.houseNumber}`  : '' : '',
@@ -549,12 +551,14 @@ class ProductSDK {
             remark: payOrderDetail.remark || "",
             payType: payType,
             merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
-            discount: 0,
+            discount: OrderCompute &&  OrderCompute.orderComputeBO && OrderCompute.orderComputeBO.discount || 0,
             points: pointsTotal ?points: null,
             orderSource: 3,
-            totalAmount: this.getProductsOriginPrice(productList) + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0),
+            totalAmount: OrderCompute &&  OrderCompute.orderComputeBO && OrderCompute.orderComputeBO.totalAmount || 0,
+            // totalAmount: this.getProductsOriginPrice(productList) + (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0),
             totalNum: this.getProductNumber(productList),
-            transAmount: transAmountNow
+            transAmount: transAmountNow,
+            // transAmount: transAmountNow
         }
 
         if (payOrderDetail.deliveryType === 1) {
@@ -570,18 +574,18 @@ class ProductSDK {
         }
 
         if (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.id) {
-            let transAmount = this.getProductTransPrice(activityList, memberInfo, productCartList)  -
-                (payOrderDetail.selectedCoupon.couponVO.discount || 0);
-            if(transAmount < 0){
-                transAmount = 
-                (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)
-            } else {
-                transAmount = transAmount +
-                (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)
-            }
+            // let transAmount = this.getProductTransPrice(activityList, memberInfo, productCartList)  -
+            //     (payOrderDetail.selectedCoupon.couponVO.discount || 0);
+            // if(transAmount < 0){
+            //     transAmount = 
+            //     (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)
+            // } else {
+            //     transAmount = transAmount +
+            //     (payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)
+            // }
             order = {
                 ...order,
-                transAmount: Math.round(transAmount * 100) / 100,
+                // transAmount: Math.round(transAmount * 100) / 100,
                 couponList: [payOrderDetail.selectedCoupon.couponCode]
             }
             
@@ -865,7 +869,15 @@ class ProductSDK {
         const result = await ProductService.cashierOrder(params);
         return result;
     }
-
+    /**
+     * @todo 确认订单
+     *
+     * @memberof ProductSDK
+     */
+    public confirmOrder = async (params: ProductCartInterface.ProductPayPayload) => {
+        const result = await ProductService.confirmOrder(params);
+        return result;
+    }
     /**
      * @todo 支付
      *

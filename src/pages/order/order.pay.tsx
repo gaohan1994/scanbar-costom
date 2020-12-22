@@ -21,7 +21,7 @@ import merchantAction from '../../actions/merchant.action';
 import { getMemberInfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
 import { getCurrentMerchantDetail, getOrderPayType } from '../../reducers/app.merchant';
-import { getOrderDetail, getDeliveryFee } from '../../reducers/app.order';
+import { getOrderDetail, getDeliveryFee, getOrderCompute } from '../../reducers/app.order';
 import { UserAction } from '../../actions'
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 import {BASE_PARAM} from '../../common/util/config';
@@ -41,6 +41,7 @@ type Props = {
     orderDetail: any;
     activityList: any;
     memberInfo: any;
+    OrderCompute: any;
     productSDKObj: any;
     DeliveryFee: any;
 }
@@ -75,13 +76,18 @@ class Page extends Taro.Component<Props, State> {
     }
 
     componentDidMount() {
-        const {dispatch, currentMerchantDetail, payOrderAddress} = this.props;
+        const {dispatch, currentMerchantDetail, payOrderDetail, payOrderAddress, DeliveryFee} = this.props;
         merchantAction.activityInfoList(dispatch, currentMerchantDetail.id);
         this.getDateList();
         const {payOrderProductList, activityList, memberInfo, productSDKObj} = this.props;
         let productIds: any[] = [];
-        for (let i = 0; i < payOrderProductList.length; i++) {
-            productIds.push(payOrderProductList[i].id)
+
+        try {
+            for (let i = 0; i < payOrderProductList.length; i++) {
+                productIds.push(payOrderProductList[i].id)
+            }
+        } catch (error) {
+            // console.log(error);
         }
         const params = {
             productIds: productIds,
@@ -91,9 +97,12 @@ class Page extends Taro.Component<Props, State> {
         orderAction.getAbleToUseCoupon(dispatch, params);
         UserAction.getMemberInfo(this.props.dispatch);
         orderAction.getPointConfig(this.props.dispatch);
+        this.getComputeData(this.props);
+        // /api/cashier/compute
+        
     }
     componentWillReceiveProps = async (nextProps) => {
-        const {dispatch, payOrderAddress, currentMerchantDetail} = nextProps;
+        const {dispatch, payOrderAddress, currentMerchantDetail} = nextProps;        
         if(payOrderAddress.id && this.state.isFirst === true) {
             const param = {
                 latitude:  payOrderAddress.latitude,
@@ -104,10 +113,44 @@ class Page extends Taro.Component<Props, State> {
             if(result.code !== ResponseCode.success){
                 productSdk.preparePayOrderAddress({}, dispatch);
             }
+            this.getComputeData(nextProps, result.data);
             this.setState({
                 isFirst: false
             })
         }
+        if (this.props.payOrderDetail.selectedCoupon !== nextProps.payOrderDetail.selectedCoupon  || this.props.payOrderDetail.deliveryType !== nextProps.payOrderDetail.deliveryType ) {
+            this.getComputeData(nextProps);
+        }
+    }
+
+    getComputeData = (nextProps, deli?: any) => {
+        const {payOrderProductList, memberInfo, DeliveryFee} = this.props;
+        let ComputeList: any = [];
+        try {
+            for (let i = 0; i < payOrderProductList.length; i++) {
+                ComputeList.push({
+                    productId: payOrderProductList[i].id,
+                    productName: payOrderProductList[i].name,
+                    sellNum: payOrderProductList[i].sellNum,
+                    unitPrice: productSdk.getProductItemPrice(payOrderProductList[i], memberInfo),
+                })
+            }
+        } catch (error) {
+            // console.log(error);
+        }
+        const paramsCompute = {
+            productInfoList: ComputeList,
+            order: {
+                couponList: nextProps.payOrderDetail.selectedCoupon && nextProps.payOrderDetail.selectedCoupon.couponCode ? [nextProps.payOrderDetail.selectedCoupon.couponCode] : [],
+                memberId: memberInfo.id,
+                points: 0,
+                deliveryFee: nextProps.payOrderDetail.deliveryType === 1 ? deli || DeliveryFee : 0
+            }
+        };
+        if(payOrderProductList.length > 0){
+            orderAction.getComputeMoney(this.props.dispatch, paramsCompute);
+        }
+        
     }
     public onSubmit = async () => {
         try {
@@ -136,8 +179,8 @@ class Page extends Taro.Component<Props, State> {
                 isOnClick: false
             })
             try {
-                const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch, DeliveryFee, orderPayType, currentMerchantDetail} = this.props;
-                const payload = productSdk.getProductInterfacePayload(currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal, productSDKObj.pointsTotalSell, DeliveryFee, orderPayType);
+                const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch, DeliveryFee, orderPayType, currentMerchantDetail, OrderCompute} = this.props;
+                const payload = productSdk.getProductInterfacePayload(currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal, productSDKObj.pointsTotalSell, DeliveryFee, orderPayType, OrderCompute);
                 const result = await productSdk.cashierOrder(payload)
                 invariant(result.code === ResponseCode.success, result.msg || ' ');
                 Taro.hideLoading();
@@ -387,30 +430,31 @@ class Page extends Taro.Component<Props, State> {
         this.onRefProductPayListViewObj = reset;
     }
     render() {
-        const {payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, DeliveryFee, dispatch} = this.props;
+        const {payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, DeliveryFee, dispatch, OrderCompute} = this.props;
         const {showTimeSelect, currentDate, selectDate, selectTime, timeList, dateList} = this.state;
         const {countTotal, onRefProductPayListView, onRefProductPayListViewObj} = this;
         const price = payOrderProductList && payOrderProductList.length > 0
             ? numeral(productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList, payOrderProductList)).format('0.00')
             : '0.00';
-        let tarnsPrice = payOrderProductList && payOrderProductList.length > 0
-            ? numeral(
-                productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList)  -
-                (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
-            ).format('0.00')
-            : '0.00';
-        console.log('pay', tarnsPrice, price);
-        if(numeral(tarnsPrice).value() < 0 ){
-            tarnsPrice = numeral(payOrderDetail.deliveryType === 1 ? DeliveryFee : 0).format('0.00')
-        } else {
-            tarnsPrice = numeral(numeral(tarnsPrice).value() +(payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)).format('0.00')
-        }
+        // let tarnsPrice = payOrderProductList && payOrderProductList.length > 0
+        //     ? numeral(
+        //         productSdk.getProductTransPrice(activityList, memberInfo, productSDKObj.productCartList,payOrderProductList)  -
+        //         (payOrderDetail.selectedCoupon && payOrderDetail.selectedCoupon.couponVO ? payOrderDetail.selectedCoupon.couponVO.discount : 0)
+        //     ).format('0.00')
+        //     : '0.00';
+        let tarnsPrice = `${numeral(OrderCompute.orderComputeBO && OrderCompute.orderComputeBO.transAmount).format('0.00')}`
+        // if(numeral(tarnsPrice).value() < 0 ){
+        //     tarnsPrice = numeral(payOrderDetail.deliveryType === 1 ? DeliveryFee : 0).format('0.00')
+        // } else {
+        //     tarnsPrice = numeral(numeral(tarnsPrice).value() +(payOrderDetail.deliveryType === 1 ? DeliveryFee : 0)).format('0.00')
+        // }
         if(productSDKObj.pointsTotal){
             tarnsPrice = numeral(numeral(tarnsPrice).value() - productSDKObj.pointsTotal).format('0.00');
         }
         let priceDiscountPay = countTotal() - numeral(tarnsPrice).value();
  
         const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
+
         return (
             <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: 'auto'}}>
                 <View className={`${cssPrefix}-bg`}/>
@@ -420,7 +464,10 @@ class Page extends Taro.Component<Props, State> {
                         this.onShowTimeSelect();
                     }}
                     currentTime={`${selectTimeStr}`}
-                    changeTabCallback={this.getTimeList}
+                    changeTabCallback={() => {
+                        this.getTimeList();
+                        this.getComputeData(this.props);
+                    }}
                     // onRefProductPayListViewObj={onRefProductPayListViewObj}
                 />
                 {
@@ -430,6 +477,7 @@ class Page extends Taro.Component<Props, State> {
                             productList={payOrderProductList}
                             payOrderDetail={payOrderDetail}
                             productSDKObj={productSDKObj}
+                            OrderCompute={OrderCompute}
                             // onRef={onRefProductPayListView}
                         />
                     ) : (
@@ -438,6 +486,7 @@ class Page extends Taro.Component<Props, State> {
                             payOrderDetail={payOrderDetail}
                             productList={payOrderProductList}
                             productSDKObj={productSDKObj}
+                            OrderCompute={OrderCompute}
                             // onRef={onRefProductPayListView}
                         />
                     )
@@ -474,8 +523,8 @@ class Page extends Taro.Component<Props, State> {
                     priceTitle={'合计：'}
                     priceSubtitle='￥'
                     price={tarnsPrice}
-                    priceOrigin={price}
-                    priceDiscountPay={priceDiscountPay}
+                    priceOrigin={OrderCompute.orderComputeBO && OrderCompute.orderComputeBO.totalAmount}
+                    priceDiscountPay={OrderCompute.orderComputeBO  && OrderCompute.orderComputeBO.discount}
                 />
                 <AtFloatLayout
                     isOpened={showTimeSelect}
@@ -522,6 +571,7 @@ class Page extends Taro.Component<Props, State> {
 const select = (state: AppReducer.AppState) => {
     return {
         DeliveryFee: getDeliveryFee(state),
+        OrderCompute: getOrderCompute(state),
         orderPayType: getOrderPayType(state),
         payOrderProductList: state.productSDK.payOrderProductList,
         payOrderAddress: state.productSDK.payOrderAddress,

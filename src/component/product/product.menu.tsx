@@ -51,7 +51,7 @@ class ProductMenu extends Taro.Component<Props> {
                   {type.id === currentMenu.id && (
                     <View className={`${cssPrefix}-list-left-item-active-bge`} />
                   )}
-                  <View style={{height: '2.13rem'}}>{type.name}</View>
+                  <View style={process.env.TARO_ENV === 'h5' ? {height: '2.13rem'} : {height: '100rpx', lineHeight: '100rpx'}}>{type.name}</View>
                 </View>
               );
             })

@@ -193,11 +193,13 @@ export declare namespace OrderInterface {
   type RECEIVE_ABLE_TO_USE_COUPONS = string;
   type RECEIVE_POINTCONFIG = string;
   type RECEIVE_DELIVERYFEE = string;
+  type RECEIVE_ORDER_DETAIL_COMPUTE = string;
 
   type ReducerInterface = {
     CHANGR_CURRENT_TYPE: CHANGR_CURRENT_TYPE;
     RECEIVE_ORDER_LIST: RECEIVE_ORDER_LIST;
     RECEIVE_ORDER_DETAIL: RECEIVE_ORDER_DETAIL;
+    RECEIVE_ORDER_DETAIL_COMPUTE: RECEIVE_ORDER_DETAIL_COMPUTE;
     RECEIVE_ORDER_COUNT: RECEIVE_ORDER_COUNT;
     RECEIVE_ORDER_ALL_STATUS: RECEIVE_ORDER_ALL_STATUS;
     RECEIVE_ABLE_TO_USE_COUPONS: RECEIVE_ABLE_TO_USE_COUPONS;
@@ -219,6 +221,7 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
     RECEIVE_DELIVERYFEE: 'RECEIVE_DELIVERYFEE',
     RECEIVE_ORDER_LIST: 'RECEIVE_ORDER_LIST',
     RECEIVE_ORDER_DETAIL: 'RECEIVE_ORDER_DETAIL',
+    RECEIVE_ORDER_DETAIL_COMPUTE: 'RECEIVE_ORDER_DETAIL_COMPUTE',
     RECEIVE_ORDER_COUNT: 'RECEIVE_ORDER_COUNT',
     RECEIVE_ORDER_ALL_STATUS: 'RECEIVE_ORDER_ALL_STATUS',
     RECEIVE_ABLE_TO_USE_COUPONS: 'RECEIVE_ABLE_TO_USE_COUPONS',
@@ -227,6 +230,9 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
   
   public getPointConfig = () => {
     return `/api/merchant/point/config/detail`;
+  }
+  public getComputeMoney = () => {
+    return `/api/cashier/compute`;
   }
   public getDeliveryFee = (param) => {
     return `/api/cashier/getDeliveryFee${jsonToQueryString(param)}`;

@@ -21,6 +21,7 @@ type Props = {
   dispatch: Dispatch;
   productList: Array<ProductCartInterface.ProductCartInfo>;
   className?: string;
+  OrderCompute: any;
   productSDKObj: any;
   activityList: any;
   isPay?: true;
@@ -505,7 +506,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
     return total;
 }
   private renderTotal = () => {
-    const { memberInfo, pointConfig, DeliveryFee, payOrderDetail, productCartList, payOrderProductList, productSDKObj, activityList } = this.props;
+    const { memberInfo, pointConfig, DeliveryFee, payOrderDetail, productCartList, payOrderProductList, productSDKObj, activityList, OrderCompute } = this.props;
     // const { order } = orderDetail;
     const {pointSet} = this.state;
     const {countTotal, countTotalPrice} = this;
@@ -528,7 +529,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
     }
     let discountPriceFoot = countTotalPrice() - numeral(tarnsPrice).value();
 
-    let newPrice = price;
+    let newPrice = OrderCompute && OrderCompute.orderComputeBO ? OrderCompute.orderComputeBO.transAmount : price;
     if(pointSet === true){
       const money = memberInfo.points * pointConfig.deductRate;
       if( DeliveryFee && payOrderDetail.deliveryType === 1){
@@ -573,11 +574,11 @@ class ProductPayListView extends Taro.Component<Props, State> {
         <View className={`${cssPrefix}-row-content-item`}>
           <View />
           <View className={`${cssPrefix}-row-tran`}>
-            <Text className={`${cssPrefix}-row-tran`}>{`已优惠￥ ${numeral(discountPriceFoot).format('0.00')}`}</Text>
+            <Text className={`${cssPrefix}-row-tran`}>{`已优惠￥ ${numeral(OrderCompute && OrderCompute.orderComputeBO ? OrderCompute.orderComputeBO.discount : discountPriceFoot).format('0.00')}`}</Text>
             <Text className={`${cssPrefix}-row-tran ${cssPrefix}-row-tran-margin`}>{`合计：`}</Text>
             <Text className={`${cssPrefix}-row-tran-price`}>￥</Text>
-            <Text className={`${cssPrefix}-row-tran-price ${cssPrefix}-row-tran-big `}>{newPrice.split('.')[0]}</Text>
-            <Text className={`${cssPrefix}-row-tran-price`}>{`.${newPrice.split('.')[1]}`}</Text>
+            <Text className={`${cssPrefix}-row-tran-price ${cssPrefix}-row-tran-big `}>{`${numeral(newPrice).format("0.00")}`.split('.')[0]}</Text>
+            <Text className={`${cssPrefix}-row-tran-price`}>{`.${`${numeral(newPrice).format("0.00")}`.split('.')[1]}`}</Text>
           </View>
         </View>
       </View>

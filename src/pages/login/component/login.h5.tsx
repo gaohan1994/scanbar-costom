@@ -57,7 +57,8 @@ class LoginH5 extends Taro.Component<Props, State> {
           nickname: '',
           avatar: '',
           token: '',
-          phone: ''
+          phone: '',
+          merchantId: currentMerchantDetail.id,
         };
         if (result.data) {
           userinfo = {
@@ -66,9 +67,17 @@ class LoginH5 extends Taro.Component<Props, State> {
             avatar: result.data.avatar ? result.data.avatar : ''
           };
         }
+        
         const setResult: any = await LoginManager.setUserInfo(userinfo, dispatch);
         invariant(setResult.success, setResult.msg || '存储用户信息失败');
-        Taro.navigateBack();
+        const saveResult: any = await UserAction.userInfoSave(userinfo);
+        invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
+        if(process.env.TARO_ENV === 'h5'){
+          Taro.navigateTo({url: '/pages/index/index'})
+        } else {
+          Taro.navigateBack();
+        }
+       
       }
     } catch (error) {
       Taro.showToast({
