@@ -226,6 +226,7 @@ class ProductInterfaceMap {
 
     public cashierPay = '/cashier/pay';
     public cashierOrder = '/api/cashier/order';
+    public confirmOrder = '/api/cashier/confirm';
 
     public productInfoType = (params: ProductInterface.ProductInfoTypeFetchFidle) => {
         return `/customer/product/type/${params.merchantId}`;

@@ -11,6 +11,31 @@ import { OrderReducer } from '../reducers/app.order';
 import Taro from '@tarojs/taro';
 
 class OrderAction {
+  
+  /**
+   * @todo 获取试算金额
+   *
+   * @memberof OrderAction
+   */
+  public getComputeMoney = async (dispatch, param) => {
+    const result = await OrderService.getComputeMoney(param);
+    if (result.code === ResponseCode.success) {
+      const reducer: OrderReducer.Reducers.OrderDetailReducer = {
+        type: OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_DETAIL_COMPUTE,
+        payload: {
+          data: result.data
+        }
+      };
+      dispatch(reducer);
+    } else {
+      Taro.showToast({
+        title: result.msg,
+        icon: 'none',
+        duration: 2000
+      })
+    }
+    return result;
+  }
   /**
    * @todo 获取配送费
    *

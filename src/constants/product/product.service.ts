@@ -31,7 +31,10 @@ class ProductService {
   public productInfoDetail = async (params: ProductInterface.ProductDetailFetchFidle): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.get(ProductInterfaceMap.productInfoDetail(params));
   }
-
+  
+  public confirmOrder = async (params: ProductCartInterface.ProductPayPayload): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    return requestHttp.post(ProductInterfaceMap.confirmOrder, params);
+  }
   public cashierOrder = async (params: ProductCartInterface.ProductPayPayload): Promise<HTTPInterface.ResponseResultBase<any>> => {
     return requestHttp.post(ProductInterfaceMap.cashierOrder, params);
   }

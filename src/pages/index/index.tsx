@@ -86,7 +86,7 @@ class Index extends Component<any> {
         try {
             
             this.init(true);
-            orderAction.orderAllStatus(this.props.dispatch);
+            // orderAction.orderAllStatus(this.props.dispatch);
         } catch (error) {
             Taro.showToast({
                 title: error.message,

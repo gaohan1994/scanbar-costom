@@ -47,6 +47,12 @@ export declare namespace OrderReducer {
         data: OrderInterface.OrderDetail;
       };
     }
+    interface OrderComputeReducer {
+      type: OrderInterface.RECEIVE_ORDER_DETAIL_COMPUTE;
+      payload: {
+        data: OrderInterface.OrderDetail;
+      };
+    }
 
     interface OrderCountReducer {
       type: OrderInterface.RECEIVE_ORDER_COUNT;
@@ -73,6 +79,7 @@ export declare namespace OrderReducer {
   interface State {
     orderList: Array<OrderInterface.OrderDetail>;
     orderListTotal: number;
+    orderCompute: any;
     orderDetail: OrderInterface.OrderDetail;
     orderCount: OrderInterface.OrderCount;
     orderAllStatus: any[];
@@ -99,6 +106,7 @@ const initState: OrderReducer.State = {
   orderAllStatus: [],
   currentType: 0,
   ableToUseCouponList: [],
+  orderCompute: {},
   pointConfig: {},
   DeliveryFee: 0,
 };
@@ -127,10 +135,18 @@ export default function orderReducer(
         orderDetail: data
       };
     }
-    
+    case OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_DETAIL_COMPUTE: {
+      const { payload } = action as OrderReducer.Reducers.OrderComputeReducer;
+      const { data } = payload;
+      return {
+        ...state,
+        orderCompute: data
+      };
+    }
     case OrderInterfaceMap.reducerInterfaces.RECEIVE_DELIVERYFEE: {
       const { payload } = action as unknown as OrderReducer.Reducers.DeliveryFeeReducer;
       const { DeliveryFee } = payload;
+      console.log('OrderInterfaceMap.reducerInterfaces.RECEIVE_DELIVERYFEE', DeliveryFee);
       return {
         ...state,
         DeliveryFee: DeliveryFee
@@ -199,6 +215,7 @@ export const getOrderList = (state: AppReducer.AppState) => state.order.orderLis
 export const getPointConfig = (state: AppReducer.AppState) => state.order.pointConfig;
 export const getDeliveryFee = (state: AppReducer.AppState) => state.order.DeliveryFee;
 export const getOrderListTotal = (state: AppReducer.AppState) => state.order.orderListTotal;
+export const getOrderCompute = (state: AppReducer.AppState) => state.order.orderCompute;
 
 export const getOrderDetail = (state: AppReducer.AppState) => state.order.orderDetail;
 
