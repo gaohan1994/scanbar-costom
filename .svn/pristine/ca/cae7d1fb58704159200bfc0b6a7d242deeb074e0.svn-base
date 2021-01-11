@@ -1,0 +1,192 @@
+@import "../../../styles/theme.less";
+
+@prefix: index-component;
+
+@address-height: 130px;
+
+.@{prefix} {
+  &-address-h5 {
+    height: 160px !important;
+    .background-image('//net.huanmusic.com/scanbar-c/v2/bg_home_shang.png') !important;
+    background-size: 100% 101% !important;
+  }
+  &-address {
+    height: @address-height;
+    .padding(30px, lr);
+    .padding(3px, t);
+    padding-bottom: 10px;
+    position: relative;
+    .bg;
+    background-image: url('//net.huanmusic.com/scanbar-c/v2/bg_home_shang.png');
+    background-size: 100% 101% !important;
+    display: flex;
+    flex-direction: column;
+    &-icon {
+      .margin(10px, l);
+      width:20px;
+      height:10px;
+      .bg;
+      background-image: url(//net.huanmusic.com/scanbar-c/v1/block@2x.png);
+    }
+    &-title-h5 {
+      margin-top: 10px;
+    }
+    &-title {
+      .flex(center, flex-start, row);
+      &-icon {
+        width:34px;
+        height:34px;  
+        .margin(10px, r);
+      }
+      &-text {
+        .clamp(1);
+        max-width: 320px;
+        font-size:36px;
+        font-weight:bold;
+        color:rgba(255,255,255,1);
+        .margin(10px, r)
+      }
+      &-text-h5 {
+        .clamp(1);
+        max-width: 320px;
+        font-size:36px;
+        font-weight:bold;
+        color:rgba(255,255,255,1);
+        .margin(10px, r);
+        display: block;
+        white-space: nowrap;
+        margin-top: 11px;
+      }
+    }
+    &-box-h5 {
+      position: relative;
+    }
+    &-box {
+      .margin(10px, t);
+      display: flex;
+    }
+    &-merchant-h5 {
+      padding: 20px !important;
+    }
+    &-merchant {
+      .padding(20px, lr);
+      .padding(8px, tb);
+      height:38px;
+      background-color:rgba(0,0,0, 0.1);
+      border-radius:19px;
+      .flex(center, center, row);
+      &-name {
+        font-size: 22px;
+        font-weight:500;
+        color:rgba(255,255,255,1);
+        line-height: 22px;
+        text-align: center;
+      }
+    }
+    &-search-h5 {
+      bottom: 0px !important;
+    }
+    &-search {
+      position: absolute;
+      bottom: 30px;
+      right: 23px;
+      .flex(center, center, row);
+      width:300px;
+      height:54px;
+      background:rgba(255,255,255, 0.2);
+      border-radius:27px;
+      &-icon {
+        width:31px;
+        height:31px;
+        .margin(14px, r)
+      }
+      &-text {
+        font-size:28px;
+        font-weight:500;
+        color:rgba(255,255,255,1);
+        padding-top: 5px;
+      }
+    }
+  }
+
+  &-discount {
+    width: 100%;
+    height: 142px;
+    padding-top: 10px;
+    .bg;
+    background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_home_zhong.png);
+    background-size: 100% 101%;
+    .flex(flex-start, space-around, row);
+
+    &-item {
+      position: relative;
+      // width: ;
+      padding-top: 10px;
+      height: 88px;
+      .flex(center, space-between, column);
+      color: #fff;
+      font-size: 24px;
+      &-h5 {
+        margin-top: -10px;
+      }
+      &-data {
+        font-size: 36px;
+        font-weight: bold;
+      }
+
+      &-integral {
+        width: 43px;
+        height: 43px;
+        // margin-bottom: 19px;
+      }
+
+      &-coupon {
+        width: 47px;
+        height: 42px;
+      }
+    }
+
+    &-pop {
+      position: absolute;
+      top: 0;
+      right: -106px;
+      width: 96px;
+      height: 28px;
+      .bg;
+      background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_coupon_prompt.png);
+      color: #FF893B;
+      font-size: 20px;
+      .flex(center, center);
+    }
+  }
+
+  &-banner {
+    width: 100%;
+    height: 245px;
+    position: relative;
+    .flex(flex-start, center);
+
+    &-bg {
+      position: absolute;
+      top: 0;
+      width: 100%;
+      height: 150px;
+      .bg;
+      background-image: url(//net.huanmusic.com/scanbar-c/v2/bg_home_xia.png);
+    }
+
+    &-swiper {
+      width: 95%;
+      height: 220px;
+
+      &-item {
+        border-radius: 10px;
+        width: 100%;
+        height: 100%;
+        .bg;
+        background-size: 100%;
+      }
+    }
+    
+  }
+}

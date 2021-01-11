@@ -287,6 +287,8 @@ class Index extends Component<any> {
                     }
                 })
             } else {
+                console.log(resMear,'resMear');
+                
                 // this.setState({
                 //     chooseAddressModal: false,
                 // })

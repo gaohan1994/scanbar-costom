@@ -124,10 +124,10 @@ class Order extends Taro.Component<Props, State> {
         pageNum += 1;
       }
     } catch (error) {
-      Taro.showToast({
-        title: error.message,
-        icon: 'none'
-      });
+      // Taro.showToast({
+      //   title: error.message,
+      //   icon: 'none'
+      // });
     }
   }
 
@@ -143,6 +143,8 @@ class Order extends Taro.Component<Props, State> {
     const { orderList, orderListTotal, orderAllStatus, currentType, userinfo, dispatch, productSDK , } = this.props;
     const hasMore = orderList.length < orderListTotal;
     // const { getUserinfoModal, loginModal } = this.state;
+    console.log(hasMore, 'hasMore');
+    
     return (
       <View className={`container ${cssPrefix}`}>
         <View className={`${cssPrefix}-tabs`}>

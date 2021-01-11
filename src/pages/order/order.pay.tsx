@@ -460,6 +460,7 @@ class Page extends Taro.Component<Props, State> {
                 <View className={`${cssPrefix}-bg`}/>
                 <PickAddress
                     isPay={true}
+                    tarnsPrice={tarnsPrice}
                     timeSelectClick={() => {
                         this.onShowTimeSelect();
                     }}

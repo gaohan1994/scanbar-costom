@@ -1,0 +1,426 @@
+@import "../../styles/theme.less";
+
+@product-prefix: component-product;
+@product-border-color: #f9f9f9;
+@product-image-size: 160px;
+// @product-image-size: 64PX;
+@product-content-width: 390px;
+@product-content-size: 150px;
+// @product-content-size: 64PX;
+@product-title-font: 30px;
+@product-title-color: #525252;
+@product-price-font: 30px;
+@product-price-color: #FC4E44;
+@product-normal-color: #999999;
+
+@product-padding: 10px;
+@product-manage-padding: 25px;
+
+.item(@bg, @color) {
+  .padding(10px, lr);
+  .margin(13px, r);
+  .margin(10px, t);
+  .flex(center, center, row);
+  height: 26px;
+  border-radius: 10px;
+  background-color: @bg;
+  color: @color;
+}
+
+.item-text {
+  font-size: 20px;
+  line-height: 20px;
+  text-align: center;
+}
+
+.@{product-prefix} {
+  width: 100%;
+  .padding(@product-padding);
+  padding-right: 30px;
+  &-cart {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  &-full {
+    .padding(30px, l);
+  }
+
+  &-border {
+    border-bottom: 1px solid @product-border-color;
+  }
+
+  &-last {
+    margin-bottom: 200px;
+  }
+
+  &-select {
+    width: 60px;
+    position: relative;
+    // .padding(30px, r);
+    &-item {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width:35px;
+      height:34px;
+      .bg;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+    }
+    &-normal {
+      background-image: url('//net.huanmusic.com/scanbar-c/bt_unavailable.png');
+    }
+    &-active {
+      background-image: url('//net.huanmusic.com/scanbar-c/bt_cart_selected.png');
+    }
+  }
+
+  &-content {
+    position: relative;
+    .flex(center, flex-start, row);
+    .padding(10px, tb);
+    flex: 1;
+
+    &-cover {
+      position: relative;
+      width: @product-image-size;
+      min-width: @product-image-size;
+      height: @product-image-size;
+      border-radius: 10px;
+      border: 1px solid @product-border-color;
+      overflow: hidden;
+      &-h5 {
+        border: 3px solid @product-border-color;
+      }
+      &-image {
+        width: 100%;
+        height: 100%;
+        background-repeat: no-repeat;
+        background-size: 100% 100%;
+        background-position: center center;
+
+      }
+
+      &-empty {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: @product-image-size;
+        height: @product-image-size;
+        background: rgba(0, 0, 0, .5);
+        // opacity: 0.5;
+        .flex(center, center);
+        font-size: 30px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 1);
+        z-index: 99;
+      }
+    }
+
+    &-detail {
+      .margin(10px, l);
+      .margin(10px, t);
+      display: flex;
+      flex: 1;
+      min-height: 150px;
+      flex-direction: column;
+      justify-content: space-between;
+
+      &-bar {
+        .flex(center, flex-start, row);
+      }
+
+      &-box {
+        .margin(17px, t);
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    &-manage {
+      .margin(10px, l);
+      display: flex;
+      width: 750px - 150px - 50px - 20px;
+      flex-direction: column;
+      justify-content: space-between;
+
+      &-bar {
+        .flex(center, flex-start, row);
+      }
+    }
+  }
+
+  &-title {
+    font-size: @product-title-font;
+    line-height: @product-title-font;
+    height: @product-title-font;
+    color: @product-title-color;
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    &-h5 {
+      width: 100%;
+      display: block;
+      line-height: 35px;
+      height: 33px;
+      display: -webkit-box !important;
+      -webkit-box-orient: vertical !important;
+      -webkit-line-clamp: 1 !important;
+      overflow: hidden !important;
+    }
+    &-manage {
+      width: 100%;
+    }
+  }
+  &-titleSearch-h5 {
+    width: 88% !important;
+  }
+  &-tipsSearch-h5 {
+    width: 88% !important;
+  }
+  &-tips {
+    font-size: 22px;
+    height: 22px;
+    line-height: 22px;
+    font-weight: 500;
+    color: rgba(153, 153, 153, 1);
+    display: -webkit-box;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-clamp: 1;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    margin-top: 10px;
+  }
+  &-tips-h5 {
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 1 !important;
+    overflow: hidden !important;
+    height: 26px;
+    line-height: 28px;
+    overflow: hidden;
+    width: 100%;
+    display: block;
+  }
+  &-activity {
+    .flex(center, flex-start, row);
+  }
+
+  &-discount {
+    .item(rgba(255, 240, 226, 1), #FF893B);
+    height: 30px;
+    &-text {
+      .item-text;
+      padding-top: 5px;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 1 !important;
+      overflow: hidden !important;
+      -webkit-box-orient: vertical;
+    }
+  }
+
+  &-batchDiscount {
+    .item(rgba(255,235,235,1), #FC4E44);
+    padding: 15px;
+    margin-right: 12px;
+    &-text {
+      .item-text;
+      margin-top: 2px;
+      display: -webkit-box !important;
+      -webkit-line-clamp: 1 !important;
+      overflow: hidden !important;
+      -webkit-box-orient: vertical;
+    }
+  }
+
+  &-inventory {
+    position: absolute;
+    right: 0;
+    bottom: 13px;
+    .item(rgba(255,240,226,1), #FF893B);
+    margin: 0;
+    border-radius: 13px 0 0 13px;
+    padding: 15px;
+    padding-top: 18px;
+    &-text {
+      .item-text;
+    }
+  }
+
+  &-price {
+    font-size: 34px;
+    color: @product-price-color;
+    font-weight: bold;
+    .margin(6px, r);
+
+    &-pre {
+      font-size: 25px;
+      font-weight: 500;
+      color: rgba(51, 51, 51, 1);
+    }
+
+    &-bge {
+      // font-size: 24px;
+      color: @product-price-color;
+      font-weight: bold;
+    }
+    &-grayT {
+      font-size: 24px;
+      margin-left: 26px;
+    }
+    &-gray {
+      font-size: 24px;
+      top: -10px;
+      position: relative;
+    }
+    &-discount {
+      font-size: 24px;
+      color: #666666;
+      top: -10px;
+      position: relative;
+
+      // margin-top: 10px;
+    }
+
+    &-pos {
+      .margin(-4px, l)
+    }
+
+    &-origin {
+      .margin(9px, l);
+      font-size: 18px;
+      font-weight: 500;
+      text-decoration: line-through;
+      color: rgba(179, 179, 179, 1);
+    }
+  }
+  &-normal-h5 {
+    height: 40px !important;
+  }
+  &-normal {
+    // .margin(18px, t);
+    font-size: 24px;
+    line-height: 50px;
+    height: 50px;
+    color: @product-normal-color;
+  }
+
+  &-manage {
+    width: 100%;
+    .padding(@product-manage-padding);
+
+    &-detail {
+      display: flex;
+      flex-direction: column;
+    }
+
+    &-corner {
+      position: absolute;
+      right: 0px;
+      bottom: 10px;
+    }
+
+    &-font {
+      font-size: 28px;
+      color: @base-font-color;
+
+      &-theme {
+        color: @theme-color;
+      }
+
+      &-price {
+        color: @product-price-color;
+        font-size: 24px;
+
+        &-big {
+          font-size: 34px;
+        }
+      }
+    }
+  }
+
+  &-stepper {
+    position: absolute;
+    right: -15px;
+    bottom: 0;
+
+    &-empty {
+      .flex(center, center);
+      width: 107px;
+      height: 50px;
+      background: rgba(204, 204, 204, 1);
+      border-radius: 25px;
+      font-size: 30px;
+      line-height: 30px;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 1);
+      margin-right: 15px;
+      padding-top: 5px;
+    }
+
+    &-delete {
+      background-color: transparent;
+      border: #2A86FC solid 2px;
+      color: #2A86FC;
+      margin-right: 15px;
+      font-weight: normal;
+    }
+
+    &-purchase {
+      bottom: 20px;
+      font-size: 36px;
+      font-weight: bold;
+      color: @theme-color;
+    }
+
+    &-edit {
+      width: 32px;
+      height: 29px;
+      .margin(11px, l);
+    }
+
+    &-container {
+      .flex(center, center, row);
+      // .margin(14px, b);
+    }
+
+    &-text {
+      min-width: 48px;
+      .flex(center, center);
+      font-size: 30px;
+      color: #666666;
+    }
+
+    &-touch {
+      width: 80px;
+      height: 80px;
+      .flex(center, center);
+    }
+
+    &-button {
+      width: 50px;
+      height: 50px;
+
+      &-reduce {
+        .background-image('//net.huanmusic.com/scanbar-c/bt_shanchu_l.png');
+      }
+
+      &-add {
+        .background-image('//net.huanmusic.com/scanbar-c/bt_increase_l.png');
+      }
+    }
+  }
+}
+
+.cart-list-info {
+  .component-product-last {
+    margin-bottom: 0;
+  }
+}

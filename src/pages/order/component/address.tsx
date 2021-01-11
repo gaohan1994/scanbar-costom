@@ -44,6 +44,7 @@ type Props = {
   timeSelectClick?: () => void;
   addressList: any[];
   currentTime?: string;
+  tarnsPrice: any;
   changeTabCallback?: () => void;
 }
 
@@ -123,7 +124,7 @@ class Comp extends Taro.Component<Props, State> {
   }
   public renderDetail = () => {
     const { currentTab } = this.state;
-    const { payOrderAddress, timeSelectClick, merchantDistance, currentTime, currentMerchantDetail, isPay, onAddressClick, orderPayType } = this.props;
+    const { payOrderAddress, timeSelectClick, merchantDistance, currentTime, currentMerchantDetail, isPay, onAddressClick, orderPayType, tarnsPrice } = this.props;
     const locations = currentMerchantDetail.location ? currentMerchantDetail.location.split(',') : [];
     const addressNew = locations.join('') + currentMerchantDetail.address;
     const self = this;
@@ -169,9 +170,11 @@ class Comp extends Taro.Component<Props, State> {
             <View className={`${prefix}-detail-row-title`}>支付方式</View>
             <View onClick={(e) => {
                 e.stopPropagation();
-                self.setState({
-                  choosePayWay: true
-                })
+                if(tarnsPrice && numeral(tarnsPrice).value() != 0){
+                  self.setState({
+                    choosePayWay: true
+                  })
+                }
               }} className={classnames(`${prefix}-detail-row-title`)}>
               <View className={classnames(`${prefix}-detail-row-title-txt`)}>{orderPayType === 8 || orderPayType === 2? '微信支付' : '储值支付'}</View>
             <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' /></View>
@@ -225,9 +228,12 @@ class Comp extends Taro.Component<Props, State> {
           <View className={`${prefix}-detail-row-title`}>支付方式</View>
           <View onClick={(e) => {
               e.stopPropagation();
-              self.setState({
-                choosePayWay: true
-              })
+              if(tarnsPrice && numeral(tarnsPrice).value() != 0){
+                self.setState({
+                  choosePayWay: true
+                })
+              }
+              
             }} className={classnames(`${prefix}-detail-row-title`)}>
             <View className={classnames(`${prefix}-detail-row-title-txt`)}>{orderPayType === 8 || orderPayType === 2? '微信支付' : '储值支付'}</View>
             <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
@@ -273,7 +279,7 @@ class Comp extends Taro.Component<Props, State> {
         >
 
         </AtFloatLayout> */}
-        <AtActionSheet className={`${prefix}${process.env.TARO_ENV === 'h5' ? '-h5wx' : '-wx'}`} title={'选择支付方式'} isOpened={this.state.choosePayWay}>
+        <AtActionSheet onClose={() => {this.setState({choosePayWay: false})}} className={`${prefix}${process.env.TARO_ENV === 'h5' ? '-h5wx' : '-wx'}`} title={'选择支付方式'} isOpened={this.state.choosePayWay}>
           <Image onClick={() => {this.setState({choosePayWay: false})}} src={'//net.huanmusic.com/weapp/icon_close.png'} className={`${prefix}${process.env.TARO_ENV === 'h5' ? '-h5wx' : '-wx'}-close`}/>
           <View onClick={() => {
             if(process.env.TARO_ENV === 'weapp'){

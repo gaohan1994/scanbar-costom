@@ -13,7 +13,10 @@ class Page extends Taro.Component {
     config: Config = {
         navigationBarTitleText: '会员码'
     }
-
+    componentDidMount = () => {
+        // api/cashier/generatePayCode
+        // await LoginManager.getUserInfo(this.props.dispatch);
+    }
     public logout = async () => {
 
     }
@@ -71,10 +74,12 @@ class Page extends Taro.Component {
                                 userinfo && userinfo.phone && (
                                     <View>
                                         <View className={`${cssPrefix}-bar-code`}>
-                                            <Barcode text={userinfo.phone}/>
+                                            <Barcode 
+                                                text={`M:${memberInfo.merchantId}:${memberInfo.phone}/${memberInfo.cardNo}`} 
+                                            />
                                         </View>
                                         <View className={`${cssPrefix}-qr-code`}>
-                                            <QRCode text={userinfo.phone}/>
+                                            <QRCode text={`M:${memberInfo.merchantId}:${memberInfo.phone}/${memberInfo.cardNo}`} />
                                         </View>
                                     </View>
                                 )

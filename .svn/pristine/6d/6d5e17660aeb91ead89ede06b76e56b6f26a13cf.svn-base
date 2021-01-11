@@ -1,0 +1,81 @@
+@import '../../styles/theme.less';
+
+@prefix: address;
+
+.@{prefix} {
+
+  &-button {
+    .margin(50px, t);
+    .padding(50px, lr);
+  }
+
+  &-buttons {
+    display: flex;
+    flex-direction: row;
+    &-button {
+      .margin(30px, t);
+      .flex(center, center);
+      .margin(30px, l);
+      font-size:32px;
+      font-weight:500;
+      color:rgba(255,255,255,1);
+    }
+    &-delete {
+      width:240px;
+      height:80px;
+      background:rgba(153,153,153,1);
+      border-radius:40px;
+    }
+    &-confirm {
+      width:417px;
+      height:80px;
+      background:rgba(42,134,252,1);
+      border-radius:40px;
+    }
+  }
+
+  &-list {
+    border-bottom: 20px solid rgba(245,245,245,1);
+    &-title {
+      margin: 34px 0 -10px 31px;
+    }
+  }
+
+  &-current {
+    .padding(30px);
+    border-bottom: 20px solid rgba(245,245,245,1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: #fff;
+    &-title {
+      font-size:24px;
+      font-weight:500;
+      color:rgba(179,179,179,1);
+    }
+    &-address {
+      .margin(20px, t);
+      font-size:30px;
+      font-weight:500;
+      color:rgba(51,51,51,1);
+    }
+    &-pos {
+      position: absolute;
+      right: 30px;
+      bottom: 30px;
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      &-icon {
+        width:32px;
+        height:32px;
+        .margin(11px, r)
+      }
+      &-text {
+        font-size:30px;
+        font-weight:500;
+        color:rgba(42,134,252,1);
+      }
+    }
+  }
+}

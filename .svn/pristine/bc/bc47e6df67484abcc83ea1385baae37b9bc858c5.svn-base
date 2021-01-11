@@ -1,0 +1,271 @@
+@import "../../styles/theme.less";
+
+@order-prefix: order;
+@order-time-pos: 200px;
+@order-status-icon: 100px;
+
+.@{order-prefix} {
+  background-color: #F2F2F2;
+  &-area {
+    height: 50px;
+    width: 750px;
+  }
+  &-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 235px;
+    width: 100%;
+    .background-image('//net.huanmusic.com/weapp/bg_order.png');
+  }
+  &-box {
+    position: relative;
+    z-index: 100;
+  }
+  &-remark {
+    width: 100%;
+    .flex(center, center, row);
+    background: #F2F2F2;
+    margin-top: 22px;
+    &-card {
+      margin: 0 30px;
+      width: 100%;
+      .component-form {
+        .at-list__item {
+          padding-left: 10px !important;
+        }
+      }
+
+    }
+  }
+  &-search {
+    width: 610px !important;
+  }
+  &-container {
+    position: absolute;
+    top: 60px + 20px + 20px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 690px;
+    background-color: #ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    .margin(30px, l);
+  }
+  &-header {
+    .margin(20px, tb);
+    .margin(30px, lr);
+    .flex(center, space-between, row);
+  }
+  &-time {
+    position: relative;
+    .flex(center, center, row) !important;
+    width: 100%;
+    height: 100px;
+    &::after {
+      .border1px;
+    }
+    &-date {
+      .margin(30px, lr);
+      min-width: 160px;
+      color: #4d4d4d;
+      font-size: 28px;
+      .flex(center, center, row);
+    }
+    &-box {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      .flex(center, center);
+      .padding(30px, lr);
+      &-left {
+        left: 0;
+      }
+      &-right {
+        right: 0
+      }
+    }
+    &-text {
+      color: #666666;
+      font-size: 30px;
+    }
+    &-icon {
+      width: 13px;
+      height: 24px;
+    }
+    &-wid {
+      .margin(11px, l);
+      height: 10px;
+      width: 18px;
+    }
+    &-rili {
+      width: 30px;
+      height: 29px;
+      .margin(12px, r);
+    }
+  }
+  &-list {
+    height: 100%;
+    &-pos {
+      position: absolute;
+      top: 100px;
+      bottom: 0;
+    }
+    &-item {
+      width: 100%;
+      .padding(40px, l);
+      .padding(30px, r);
+      .padding(32px, tb);
+      .flex(center, space-between, row);
+      border-bottom: 1px solid  #e3e3e3;
+    }
+    &-top {
+      border-radius: 20px 20px 0 0;
+    }
+    &-bottom {
+      border-radius: 0 0 20px 20px;
+      .margin(30px, b);
+    }
+    &-empty {
+      .padding(250px, b);
+    }
+  }
+
+  &-detail {
+    &-bg {
+      .background-image('//net.huanmusic.com/weapp/v1/bg_home.png');
+      width: 100%;
+      height: 260px;
+    }
+    &-container {
+      .margin(-220px, t);
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    &-status {
+      .flex(center, flex-start, row);
+      .padding(30px, b);
+      .margin(30px, l);
+      &-icon {
+        width: @order-status-icon;
+        height: @order-status-icon;
+        .margin(30px, r);
+      }
+      &-purchase {
+        width: 92px;
+        height: 92px;
+        .margin(20px, r);
+      }
+      &-copy {
+        width: 22px;
+        height: 23px;
+        .margin(11px, l);
+      }
+      &-detail {
+        display: flex;
+        flex-direction: column;
+        color: #ffffff;
+        &-box {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+        }
+      }
+      &-result {
+        font-size: 34px;
+      }
+      &-time {
+        font-size: 26px;
+      }
+    }
+    &-cards {
+      .margin(30px, l);
+      width: 690px;
+    }
+  }
+  &-modal-h5 {
+    display: flex;
+    background-color: #f6f6f6;
+    height: 80vh;
+    border-top: 1px solid #f9f9f9;
+    &-layout{
+      .at-float-layout__container {
+        height: 484px;
+      }
+    }
+    &-list {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      overflow-y: scroll;
+      background-color: #fff;
+
+      &-item {
+        height: 94px;
+        line-height: 94px;
+        width: 100%;
+        display: block;
+        align-items: center;
+        border-bottom: 1px solid #f9f9f9;
+        font-size: 26px;
+        font-size: #333333;
+        padding: 0 30px;
+      }
+
+      &-select {
+        font-size: #333333;
+        color: #2A86FC;
+      }
+    }
+
+    &-menu {
+      width: 40% !important;
+      height: 100%;
+    }
+  }
+  &-modal {
+    display: flex;
+    background-color: #f6f6f6;
+    height: 600px;
+    border-top: 1px solid #f9f9f9;
+    
+    &-list {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      background-color: #fff;
+
+      &-item {
+        height: 94px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid #f9f9f9;
+        font-size: 26px;
+        font-size: #333333;
+        padding: 0 30px;
+      }
+
+      &-select {
+        font-size: #333333;
+        color: #2A86FC;
+      }
+    }
+
+    &-menu {
+      width: 220px !important;
+    }
+  }
+}
+
+.layout-header__title {
+  text-align: center !important;
+  padding-right: 0px !important;
+}

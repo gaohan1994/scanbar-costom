@@ -1,0 +1,64 @@
+import Taro from '@tarojs/taro';
+import { ScrollView, View } from '@tarojs/components';
+import "../../pages/style/product.less";
+import "../../pages/style/order.less";
+import { ProductInterface, OrderInterface } from '../../constants';
+import classnames from 'classnames';
+
+const cssPrefix = 'product';
+
+type Props = { 
+  className?: string;
+  currentMenu: ProductInterface.ProductType | OrderInterface.DateItem;
+  menu: ProductInterface.ProductType[] | OrderInterface.DateItem[];
+  onClick: ((menu: ProductInterface.ProductType) => void) | ((menu: any) => void);
+  onTouchMove?: (e: any) => any;
+};
+
+class ProductMenu extends Taro.Component<Props> {
+  static options = {
+    addGlobalClass: true
+  };
+
+  static defaultProps = {
+    currentMenu: {},
+    menu: [],
+    onClick: undefined,
+  };
+
+  render () {
+    const { className, menu, currentMenu, onClick, onTouchMove } = this.props;
+    return (
+      <ScrollView 
+        scrollY={true}
+        className={classnames(`${cssPrefix}-list-left`, className)}
+        onTouchMove={onTouchMove}
+      > 
+        {this.props.children}
+        {
+          menu && menu.length > 0
+            ? menu.map((type) => {
+              return (
+                <View 
+                  key={type.id}
+                  className={classnames(`${cssPrefix}-list-left-item`, {
+                    [`${cssPrefix}-list-left-item-active`]:  type.id === currentMenu.id,
+                    [`${cssPrefix}-list-left-item-h5`]: process.env.TARO_ENV === 'h5' ? true: false
+                  })}
+                  onClick={() =>onClick(type)}
+                  
+                >
+                  {type.id === currentMenu.id && (
+                    <View className={`${cssPrefix}-list-left-item-active-bge`} />
+                  )}
+                  <View style={process.env.TARO_ENV === 'h5' ? {height: '2.13rem'} : {height: '100rpx', lineHeight: '100rpx'}}>{type.name}</View>
+                </View>
+              );
+            })
+            : <View />
+        }
+      </ScrollView>  
+    );
+  }
+}
+export default ProductMenu;
