@@ -10,7 +10,7 @@ import numeral from 'numeral';
 import { AppReducer } from '../../reducers';
 import { connect } from '@tarojs/redux';
 import { getOrderDetail, getAbleToUseCouponList, getPointConfig } from '../../reducers/app.order';
-import { OrderInterface, UserInterface } from '../../constants';
+import { OrderInterface, UserInterface, MerchantInterfaceMap } from '../../constants';
 import { getMemberInfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
 import { getPayOrderDetail } from '../../common/sdk/product/product.sdk.reducer';
@@ -258,7 +258,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
     return total;
   }
   private renderDisount = () => {
-    const { payOrderDetail, type, orderDetail, productCartList, memberInfo, pointConfig, activityList, isDetail, dispatch, DeliveryFee } = this.props;
+    const { payOrderDetail, type, orderDetail,OrderCompute, productCartList, memberInfo, pointConfig, activityList, isDetail, dispatch, DeliveryFee } = this.props;
     const { order, orderActivityInfoList } = orderDetail;
     const {pointSet} = this.state;
     const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
@@ -269,6 +269,8 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const pointPrice = DeliveryFee && payOrderDetail.deliveryType === 1 && numeral(price).value() > 0  ? numeral(price).value() - DeliveryFee : numeral(price).value();
     const PointsPre = numeral(numeral(memberInfo.points * pointConfig.deductRate < pointPrice ? memberInfo.points * pointConfig.deductRate : pointPrice).format('0.00')).value();
     const MathPointsPre = Math.ceil(PointsPre / pointConfig.deductRate);
+    let newPrice = OrderCompute && OrderCompute.orderComputeBO ? OrderCompute.orderComputeBO.transAmount : price;
+
     return (
       <View>
         {totalActivityMoney !== 0 && !isDetail && (
@@ -415,12 +417,31 @@ class ProductPayListView extends Taro.Component<Props, State> {
                             pointsTotalSell: MathPointsPre, 
                           }
                           productSdk.preparePayOrderPoints(points, dispatch);
+                          if( numeral(newPrice).value() - numeral(PointsPre).value() === 0){
+                            let payType = 7;
+                            dispatch({
+                              type: MerchantInterfaceMap.reducerInterface.SET_PAYTYPE,
+                              payload: {
+                                orderPayType: payType
+                              }
+                            })
+                          }
                         } else {
                           const points = {
                             pointsTotalSell: 0, 
                             pointsTotal: 0, 
                           }
                           productSdk.preparePayOrderPoints(points, dispatch);
+                          let payType = 8;
+                          if(process.env.TARO_ENV === 'h5'){
+                            payType = 2;
+                          }
+                          dispatch({
+                            type: MerchantInterfaceMap.reducerInterface.SET_PAYTYPE,
+                            payload: {
+                              orderPayType: payType
+                            }
+                          })
                         }
                     }}
                   >

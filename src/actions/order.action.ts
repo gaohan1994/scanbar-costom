@@ -5,10 +5,11 @@
  * @Last Modified by: centerm.gaozhiying
  * @Last Modified time: 2020-03-17 16:43:55
  */
-import { ResponseCode, OrderService, OrderInterface, OrderInterfaceMap } from '../constants/index';
+import { ResponseCode, OrderService, OrderInterface, OrderInterfaceMap, MerchantInterfaceMap } from '../constants/index';
 // import { store } from '../app';
 import { OrderReducer } from '../reducers/app.order';
 import Taro from '@tarojs/taro';
+import merchant from '../reducers/app.user';
 
 class OrderAction {
   
@@ -27,6 +28,26 @@ class OrderAction {
         }
       };
       dispatch(reducer);
+      if (result.data.orderComputeBO.transAmount === 0) {
+        let payType = 7;
+        dispatch({
+          type: MerchantInterfaceMap.reducerInterface.SET_PAYTYPE,
+          payload: {
+            orderPayType: payType
+          }
+        })
+      } else {
+        let payType = 8;
+        if(process.env.TARO_ENV === 'h5'){
+          payType = 2;
+        }
+        dispatch({
+          type: MerchantInterfaceMap.reducerInterface.SET_PAYTYPE,
+          payload: {
+            orderPayType: payType
+          }
+        })
+      }
     } else {
       Taro.showToast({
         title: result.msg,
@@ -464,6 +485,12 @@ class OrderAction {
       return {
         title: "已完成",
         detail: "订单已完成，感谢您的信任"
+      };
+    }
+     else if (order.transFlag === 4) {
+      return {
+        title: "交易取消",
+        detail: "您已取消交易"
       };
     }
     // if (time && time === -1) {

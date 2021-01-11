@@ -223,7 +223,7 @@ class OrderItem extends Taro.Component<Props, State> {
     const { order, orderDetailList } = data;
     let res: any = {};
     if(data.order){
-      res = OrderAction.orderStatus(orderAllStatus, data);
+      res = OrderAction.orderStatus(orderAllStatus, data) || {};
     }
    
     let products: any[] = [];
@@ -233,7 +233,6 @@ class OrderItem extends Taro.Component<Props, State> {
     } else if (orderDetailList) {
       products = orderDetailList
     }
-
     return (
       <View className={`${cssPrefix}-card`}>
         <View

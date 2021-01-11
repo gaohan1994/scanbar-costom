@@ -1,0 +1,255 @@
+@import "../../styles/theme.less";
+
+@cart-prefix: cart;
+@cart-height: 128px;        // 购物车背景图高度
+@cart-button-font: 36px;    // 结算按钮字体大小
+@cart-button-width: 190px;  // 结算按钮大小
+@cart-icon-size: 136px;     // 购物车icon大小
+@product-border-color: #f9f9f9;
+@product-name-color: #4f4f4f;
+@product-price-font: 32px;
+@product-price-color: #FC4E44;
+@cart-list-header-font-color: #808080; // 购物车列表头部字体颜色
+@product-normal-color: #cccccc;
+@cart-scan-size: 162px;
+
+.@{cart-prefix} {
+  position: fixed;
+  bottom: 0;
+  z-index: 999;
+  &-bg {
+    position: relative;
+    .padding(@cart-button-width + 40px, r);
+    width: 750px;
+    height: @cart-height;
+    .background-image('//net.huanmusic.com/weapp/bmg_bottom_close.png');
+    &-suspension {
+      .padding(414px, r);
+    }
+  }
+  &-scan {
+    position: absolute;
+    bottom: 60px;
+    width: @cart-scan-size;
+    height: @cart-scan-size;
+    left: (750px - @cart-scan-size) / 2;
+    &-image {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  &-right {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: @cart-button-width;
+    height: 100%;
+    .flex(center, center, column);
+    color: #ffffff;
+    font-size: @cart-button-font;
+    &-suspension {
+      width: 414px;
+      flex-direction: row;
+      &-text {
+        font-size: 36px;
+        font-weight: bold;
+      }
+      &-icon {
+        width: 36px;
+        height: 36px;
+        .margin(13px, r);
+      }
+      &-disabled {
+        .background-image('//net.huanmusic.com/weapp/bt_put_bottom_close_und.png');
+        color: #7C7C7C;
+      }
+      &-active {
+        .background-image('//net.huanmusic.com/weapp/bt_put_bottom_close_pitch.png');
+      }
+    }
+    &-disabled {
+      .background-image('//net.huanmusic.com/weapp/bt_bottom_close_unselected.png');
+      color: #666666;
+    }
+    &-active {
+      .background-image('//net.huanmusic.com/weapp/bt_bottom_close_pitch.png');
+    }
+  }
+  &-suspension {
+    &-left {
+      .flex(center, space-between, row);
+      .padding(60px, lr);
+      height: 100%;
+      &-item {
+        .flex(center, center, column);
+        flex: 1;
+        &-text {
+          font-size: 26px;
+          color: #ffffff;
+          .margin(5px, t);
+        }
+        &-empty {
+          width: 39px;
+          height: 36px;
+        }
+        &-delete {
+          width: 32px;
+          height: 35px;
+        }
+      }
+    }
+  }
+  &-left {
+    .flex(center, space-between);
+    height: 100%;
+    .padding(170px, l);
+    &-purchase {
+      .padding(60px, l);
+      .padding(15px, t);
+      &-box {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+      }
+      &-text {
+        color: #8C8C8C;
+        font-size: 30px;
+      }
+      &-price {
+        font-size: 40px;
+        color: #8C8C8C;
+        font-weight: bold;
+      }
+      &-active {
+        color: #ffffff;
+      }
+    }
+    &-price {
+      font-size: 40px;
+      font-weight: bold;
+      .margin(20px, r);
+      &-active {
+        color: #ffffff;
+        position: relative;
+        z-index: 100;
+      }
+      &-disabled {
+        color: #8B8B8B;
+      }
+    }
+    &-suspension {
+      .padding(14px, tb);
+      .padding(45px, lr);
+      border-radius: 20px;
+      &-active {
+        border: 1px solid #A0A0A0;
+        color: #A0A0A0;
+        font-size: 26px;
+      }
+      &-disabled {
+        border: 1px solid #696969;
+        color: #666666;
+        font-size: 26px;
+      }
+    }
+    &-image {
+      width: 18px;
+      height: 10px;
+      .margin(18px, l);
+      &-down {
+        transform: rotate(180deg);
+      }
+    }
+  }
+  &-icon {
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+    &-image {
+      width: @cart-icon-size;
+      height: @cart-icon-size;
+    }
+  }
+  &-list {
+    &-header {
+      .padding(22px, tb);
+      .padding(38px, lr);
+      background-color: #f8f8f8;
+      .flex(center, space-between, row);
+      color: @cart-list-header-font-color;
+      font-size: 26px;
+      &-empty {
+        .flex(center, center, row);
+        &-icon {
+          width: 25px;
+          height: 25px;
+          .margin(10px, r);
+        }
+      }
+    }
+  }
+
+  &-product {
+    .padding(35px);
+    display: flex;
+    flex-direction: row;
+    &-border {
+      border-bottom: 1px solid @product-border-color;
+    }
+    &-delete {
+      .padding(10px, l);
+      .padding(23px, r);
+      &-img {
+        width: 18px;
+        height: 18px;
+      }
+    }
+    &-container {
+      flex: 1;
+      .flex(center, space-between, row);
+      &-name {
+        width: 300px;
+        height: 27px;
+        line-height: 27px;
+        overflow: hidden;
+        font-size: @normal-text-fontsize;
+        color: @product-name-color;
+      }
+      &-price {
+        font-size: @product-price-font;
+        color: @product-price-color;
+      }
+      &-normal {
+        font-size: @normal-text-fontsize;
+        color: @product-normal-color;
+      }
+    }
+    &-stepper {
+      .flex(center, center, row);
+      &-purchase {
+        font-size: 30px;
+        color: @theme-color;
+      }
+    }
+  }
+
+  &-buttons {
+    &-button {
+      color: #ffffff;
+      font-size: 32px;
+      .flex(center, center, row);
+      height: 66px;
+      border-radius: 33px;
+      width: 100%;
+    }
+    &-two {
+      width: 320px;
+    }
+    &-confirm {
+      background-color: @theme-color;
+    }
+    &-cancel {
+      background-color: #999999;
+    }
+  }
+}

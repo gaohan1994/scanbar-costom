@@ -250,7 +250,9 @@ class OrderInterfaceMap implements OrderInterface.OrderInterfaceMapImp {
   }
 
   public orderClose = (params: OrderInterface.OrderDetailFetchField) => {
-    return `/order/closeOrder/${params.orderNo}`;
+    // return `/api/cashier/confirm`;
+    return `/api/order/cancel/${params.orderNo}`
+    // return `/order/closeOrder/${params.orderNo}`;
   }
 
   public orderAllStatus = () => {

@@ -33,6 +33,13 @@ class OrderService {
   }
 
   public orderClose = async (params: OrderInterface.OrderDetailFetchField): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    // const orderParam = {
+    //   payType: process.env.TARO_ENV === 'weapp' ? 8 : 2,
+    //   thirdPartFlag: 0,
+    //   transFlag: 4,
+    //   isCombined: false,
+    //   orderNo: params.orderNo
+    // };
     return requestHttp.post(OrderInterfaceMap.orderClose(params), params);
   }
 

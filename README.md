@@ -5,6 +5,7 @@
 
 ### 项目安装和启动
 git地址：https://github.com/gaohan1994/scanbar-costom.git
+svn: svn://192.168.48.142/cloudsys/Products/JinXiaoCun/src/web/C-Applets/trunk
 
 安装： yarn 或者 npm install
 

@@ -43,7 +43,7 @@ class ChangeDetails extends Taro.Component<Props, State> {
     const param = {
       pageNum: this.state.pageNum,
       pageSize: this.state.pageSize,
-      orderByColumn: 'change_time desc',
+      // orderByColumn: 'change_time desc',
     }
     UserAction.getMemberInfo(this.props.dispatch);
     UserAction.getBalanceChange(dispatch, param)
@@ -53,7 +53,7 @@ class ChangeDetails extends Taro.Component<Props, State> {
     const params = {
       pageSize: this.state.pageSize,
       pageNum: this.state.pageNum + 1,
-      orderByColumn: 'change_time desc',
+      // orderByColumn: 'change_time desc',
     }
     Taro.showLoading();
     UserAction.getBalanceChangeMore(dispatch, params)
@@ -92,23 +92,29 @@ class ChangeDetails extends Taro.Component<Props, State> {
           <ScrollView
             scrollY={true}
             className={`${BlockchainBdPrefix}-scrollview`}
-            style={process.env.TARO_ENV === 'weapp' ? {display:'flex'} : {}}
+            style={process.env.TARO_ENV === 'weapp' ? {display:'flex', height: '100%'} : {}}
             onScrollToLower={rows.length < total ? this.loadData: () => {/** */}}
           >
             {
                 rows.map((val, index) => {
                     return (
                        <View className={`${BlockchainBdPrefix}-content-title`}>
-                            <Image className={`${BlockchainBdPrefix}-content-title-icon`} src={val.transType === 3 ?  '//net.huanmusic.com/weapp/icon_dot_blue.png' : '//net.huanmusic.com/weapp/icon_dot_red.png'}/>
+                            <Image className={`${BlockchainBdPrefix}-content-title-icon`} src={val.storeType === 0 || val.storeType === 2 ?  '//net.huanmusic.com/weapp/icon_dot_blue.png' : '//net.huanmusic.com/weapp/icon_dot_red.png'}/>
                             <View className={`${BlockchainBdPrefix}-content-title-message`} style={index === rows.length - 1 ? {border: 'none'} : {}}>
-                                <Image className={`${BlockchainBdPrefix}-content-title-message-img`} src={val.transType !== 3  ? '//net.huanmusic.com/weapp/icon_details_pay.png' : '//net.huanmusic.com/weapp/icon_details_income.png'}/>
-                                <View className={val.transType === 3 ? `${BlockchainBdPrefix}-content-title-message-money` : `${BlockchainBdPrefix}-content-title-message-money ${BlockchainBdPrefix}-content-title-message-money-red`}>{`${val.transAmount}`.indexOf('-') === -1 ? `+${val.transAmount}` : val.transAmount}</View>
+                                <Image className={`${BlockchainBdPrefix}-content-title-message-img`} src={val.storeType === 0 || val.storeType === 2 ? '//net.huanmusic.com/weapp/icon_details_income.png' : '//net.huanmusic.com/weapp/icon_details_pay.png'}/>
+                                <View className={val.storeType === 0 || val.storeType === 2 ? 
+                                  `${BlockchainBdPrefix}-content-title-message-money` : 
+                                  `${BlockchainBdPrefix}-content-title-message-money ${BlockchainBdPrefix}-content-title-message-money-red`}>
+                                    {val.storeType === 0 ? `+${val.storeAmount}` : ''}
+                      {val.storeType === 1 ? val.faceAmount : ''}
+                      {val.storeType === 2 ? `+${val.faceAmount}` : ''}</View>
                                 <View className={`${BlockchainBdPrefix}-content-title-message-time`}>{val.changeTime}</View>
                             </View>
                        </View> 
                     );
                 })
             }
+            
           </ScrollView>
         </View>
        </View>

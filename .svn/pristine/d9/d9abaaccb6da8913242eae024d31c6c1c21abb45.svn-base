@@ -1,0 +1,59 @@
+@import "../../styles/theme.less";
+
+@loginModal: login-modal;
+
+.@{loginModal} {
+
+  &-modal {
+    justify-self: center;
+    align-self: center;
+  }
+  &-modal-h5 {
+    justify-self: center;
+    align-self: center;
+    & > div {
+      & > div {
+        min-height: 0px;
+        padding: 32px 24px;
+      }
+    }
+  }
+  &-content {
+    .flex(center, center, column);
+    height: 80px;
+    min-height: 0px;
+    font-size: 30px;
+    color: #666666;
+  }
+  &-content-h5 {
+    .flex(center, center, column);
+    height: 100px;
+    font-size: 30px;
+    color: #666666;
+    background-color: #fff
+  }
+  &-buttons {
+    .flex(center, center, row);
+  }
+  &-buttons-h5 {
+    .flex(center, center, row);
+    background-color: #fff
+  }
+
+  &-button {
+    width: 230px;
+    height: 66px;
+    border-radius: 33px;
+    font-size: 30px;
+    line-height: 30px;
+    margin-bottom: 39px;
+    background-color: #999999;
+    color: #fff;
+    .flex(center, center, row);
+    border-color: transparent;
+  }
+
+  &-blue {
+    background-color: #2A86FC;
+  }
+}

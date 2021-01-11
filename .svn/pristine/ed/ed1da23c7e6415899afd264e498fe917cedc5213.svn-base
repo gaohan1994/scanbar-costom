@@ -1,0 +1,409 @@
+/**
+ * @Author: Ghan 
+ * @Date: 2019-10-30 11:33:11 
+ * @Last Modified by: centerm.gaozhiying
+ * @Last Modified time: 2020-03-01 17:43:00
+ */
+
+// 主色调
+@theme-color: #2a86fc;
+@theme-false-color: #CCCCCC;
+// placeholer-text-color: placeholer颜色
+@placeholer-text-color: #cccccc;
+// base-font-color: 字体颜色
+@base-font-color: #666666;
+// 标题字体大小
+@title-text-fontsize: 36px;
+// 标题字体颜色
+@title-text-color: @base-font-color;
+// 普通文字字体大小
+@normal-text-fontsize: 26px;
+// 普通文字字体颜色
+@normal-text-color: @base-font-color;
+// 小文本文字字体大小
+@small-text-fontsize: 24px;
+// 小文本文字字体颜色
+@small-text-color: @base-font-color;
+// primary-button-size: 按钮大小 
+@primary-button-size: 80px;
+.taro_chooselocation {
+  z-index: 999;
+}
+
+.title-text (@color: @title-text-color) {
+  font-size: @title-text-fontsize;
+  color: @color;
+  font-weight: bold;
+}
+
+.title-text {
+  font-size: @title-text-fontsize;
+  color: @title-text-color;
+  font-weight: bold;
+}
+
+.normal-text {
+  font-size: @normal-text-fontsize;
+  color: @normal-text-color;
+}
+
+.small-text {
+  font-size: @small-text-fontsize;
+  color: @small-text-color;
+}
+
+.bg {
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center center;
+}
+
+.clamp (@line: 1) {
+  display: -webkit-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-clamp: @line;
+  -webkit-line-clamp: @line;
+  -webkit-box-orient: vertical;
+}
+
+.act-item (@color) {
+  .padding(3px, tb);
+  .padding(10px, lr);
+  .flex(center, center);
+  height:30px;
+  // border:1px solid @color;
+  border-radius:10px;
+  color: @color;
+  font-size:24px;
+  line-height: 24px;
+}
+
+.act-item-bg (@color, @bgcolor) {
+  .act-item(@color);
+  background-color: @bgcolor;
+}
+
+.border1px {
+  content: '';
+  position: absolute;
+  transform-origin: center;
+  box-sizing: border-box;
+  pointer-events: none;
+  
+  top: auto;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  transform: scaleY(0.5);
+  border-bottom: 3px solid #e3e3e3;
+}
+
+.container {
+  width: 100%;
+  height: 100%; 
+  &-colorB {
+    background: #fff;
+  }
+  &-color {
+    background-color: #f2f2f2;
+  }
+  &-border::after {
+    content: '';
+    position: absolute;
+    transform-origin: center;
+    box-sizing: border-box;
+    pointer-events: none;
+    
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transform: scaleY(0.5);
+    border-bottom: 1px solid #e3e3e3;
+  }
+}
+
+.flex (@alignItems: flex-start, @justifyContent: flex-start, @flexDirection: row) {
+  display: flex;
+  align-items: @alignItems;
+  justify-content: @justifyContent;
+  flex-direction: @flexDirection;
+} 
+
+.background-image (@imageUrl) {
+  background-image: ~"url(@{imageUrl})";
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+}
+
+.margin(@value: 1px, @position: all) when (@position = all) {
+  margin-top: @value;
+  margin-right: @value;
+  margin-bottom: @value;
+  margin-left: @value;
+}
+
+.margin(@value: 1px, @position: all) when (@position = t) {
+  margin-top: @value;
+}
+
+.margin(@value: 1px, @position: all) when (@position = r) {
+  margin-right: @value;
+}
+
+.margin(@value: 1px, @position: all) when (@position = b) {
+  margin-bottom: @value;
+}
+
+.margin(@value: 1px, @position: all) when (@position = l) {
+  margin-left: @value;
+}
+
+.margin(@value: 1px, @position: all) when (@position = tb) {
+  margin-top: @value;
+  margin-bottom: @value;
+}
+
+.margin(@value: 1px, @position: all) when (@position = lr) {
+  margin-left: @value;
+  margin-right: @value;
+}
+
+
+.padding(@value: 1px, @position: all) when (@position = all) {
+  padding-top: @value;
+  padding-right: @value;
+  padding-bottom: @value;
+  padding-left: @value;
+}
+
+.padding(@value: 1px, @position: all) when (@position = t) {
+  padding-top: @value;
+}
+
+.padding(@value: 1px, @position: all) when (@position = r) {
+  padding-right: @value;
+}
+
+.padding(@value: 1px, @position: all) when (@position = b) {
+  padding-bottom: @value;
+}
+
+.padding(@value: 1px, @position: all) when (@position = l) {
+  padding-left: @value;
+}
+
+.padding(@value: 1px, @position: all) when (@position = tb) {
+  padding-top: @value;
+  padding-bottom: @value;
+}
+
+.padding(@value: 1px, @position: all) when (@position = lr) {
+  padding-left: @value;
+  padding-right: @value;
+}
+
+.config-button(
+  @background-color: @theme-color, 
+  @height: @primary-button-size, 
+  @border-radius: @primary-button-size / 2, 
+  @font-size: @title-text-fontsize,
+  @font-color: #ffffff
+) {
+  background-color: @background-color !important;
+  border-color: @background-color !important;
+  height: @height !important;
+  line-height: @height !important;
+  border-radius: @border-radius !important;
+  font-size: @font-size !important;
+  color: @font-color !important;
+}
+
+.config-button-text (@height, @font-size, @color) {
+  .flex(center, center, row) !important;
+  height: @height !important;
+  font-size: @font-size !important;
+  color: @color !important;
+}
+
+.theme-button {
+  .config-button(@theme-color, @primary-button-size, @primary-button-size / 2,  32px);
+  &-text {
+    .config-button-text(@primary-button-size, 32px, #ffffff);
+  }
+}
+
+.theme-button-cancel {
+  .config-button(#999999, @primary-button-size, @primary-button-size / 2,  32px);
+  &-text {
+    .config-button-text(@primary-button-size, 32px, #ffffff);
+  }
+}
+
+.theme-input-placeholder {
+  font-size: @normal-text-fontsize;
+  color: #cccccc;
+}
+
+.theme-card {
+  border-radius: 10px;
+  background-color: #ffffff;
+}
+
+.theme-shadow {
+  // box-shadow: 0px 1px 20px #e6f3fd;
+}
+
+/**
+ * @Author: Ghan 
+ * @Date: 2019-10-30 11:33:11 
+ * @Last Modified by: Ghan
+ * 通用css配置
+ */
+.fixed-header () {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.fixed-container (@top) {
+  position: fixed;
+  top: @top;
+  width: 100%;
+}
+
+/**
+ * @Author: Ghan 
+ * @Date: 2019-10-30 11:33:11 
+ * @Last Modified by: Ghan
+ * Modal 部分配置
+ */
+@modal-button-height: 66px;                 // modal 按钮高度
+
+.component-modal-cancel-button {
+  .config-button(#999999, @modal-button-height, @modal-button-height / 2,  30px);
+  .padding(86px, lr) !important;
+}
+
+.component-modal-confirm-button {
+  .config-button(@theme-color, @modal-button-height, @modal-button-height / 2,  30px);
+  .padding(86px, lr) !important;
+}
+
+/**
+ * @Author: Ghan 
+ * @Date: 2019-10-30 11:33:11 
+ * @Last Modified by: Ghan
+ * ListRow 部分配置 
+ */
+@list-row-button-height: 44px;
+@list-row-prefix: component-list-row;
+
+.@{list-row-prefix} {
+  &-extra {
+    display: flex;
+    flex-direction: row;
+  }
+  &-button {
+    .margin(15px, l) !important;
+    min-width: 120px !important;
+  }
+  &-cancel-button {
+    .config-button(#D4D8DB, @list-row-button-height, @list-row-button-height / 2,  32px);
+    .padding(20px, lr) !important;
+    &-text {
+      .config-button-text(@list-row-button-height, 32px,#ffffff);
+    }
+  }
+  &-confirm-button {
+    .config-button(@theme-color, @list-row-button-height, @list-row-button-height / 2,  32px);
+    .padding(20px, lr) !important;
+    &-text {
+      .config-button-text(@list-row-button-height, 32px,#ffffff);
+    }
+  }
+  &-input {
+    .padding(0px, tb) !important;
+    font-size: 30px !important;
+    &-placeholder {
+      font-size: 30px !important;
+      color: #cccccc !important;
+    }
+  }
+}
+
+@select-cancel-color: #F8F8FA;
+@select-button-size: 66px;
+@select-button-radius: 20px;
+@select-button-font-size: 32px;
+@select-reset-color: #999999;
+@select-prefix: product-manage-select-modal;
+
+.@{select-prefix} {
+  &-button {
+    .margin(15px, r) !important;
+    .margin(25px, t) !important;
+    &-cancel {
+      .config-button(
+        @select-cancel-color, 
+        @select-button-size, 
+        @select-button-radius,
+        @select-button-font-size,
+        #999999,
+      ); 
+      &-text {
+        .config-button-text(@select-button-size, @select-button-font-size, #999999);
+      }
+    }
+    &-confirm {
+      .config-button(
+        @theme-color, 
+        @select-button-size, 
+        @select-button-radius,
+        @select-button-font-size,
+        #ffffff,
+      ); 
+      &-text {
+        .config-button-text(@select-button-size, @select-button-font-size, #ffffff);
+      }
+    }
+    &-reset {
+      .config-button(
+        @select-reset-color,
+        @select-button-size, 
+        @select-button-size / 2,
+        @select-button-font-size,
+        #ffffff,
+      ); 
+      .padding(86px, lr) !important;
+      &-text {
+        .config-button-text(@select-button-size, @select-button-font-size, #ffffff);
+      }
+    }
+    &-submit {
+      .config-button(
+        @theme-color, 
+        @select-button-size, 
+        @select-button-size / 2,
+        @select-button-font-size,
+        #ffffff,
+      ); 
+      .padding(86px, lr) !important;
+      &-text {
+        .config-button-text(@select-button-size, @select-button-font-size, #ffffff);
+      }
+    }
+  }
+}
+
+/**
+ * @Author: Ghan 
+ * @Date: 2019-10-30 11:33:11 
+ * @Last Modified by: Ghan
+ * pay 部分配置 支付
+ */
+.theme-pay-button {
+  .config-button(#ffffff, @primary-button-size, @primary-button-size / 2, 30px, @theme-color);
+}

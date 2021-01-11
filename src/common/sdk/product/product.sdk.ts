@@ -622,10 +622,10 @@ class ProductSDK {
     public requestPayment = async (orderNo: string, payType: any, fail?: (res: any) => void) => {
         let payload = {
             orderNo,
-            payType: payType
+            payType: payType === 7 ? payType: (process.env.TARO_ENV === 'h5' ? 2 : 8 ) ,
         };
         const result = await requestHttp.post(`/api/cashier/pay`, payload);
-        if (result.code === ResponseCode.success && payType !== 7 && result.data.param) {
+        if (result.code === ResponseCode.success && payType !== 7) {
             return new Promise(async (resolve) => {
                 // const payload = JSON.parse(result.data.param);
                 //     delete payload.appId;
@@ -643,6 +643,7 @@ class ProductSDK {
                 if(process.env.TARO_ENV === 'h5'){
                 
                     const data = result.data;
+                    
                     const url = data.codeUrl.replace('-app', '-customer')
                     window.location.href = url;
                 } else {
@@ -654,6 +655,8 @@ class ProductSDK {
                             resolve(res)
                         },
                         fail: (error) => {
+                            console.log('不支付');
+                            
                             resolve(error)
                         }
                     };
