@@ -310,7 +310,7 @@ class ProductSDK {
         if (!!rule && rule.length > 0) {
             const discountArray: any = []
             rule.forEach((item) => {
-                if(item.threshold < price) {
+                if(item.threshold <= price) {
                     discountArray.push(item.discount);
                 }
             });
@@ -319,7 +319,7 @@ class ProductSDK {
             const maxDiscountIndex = rule.findIndex((r) => r.discount === maxDiscount);
             const maxDiscountItem = rule.find((r) => r.discount === maxDiscount);
             while (discountArray.length > 0) {
-                if (maxDiscountItem && price > maxDiscountItem.threshold) {
+                if (maxDiscountItem && price >= maxDiscountItem.threshold) {
                     return maxDiscountItem;
                 } else {
                     discountArray.splice(maxDiscountIndex, 1);
