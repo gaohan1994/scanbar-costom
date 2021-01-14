@@ -117,20 +117,20 @@ class Page extends Taro.Component<Props, State> {
     if(activity.rule){
       const list: any = [];
       let maxThreshold = activity.rule[0].threshold;
-      let nowThreshold = activity.rule[0].threshold;
+      let nowThreshold = activity.rule[0].discount;
       activity.rule.forEach(element => {
         if(subTotalPrice < element.threshold){
           list.push(element.threshold);
 
-          if(nowThreshold > element.threshold){
-            nowThreshold  = element.threshold;
+          if(nowThreshold < element.discount){
+            nowThreshold  = element.discount;
           }
           if(maxThreshold < element.threshold){
             maxThreshold  = element.threshold;
           }
         } else {
-          if(nowThreshold < element.threshold){
-            nowThreshold  = element.threshold;
+          if(nowThreshold < element.discount){
+            nowThreshold  = element.discount;
           }
           if(maxThreshold < element.threshold){
             maxThreshold  = element.threshold;
@@ -147,7 +147,7 @@ class Page extends Taro.Component<Props, State> {
 
       const Item = activity.rule.find((r) => r.threshold === price);
       const maxDiscountItem = activity.rule.find((r) => r.threshold === maxThreshold);
-      const NowDiscountItem = activity.rule.find((r) => r.threshold === nowThreshold);
+      const NowDiscountItem = activity.rule.find((r) => r.discount === nowThreshold);
       if(Item){
         return {rule: Item, ruleNow: NowDiscountItem};
       }
