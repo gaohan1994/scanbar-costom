@@ -191,25 +191,26 @@ class Page extends Taro.Component<Props, State> {
                     setTimeout(function(){
                         productSdk.cashierOrderCallback(dispatch, result.data, orderPayType);
                     
-                        if(process.env.TARO_ENV === 'h5') {
-                            Taro.redirectTo({
-                                url: `/pages/order/order.detail?id=${result.data.order.orderNo || result.data.orderNo}`
-                            });
-                        } else {
-                            Taro.navigateTo({
-                                url: '/pages/orderList/order'
-                            }).catch((error) => {
-                                /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
-                                const {order} = result.data;
-                                Taro.redirectTo({
-                                    url: `/pages/order/order.detail?id=${order.orderNo}`
-                                });
-                                // Taro.switchTab({url: '/pages/orderList/order'})
-                            })
+                        // if(process.env.TARO_ENV === 'h5') {
+                        //     Taro.redirectTo({
+                        //         url: `/pages/order/order.detail?id=${result.data.order.orderNo || result.data.orderNo}`
+                        //     });
+                        // } else {
+                        //     Taro.navigateTo({
+                        //         url: '/pages/orderList/order'
+                        //     }).catch((error) => {
+                        //         /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
+                        //         const {order} = result.data;
+                        //         Taro.redirectTo({
+                        //             url: `/pages/order/order.detail?id=${order.orderNo}`
+                        //         });
+                        //         // Taro.switchTab({url: '/pages/orderList/order'})
+                        //     })
                             
                             
-                        }
+                        // }
                         
+                
                         this.setState({
                             isOnClick: true
                         })
@@ -260,6 +261,7 @@ class Page extends Taro.Component<Props, State> {
                                 icon: 'success',
                                 duration: 2000
                             })
+                            
                         }
                         callB();
                     }
@@ -267,10 +269,13 @@ class Page extends Taro.Component<Props, State> {
                 } else {
                    
                     productSdk.cashierOrderCallbackOnly(this.props.dispatch, result.data, orderPayType)
-                        const {order} = result.data;
-                        Taro.redirectTo({
-                            url: `/pages/order/order.detail?id=${order.orderNo}`
-                        });
+                        // const {order} = result.data;
+                        // Taro.redirectTo({
+                        //     url: `/pages/order/order.detail?id=${order.orderNo}`
+                        // });
+                        setTimeout(function(){
+                            Taro.switchTab({url: '/pages/orderList/order'})
+                        }, 1000);
                     productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, this.props.dispatch)
                     UserAction.getMemberInfo(this.props.dispatch);
                     this.setState({
@@ -471,27 +476,15 @@ class Page extends Taro.Component<Props, State> {
                     }}
                     // onRefProductPayListViewObj={onRefProductPayListViewObj}
                 />
-                {
-                    payOrderDetail.deliveryType === 0 ? (
-                        <ProductPayListView
-                            DeliveryFee={DeliveryFee}
-                            productList={payOrderProductList}
-                            payOrderDetail={payOrderDetail}
-                            productSDKObj={productSDKObj}
-                            OrderCompute={OrderCompute}
-                            // onRef={onRefProductPayListView}
-                        />
-                    ) : (
-                        <ProductPayListView
-                            DeliveryFee={DeliveryFee}
-                            payOrderDetail={payOrderDetail}
-                            productList={payOrderProductList}
-                            productSDKObj={productSDKObj}
-                            OrderCompute={OrderCompute}
-                            // onRef={onRefProductPayListView}
-                        />
-                    )
-                }
+                <ProductPayListView
+                    hasDeliveryFee={payOrderDetail.deliveryType === 1}
+                    DeliveryFee={DeliveryFee}
+                    productList={payOrderProductList}
+                    payOrderDetail={payOrderDetail}
+                    productSDKObj={productSDKObj}
+                    OrderCompute={OrderCompute}
+                    // onRef={onRefProductPayListView}
+                />
                 
                 <View className={`${cssPrefix}-remark`}>
                     <View className={`${cssPrefix}-remark-card`}>

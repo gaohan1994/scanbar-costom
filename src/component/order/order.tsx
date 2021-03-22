@@ -75,9 +75,12 @@ class OrderItem extends Taro.Component<Props, State> {
         Taro.showLoading();
         if(order.payType !== 7) await ProductService.cashierQueryStatus({orderNo: orderNo});
         Taro.hideLoading();
-        Taro.redirectTo({
-          url: `/pages/order/order.detail?id=${orderNo}`,
-        })
+        setTimeout(function(){
+          Taro.switchTab({url: '/pages/orderList/order'})
+      }, 1000);
+        // Taro.redirectTo({
+        //   url: `/pages/order/order.detail?id=${orderNo}`,
+        // })
       }
       if(payment.data && payment.data.msg === '余额不足') {
         Taro.showModal({

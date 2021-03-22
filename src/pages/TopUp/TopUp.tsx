@@ -13,6 +13,7 @@ import img_jine from '../../assets/img_jine.png';
 import { Dispatch } from 'redux';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 import { BASE_PARAM } from '../../common/util/config';
+import requestHttp from '../../common/request/request.http';
 
 const BlockchainBdPrefix = 'jxc-h5-top';
 
@@ -70,9 +71,15 @@ class TopUp extends Taro.Component<Props, State> {
       "orderSource": process.env.TARO_ENV === 'weapp' ? 3 : 6,
       merchantId: currentMerchantDetail.id || BASE_PARAM.MCHID
     };
-    const result: any = await UserAction.cashierStore(param);
-    if (result.code === ResponseCode.success) {
-      return new Promise((resolve) => {
+    const resultStore: any = await UserAction.cashierStore(param);
+    if (resultStore.code === ResponseCode.success) {
+      const payload = {
+        orderNo: resultStore.data.orderNo,
+        payType: process.env.TARO_ENV === 'weapp' ? 8 : 2,
+      }
+      const result = await requestHttp.post(`/api/cashier/pay`, payload);
+      if (result.code === ResponseCode.success) {
+        return new Promise((resolve) => {
           if(process.env.TARO_ENV === 'h5'){
               const data = result.data;
               const url = data.codeUrl.replace('-app', '-customer')
@@ -98,7 +105,15 @@ class TopUp extends Taro.Component<Props, State> {
               };
               Taro.requestPayment(paymentPayload);
           }
-      })
+        })
+      } else {
+        Taro.showToast({
+          icon: 'none',
+          title: result.msg,
+          duration: 2000
+        })
+      }
+      
     }
     
   }

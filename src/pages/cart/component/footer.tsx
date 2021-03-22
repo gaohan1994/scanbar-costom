@@ -34,6 +34,7 @@ class Footer extends Taro.Component<Props> {
      * @todo [新增选择部分商品下单]
      */
     const { productCartList, beforeSubmit, productCartSelectedIndex, dispatch } = this.props;
+
     if (beforeSubmit) {
       const res = await beforeSubmit();
       if (res === false) {
@@ -44,6 +45,14 @@ class Footer extends Taro.Component<Props> {
     const selectProductList = productCartList.filter((product) => {
       return productCartSelectedIndex.some((id) => id === product.id);
     });
+    if(selectProductList.length === 0){
+      Taro.showToast({
+        title: '请选择商品',
+        icon: 'none',
+        duration: 2000
+      })
+      return false;
+    }
     productSdk.preparePayOrder(dispatch, productCartList, selectProductList);
     productSdk.preparePayOrderDetail({ selectedCoupon: {} }, dispatch);
     Taro.navigateTo({

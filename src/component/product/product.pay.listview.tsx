@@ -30,6 +30,7 @@ type Props = {
   padding?: boolean;
   type?: number;
   payOrderDetail: any;
+  hasDeliveryFee?: boolean;
   isDetail?: boolean;
   DeliveryFee: any;
   pointConfig: any
@@ -85,7 +86,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
   }
 
   render() {
-    const { productList, className, padding, payOrderDetail, type, orderDetail, showCallModal, DeliveryFee } = this.props;
+    const { productList, className, padding, payOrderDetail,hasDeliveryFee, type, orderDetail, showCallModal, DeliveryFee } = this.props;
     const { orderDetailList, order } = orderDetail;
     return (
       <View
@@ -126,8 +127,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
               })
           }
           {
-            ((payOrderDetail && payOrderDetail.deliveryType !== undefined && payOrderDetail.deliveryType === 1)
-              || (order && order.deliveryType !== undefined && order.deliveryType === 1)) && (
+            hasDeliveryFee === true && (
               <View className={`${cssPrefix}-row-totals`}>
                 <View className={`${cssPrefix}-row-content-item`}>
                   <Text className={`${cssPrefix}-row-voucher`}>配送费</Text>

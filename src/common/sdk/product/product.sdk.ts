@@ -912,11 +912,14 @@ class ProductSDK {
         Taro.hideLoading();
         this.empty(dispatch, result.orderDetailList as any);
         this.preparePayOrder(dispatch, [], [])
+        this.preparePayOrderDetail({remark: '', selectedCoupon: {}}, dispatch)
         this.preparePayOrderAddress({} as any, dispatch)
-        this.preparePayOrderDetail({} as any, dispatch)
-        Taro.redirectTo({
-            url: `/pages/order/order.detail?id=${order.orderNo || orderNo}`
-        });
+        setTimeout(function(){
+            Taro.switchTab({url: '/pages/orderList/order'})
+        }, 1000);
+        // Taro.redirectTo({
+        //     url: `/pages/order/order.detail?id=${order.orderNo || orderNo}`
+        // });
     }
 
     public storageProductCartList = () => {

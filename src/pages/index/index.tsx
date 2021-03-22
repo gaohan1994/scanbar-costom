@@ -59,7 +59,12 @@ class Index extends Component<any> {
     config: Config = {
         navigationBarTitleText: '首页'
     }
-
+    onShareAppMessage = () => {
+        return {
+            title: '21号生活馆',
+            path: `/pages/index/index`,
+        };
+    };
     async componentDidMount() {
         this.initDit();
     }
