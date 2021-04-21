@@ -211,7 +211,6 @@ class WeixinSDK {
       }
       const result = await this.getLocation(dispatch);
       invariant(!!result.success, result.msg || '获取位置失败, 请开启手机定位');
-      console.log(result, 'resultawait this.getLocation(dispatch) ');
       const payload = {
         address: result.result.address,
         latitude: result.result.location.lat,

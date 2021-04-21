@@ -28,7 +28,7 @@ class HeaderInput extends Taro.Component<Props> {
   };
 
   render () {
-    const { value, onInput, placeholder, isRenderInputRight, inputRightClick, className } = this.props;
+    const { value, onInput, onConfirm, placeholder, isRenderInputRight, inputRightClick, className } = this.props;
     return (
       <View className={`${cssPrefix}-header`}>
         <View className={classnames(`${memberPrefix}-main-header-search  ${process.env.TARO_ENV  === 'h5' ? `${memberPrefix}-main-header-search-h5` : ''}`, className)}>
@@ -38,6 +38,7 @@ class HeaderInput extends Taro.Component<Props> {
             placeholder={placeholder}
             value={value}
             onInput={onInput}
+            onConfirm={onConfirm}
             placeholderClass={`${memberPrefix}-main-header-search-input-holder`}
           />
           {isRenderInputRight && value !== '' && (

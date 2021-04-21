@@ -20,7 +20,7 @@
 import Taro from '@tarojs/taro';
 import {ProductInterface, ProductService, OrderInterface, ResponseCode, UserInterface, MerchantInterface} from '../../../constants';
 // import {store} from '../../../app';
-import {ProductSDKReducer} from './product.sdk.reducer';
+import { ProductSDKReducer, getProductCartList } from './product.sdk.reducer';
 import {BASE_PARAM} from '../../../common/util/config';
 import requestHttp from '../../../common/request/request.http';
 import merge from 'lodash.merge';
@@ -285,8 +285,8 @@ class ProductSDK {
             return prevTotal + (item.price * item.sellNum);
         };
         const total = productList.reduce(reduceCallback, 0);
-        return total;
-    }
+        
+        return Math.round(total * 100) / 100;    }
 
     /**
      * @todo 获取商品会员价格
@@ -392,7 +392,7 @@ class ProductSDK {
         }
         total -= this.getProductTotalActivityPrice(activityList, memberInfo,productCartList, productList);
         // total = this.getProductActivityPrice(total, this.checkActivity(total));
-
+        
         return Math.round(total * 100) / 100;
     }
 
@@ -523,7 +523,9 @@ class ProductSDK {
      *
      * ```ts
      * import productSdk from 'xxx';
-     *
+     *import { store } from '../../../../.temp/app';
+import store from '../../../store/middleware';
+
      * @memberof ProductSDK
      */
 
@@ -655,7 +657,6 @@ class ProductSDK {
                             resolve(res)
                         },
                         fail: (error) => {
-                            console.log('不支付');
                             
                             resolve(error)
                         }
@@ -833,7 +834,8 @@ class ProductSDK {
     public empty = (dispatch, sort?: string, products?: ProductInterface.ProductInfo[]) => {
         dispatch({
             type: this.reducerInterface.MANAGE_EMPTY_CART,
-            payload: {sort}
+            payload: {sort
+            }
         });
 
         dispatch({
@@ -844,7 +846,31 @@ class ProductSDK {
             }
         })
     }
+    /**
+     * @todo 清空购物车
+     *
+     * @memberof ProductSDK
+     */
+    public emptyOrder = (dispatch, productCartList, products: ProductInterface.ProductInfo[]) => {
+        let list = productCartList;
+        products.forEach(function(item) {
+            list = list.filter(val => val.id !== item.id);
+        })
+        dispatch({
+            type: this.reducerInterface.MANAGE_CART,
+            payload: {
+                productCartList: list
+            }
+        });
 
+        dispatch({
+            type: this.reducerInterface.SELECT_INDEX,
+            payload: {
+                type: 'list',
+                products: list,
+            }
+        })
+    }
     /**
      * @todo 购物车管理，判断操作类型是增加、删除或者清空，执行相应操作
      *
@@ -855,7 +881,17 @@ class ProductSDK {
         if (type === this.productCartManageType.EMPTY) {
             this.empty(dispatch);
         } else if (type === this.productCartManageType.ADD) {
-            this.add(dispatch, productSDK, product, num);
+            const list = productSDK.productCartList.filter(val => val.id === product.id);
+            if(productSDK.productCartList.length != BASE_PARAM.cartLimitNum || list.length !== 0){
+                this.add(dispatch, productSDK, product, num);
+            } else {
+                Taro.showToast({
+                    title: '购物车已满，请删除商品后再添加!',
+                    icon: 'none',
+                    duration: 2000
+                })
+            }
+           
         } else {
             this.reduce(dispatch, productSDK, product, num);
         }
@@ -894,8 +930,10 @@ class ProductSDK {
      * @todo [清空购物车]
      * @todo [清空下单信息]
      */
-    public cashierOrderCallbackOnly = async (dispatch, result: OrderInterface.OrderDetail, orderPayType: any) => {
-        this.empty(dispatch, result.orderDetailList as any);
+    public cashierOrderCallbackOnly = async (dispatch, result: OrderInterface.OrderDetail, orderPayType: any, productCartList, payOrderProductList) => {
+        
+       
+        this.emptyOrder(dispatch, productCartList, payOrderProductList);
         this.preparePayOrder(dispatch, [], [])
         this.preparePayOrderAddress({} as any, dispatch)
         this.preparePayOrderDetail({} as any, dispatch)
@@ -904,19 +942,21 @@ class ProductSDK {
      * @todo [清空购物车]
      * @todo [清空下单信息]
      */
-    public cashierOrderCallback = async (dispatch, result: OrderInterface.OrderDetail, orderPayType: any) => {
+    public cashierOrderCallback = async (dispatch, result: OrderInterface.OrderDetail, orderPayType: any, productCartList, payOrderProductList) => {
         const {order, orderNo} = result;
 
         Taro.showLoading();
         if(orderPayType !== 7) await ProductService.cashierQueryStatus({orderNo: order.orderNo || orderNo});
-        Taro.hideLoading();
-        this.empty(dispatch, result.orderDetailList as any);
+        
+        Taro.switchTab({url: '/pages/orderList/order'})
+        // setTimeout(function(){
+            
+        // }, 1000);
+        this.emptyOrder(dispatch, productCartList, payOrderProductList);
         this.preparePayOrder(dispatch, [], [])
         this.preparePayOrderDetail({remark: '', selectedCoupon: {}}, dispatch)
         this.preparePayOrderAddress({} as any, dispatch)
-        setTimeout(function(){
-            Taro.switchTab({url: '/pages/orderList/order'})
-        }, 1000);
+        Taro.hideLoading();
         // Taro.redirectTo({
         //     url: `/pages/order/order.detail?id=${order.orderNo || orderNo}`
         // });

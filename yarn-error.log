@@ -1,8 +1,8 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn add src/common/request/request.http --silent --no-progress
+  /usr/local/bin/node /usr/local/bin/yarn add xxx --silent --no-progress
 
 PATH: 
-  /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin
+  /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/chenshuilian/workspace/Jxc-sy-web/xiao-chen-xu/scanbar-costom/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/chenshuilian/workspace/Jxc-sy-web/xiao-chen-xu/scanbar-costom/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin
 
 Yarn version: 
   1.22.4
@@ -14,17 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.npm.taobao.org/src%2fcommon/request/request.http: [not_found] document not found
-      at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66987:18)
-      at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140748:22)
-      at Request.emit (events.js:315:20)
-      at Request.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141720:10)
-      at Request.emit (events.js:315:20)
-      at Gunzip.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141642:12)
-      at Object.onceWrapper (events.js:421:28)
-      at Gunzip.emit (events.js:327:22)
-      at endReadableNT (_stream_readable.js:1221:12)
-      at processTicksAndRejections (internal/process/task_queues.js:84:21)
+  Error: ENOENT: no such file or directory, lstat '/Users/chenshuilian/workspace/Jxc-sy-web/xiao-chen-xu/scanbar-costom/node_modules/@jest/types'
 
 npm manifest: 
   {
@@ -94,7 +84,8 @@ npm manifest:
       "redux-thunk": "^2.3.0",
       "taro-code": "^2.2.0",
       "taro-ui": "^2.2.4",
-      "webpack-bundle-analyzer": "^3.8.0"
+      "webpack-bundle-analyzer": "^3.8.0",
+      "xxx": "^0.0.1"
     },
     "devDependencies": {
       "@tarojs/plugin-babel": "1.3.17",
@@ -12063,6 +12054,11 @@ Lockfile:
     version "4.0.2"
     resolved "https://registry.npm.taobao.org/xtend/download/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
     integrity sha1-u3J3n1+kZRhrH0OPZ0+jR/2121Q=
+  
+  xxx@^0.0.1:
+    version "0.0.1"
+    resolved "https://registry.yarnpkg.com/xxx/-/xxx-0.0.1.tgz#9d8b8a55dbab7901e72c2174bacd13e82fbc1340"
+    integrity sha1-nYuKVdureQHnLCF0us0T6C+8E0A=
   
   y18n@^3.2.1:
     version "3.2.1"

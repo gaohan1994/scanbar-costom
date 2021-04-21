@@ -5,10 +5,9 @@ import Index from './pages/index'
 import "./styles/reset.less";
 import configStore from "./store";
 import "taro-ui/dist/style/index.scss"; // 引入组件样式 - 方式一
-import {BASE_PARAM} from './common/util/config';
+// import {BASE_PARAM} from './common/util/config';
 import getBaseUrl from './common/request/base.url';
-import { LoginManager } from "./common/sdk";
-
+// import { LoginManager, productSdk } from "./common/sdk";
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
 if (process.env.NODE_ENV !== "production" && process.env.TARO_ENV === "h5") {
@@ -169,6 +168,7 @@ class App extends Component {
         });
       }
     }
+   
   }
   async initWx () {
     const href = window.location.href;

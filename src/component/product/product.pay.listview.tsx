@@ -14,6 +14,8 @@ import { OrderInterface, UserInterface, MerchantInterfaceMap } from '../../const
 import { getMemberInfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
 import { getPayOrderDetail } from '../../common/sdk/product/product.sdk.reducer';
+import { BASE_PARAM } from '../../common/util/config';
+import order from 'src/constants/order/order';
 
 const cssPrefix = 'product';
 
@@ -59,6 +61,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
     payOrderDetail: {} as any,
   };
   componentWillMount = () => {
+    
     if(this.props.onRef){
       this.props.onRef(this)
     }
@@ -86,8 +89,9 @@ class ProductPayListView extends Taro.Component<Props, State> {
   }
 
   render() {
-    const { productList, className, padding, payOrderDetail,hasDeliveryFee, type, orderDetail, showCallModal, DeliveryFee } = this.props;
+    const { productList, className, padding, isDetail,payOrderDetail,hasDeliveryFee, type, orderDetail, showCallModal, DeliveryFee } = this.props;
     const { orderDetailList, order } = orderDetail;
+    
     return (
       <View
         className={classnames(className, {
@@ -127,7 +131,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
               })
           }
           {
-            hasDeliveryFee === true && (
+            hasDeliveryFee === true || isDetail && order.orderNo && order.deliveryFee ? (
               <View className={`${cssPrefix}-row-totals`}>
                 <View className={`${cssPrefix}-row-content-item`}>
                   <Text className={`${cssPrefix}-row-voucher`}>配送费</Text>
@@ -137,7 +141,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
                         `${cssPrefix}-row-content-price ${cssPrefix}-row-content-price-black`
                       }
                     >
-                      ￥{numeral(DeliveryFee).format('0.00')}
+                      ￥{numeral(isDetail && order.orderNo && order.deliveryFee || DeliveryFee).format('0.00')}
                     </Text>
                     {/* <Image
                       className={`${cssPrefix}-card-products-header-next`}
@@ -146,7 +150,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
                   </View>
                 </View>
               </View>
-            )
+            ) : null
           }
           {this.renderDisount()}
           {this.renderTotal()}
@@ -258,11 +262,11 @@ class ProductPayListView extends Taro.Component<Props, State> {
     return total;
   }
   private renderDisount = () => {
-    const { payOrderDetail, type, orderDetail,OrderCompute, productCartList, memberInfo, pointConfig, activityList, isDetail, dispatch, DeliveryFee } = this.props;
+    const { payOrderDetail, type, orderDetail,OrderCompute, productCartList, payOrderProductList,memberInfo, pointConfig, activityList, isDetail, dispatch, DeliveryFee } = this.props;
     const { order, orderActivityInfoList } = orderDetail;
     const {pointSet} = this.state;
-    const ableToUseCouponsNum = this.getAbleToUseCouponsNum();
-    const totalActivityMoney = productSdk.getProductTotalActivityPrice(activityList, memberInfo, productCartList);
+    const ableToUseCouponsNum = this.getAbleToUseCouponsNum();    
+    const totalActivityMoney = productSdk.getProductTotalActivityPrice(activityList, memberInfo, payOrderProductList);
     const orderActivityInfoListTotal = this.getorderActivityInfoListTotal(orderActivityInfoList);
     const {countTotal} = this;
     const {price} = countTotal();
@@ -346,6 +350,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
           </View>
         )}
         {
+          BASE_PARAM.iscoupon != false ? (
           type && type === 1 
             ? order.couponDiscount && order.couponDiscount > 0 ? (
               <View className={`${cssPrefix}-row-totals`} >
@@ -395,8 +400,10 @@ class ProductPayListView extends Taro.Component<Props, State> {
                 </View>
               </View>
             )
+          ) : null
         }
         {
+          BASE_PARAM.isPointsdeduction !=false ? (
           !isDetail  && memberInfo && memberInfo.points ? (
             <View className={`${cssPrefix}-row-totals`} >
               <View className={`${cssPrefix}-row-content-item`}>
@@ -455,6 +462,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
                 </View>
               </View>
             </View>
+          ) : null
           ) : null
         }
         {
@@ -527,8 +535,9 @@ class ProductPayListView extends Taro.Component<Props, State> {
     return total;
 }
   private renderTotal = () => {
-    const { memberInfo, pointConfig, DeliveryFee, payOrderDetail, productCartList, payOrderProductList, productSDKObj, activityList, OrderCompute } = this.props;
+    const { memberInfo, pointConfig, DeliveryFee, orderDetail, payOrderDetail, productCartList, payOrderProductList, productSDKObj, activityList, OrderCompute, isDetail } = this.props;
     // const { order } = orderDetail;
+    
     const {pointSet} = this.state;
     const {countTotal, countTotalPrice} = this;
     const {price} = countTotal();
@@ -590,12 +599,14 @@ class ProductPayListView extends Taro.Component<Props, State> {
     //     discountPrice = numeral(0).format('0.00');
     //   }
     // }
+    
     return (
       <View className={`${cssPrefix}-row-totals`}>
         <View className={`${cssPrefix}-row-content-item`}>
           <View />
           <View className={`${cssPrefix}-row-tran`}>
-            <Text className={`${cssPrefix}-row-tran`}>{`已优惠￥ ${numeral(OrderCompute && OrderCompute.orderComputeBO ? OrderCompute.orderComputeBO.discount : discountPriceFoot).format('0.00')}`}</Text>
+            <Text className={`${cssPrefix}-row-tran`}>{`已优惠￥ ${isDetail && orderDetail && orderDetail.order? numeral(orderDetail.order.totalAmount - orderDetail.order.transAmount + orderDetail.order.deliveryFee).format('0.00') : 
+            numeral(OrderCompute && OrderCompute.orderComputeBO ? OrderCompute.orderComputeBO.discount : discountPriceFoot).format('0.00')}`}</Text>
             <Text className={`${cssPrefix}-row-tran ${cssPrefix}-row-tran-margin`}>{`合计：`}</Text>
             <Text className={`${cssPrefix}-row-tran-price`}>￥</Text>
             <Text className={`${cssPrefix}-row-tran-price ${cssPrefix}-row-tran-big `}>{`${numeral(newPrice).format("0.00")}`.split('.')[0]}</Text>

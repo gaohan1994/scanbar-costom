@@ -189,7 +189,7 @@ class Page extends Taro.Component<Props, State> {
                 const callB  = () => {
                     
                     setTimeout(function(){
-                        productSdk.cashierOrderCallback(dispatch, result.data, orderPayType);
+                        productSdk.cashierOrderCallback(dispatch, result.data, orderPayType,productSDKObj.productCartList, payOrderProductList);
                     
                         // if(process.env.TARO_ENV === 'h5') {
                         //     Taro.redirectTo({
@@ -238,7 +238,7 @@ class Page extends Taro.Component<Props, State> {
             
                                     }, 500);
             
-                                    productSdk.cashierOrderCallbackOnly(dispatch, result.data, orderPayType);
+                                    productSdk.cashierOrderCallbackOnly(dispatch,result.data, orderPayType, productSDKObj.productCartList,  payOrderProductList);
                                     productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, dispatch)
                                     UserAction.getMemberInfo(dispatch);
                                     this.setState({
@@ -267,21 +267,23 @@ class Page extends Taro.Component<Props, State> {
                     }
                     
                 } else {
-                   
-                    productSdk.cashierOrderCallbackOnly(this.props.dispatch, result.data, orderPayType)
+                    Taro.showLoading();
+                    Taro.switchTab({url: '/pages/orderList/order'})
+                    // setTimeout(function(){
+                        
+                    // }, 1000);
+                    productSdk.cashierOrderCallbackOnly(this.props.dispatch, result.data, orderPayType, productSDKObj.productCartList, payOrderProductList)
                         // const {order} = result.data;
                         // Taro.redirectTo({
                         //     url: `/pages/order/order.detail?id=${order.orderNo}`
                         // });
-                        setTimeout(function(){
-                            Taro.switchTab({url: '/pages/orderList/order'})
-                        }, 1000);
+                        
                     productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, this.props.dispatch)
                     UserAction.getMemberInfo(this.props.dispatch);
                     this.setState({
                         isOnClick: true
                     })
-                    
+                    Taro.hideLoading();
                 }
                 
             } catch (error) {
@@ -508,7 +510,7 @@ class Page extends Taro.Component<Props, State> {
 
 
                 </View>
-                <View style='width: 100%; height: 100px' className={'container-color'}/>
+                <View style='width: 100%; height: 150px' className={'container-color'}/>
                 <CartFooter
                     dispatch={this.props.dispatch}
                     productCartList={productSDKObj.productCartList}

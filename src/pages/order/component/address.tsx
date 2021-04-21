@@ -17,14 +17,14 @@ import { getCurrentPostion, getIndexAddress, getAddressList } from '../../../red
 import { Dispatch } from 'redux';
 import { BASE_PARAM } from "../../../common/util/config";
 import UserAction from '../../../actions/user.action';
-const tabs = [
+let tabs = [
   {
     title: '配送上门',
     id: 0,
   },
   {
-    title: '到店自提',
-    id: 1
+    title: BASE_PARAM.isSelfmention === false ?'' : '到店自提',
+    id: BASE_PARAM.isSelfmention === false ? 1212 : 1
   }
 ];
 
@@ -170,14 +170,18 @@ class Comp extends Taro.Component<Props, State> {
             <View className={`${prefix}-detail-row-title`}>支付方式</View>
             <View onClick={(e) => {
                 e.stopPropagation();
-                if(tarnsPrice && numeral(tarnsPrice).value() != 0){
-                  self.setState({
-                    choosePayWay: true
-                  })
+                if(BASE_PARAM.isyuE != false){
+                  if(tarnsPrice && numeral(tarnsPrice).value() != 0){
+                    self.setState({
+                      choosePayWay: true
+                    })
+                  }
                 }
+                
               }} className={classnames(`${prefix}-detail-row-title`)}>
               <View className={classnames(`${prefix}-detail-row-title-txt`)}>{orderPayType === 8 || orderPayType === 2? '微信支付' : '储值支付'}</View>
-            <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' /></View>
+            {/* <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' /> */}
+            </View>
           </View>
         </View>
       );
@@ -228,15 +232,16 @@ class Comp extends Taro.Component<Props, State> {
           <View className={`${prefix}-detail-row-title`}>支付方式</View>
           <View onClick={(e) => {
               e.stopPropagation();
-              if(tarnsPrice && numeral(tarnsPrice).value() != 0){
-                self.setState({
-                  choosePayWay: true
-                })
-              }
-              
+              if(BASE_PARAM.isyuE != false){
+                if(tarnsPrice && numeral(tarnsPrice).value() != 0){
+                  self.setState({
+                    choosePayWay: true
+                  })
+                }
+              }              
             }} className={classnames(`${prefix}-detail-row-title`)}>
             <View className={classnames(`${prefix}-detail-row-title-txt`)}>{orderPayType === 8 || orderPayType === 2? '微信支付' : '储值支付'}</View>
-            <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
+            {/* <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' /> */}
           </View>
         </View>
       </View>
@@ -252,7 +257,9 @@ class Comp extends Taro.Component<Props, State> {
         })}
       >
         <View className={`${prefix}-tabs`}>
-          <View className={`${prefix}-tabs-bg`} />
+          {
+            BASE_PARAM.isSelfmention === false ?null : (<View className={`${prefix}-tabs-bg`} />)
+          }
           {tabs.map((tab) => {
             return (
               <View
@@ -263,7 +270,8 @@ class Comp extends Taro.Component<Props, State> {
                   [`${prefix}-tab-active-left`]: currentTab === tab.id && tab.id === 0,
                   [`${prefix}-tab-active-right`]: currentTab === tab.id && tab.id === 1,
                 })}
-                onClick={() => this.changeTab(tab)}
+                style={BASE_PARAM.isSelfmention === false && currentTab !== tab.id ? {background: 'none'} : {}}
+                onClick={BASE_PARAM.isSelfmention === false && currentTab !== tab.id ? () => {} : () => this.changeTab(tab)}
               >
                 {tab.title}
               </View>

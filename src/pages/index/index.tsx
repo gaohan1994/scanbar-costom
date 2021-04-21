@@ -61,13 +61,16 @@ class Index extends Component<any> {
     }
     onShareAppMessage = () => {
         return {
-            title: '21号生活馆',
+            title: BASE_PARAM.MCHID === 28 ? '21号生活馆': '一米阳光便利店',
             path: `/pages/index/index`,
         };
     };
     async componentDidMount() {
+         
         this.initDit();
+        
     }
+    
     initDit = () => {
         if(process.env.TARO_ENV === 'h5'){
             const hash = window.location.hash.split('?')
@@ -110,6 +113,25 @@ class Index extends Component<any> {
         this.setState({couponModalShow: true})
     }
     async componentDidShow() {
+        let cart = Taro.getStorageSync('productCartList');
+        if(cart) cart = JSON.parse(cart);
+        const {dispatch, productCartList} = this.props;
+        
+        if(productCartList.length === 0 && cart){
+            dispatch({
+                type: ProductSDK.reducerInterface.MANAGE_CART,
+                payload: {
+                  productCartList: cart
+                }
+            })
+            dispatch({
+                type: ProductSDK.reducerInterface.SELECT_INDEX,
+                payload: {
+                    type: 'all',
+                }
+            })
+        }
+      
         this.init(true);
         this.changeRefrash();
     }
@@ -292,7 +314,7 @@ class Index extends Component<any> {
                     }
                 })
             } else {
-                console.log(resMear,'resMear');
+                // console.log(resMear,'resMear');
                 
                 // this.setState({
                 //     chooseAddressModal: false,
@@ -429,7 +451,7 @@ class Index extends Component<any> {
                 {
                     showActivity && (
                         <View className={`${cssPrefix}-activity`}>
-                            {userinfo && userinfo.phone && userinfo.phone.length > 0 &&
+                            {BASE_PARAM.ishomeView != false && userinfo && userinfo.phone && userinfo.phone.length > 0 &&
                             <DiscountInfo/>
                             }
                             {

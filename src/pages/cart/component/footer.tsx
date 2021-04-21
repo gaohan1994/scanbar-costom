@@ -73,6 +73,8 @@ class Footer extends Taro.Component<Props> {
     const tarnsPrice = selectProductList && selectProductList.length > 0 
       ? numeral(productSdk.getProductTransPrice(activityList, memberInfo, productCartList,selectProductList)).format('0.00')
       : '0.00';
+    const proAcPrice = numeral(productSdk.getProductsOriginPrice(productCartList, selectProductList)).value() - 
+    numeral(productSdk.getProductTransPrice(activityList, memberInfo, productCartList,selectProductList)).value();
     return (
       <CartFooter
         selectedIndex={selectedIndex}
@@ -83,10 +85,7 @@ class Footer extends Taro.Component<Props> {
         buttonClick={() => this.onSubmit()}
         priceTitle={'合计：'}
         priceSubtitle='￥'
-        priceDiscount={`已优惠￥ ${numeral(
-          numeral(productSdk.getProductsOriginPrice(productCartList, selectProductList)).value() - 
-          numeral(productSdk.getProductTransPrice(activityList, memberInfo, productCartList,selectProductList)).value()
-        ).format('0.00')}`}
+        priceDiscount={`已优惠￥ ${numeral(proAcPrice? proAcPrice : 0).format('0.00')}`}
         price={tarnsPrice}
         priceOrigin={price}
         style={this.props.style}

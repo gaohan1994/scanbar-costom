@@ -143,7 +143,6 @@ class Order extends Taro.Component<Props, State> {
     const { orderList, orderListTotal, orderAllStatus, currentType, userinfo, dispatch, productSDK , } = this.props;
     const hasMore = orderList.length < orderListTotal;
     // const { getUserinfoModal, loginModal } = this.state;
-    console.log(hasMore, 'hasMore');
     
     return (
       <View className={`container ${cssPrefix}`}>
@@ -229,10 +228,10 @@ class Order extends Taro.Component<Props, State> {
         title: '待收货',
         num: orderCount.inTransNum || 0,
       },
-      {
-        title: '待自提',
-        num: orderCount.waitForReceiptNum || 0,
-      },
+      // {
+      //   title: '待自提',
+      //   num: orderCount.waitForReceiptNum || 0,
+      // },
     ];
     return (
       <TabsSwitch

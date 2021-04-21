@@ -12,6 +12,7 @@ import { connect } from '@tarojs/redux';
 import numeral from 'numeral';
 import { Dispatch } from 'redux';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
+import { BASE_PARAM } from '../../common/util/config';
 
 const Rows = [
     {
@@ -255,44 +256,54 @@ class User extends Taro.Component<Props, State> {
                                 </View>
                             )
                     }
-                    <View className={`${cssPrefix}-code-wrap`} onClick={() => { this.navTo('/pages/user/user.code', true) }}>
-                        <View
-                            className={`${cssPrefix}-code-wrap-code`}
-                            
-                        > </View>
-                    </View>
-                    <View className={`${cssPrefix}-member`}>
-                        <View className={`${cssPrefix}-member-item`} onClick={() => { 
-                            if (currentMerchantDetail.storedCard) {
-                                this.navTo('/pages/TopUp/TopUp?entry=nolmal', true)
-                            } else {
-                                Taro.showToast({
-                                    title: '该门店暂未开通储值，请联系商户',
-                                    duration: 2000
-                                });
-                            }
-                             }}>
-                            <Text className={`${cssPrefix}-member-item-number`}>￥{numeral(memberInfo.overage || 0).format('0.00')}</Text>
-                            <Text>储值余额</Text>
-                        </View>
-                        <View className={`${cssPrefix}-member-item`}>
-                            <Text className={`${cssPrefix}-member-item-number`}>{memberInfo.points || 0}</Text>
-                            <Text>积分</Text>
-                        </View>
-                        <View
-                            className={`${cssPrefix}-member-item ${cssPrefix}-member-item-discount`}
-                            onClick={() => { this.navTo('/pages/user/user.coupon', true) }}
-                        >
-                            <Text className={`${cssPrefix}-member-item-number`}>{memberInfo.couponNum > 99 ? '99+' : memberInfo.couponNum || 0}</Text>
-                            
-                            {
-                                couponListCenter.length > 0 ? (
-                                    <View className={`${cssPrefix}-member-item-pop`}>{couponListCenter.length > 99 ? '99+' : couponListCenter.length }张可领</View>
-                                ) : null
-                            }
-                            <Text>优惠券</Text>
-                        </View>
-                    </View>
+                    {
+                        BASE_PARAM.isuserCenter != false ?(
+                            <View className={`${cssPrefix}-code-wrap`} onClick={() => { this.navTo('/pages/user/user.code', true) }}>
+                                <View
+                                    className={`${cssPrefix}-code-wrap-code`}
+                                    
+                                > </View>
+                            </View>
+                        ):null
+                    }
+                    
+                    {
+                        BASE_PARAM.isuserCenter != false ?  (
+                            <View className={`${cssPrefix}-member`}>
+                                <View className={`${cssPrefix}-member-item`} onClick={() => { 
+                                    if (currentMerchantDetail.storedCard) {
+                                        this.navTo('/pages/TopUp/TopUp?entry=nolmal', true)
+                                    } else {
+                                        Taro.showToast({
+                                            title: '该门店暂未开通储值，请联系商户',
+                                            duration: 2000
+                                        });
+                                    }
+                                    }}>
+                                    <Text className={`${cssPrefix}-member-item-number`}>￥{numeral(memberInfo.overage || 0).format('0.00')}</Text>
+                                    <Text>储值余额</Text>
+                                </View>
+                                <View className={`${cssPrefix}-member-item`}>
+                                    <Text className={`${cssPrefix}-member-item-number`}>{memberInfo.points || 0}</Text>
+                                    <Text>积分</Text>
+                                </View>
+                                <View
+                                    className={`${cssPrefix}-member-item ${cssPrefix}-member-item-discount`}
+                                    onClick={() => { this.navTo('/pages/user/user.coupon', true) }}
+                                >
+                                    <Text className={`${cssPrefix}-member-item-number`}>{memberInfo.couponNum > 99 ? '99+' : memberInfo.couponNum || 0}</Text>
+                                    
+                                    {
+                                        couponListCenter.length > 0 ? (
+                                            <View className={`${cssPrefix}-member-item-pop`}>{couponListCenter.length > 99 ? '99+' : couponListCenter.length }张可领</View>
+                                        ) : null
+                                    }
+                                    <Text>优惠券</Text>
+                                </View>
+                            </View>
+                        ) : null
+                    }
+                    
 
                     <View className={`${cssPrefix}-rows`}>
                         {

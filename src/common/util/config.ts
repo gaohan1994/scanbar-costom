@@ -4,4 +4,13 @@ const MCHIDFist = localStorage && localStorage.getItem('MCHIDFist') && localStor
 export const BASE_PARAM = {
     MCHID: merchant && process.env.TARO_ENV === 'h5' ? parseInt(merchant) : 28,
     MCHIDFist: MCHIDFist && process.env.TARO_ENV === 'h5' ? parseInt(MCHIDFist) : 28,
+    ishomeView: false,
+    isuserCenter: false,
+    isSelfmention:false,
+    iscoupon:false,
+    isPointsdeduction: false,
+    iscancelorder: false,
+    isrefundorder: false,
+    isyuE: false,
+    cartLimitNum:50,
 };

@@ -146,7 +146,7 @@ export default function orderReducer(
     case OrderInterfaceMap.reducerInterfaces.RECEIVE_DELIVERYFEE: {
       const { payload } = action as unknown as OrderReducer.Reducers.DeliveryFeeReducer;
       const { DeliveryFee } = payload;
-      console.log('OrderInterfaceMap.reducerInterfaces.RECEIVE_DELIVERYFEE', DeliveryFee);
+      // console.log('OrderInterfaceMap.reducerInterfaces.RECEIVE_DELIVERYFEE', DeliveryFee);
       return {
         ...state,
         DeliveryFee: DeliveryFee

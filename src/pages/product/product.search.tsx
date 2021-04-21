@@ -15,6 +15,7 @@ import ButtonCostom from '../../component/button/button'
 import {getCurrentMerchantDetail} from '../../reducers/app.merchant'
 import { AtActivityIndicator } from 'taro-ui';
 import {BASE_PARAM} from '../../common/util/config'
+import { ProductInterfaceMap } from '../../constants'
 
 const cssPrefix = 'product';
 const prefix = 'page-search'
@@ -42,10 +43,17 @@ class Index extends Component<any> {
   async componentDidMount() {
     this.setState({ value: '' })
     productAction.productInfoEmptySearchList(this.props.dispatch);
-    const res = await productAction.getSearchRecord();
+    const res = await productAction.getSearchRecord();    
     if (res.success) {
       this.setState({ searchRecordList: res.result });
     }
+  }
+  componentWillMount() {
+    const {dispatch} = this.props;
+    dispatch({
+      type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_SEARCH_LIST,
+      payload: []
+    });
   }
 
   public onValueChange = ({ detail: { value } }) => {
@@ -159,6 +167,7 @@ class Index extends Component<any> {
           placeholder="请输入商品名称或条码"
           value={value}
           onInput={this.onValueChange}
+          onConfirm={() => this.onSearch()}
           isRenderInputRight={true}
           inputRightClick={() => {
             this.setState({ value: '', searchFlag: false });

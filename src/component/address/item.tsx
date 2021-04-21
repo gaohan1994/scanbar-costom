@@ -31,7 +31,7 @@ class Item extends Taro.Component<Props> {
 
   render() {
     const { address,currentMerchantDetail,hasRadio,productCartListMerchantIndex, isPay, onAddressClick,pre = false, onClick = undefined, isBorder = true, showEdit = true, showArrow = false } = this.props;
-    const showFlag = address && address.flag ? (address.flag === 0 || address.flag === 1 || address.flag === 2) : false;
+    const showFlag = address && address.flag != undefined ? (address.flag === 0 || address.flag === 1 || address.flag === 2) : false;
     return (
       <View
         className={classNames(`${prefix}`, {

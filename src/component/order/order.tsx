@@ -75,9 +75,10 @@ class OrderItem extends Taro.Component<Props, State> {
         Taro.showLoading();
         if(order.payType !== 7) await ProductService.cashierQueryStatus({orderNo: orderNo});
         Taro.hideLoading();
-        setTimeout(function(){
-          Taro.switchTab({url: '/pages/orderList/order'})
-      }, 1000);
+        Taro.switchTab({url: '/pages/orderList/order'})
+        // setTimeout(function(){
+            
+        // }, 1000);
         // Taro.redirectTo({
         //   url: `/pages/order/order.detail?id=${orderNo}`,
         // })

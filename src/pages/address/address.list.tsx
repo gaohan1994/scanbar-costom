@@ -88,7 +88,7 @@ class Page extends Taro.Component<Props, State> {
   render () {
     const { addressList, currentMerchantDetail } = this.props;
     return (
-      <View className='container'>
+      <View className='container' style={{height: '120%'}}>
         {addressList && addressList.length > 0 ? addressList.map((address, index) => {
           return(
             <AddressItem

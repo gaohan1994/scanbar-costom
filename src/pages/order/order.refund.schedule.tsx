@@ -104,7 +104,7 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
     }
     const orderRefundIndicesItem = orderRefundIndices[currentTab];
     let items: any[] = [];
-    console.log(orderRefundIndicesItem, 'orderRefundIndicesItem', orderRefundIndicesItem.clinchTime, orderDetail);
+    // console.log(orderRefundIndicesItem, 'orderRefundIndicesItem', orderRefundIndicesItem.clinchTime, orderDetail);
     if (orderRefundIndicesItem.clinchTime && orderRefundIndicesItem.clinchTime.length > 0) {
       let title = orderRefundIndicesItem.transFlag === 6
         ? '商家拒绝您的退货申请'
@@ -171,7 +171,7 @@ class OrderRefundSchedule extends Taro.Component<Props, State> {
         icon: 'check-circle'
       })
     }
-    console.log('items', items);
+    // console.log('items', items);
     return items;
   }
 

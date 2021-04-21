@@ -3,6 +3,7 @@ import { AppReducer } from "../../../reducers";
 import { ProductInterface, UserInterface } from "../../../constants";
 import merge from 'lodash.merge';
 import { BASE_PARAM } from '../../util/config';
+import Taro from '@tarojs/taro';
 
 /**
  * @Author: Ghan 
@@ -106,6 +107,10 @@ export default function productSDKReducer(
         ...state.productCartListMerchant,
         [state.productCartListMerchantIndex]: cart,
       } 
+      
+      Taro.setStorageSync('productCartList', JSON.stringify(newCart));
+      Taro.setStorageSync('productCartListMerchant', JSON.stringify(newProductCartListMerchant));
+      Taro.setStorageSync('productCartListMerchantIndex', JSON.stringify(id));
       return {
         ...state,
         productCartList: newCart,
@@ -118,7 +123,12 @@ export default function productSDKReducer(
       const { payload } = action as ProductSDKReducer.Reducers.CartSelectedIndex;
       const { productCartList } = state;
       const { product, products, type = 'normal' } = payload;
-      
+      if(type === 'list'){
+        return {
+          ...state,
+          productCartSelectedIndex: products ? products.map(val => val.id) : []
+        };
+      }
       if (type === 'empty') {
         let nextProductCartSelectedIndex = merge([], state.productCartSelectedIndex);
         nextProductCartSelectedIndex = nextProductCartSelectedIndex.filter((index) => {
@@ -140,9 +150,9 @@ export default function productSDKReducer(
           ...state,
           productCartSelectedIndex: productCartList.length === 0 
             ? []
-              : state.productCartSelectedIndex.length > 0 
-                ? [] 
-                : productCartList.map((item) => item.id)
+              : state.productCartSelectedIndex.length === 0 
+                ?  productCartList.map((item) => item.id) :
+                productCartList.length !== state.productCartSelectedIndex.length ?productCartList.map((item) => item.id) : []
         }
       }
 
@@ -172,6 +182,7 @@ export default function productSDKReducer(
           list = list.filter(val => val.id !== element.id);
         });
       }
+      Taro.setStorageSync('productCartList', JSON.stringify(list));
       return {
         ...state,
         productCartList: list
@@ -224,12 +235,14 @@ export default function productSDKReducer(
     case productSdk.reducerInterface.MANAGE_CART: {
       const { payload } = action as ProductSDKReducer.Reducers.ManageCartList;
       const { productCartList } = payload;
+      Taro.setStorageSync('productCartList', JSON.stringify(productCartList));
       return {
         ...state,
         productCartList: productCartList
       };
     }
     case productSdk.reducerInterface.MANAGE_EMPTY_CART: {
+      Taro.setStorageSync('productCartList', JSON.stringify([]));
       return {
         ...state,
         productCartList: [],
@@ -252,12 +265,14 @@ export default function productSDKReducer(
             ...product,
             sellNum: (num || 1)
           });
+          Taro.setStorageSync('productCartList', JSON.stringify(newProductCartList));
           return {
             ...state,
             productCartList: newProductCartList
           };
         } else {
           newProductCartList[index].sellNum += (num || 1);;
+          Taro.setStorageSync('productCartList', JSON.stringify(newProductCartList));
           return {
             ...state,
             productCartList: newProductCartList
@@ -270,12 +285,14 @@ export default function productSDKReducer(
           const reduceNum = num || 1;
           if (currentItem.sellNum === reduceNum) {
             newProductCartList.splice(index, 1);
+            Taro.setStorageSync('productCartList', JSON.stringify(newProductCartList));
             return {
               ...state,
               productCartList: newProductCartList,
             };
           } else {
             newProductCartList[index].sellNum -= reduceNum;
+            Taro.setStorageSync('productCartList', JSON.stringify(newProductCartList));
             return {
               ...state,
               productCartList: newProductCartList

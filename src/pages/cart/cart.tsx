@@ -223,7 +223,7 @@ class Page extends Taro.Component<Props, State> {
                               <View
                                 className={`cart-component-section-toHome`}
                                 onClick={() => {
-                                  Taro.navigateTo({url: '/pages/index/index'})
+                                  Taro.switchTab({url: '/pages/index/index'})
                                 }}
                               >
                                 去凑单
