@@ -18,12 +18,12 @@ import ProductMenu from '../../component/product/product.menu'
 import classnames from 'classnames';
 import orderAction from '../../actions/order.action'
 import merchantAction from '../../actions/merchant.action';
-import { getMemberInfo } from '../../reducers/app.user';
+import { getMemberInfo, getUserinfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
 import { getCurrentMerchantDetail, getOrderPayType } from '../../reducers/app.merchant';
 import { getOrderDetail, getDeliveryFee, getOrderCompute } from '../../reducers/app.order';
 import { UserAction } from '../../actions'
-import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
+import { getProductCartList, getPayOrderAddress } from '../../common/sdk/product/product.sdk.reducer';
 import {BASE_PARAM} from '../../common/util/config';
  
 const cssPrefix = 'order';
@@ -44,6 +44,8 @@ type Props = {
     OrderCompute: any;
     productSDKObj: any;
     DeliveryFee: any;
+    userinfo: any;
+    user: any;
 }
 
 type State = {
@@ -55,6 +57,7 @@ type State = {
     timeList: string[];
     dateList: OrderInterface.DateItem;
     isOnClick: boolean;
+    iscomponentWillUpdate: boolean;
 }
 
 class Page extends Taro.Component<Props, State> {
@@ -73,9 +76,10 @@ class Page extends Taro.Component<Props, State> {
         timeList: [],
         dateList: [] as any,
         isOnClick: true,
+        iscomponentWillUpdate: true,
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         const {dispatch, currentMerchantDetail, payOrderDetail, payOrderAddress, DeliveryFee} = this.props;
         merchantAction.activityInfoList(dispatch, currentMerchantDetail.id);
         this.getDateList();
@@ -99,11 +103,11 @@ class Page extends Taro.Component<Props, State> {
         orderAction.getPointConfig(this.props.dispatch);
         this.getComputeData(this.props);
         // /api/cashier/compute
-        
     }
-    componentWillReceiveProps = async (nextProps) => {
-        const {dispatch, payOrderAddress, currentMerchantDetail} = nextProps;        
-        if(payOrderAddress.id && this.state.isFirst === true) {
+    async componentWillUpdate(newProps) {
+        const {dispatch, payOrderAddress, currentMerchantDetail, user} = this.props; 
+        if(payOrderAddress.id && this.state.iscomponentWillUpdate === true){
+            console.log('componentWillUpdate', user)
             const param = {
                 latitude:  payOrderAddress.latitude,
                 longitude: payOrderAddress.longitude,
@@ -113,10 +117,28 @@ class Page extends Taro.Component<Props, State> {
             if(result.code !== ResponseCode.success){
                 productSdk.preparePayOrderAddress({}, dispatch);
             }
-            this.getComputeData(nextProps, result.data);
+            this.getComputeData(this.props, result.data);
             this.setState({
-                isFirst: false
+                iscomponentWillUpdate: false
             })
+        }
+    }
+    componentWillReceiveProps = async (nextProps) => {
+        const {dispatch, payOrderAddress, currentMerchantDetail} = nextProps;    
+        if(payOrderAddress.id && payOrderAddress.id !==this.props.payOrderAddress.id && this.state.isFirst === true) {
+            // const param = {
+            //     latitude:  payOrderAddress.latitude,
+            //     longitude: payOrderAddress.longitude,
+            //     merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
+            // }
+            // const result = await orderAction.getDeliveryFee(dispatch, param);
+            // if(result.code !== ResponseCode.success){
+            //     productSdk.preparePayOrderAddress({}, dispatch);
+            // }
+            // this.getComputeData(nextProps, result.data);
+            // this.setState({
+            //     isFirst: false
+            // })
         }
         if (this.props.payOrderDetail.selectedCoupon !== nextProps.payOrderDetail.selectedCoupon  || this.props.payOrderDetail.deliveryType !== nextProps.payOrderDetail.deliveryType ) {
             this.getComputeData(nextProps);
@@ -124,7 +146,8 @@ class Page extends Taro.Component<Props, State> {
     }
 
     getComputeData = (nextProps, deli?: any) => {
-        const {payOrderProductList, memberInfo, DeliveryFee} = this.props;
+        const {payOrderProductList, memberInfo, DeliveryFee, currentMerchantDetail} = this.props;
+
         let ComputeList: any = [];
         try {
             for (let i = 0; i < payOrderProductList.length; i++) {
@@ -143,6 +166,7 @@ class Page extends Taro.Component<Props, State> {
             order: {
                 couponList: nextProps.payOrderDetail.selectedCoupon && nextProps.payOrderDetail.selectedCoupon.couponCode ? [nextProps.payOrderDetail.selectedCoupon.couponCode] : [],
                 memberId: memberInfo.id,
+                merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
                 points: 0,
                 deliveryFee: nextProps.payOrderDetail.deliveryType === 1 ? deli || DeliveryFee : 0
             }
@@ -150,7 +174,7 @@ class Page extends Taro.Component<Props, State> {
         if(payOrderProductList.length > 0){
             orderAction.getComputeMoney(this.props.dispatch, paramsCompute);
         }
-        
+
     }
     public onSubmit = async () => {
         try {
@@ -179,7 +203,7 @@ class Page extends Taro.Component<Props, State> {
                 isOnClick: false
             })
             try {
-                const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, dispatch, DeliveryFee, orderPayType, currentMerchantDetail, OrderCompute} = this.props;
+                const {payOrderAddress, payOrderProductList, payOrderDetail, activityList, memberInfo, productSDKObj, userinfo, dispatch, DeliveryFee, orderPayType, currentMerchantDetail, OrderCompute} = this.props;
                 const payload = productSdk.getProductInterfacePayload(currentMerchantDetail,activityList, memberInfo, payOrderProductList, payOrderProductList, payOrderAddress, payOrderDetail, productSDKObj.pointsTotal, productSDKObj.pointsTotalSell, DeliveryFee, orderPayType, OrderCompute);
                 const result = await productSdk.cashierOrder(payload)
                 invariant(result.code === ResponseCode.success, result.msg || ' ');
@@ -570,14 +594,16 @@ const select = (state: AppReducer.AppState) => {
         OrderCompute: getOrderCompute(state),
         orderPayType: getOrderPayType(state),
         payOrderProductList: state.productSDK.payOrderProductList,
-        payOrderAddress: state.productSDK.payOrderAddress,
+        payOrderAddress: getPayOrderAddress(state),
         payOrderDetail: state.productSDK.payOrderDetail,
         orderDetail: getOrderDetail(state),
         productCartList: getProductCartList(state),
         activityList: state.merchant.activityList,
         currentMerchantDetail: getCurrentMerchantDetail(state),
         memberInfo: getMemberInfo(state),
+        userinfo: getUserinfo(state),
         productSDKObj: state.productSDK,
+        user: state.user,
     }
 }
 export default connect(select)(Page);

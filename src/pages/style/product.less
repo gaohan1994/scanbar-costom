@@ -13,13 +13,26 @@
 @product-section-color: #F8F8FA;
 @product-select-title-font: 32px;
 @product-pay-footer-right: 410px;
-
+@keyframes rotate { 
+  from {-webkit-transform:rotate(0deg);} 
+  to {-webkit-transform:rotate(360deg);} 
+} 
 .@{product-prefix} {
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-
+  &-loading{
+    &-img{
+      width: 40px;
+      height: 40px;
+      -webkit-animation-name: rotate; 
+      -webkit-animation-duration: 1.5s; 
+      -webkit-animation-iteration-count: infinite; 
+      -webkit-animation-timing-function: linear; 
+    }
+  }
+ 
   &-header {
     z-index: @product-header-zindex;
     position: fixed;

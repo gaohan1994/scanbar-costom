@@ -22,6 +22,7 @@ import { getUserinfo, getMemberInfo, getIndexAddress } from '../../reducers/app.
 import {BASE_PARAM} from '../../common/util/config'
 import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 import ProductSDK from '../../common/sdk/product/product.sdk';
+import { getProductListTotal } from '../../reducers/app.product';
 
 const cssPrefix = 'product';
 
@@ -34,6 +35,8 @@ class Index extends Component<any> {
             createTime: '',
             subCategory: [],
         },
+        pageSize: 20,
+        pageNum: 1,
         loading: false,
         isOpen: false,
         showActivity: true,
@@ -345,6 +348,8 @@ class Index extends Component<any> {
             type: `${type.id}`,
             status: 0,
             saleType: 0,
+            pageSize: this.state.pageSize,
+            pageNum: 1,
             merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
         } as any);
         if (this.common.changeTypeFlag) {
@@ -354,19 +359,36 @@ class Index extends Component<any> {
                 this.common.refreshFlag = false;
             }
         }
-        this.setState({loading: false});
+        this.setState({loading: false, pageNum: 1});
         return result;
     }
-
     public onScrollToLower = async () => {
-        const {currentType} = this.state;
-        const {productType} = this.props;
-        for (let i = 0; i < productType.length; i++) {
-            if (currentType.id === productType[i].id && (i !== productType.length - 1)) {
-                this.onTypeClick(productType[i + 1]);
-                break;
+        // const {currentType} = this.state;
+        // const {productType} = this.props;
+        // for (let i = 0; i < productType.length; i++) {
+        //     if (currentType.id === productType[i].id && (i !== productType.length - 1)) {
+        //         this.onTypeClick(productType[i + 1]);
+        //         break;
+        //     }
+        // }
+        const {currentMerchantDetail, dispatch} = this.props;
+        this.setState({loading: true});
+        const result = await ProductAction.productInfoListMore(dispatch, {
+            type: this.state.currentType.id,
+            status: 0,
+            saleType: 0,
+            pageSize: this.state.pageSize,
+            pageNum: this.state.pageNum + 1,
+            merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
+        } as any);
+        if (this.common.changeTypeFlag) {
+            this.common.changeTypeFlag = false;
+            this.common.refreshFlag = true;
+            if (!result || !result.data || !Array.isArray(result.data.rows)) {
+                this.common.refreshFlag = false;
             }
         }
+        this.setState({loading: false, pageNum: this.state.pageNum + 1});
     }
 
     public getTabs = (tabs: any[]) => {
@@ -441,7 +463,7 @@ class Index extends Component<any> {
     
     render() {
         const {currentType, loading, showActivity, obtainCouponList, showStore, chooseAddressModal} = this.state;
-        const {productList, productType, advertisement, userinfo, merchantList, currentMerchantDetail, dispatch} = this.props;
+        const {productList, productCartList, productListTotal, productType, advertisement, userinfo, merchantList, currentMerchantDetail, dispatch} = this.props;
         const isNew = this.CouponisNew(obtainCouponList);
         const {changeRefrash, getNewData} = this;
         return (
@@ -476,6 +498,7 @@ class Index extends Component<any> {
                                         <TabsChoose
                                             tabs={this.getTabs(currentType.subCategory)}
                                             onChange={(type) => {
+                                            
                                                 this.fetchData(type)
                                             }}
                                             currentType={currentType}
@@ -497,7 +520,9 @@ class Index extends Component<any> {
                             className={ `${cssPrefix}-list-right-container`}
                             onScroll={this.onScroll}
                             ismenu={true}
-                        // onScrollToLower={this.onScrollToLower}
+                            productListTotal={productListTotal} 
+                            onScrollToLower={this.onScrollToLower}
+                            productCartList={productCartList}
                     />
                 </View>
             </View>
@@ -580,6 +605,7 @@ const select = (state) => {
         productType: state.product.productType,
         merchantList: getMerchantList(state),
         productList: state.product.productList,
+        productListTotal: getProductListTotal(state),
         productCartList: getProductCartList(state),
         advertisement: getMerchantAdvertisement(state),
         currentMerchantDetail: getCurrentMerchantDetail(state),

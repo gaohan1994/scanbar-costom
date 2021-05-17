@@ -188,6 +188,7 @@ export declare namespace ProductInterface {
     }
 
     type RECEIVE_PRODUCT_LIST = string;
+    type RECEIVE_PRODUCT_LIST_MORE = string;
     type RECEIVE_PRODUCT_SEARCH_LIST = string;
     type RECEIVE_PRODUCT_TYPE = string;
     type RECEIVE_PRODUCT_DETAIL = string;
@@ -195,6 +196,7 @@ export declare namespace ProductInterface {
 
     interface ReducerInterface {
         RECEIVE_PRODUCT_LIST: RECEIVE_PRODUCT_LIST;
+        RECEIVE_PRODUCT_LIST_MORE: RECEIVE_PRODUCT_LIST_MORE;
         RECEIVE_PRODUCT_SEARCH_LIST: RECEIVE_PRODUCT_SEARCH_LIST;
         RECEIVE_PRODUCT_TYPE: RECEIVE_PRODUCT_TYPE;
         RECEIVE_PRODUCT_DETAIL: RECEIVE_PRODUCT_DETAIL;
@@ -218,6 +220,7 @@ class ProductInterfaceMap {
 
     public reducerInterfaces = {
         RECEIVE_PRODUCT_LIST: 'RECEIVE_PRODUCT_LIST',
+        RECEIVE_PRODUCT_LIST_MORE: 'RECEIVE_PRODUCT_LIST_MORE',
         RECEIVE_PRODUCT_SEARCH_LIST: 'RECEIVE_PRODUCT_SEARCH_LIST',
         RECEIVE_PRODUCT_TYPE: 'RECEIVE_PRODUCT_TYPE',
         RECEIVE_PRODUCT_DETAIL: 'RECEIVE_PRODUCT_DETAIL',
@@ -237,6 +240,9 @@ class ProductInterfaceMap {
     }
 
     public productInfoList = (params?: ProductInterface.ProductInfoListFetchFidle) => {
+        if(params){
+            params.orderByColumn = 'sale_number desc';
+        }
         return `/customer/product/list${params ? jsonToQueryString(params) : ''}`;
     }
 

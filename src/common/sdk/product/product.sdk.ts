@@ -943,10 +943,10 @@ import store from '../../../store/middleware';
      * @todo [清空下单信息]
      */
     public cashierOrderCallback = async (dispatch, result: OrderInterface.OrderDetail, orderPayType: any, productCartList, payOrderProductList) => {
-        const {order, orderNo} = result;
+        // const {order, orderNo} = result;
 
         Taro.showLoading();
-        if(orderPayType !== 7) await ProductService.cashierQueryStatus({orderNo: order.orderNo || orderNo});
+        // if(orderPayType !== 7) await ProductService.cashierQueryStatus({orderNo: order.orderNo || orderNo});
         
         Taro.switchTab({url: '/pages/orderList/order'})
         // setTimeout(function(){

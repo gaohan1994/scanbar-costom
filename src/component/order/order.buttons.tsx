@@ -76,7 +76,7 @@ class OrderButtons extends Taro.Component<Props, State> {
     if (payment.code === ResponseCode.success || payment.errMsg === "requestPayment:ok") {
       const callB = async function () {
         Taro.showLoading();
-        if(order.payType !== 7) await ProductService.cashierQueryStatus({orderNo: orderNo});
+        // if(order.payType !== 7) await ProductService.cashierQueryStatus({orderNo: orderNo});
         Taro.hideLoading();
         setTimeout(function(){
             Taro.switchTab({url: '/pages/orderList/order'})

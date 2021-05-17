@@ -21,6 +21,7 @@ export declare namespace ProductReducer {
     productSupplier: Array<ProductInterface.ProductSupplier>;
     productDetail: ProductInterface.ProductInfo;
     selectProduct?: ProductInterface.ProductInfo;
+    productListTotal: number;
   }
 
   interface Action {
@@ -44,19 +45,31 @@ export const initState: ProductReducer.InitState = {
   productSupplier: [],
   productDetail: {} as any,
   selectProduct: undefined,
+  productListTotal: 0
 };
 
 export default function productReducer (state: ProductReducer.InitState = initState, action: ProductReducer.Action): ProductReducer.InitState {
   switch (action.type) {
 
     case ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_LIST: {
-      const { payload: { rows } } = action;
+      const { payload: { rows, total } } = action;
       return {
         ...state,
-        productList: rows
+        productList: rows,
+        productListTotal: total
       };
     }
-
+    case ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_LIST_MORE: {
+      const { payload: { rows, total } } = action;
+      return {
+        ...state,
+        productList: [
+          ...state.productList,
+          ...rows
+        ],
+        productListTotal: total
+      };
+    }
     case ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_SEARCH_LIST: {
       const { payload: { rows } } = action;
       return {
@@ -118,6 +131,7 @@ export function getProductManageListIndexes (list: ProductInterface.ProductInfo[
 }
 
 export const getProductList = (state: AppReducer.AppState) => state.product.productList;
+export const getProductListTotal =  (state: AppReducer.AppState) => state.product.productListTotal;
 
 export const getProductSearchList = (state: AppReducer.AppState) => state.product.productSearchList;
 

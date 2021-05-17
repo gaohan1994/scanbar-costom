@@ -129,6 +129,7 @@ class Index extends Component<any> {
                   productList={productList}
                   className={`${prefix}-header-container`}
                   isHome={false}
+                  productCartList={productCartList}
                 />
               </View>
             </View>

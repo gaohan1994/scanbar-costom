@@ -75,6 +75,10 @@ class User extends Taro.Component<Props, State> {
             })
         }
     }
+    onPullDownRefresh () {
+        setTimeout(() => Taro.stopPullDownRefresh(),100)
+    
+      }
     async componentDidShow() {
         const { userinfo } = this.props;
         if (userinfo.phone && userinfo.phone.length > 0) {

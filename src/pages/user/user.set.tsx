@@ -91,7 +91,31 @@ class Page extends Taro.Component<{dispatch: Dispatch}> {
               <Text className="theme-button-text" >退出登录</Text>
             </AtButton>
           </View>
-
+          {/* <View className={`${cssPrefix}-set-button`}>
+            <AtButton
+              className="theme-button"
+              onClick={() => {
+                
+                const paymentPayload = {
+                  timeStamp: '1620801439',
+                  package: 'prepay_id=wx12143719065550d2b927d6c4b6c0b40000',
+                  paySign: '1VFEx0YEfKRomH1RpD2eaQlTfCqHgO32OGaquhkKWoILoWRv01rVADfqoGtR0zAQe21ywDVuE4kFV6HnlhbhNMipIfrejtS+HONgvlEL7anvDem09Iz9HFdMVa9hdgUzwHDwudcVuncBD2LyigIW4f4dJ1s/Sogtou882NBbtkTkcx/wP4iOJP/OhkNJQWAdvBNZoORUwhg6XgCWVKXFs/kWj2Ypp9LnRdcbgRin315K+AqxcxtOUbtWI/Q72OH0+nHVC1UO3iBCFX3BPpggbBWkgieEWHcOnyrhdzdAENc8HM5pDnJTB0aLH6FNKQGVfbO403fVmeCqlDimcNCOPg==',
+                  // appId: 'wxe00658982eae2459',
+                  signType: 'RSA', 
+                  nonceStr: '124420942b574b32aa8a1e9eed546dea',
+                  success: (res) => {
+                      console.log(res);
+                  },
+                  fail: (error) => {
+                    console.log(error)
+                  }
+                };
+                Taro.requestPayment(paymentPayload);
+              }}
+            >
+              <Text className="theme-button-text" >测试支付</Text>
+            </AtButton>
+          </View> */}
         </View>
       </View>
     );

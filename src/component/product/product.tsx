@@ -51,6 +51,7 @@ class ProductComponent extends Taro.Component<Props, State> {
     };
     componentDidMount =() => {
         const { product, productInCart, direct,} = this.props;
+        
         if(direct) {
             this.setState({
                 changeSellNum: product ? product.sellNum : 0
@@ -59,6 +60,20 @@ class ProductComponent extends Taro.Component<Props, State> {
             this.setState({
                 changeSellNum: productInCart ? productInCart.sellNum : 0
             })
+        }
+    }
+    componentWillReceiveProps= (nextProps) => {
+        const { product, productInCart, direct,} = this.props;
+        if(nextProps.productInCart !== productInCart){
+            if(direct) {
+                this.setState({
+                    changeSellNum: nextProps.product ? nextProps.product.sellNum : 0
+                })
+            } else {
+                this.setState({
+                    changeSellNum: nextProps.productInCart ? nextProps.productInCart.sellNum : 0
+                })
+            }
         }
     }
     public changeValue = (key: string, value: string) => {
@@ -171,10 +186,10 @@ class ProductComponent extends Taro.Component<Props, State> {
                         {product.saleNumber <= 0 && (
                             <View className={`${cssPrefix}-content-cover-empty`}>补货中</View>
                         )}
-                        {product.pictures && product.pictures !== '' ? (
+                        {product.pic || product.pictures && product.pictures !== '' ? (
                             <View
                                 className={`${cssPrefix}-content-cover-image`}
-                                style={`background-image: url(${product.pictures[0]})`}
+                                style={`background-image: url(${product.pic || product.pictures[0]})`}
                             />
                         ) : (
                             <Image
@@ -436,11 +451,11 @@ class ProductComponent extends Taro.Component<Props, State> {
 
 const select = (state: AppReducer.AppState, ownProps: Props) => {
     const {product} = ownProps;
-    const productList = state.productSDK.productCartList;
-    const productInCart = product !== undefined && productList.find(p => p.id === product.id);
+    // const productList = state.productSDK.productCartList;
+    // const productInCart = product !== undefined && productList.find(p => p.id === product.id);
     return {
         product,
-        productInCart,
+        // productInCart,
         activityList: state.merchant.activityList,
         productSDKObj: state.productSDK,
         memberInfo: getMemberInfo(state)

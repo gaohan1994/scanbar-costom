@@ -91,7 +91,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
   render() {
     const { productList, className, padding, isDetail,payOrderDetail,hasDeliveryFee, type, orderDetail, showCallModal, DeliveryFee } = this.props;
     const { orderDetailList, order } = orderDetail;
-    
+    // console.log(isDetail && order.orderNo && order.deliveryFee ,  DeliveryFee, 'DeliveryFee', this.props);
     return (
       <View
         className={classnames(className, {
@@ -171,11 +171,11 @@ class ProductPayListView extends Taro.Component<Props, State> {
         >
           <View className={`${cssPrefix}-row-box`}>
             {
-              item && item.picUrl && item.picUrl.length > 0
+              item && item.pic
                 ? (
                   <View
                     className={`${cssPrefix}-row-cover`}
-                    style={`background-image: url(${item.picUrl})`}
+                    style={`background-image: url(${item.pic})`}
                   />
                 )
                 : (
@@ -216,11 +216,11 @@ class ProductPayListView extends Taro.Component<Props, State> {
       >
         <View className={`${cssPrefix}-row-box`}>
           {
-            item && item.pictures && item.pictures.length > 0
+            item && item.pic 
               ? (
                 <View
                   className={`${cssPrefix}-row-cover`}
-                  style={`background-image: url(${item.pictures[0]})`}
+                  style={`background-image: url(${item.pic})`}
                 />
               )
               : (
@@ -271,8 +271,8 @@ class ProductPayListView extends Taro.Component<Props, State> {
     const {countTotal} = this;
     const {price} = countTotal();
     const pointPrice = DeliveryFee && payOrderDetail.deliveryType === 1 && numeral(price).value() > 0  ? numeral(price).value() - DeliveryFee : numeral(price).value();
-    const PointsPre = numeral(numeral(memberInfo.points * pointConfig.deductRate < pointPrice ? memberInfo.points * pointConfig.deductRate : pointPrice).format('0.00')).value();
-    const MathPointsPre = Math.ceil(PointsPre / pointConfig.deductRate);
+    const PointsPre = pointConfig &&  memberInfo && numeral(numeral(memberInfo.points * pointConfig.deductRate < pointPrice ? memberInfo.points * pointConfig.deductRate : pointPrice).format('0.00')).value() || 0;
+    const MathPointsPre = pointConfig && Math.ceil(PointsPre / pointConfig.deductRate) || 0;
     let newPrice = OrderCompute && OrderCompute.orderComputeBO ? OrderCompute.orderComputeBO.transAmount : price;
 
     return (

@@ -81,7 +81,7 @@ class Page extends Taro.Component<any> {
         <View className="container">
           <ProductSwiper
             images={
-              productDetail.pictures || [
+               [productDetail.pic, ...productDetail.pictures] || [
                 "//net.huanmusic.com/scanbar-c/v1/pic_default.png"
               ]
             }

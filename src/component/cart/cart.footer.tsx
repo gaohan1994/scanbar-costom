@@ -133,6 +133,16 @@ class Footer extends Taro.Component<Props> {
                             Taro.showToast({
                               title: '删除成功',
                             });
+                            
+                            let listNew: any = this.props.productCartList;
+                            if(list.length === 0){
+                              listNew = this.props.productCartList;
+                            } else {
+                              list.forEach(element => {
+                                listNew = listNew.filter(val => val.id !== element.id);
+                              });
+                            }
+                            productSdk.refreshCartNumber(listNew);
                           }
                         }
                       })

@@ -74,6 +74,7 @@ class WeixinSDK {
       return new Promise((resolve) => {
         Taro.getUserInfo({
           success: (res) => {
+            console.log(res, ' Taro.getUserInfo')
             resolve({ success: true, result: res.userInfo, msg: '' })
           },
           fail: (error: any) => {
@@ -210,14 +211,18 @@ class WeixinSDK {
         return;
       }
       const result = await this.getLocation(dispatch);
-      invariant(!!result.success, result.msg || '获取位置失败, 请开启手机定位');
-      const payload = {
-        address: result.result.address,
-        latitude: result.result.location.lat,
-        longitude: result.result.location.lng,
+      // console.log(result, 'result');
+      // invariant(!!result.success, result.msg || '获取位置失败, 请开启手机定位');
+      if(result.success){
+        const payload = {
+          address: result.result.address,
+          latitude: result.result.location.lat,
+          longitude: result.result.location.lng,
+        }
+        this.changeCostomIndexAddress(payload as any, dispatch);
+        return result.result.location;
       }
-      this.changeCostomIndexAddress(payload as any, dispatch);
-      return result.result.location;
+      
     } catch (error) {
       Taro.showToast({
         title: error.message,

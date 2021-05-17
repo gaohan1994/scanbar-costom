@@ -27,6 +27,21 @@ class ProductAction {
     }
     return result;
   }
+  /**
+   * @todo 获取商品列表下一页
+   *
+   * @memberof ProductAction
+   */
+  public productInfoListMore = async (dispatch, params?: ProductInterface.ProductInfoListFetchFidle) => {
+    const result = await ProductService.productInfoList(params);
+    if (result.code === ResponseCode.success) {
+      dispatch({
+        type: ProductInterfaceMap.reducerInterfaces.RECEIVE_PRODUCT_LIST_MORE,
+        payload: result.data
+      });
+    }
+    return result;
+  }
 
   /**
    * @todo 获取搜素商品列表列表

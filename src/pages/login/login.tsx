@@ -69,6 +69,7 @@ class GetUserinfo extends Taro.Component<Props, State> {
                     merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
                     // token: loginRes.result.token
                 };
+                console.log('loginRes', getResult, loginRes)
                 const saveResult: any = await UserAction.userInfoSave(newUserinfo);
                 invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
                 const localUserinfo = {

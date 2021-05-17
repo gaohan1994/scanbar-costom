@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn add xxx --silent --no-progress
+  /usr/local/bin/node /usr/local/bin/yarn add @tarojs/components/virtual-list --silent --no-progress
 
 PATH: 
   /usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/chenshuilian/workspace/Jxc-sy-web/xiao-chen-xu/scanbar-costom/node_modules/.bin:/usr/local/lib/node_modules/npm/node_modules/npm-lifecycle/node-gyp-bin:/Users/chenshuilian/workspace/Jxc-sy-web/xiao-chen-xu/scanbar-costom/node_modules/.bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin
@@ -14,7 +14,17 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: ENOENT: no such file or directory, lstat '/Users/chenshuilian/workspace/Jxc-sy-web/xiao-chen-xu/scanbar-costom/node_modules/@jest/types'
+  Error: https://registry.npmjs.org/@tarojs%2fcomponents/virtual-list: Request "https://registry.npmjs.org/@tarojs%2fcomponents/virtual-list" returned a 405
+      at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66996:18)
+      at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140748:22)
+      at Request.emit (events.js:315:20)
+      at Request.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141720:10)
+      at Request.emit (events.js:315:20)
+      at IncomingMessage.<anonymous> (/usr/local/lib/node_modules/yarn/lib/cli.js:141642:12)
+      at Object.onceWrapper (events.js:421:28)
+      at IncomingMessage.emit (events.js:327:22)
+      at endReadableNT (_stream_readable.js:1221:12)
+      at processTicksAndRejections (internal/process/task_queues.js:84:21)
 
 npm manifest: 
   {
@@ -88,7 +98,7 @@ npm manifest:
       "xxx": "^0.0.1"
     },
     "devDependencies": {
-      "@tarojs/plugin-babel": "1.3.17",
+      "@tarojs/plugin-babel": "^2.2.10",
       "@tarojs/plugin-csso": "1.3.17",
       "@tarojs/plugin-less": "1.3.17",
       "@tarojs/plugin-sass": "^2.0.3",
@@ -1877,10 +1887,10 @@ Lockfile:
       swiper "^4.4.2"
       weui "^1.1.2"
   
-  "@tarojs/plugin-babel@1.3.17":
-    version "1.3.17"
-    resolved "https://registry.npm.taobao.org/@tarojs/plugin-babel/download/@tarojs/plugin-babel-1.3.17.tgz#d20b95850204558ca5dbb3518e1bd9a9a4e3d5f4"
-    integrity sha1-0guVhQIEVYyl27NRjhvZqaTj1fQ=
+  "@tarojs/plugin-babel@^2.2.10":
+    version "2.2.10"
+    resolved "https://registry.yarnpkg.com/@tarojs/plugin-babel/-/plugin-babel-2.2.10.tgz#587c872e7a1fc07c2e8d0a165523bd33d8fa7856"
+    integrity sha512-GqKLHH2wUz0SSLMXg1KVfF6t0EuI88TWuEAg5EQghKEkBg0fPDWzRCla/ytmXtoDFAxYK/RhVTrGH0WzBUJYcg==
     dependencies:
       babel-core "^6.26.0"
   

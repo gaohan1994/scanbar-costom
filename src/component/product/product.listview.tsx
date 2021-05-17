@@ -12,8 +12,9 @@ import ProductComponent from './product';
 import "../../pages/style/product.less";
 import { ProductInterface } from '../../constants';
 import { ProductCartInterface } from '../../common/sdk/product/product.sdk';
-import { AtActivityIndicator } from 'taro-ui';
+// import { AtActivityIndicator } from 'taro-ui';
 import classnames from 'classnames';
+import loading1 from '../../assets/loading2.png'
 import merge from 'lodash.merge'
 import Empty from '../empty';
 import {  CommonEventFunction } from '@tarojs/components/types/common';
@@ -28,6 +29,9 @@ type Props = {
   productList: Array<ProductInterface.ProductInfo | ProductCartInterface.ProductCartInfo>;
   isRenderFooter?: boolean;
   bottomSpector?: boolean;
+  productListTotal?: number;
+  productCartList?: any;
+  onScrollToLower?: (e: any) => any;
   isHome?: boolean;
   onScroll?: (e: any) => any;
 };
@@ -71,20 +75,21 @@ class ProductListView extends Taro.Component<Props> {
     }
   }
   
-
   render () {
-    const { className, ismenu, loading, productList, isRenderFooter, bottomSpector, isHome, onScroll } = this.props;
+    const { className,productCartList, productListTotal, ismenu,onScrollToLower, loading, productList, isRenderFooter, bottomSpector, isHome, onScroll } = this.props;
     return (
       <ScrollView 
         scrollY={true}
         scrollIntoView={this.state.scrollIntoView}
         className={classnames(`${cssPrefix}-list-right ${ process.env.TARO_ENV === 'h5' ? `${cssPrefix}&-h5-height` : ''}`, className)}
         onScroll={onScroll}
+        onScrollToLower={productListTotal && productList && productListTotal === productList.length ? ()=>{} : onScrollToLower}
       >
         {
-          !loading 
+          !loading || productList && productList.length > 0
           ? productList && productList.length > 0
             ? productList.map((product) => {
+              const productInCart = product !== undefined && productCartList.find(p => p.id === product.id);
               return (
                 <View    
                   id={`product${product.id}`}
@@ -94,6 +99,7 @@ class ProductListView extends Taro.Component<Props> {
                     product={product}
                     isHome={isHome}
                     ismenu={ismenu}
+                    productInCart={productInCart}
                   /> 
                 </View>
               );
@@ -112,8 +118,13 @@ class ProductListView extends Taro.Component<Props> {
             </View>
           )
         }
-        {isRenderFooter && productList && productList.length > 0 && (
+        {isRenderFooter && productListTotal && productList && productListTotal === productList.length && (
           <View className={`${cssPrefix}-list-bottom ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-list-bottom-h5`: ''}`}>已经到底啦</View>
+        )}
+        {isRenderFooter && loading && productList && productList.length > 0 && (
+          <View className={`${cssPrefix}-list-bottom ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-list-bottom-h5`: ''}`}>
+            <Image className={`${cssPrefix}-loading-img`} src={loading1}></Image>
+          </View>
         )}
         {bottomSpector && (
           <View style="height: 100px" />

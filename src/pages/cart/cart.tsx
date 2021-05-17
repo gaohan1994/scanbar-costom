@@ -59,7 +59,10 @@ class Page extends Taro.Component<Props, State> {
         });
     }
   }
+  onPullDownRefresh () {
+    setTimeout(() => Taro.stopPullDownRefresh(),100)
 
+  }
   async componentDidShow() {
     // this.loginCheck();
     const { dispatch, currentMerchantDetail } = this.props;

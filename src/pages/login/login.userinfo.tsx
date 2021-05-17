@@ -55,13 +55,14 @@ class GetUserinfo extends Taro.Component<Props, State> {
       
       // const { callback, onCancle } = this.props;
       const result: any = await WeixinSDK.getWeixinUserinfo();
+      // console.log(result)
       invariant(result.success, result.msg || '获取用户昵称和头像失败');
       const newUserinfo = {
         ...userinfo,
         avatar: result.result.avatarUrl,
         nickname: result.result.nickName,
       }
-
+      // console.log('getWxUserInfo', result)
       if (userinfo && userinfo.phone && userinfo.phone.length > 0) {
         const saveResult: any = await UserAction.userInfoSave(newUserinfo);
         invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
