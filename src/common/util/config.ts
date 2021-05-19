@@ -1,9 +1,9 @@
 
-const merchant = localStorage && localStorage.getItem('merchantId') && localStorage.getItem('merchantId') !== 'undefined' ? localStorage.getItem('merchantId') : '80';
-const MCHIDFist = localStorage && localStorage.getItem('MCHIDFist') && localStorage.getItem('MCHIDFist') !== 'undefined' ? localStorage.getItem('MCHIDFist') : '80';
+const merchant = localStorage && localStorage.getItem('merchantId') && localStorage.getItem('merchantId') !== 'undefined' ? localStorage.getItem('merchantId') : '111';
+const MCHIDFist = localStorage && localStorage.getItem('MCHIDFist') && localStorage.getItem('MCHIDFist') !== 'undefined' ? localStorage.getItem('MCHIDFist') : '111';
 export const BASE_PARAM = {
-    MCHID: merchant && process.env.TARO_ENV === 'h5' ? parseInt(merchant) : 80,
-    MCHIDFist: MCHIDFist && process.env.TARO_ENV === 'h5' ? parseInt(MCHIDFist) : 80,
+    MCHID: merchant && process.env.TARO_ENV === 'h5' ? parseInt(merchant) : 111,
+    MCHIDFist: MCHIDFist && process.env.TARO_ENV === 'h5' ? parseInt(MCHIDFist) : 111,
     ishomeView: false,        // 是否展示首页个人信息
     isuserCenter: false,      // 是否展示个人中心会员信息
     isSelfmention:false,      // 是否展示到店自提
