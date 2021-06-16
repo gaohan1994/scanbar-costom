@@ -6,13 +6,12 @@
 
 .@{prefix} {
   &-address-h5 {
-    height: 160px !important;
-    .background-image('https://net.huanmusic.com/scanbar-c/v2/bg_home_shang.png') !important;
+    height: 120px;
+    .background-image('https://net.huanmusic.com/scanbar-c/v2/bg_home_zhong.png') !important;
     background-size: 100% 101% !important;
   }
   &-address {
-    height: @address-height;
-    .padding(30px, lr);
+    // height: @address-height;
     .padding(3px, t);
     padding-bottom: 10px;
     position: relative;
@@ -72,15 +71,19 @@
       .padding(20px, lr);
       .padding(8px, tb);
       height:38px;
-      background-color:rgba(0,0,0, 0.1);
       border-radius:19px;
       .flex(center, center, row);
       &-name {
-        font-size: 22px;
+        font-size: 36px;
         font-weight:500;
         color:rgba(255,255,255,1);
         line-height: 22px;
         text-align: center;
+      }
+      &-icon {
+        width:42px;
+        height:42px;
+        .margin(14px, r)
       }
     }
     &-search-h5 {
@@ -91,20 +94,21 @@
       bottom: 30px;
       right: 23px;
       .flex(center, center, row);
-      width:300px;
+      width:196px;
       height:54px;
       background:rgba(255,255,255, 0.2);
-      border-radius:27px;
+      border-radius:28px;
+      top: -4px;
       &-icon {
         width:31px;
         height:31px;
         .margin(14px, r)
       }
       &-text {
-        font-size:28px;
-        font-weight:500;
+        font-size:26px;
         color:rgba(255,255,255,1);
         padding-top: 5px;
+        opacity: 0.5
       }
     }
   }

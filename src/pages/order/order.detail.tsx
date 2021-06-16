@@ -19,6 +19,8 @@ import ProductPayListView from '../../component/product/product.pay.listview'
 import OrderButtons from '../../component/order/order.buttons';
 import { Dispatch } from 'redux';
 import icon_order_time from '../../assets/icon_order_time.png';
+import { BASE_PARAM } from '../../common/util/config';
+import { QRCode } from 'taro-code'
 
 const cssPrefix = 'order-detail';
 
@@ -56,7 +58,7 @@ class OrderDetail extends Taro.Component<Props, State> {
       invariant(!!id, '请传入订单id');
       this.init(id);
       // OrderAction.orderList({ pageNum: 1, pageSize: 20 });
-      OrderAction.orderCount(this.props.dispatch);
+      // OrderAction.orderCount(this.props.dispatch);
     } catch (error) {
       Taro.showToast({
         title: error.message,
@@ -276,7 +278,8 @@ class OrderDetail extends Taro.Component<Props, State> {
             orderDetail && orderDetail.refundOrderList && orderDetail.refundOrderList.length > 0 &&
             this.renderRefundSchedule()
           }
-          {this.renderLogisticsCard()}
+          {this.renderCode()}
+          {BASE_PARAM.isPayAdressTime && this.renderLogisticsCard()}
           {this.renderProductList()}
           {this.renderOrderCard()}
         </ScrollView>
@@ -290,7 +293,26 @@ class OrderDetail extends Taro.Component<Props, State> {
       </View>
     )
   }
-
+  
+  private renderCode() {
+    const { orderDetail } = this.props;
+    const { order } = orderDetail;
+    return (
+      <View className={`${cssPrefix}-card ${cssPrefix}-card-refund`} style={{marginBottom: 10, height: 372,}}>
+          <View className={`${cssPrefix}-card-numT`}>取餐码<Text className={`${cssPrefix}-card-num`}>{order && order.mealCode || ''}</Text></View>
+          <View className={`${cssPrefix}-card-code`}>
+              <QRCode 
+                text={`${order && order.orderNo || ''}`} 
+                size={256}
+                scale={4}
+                errorCorrectLevel='M'
+                typeNumber={10}
+              />
+          </View>
+          <View className={`${cssPrefix}-card-numT`} style={{color: "#999999", marginTop: 10}}>请出示订单二维码支付</View>
+      </View>
+    )
+  }
   private renderStatusCard() {
     const { time } = this.state;
     const { orderDetail, orderAllStatus, currentType, dispatch, productSDKObj } = this.props;
@@ -300,7 +322,7 @@ class OrderDetail extends Taro.Component<Props, State> {
     }
     
     return (
-      <View className={`${cssPrefix}-card ${cssPrefix}-card-status`} style={process.env.TARO_ENV === 'h5' ? {paddingBottom: '5.8rem'} : {}}>
+      <View className={`${cssPrefix}-card ${cssPrefix}-card-status`} style={process.env.TARO_ENV === 'h5' ? {paddingBottom: '3.8rem', height: '4.5rem'} : {}}>
         {
           res.title === '待支付' || res.title === '待发货' || res.title === '等待商家处理'
             ? (
@@ -338,11 +360,18 @@ class OrderDetail extends Taro.Component<Props, State> {
           res.title === '待支付'
             ? (
               <Text className={`${cssPrefix}-card-status-detail`}>
-                订单待支付，请在
-                <Text className={`${cssPrefix}-card-status-red`}>
-                  {this.getTimeStr(time)}
-                </Text>
-                之内付款
+                {
+                  BASE_PARAM.ishavePay ?  (
+                    <View>
+                      订单待支付，请在
+                      <Text className={`${cssPrefix}-card-status-red`}>
+                        {this.getTimeStr(time)}
+                      </Text>
+                      之内付款
+                    </View>
+                  ) : '订单待支付, 请去收银台付款'
+                }
+                
               </Text>
             )
             : (
@@ -387,7 +416,7 @@ class OrderDetail extends Taro.Component<Props, State> {
 
           <View className={`${cssPrefix}-card-logistics-item-info`}>
             <Text className={`${cssPrefix}-card-logistics-item-info-title`}>
-              {order && order.deliveryType == 0 ? '到店自提时间' : '配送时间'}
+              {order && order.deliveryType == 0 ? '店内用餐时间' : '配送时间'}
             </Text>
             <Text className={`${cssPrefix}-card-logistics-item-info-content`}>
               {
@@ -498,10 +527,11 @@ class OrderDetail extends Taro.Component<Props, State> {
         title: '下单时间',
         extraText: `${order.createTime}`,
       },
-      {
+      ...(BASE_PARAM.ishavePay ? [{
         title: '支付方式',
         extraText: `${OrderAction.orderPayType(orderDetail)}支付`,
-      },
+      }] : [])
+      ,
       {
         title: '订单备注',
         extraText: `${order.remark || '无'}`,

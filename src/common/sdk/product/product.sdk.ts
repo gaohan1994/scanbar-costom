@@ -225,8 +225,9 @@ class ProductSDK {
         const productList = products !== undefined
             ? products
             : productCartList;
+            console.log(productList, 'productList')
         const reduceCallback = (prevTotal: number, item: ProductCartInterface.ProductCartInfo) => prevTotal + item.sellNum
-        const total = productList.reduce(reduceCallback, 0);
+        const total = productList && productList.reduce(reduceCallback, 0) || 0;
         return total;
     }
 
@@ -569,7 +570,7 @@ import store from '../../../store/middleware';
                 deliveryInfo: {
                     ...order.deliveryInfo,
                     receiver: address && address.contact || "",
-                    receiverPhone: address && address.phone || '',
+                    receiverPhone: address && address.phone || memberInfo.phoneNumber,
                 }
 
             }

@@ -84,7 +84,7 @@ const initState: ProductSDKReducer.State = {
   productCartSelectedIndex: [],
   payOrderProductList: [],
   payOrderDetail: {
-    deliveryType: 0,
+    deliveryType: 1,
     remark: ''
   },
   payOrderAddress: {} as any,

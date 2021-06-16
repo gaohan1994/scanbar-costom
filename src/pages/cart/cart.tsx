@@ -59,6 +59,24 @@ class Page extends Taro.Component<Props, State> {
         });
     }
   }
+  componentWillReceiveProps (nextProps) {
+    if(this.props.productCartList !== nextProps.productCartList){
+        const {productCartList} = nextProps;
+        let total = 0;
+        productCartList.forEach(element => {
+            total += element.sellNum;
+        });
+        
+        if (total !== 0) {
+            Taro.setTabBarBadge({
+                index: 2,
+                text: `${total}`
+            });
+        } else {
+            Taro.removeTabBarBadge({index: 2});
+        }
+    }
+  }
   onPullDownRefresh () {
     setTimeout(() => Taro.stopPullDownRefresh(),100)
 
@@ -171,7 +189,7 @@ class Page extends Taro.Component<Props, State> {
       activityList
     ).filter(val => val.productList.length > 0);
     return (
-      <View className="container">
+      <View className="container" style={{position:'relative', height: window.innerHeight - 53}}>
         {productCartList && productCartList.length > 0 ? (
           <View className="cart-list-info-cont">
             {productFilterCartList &&
@@ -197,6 +215,10 @@ class Page extends Taro.Component<Props, State> {
                 return (
                   <View
                     className={str}
+                    style={{
+                      height: window.innerHeight - 103,
+                      overflow: 'auto'
+                    }}
                   >
                     {productList && productList.length > 0 && (
                       <View>
@@ -299,7 +321,7 @@ class Page extends Taro.Component<Props, State> {
             selectedIndex={productCartSelectedIndex}
             isCart={true}
             beforeSubmit={this.beforeSubmit}
-            style={process.env.TARO_ENV === "h5" ? { bottom: "50px" } : {}}
+            style={process.env.TARO_ENV === "h5" ? { bottom: "0px", position: 'absolute' } : {}}
           />
         )}
       </View>

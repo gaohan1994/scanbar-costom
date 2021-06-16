@@ -4,7 +4,7 @@ import './index.less'
 import { connect } from '@tarojs/redux'
 import { AppReducer } from '../../../reducers'
 import { AtButton  } from 'taro-ui'
-import { UserAction } from '../../../actions'
+import { UserAction, MerchantAction } from '../../../actions'
 import { Dispatch } from 'redux';
 import { ResponseCode, MerchantInterface } from '../../../constants/index';
 import invariant from 'invariant';
@@ -32,6 +32,17 @@ class LoginH5 extends Taro.Component<Props, State> {
     phone: '',
     password: '',
     count: 61,
+  }
+  async componentDidMount () {
+    const {dispatch, currentMerchantDetail} = this.props;
+    const param = {
+      merchantId: BASE_PARAM.MCHID,
+    }
+    if(!currentMerchantDetail.name){
+      await MerchantAction.merchantList(dispatch, param, {id: BASE_PARAM.MCHID});
+
+    }
+   
   }
   public onNavAddress = () => {
     Taro.navigateTo({
@@ -70,6 +81,7 @@ class LoginH5 extends Taro.Component<Props, State> {
         
         const setResult: any = await LoginManager.setUserInfo(userinfo, dispatch);
         invariant(setResult.success, setResult.msg || '存储用户信息失败');
+        console.log(userinfo, 'userinfo')
         const saveResult: any = await UserAction.userInfoSave(userinfo);
         invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
         if(process.env.TARO_ENV === 'h5'){
@@ -156,7 +168,7 @@ class LoginH5 extends Taro.Component<Props, State> {
               </View>
               <View 
                 className={this.state.count !== 61 ? `${prefix}_content__code ${prefix}_content__code_wait`: `${prefix}_content__code ${prefix}_content__code_first`}
-                onClick={this.state.count !== 61 ? () => {/** */} : getCode}
+                // onClick={this.state.count !== 61 ? () => {/** */} : getCode}
               >
                 {this.state.count !== 61 ? `重新发送(${this.state.count})s` : '获取验证码'}
                 

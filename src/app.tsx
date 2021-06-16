@@ -5,9 +5,11 @@ import Index from './pages/index'
 import "./styles/reset.less";
 import configStore from "./store";
 import "taro-ui/dist/style/index.scss"; // 引入组件样式 - 方式一
-// import {BASE_PARAM} from './common/util/config';
+// import { BASE_PARAM } from './common/util/config';
 import getBaseUrl from './common/request/base.url';
 // import { LoginManager, productSdk } from "./common/sdk";
+import ProductSDK from './common/sdk/product/product.sdk';
+import { BASE_PARAM } from "./common/util/config";
 // 如果需要在 h5 环境中开启 React Devtools
 // 取消以下注释：
 if (process.env.NODE_ENV !== "production" && process.env.TARO_ENV === "h5") {
@@ -100,7 +102,7 @@ class App extends Component {
       borderStyle: "black",
       list: [
         {
-          pagePath: "pages/index/index",
+          pagePath:  "pages/index/index",
           iconPath: "./assets/tab-bar/icon_nav_home.png",
           selectedIconPath: "./assets/tab-bar/icon_nav_home_selected.png",
           text: "首页"
@@ -134,6 +136,26 @@ class App extends Component {
   // 在 App 类中的 render() 函数没有实际作用
   // 请勿修改此函数
   componentWillMount () {
+    const hash = window.location.hash.split('?')
+    const keywords = hash[1] ? hash[1] : '';
+    const result = keywords.replace(/&/g, '","').replace(/=/g, '":"');
+    if(result){
+        const reqDataString = '{"' + result + '"}';
+        const key = JSON.parse(reqDataString); 
+        const {dispatch} = store;
+        if(key && key.merchantId){
+          ProductSDK.changeStoreCart(key.merchantId || BASE_PARAM.MCHID , dispatch);
+          dispatch({
+              type: ProductSDK.reducerInterface.SELECT_INDEX,
+              payload: {
+                  type: 'all',
+              }
+          })
+        }
+        
+    }
+    
+      
     if(process.env.TARO_ENV === 'h5'){
       this.initWx();
     }

@@ -58,7 +58,7 @@ class OrderAction {
     return result;
   }
   /**
-   * @todo 获取配送费
+   * @todo 获取打包费
    *
    * @memberof OrderAction
    */
@@ -312,7 +312,9 @@ class OrderAction {
     const { order } = params;
     // const { transFlag } = order;
     // 待发货的退款状态
-    console.log(order);
+    if(!order){
+      return {}
+    }
     if (order.deliveryStatus === 0 && order.transFlag === 1 && order.afterSaleStatus === 0) {
       return {
         title: "等待商家处理",

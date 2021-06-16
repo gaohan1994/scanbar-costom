@@ -24,6 +24,10 @@ class MerchantService {
   }
 
   public merchantList = async (param: any): Promise<HTTPInterface.ResponseResultBase<any>> => {
+    if(param.latitude===undefined || param.longitude===undefined){
+      delete param.latitude;
+      delete param.longitude;
+    }
     const result = await requestHttp.get(`${MerchantInterfaceMap.merchantList}${jsonToQueryString(param)}`);
     return result;
   }

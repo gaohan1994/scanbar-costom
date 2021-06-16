@@ -26,10 +26,16 @@ const customInterceptor = (chain) => {
       return Promise.reject("需要鉴权");
 
     } 
-    else if (res.data && res.data.code === 'unauthorized') {
+    else if (res.data && res.data.code === 'unauthorized' || res.data && res.data.code === 'response.login') {
       Taro.setStorage({ key: 'CentermOAuthTokenCostom', data: '' });
+      const hash = window.location.hash.split('?')
+      const keywords = hash[1] ? hash[1] : '';
+      const result = keywords.replace(/&/g, '","').replace(/=/g, '":"');
+      const reqDataString = result ? '{"' + result + '"}' : '{}';
+      const key = JSON.parse(reqDataString); 
+      console.log('key', key)
       if(process.env.TARO_ENV === 'h5'){
-        Taro.navigateTo({url: '/pages/login/login.userinfo'})
+        Taro.navigateTo({url: key.merchantId ? '/pages/login/login.userinfo?merchantId=' + key.merchantId : '/pages/login/login.userinfo'})
       }
       return res.data;
     }

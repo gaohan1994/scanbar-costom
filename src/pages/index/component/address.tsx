@@ -7,11 +7,14 @@ import { connect } from '@tarojs/redux'
 import { AppReducer } from '../../../reducers'
 import { getCurrentMerchantDetail } from '../../../reducers/app.merchant'
 import { getIndexAddress } from '../../../reducers/app.user'
+import { BASE_PARAM } from '../../../common/util/config';
+import icon_store from '../../../assets/icon_store.png';
 
 const prefix = 'index-component-address'
 
 type Props = {
   initDit: () => void;
+  advertisement?: any;
   indexAddress: UserInterface.Address;
   changeModalStroe: (param) => void;
   currentMerchantDetail: MerchantInterface.MerchantDetail;
@@ -29,7 +32,7 @@ class Comp extends Taro.Component<Props, State> {
   }
 
   render () {
-    const { indexAddress, currentMerchantDetail, changeModalStroe, initDit } = this.props;
+    const { indexAddress, advertisement, currentMerchantDetail, changeModalStroe, initDit } = this.props;
 
     const address = indexAddress && indexAddress.address 
       ? indexAddress.address.indexOf('市') !== -1
@@ -40,8 +43,10 @@ class Comp extends Taro.Component<Props, State> {
     return (
       <View 
         className={`${prefix} ${process.env.TARO_ENV === 'h5' ? `${prefix}-h5` : ''}`}
+        style={advertisement && advertisement.length > 0 ? {height: '3.56rem'} : {}}
       >
         <View 
+          style={BASE_PARAM.ishomeAdress ? {} : {display: 'none'}}
           className={`${prefix}-title  ${process.env.TARO_ENV === 'h5' ? `${prefix}-title-h5` : ''}`}
           onClick={address ? () => this.onNavAddress() : () => {initDit();}}
         >
@@ -51,8 +56,10 @@ class Comp extends Taro.Component<Props, State> {
           </View>
           <View className={`${prefix}-icon`} />
         </View>
-        <View className={`${prefix}-box ${process.env.TARO_ENV === 'h5' ? `${prefix}-box-h5` : ''}`}>
+        <View className={`${prefix}-box ${process.env.TARO_ENV === 'h5' ? `${prefix}-box-h5` : ''}`} style={BASE_PARAM.ishomeAdress ? {} : {marginTop: '0.7rem'}}>
           <View className={`${prefix}-merchant ${process.env.TARO_ENV === 'h5' ? `${prefix}-merchant-h5` : ''}`}>
+            <Image className={`${prefix}-merchant-icon`} src={icon_store} />
+
             <View className={`${prefix}-merchant-name`} onClick={() => {changeModalStroe(true)}}>
               {
                 currentMerchantDetail && currentMerchantDetail.name && currentMerchantDetail.name.length > 0 ? currentMerchantDetail.name : '未获取到店名'
@@ -68,7 +75,7 @@ class Comp extends Taro.Component<Props, State> {
             }}
           >
             <Image className={`${prefix}-search-icon`} src='//net.huanmusic.com/scanbar-c/icon_search.png' />
-            <View className={`${prefix}-search-text`}>请输入商品名称</View>
+            <View className={`${prefix}-search-text`}>商品名称</View>
           </View>
         </View>
         

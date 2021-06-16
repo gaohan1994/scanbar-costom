@@ -98,12 +98,14 @@ class ProductPayListView extends Taro.Component<Props, State> {
           [`${cssPrefix}-pay-pos`]: padding,
           'component-form-wrap': true,
         })}
+        style={BASE_PARAM.isPayAdressTime ? {} : {marginTop: '0px'}}
       >
         <View
           className={classnames('component-form', {
             'component-form-shadow': true,
             [`${cssPrefix}-row-items`]: true
           })}
+          style={BASE_PARAM.isPayAdressTime ? {} : {borderTopLeftRadius: 0, borderTopRightRadius: 0}}
         >
           {
             type && type === 1 && (
@@ -111,13 +113,16 @@ class ProductPayListView extends Taro.Component<Props, State> {
                 <View className={`${cssPrefix}-row-header-item`}>
                   <Text className={`${cssPrefix}-row-header-shop `}>{order.merchantName || '未知商店'}</Text>
                 </View>
-                <View className={`${cssPrefix}-row-header-item`} onClick={() => { showCallModal ? showCallModal() : () => { } }}>
+                {
+                  BASE_PARAM.ishaveStorePhone &&<View className={`${cssPrefix}-row-header-item`} onClick={() => { showCallModal ? showCallModal() : () => { } }}>
                   <Image
                     className={`${cssPrefix}-row-header-phone`}
                     src={'//net.huanmusic.com/weapp/icon_order_phone.png'}
                   />
                   <Text className={`${cssPrefix}-row-header-green`}>联系商家</Text>
                 </View>
+                }
+                
               </View>
             )
           }
@@ -134,7 +139,7 @@ class ProductPayListView extends Taro.Component<Props, State> {
             hasDeliveryFee === true || isDetail && order.orderNo && order.deliveryFee ? (
               <View className={`${cssPrefix}-row-totals`}>
                 <View className={`${cssPrefix}-row-content-item`}>
-                  <Text className={`${cssPrefix}-row-voucher`}>配送费</Text>
+                  <Text className={`${cssPrefix}-row-voucher`}>打包费</Text>
                   <View className={`${cssPrefix}-row-voucher-wrap`}>
                     <Text
                       className={

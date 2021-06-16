@@ -118,14 +118,14 @@ class ProductListView extends Taro.Component<Props> {
             </View>
           )
         }
-        {isRenderFooter && productListTotal && productList && productListTotal === productList.length && (
-          <View className={`${cssPrefix}-list-bottom ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-list-bottom-h5`: ''}`}>已经到底啦</View>
-        )}
-        {isRenderFooter && loading && productList && productList.length > 0 && (
+        {isRenderFooter && productListTotal && productList && productListTotal === productList.length ? (
+          <View className={`${cssPrefix}-list-bottom ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-list-bottom-h5`: ''}`}>已经到底啦</View> 
+        ) : null}
+        {isRenderFooter && loading && productList && productList.length > 0 ? (
           <View className={`${cssPrefix}-list-bottom ${process.env.TARO_ENV === 'h5' ? `${cssPrefix}-list-bottom-h5`: ''}`}>
             <Image className={`${cssPrefix}-loading-img`} src={loading1}></Image>
           </View>
-        )}
+        ): null}
         {bottomSpector && (
           <View style="height: 100px" />
         )}

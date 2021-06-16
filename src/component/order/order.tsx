@@ -10,6 +10,7 @@ import productSdk from '../../common/sdk/product/product.sdk';
 import orderAction from '../../actions/order.action';
 import OrderButtons from './order.buttons';
 import { Dispatch } from 'redux';
+import { BASE_PARAM } from '../../common/util/config';
 
 const cssPrefix = 'component-order-item';
 
@@ -187,8 +188,13 @@ class OrderItem extends Taro.Component<Props, State> {
     if (order && order.transFlag !== undefined) {
       switch (order.transFlag) {
         case 0:
+          if(BASE_PARAM.ishavePay) {
+            return [
+              { title: '去支付', function: this.onPay },
+              { title: '再来一单', function: this.orderOneMore },
+            ];
+          }
           return [
-            { title: '去支付', function: this.onPay },
             { title: '再来一单', function: this.orderOneMore },
           ];
         case 1:
@@ -315,12 +321,15 @@ class OrderItem extends Taro.Component<Props, State> {
                 >
                   取消订单
                 </View>
-                <View
-                  className={`${cssPrefix}-card-button-common ${cssPrefix}-card-button-pay`}
-                  onClick={() => { this.onPay(order); }}
-                >
-                  去支付
-                </View>
+                {
+                  BASE_PARAM.ishavePay && <View
+                      className={`${cssPrefix}-card-button-common ${cssPrefix}-card-button-pay`}
+                      onClick={() => { this.onPay(order); }}
+                    >
+                      去支付
+                    </View>
+                }
+                
               </View>
             )
             : (

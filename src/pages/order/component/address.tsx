@@ -19,13 +19,13 @@ import { BASE_PARAM } from "../../../common/util/config";
 import UserAction from '../../../actions/user.action';
 let tabs = [
   {
-    title: '配送上门',
-    id: 0,
+    title: BASE_PARAM.isSelfmention === false ?'' : '店内用餐',
+    id: BASE_PARAM.isSelfmention === false ? 1212 : 1
   },
   {
-    title: BASE_PARAM.isSelfmention === false ?'' : '到店自提',
-    id: BASE_PARAM.isSelfmention === false ? 1212 : 1
-  }
+    title: '打包带走',
+    id: 0,
+  },
 ];
 
 const prefix = 'order-component-address'
@@ -150,7 +150,7 @@ class Comp extends Taro.Component<Props, State> {
             }}
           />
           <View className={`${prefix}-detail-row ${prefix}-detail-row-border `}>
-            <View className={`${prefix}-detail-row-title`}>自提时间</View>
+            <View className={`${prefix}-detail-row-title`}>用餐时间</View>
             <View onClick={(e) => {
               e.stopPropagation();
               timeSelectClick ? timeSelectClick() : () => { };
@@ -166,7 +166,9 @@ class Comp extends Taro.Component<Props, State> {
               <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
             </View>
           </View>
-          <View className={`${prefix}-detail-row`} >
+          {
+            BASE_PARAM.ishavePay && 
+            <View className={`${prefix}-detail-row`} >
             <View className={`${prefix}-detail-row-title`}>支付方式</View>
             <View onClick={(e) => {
                 e.stopPropagation();
@@ -183,6 +185,8 @@ class Comp extends Taro.Component<Props, State> {
             {/* <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' /> */}
             </View>
           </View>
+          }
+          
         </View>
       );
     }
@@ -228,7 +232,9 @@ class Comp extends Taro.Component<Props, State> {
             <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' />
           </View>
         </View>
-        <View className={`${prefix}-detail-row`} >
+        {
+          BASE_PARAM.ishavePay && 
+          <View className={`${prefix}-detail-row`} >
           <View className={`${prefix}-detail-row-title`}>支付方式</View>
           <View onClick={(e) => {
               e.stopPropagation();
@@ -244,6 +250,8 @@ class Comp extends Taro.Component<Props, State> {
             {/* <Image className={`${prefix}-detail-row-arrow`} src='//net.huanmusic.com/scanbar-c/icon_commodity_into.png' /> */}
           </View>
         </View>
+        }
+       
       </View>
     )
   }
@@ -267,8 +275,8 @@ class Comp extends Taro.Component<Props, State> {
                 className={classnames(`${prefix}-tab`, {
                   [`${prefix}-tab-active`]: currentTab === tab.id,
                   [`${prefix}-tab-disable`]: currentTab !== tab.id,
-                  [`${prefix}-tab-active-left`]: currentTab === tab.id && tab.id === 0,
-                  [`${prefix}-tab-active-right`]: currentTab === tab.id && tab.id === 1,
+                  [`${prefix}-tab-active-left`]: currentTab === tab.id && tab.id === 1,
+                  [`${prefix}-tab-active-right`]: currentTab === tab.id && tab.id === 0,
                 })}
                 style={BASE_PARAM.isSelfmention === false && currentTab !== tab.id ? {background: 'none'} : {}}
                 onClick={BASE_PARAM.isSelfmention === false && currentTab !== tab.id ? () => {} : () => this.changeTab(tab)}
@@ -278,7 +286,7 @@ class Comp extends Taro.Component<Props, State> {
             )
           })}
         </View>
-        {this.renderDetail()}
+        {BASE_PARAM.isPayAdressTime && this.renderDetail()}
         {/* <PickerComponent /> */}
         {/* <AtFloatLayout
           isOpened={this.state.choosePayWay}

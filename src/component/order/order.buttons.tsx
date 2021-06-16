@@ -369,9 +369,12 @@ class OrderButtons extends Taro.Component<Props, State> {
               { title: '去支付', function: () => this.onPay(order), color: 'blue' },
             ];
           } else {
-            return [
-              { title: '去支付', function: () => this.onPay(order), color: 'blue' },
-            ];
+            if(BASE_PARAM.ishavePay){
+              return [
+                { title: '去支付', function: () => this.onPay(order), color: 'blue' },
+              ];
+            }
+            return [];
           }
           
         case 1: // 已完成

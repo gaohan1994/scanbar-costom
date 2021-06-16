@@ -14,6 +14,7 @@ import orderAction from '../../actions/order.action';
 import { getUserinfo } from '../../reducers/app.user';
 import { Dispatch } from 'redux';
 import { LoginManager } from "../../common/sdk";
+import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 
 const cssPrefix = 'order';
 
@@ -27,6 +28,7 @@ interface Props {
   orderListTotal: number;
   orderCount: OrderInterface.OrderCount;
   orderAllStatus: any[];
+  productCartList: any;
   currentType: number;
   userinfo: UserInterface.UserInfo;
 }
@@ -53,7 +55,20 @@ class Order extends Taro.Component<Props, State> {
         await LoginManager.getUserInfo(this.props.dispatch);
         this.fetchOrder(currentType, 1);
         OrderAction.orderCount(this.props.dispatch);
-
+        const {productCartList} = this.props;
+        let total = 0;
+        productCartList.forEach(element => {
+            total += element.sellNum;
+        });
+        
+        if (total !== 0) {
+            Taro.setTabBarBadge({
+                index: 2,
+                text: `${total}`
+            });
+        } else {
+            Taro.removeTabBarBadge({index: 2});
+        }
     } catch (error) {
         Taro.showToast({
             title: error.message,
@@ -148,7 +163,7 @@ class Order extends Taro.Component<Props, State> {
     // const { getUserinfoModal, loginModal } = this.state;
     
     return (
-      <View className={`container ${cssPrefix}`}>
+      <View className={`container ${cssPrefix}`} style={process.env.TARO_ENV === 'h5' ? { height: window.innerHeight} : {}}>
         <View className={`${cssPrefix}-tabs`}>
           {this.renderTabs()}
         </View>
@@ -223,14 +238,14 @@ class Order extends Taro.Component<Props, State> {
         title: '待支付',
         num: orderCount.initNum || 0,
       },
-      {
-        title: '待发货',
-        num: orderCount.waitForDelivery || 0,
-      },
-      {
-        title: '待收货',
-        num: orderCount.inTransNum || 0,
-      },
+      // {
+      //   title: '待发货',
+      //   num: orderCount.waitForDelivery || 0,
+      // },
+      // {
+      //   title: '待收货',
+      //   num: orderCount.inTransNum || 0,
+      // },
       // {
       //   title: '待自提',
       //   num: orderCount.waitForReceiptNum || 0,
@@ -251,6 +266,7 @@ const select = (state: any) => ({
   orderListTotal: getOrderListTotal(state),
   orderCount: getOrderCount(state),
   orderAllStatus: getOrderAllStatus(state),
+  productCartList: getProductCartList(state),
   currentType: getCurrentType(state),
   userinfo: getUserinfo(state),
   productSDK: state.productSDK,

@@ -74,36 +74,48 @@ class Index extends Component<any> {
         
     }
     
-    initDit = () => {
+    initDit = async () => {
+        let merchantId = '';
         if(process.env.TARO_ENV === 'h5'){
             const hash = window.location.hash.split('?')
             const keywords = hash[1] ? hash[1] : '';
             const result = keywords.replace(/&/g, '","').replace(/=/g, '":"');
             if(result){
-              const reqDataString = '{"' + result + '"}';
-              const key = JSON.parse(reqDataString); 
-              const merchantId = localStorage.getItem('merchantId');
-              if(merchantId && parseInt(merchantId) !== parseInt(key.merchantId)){
-                LoginManager.logout(this.props.dispatch);
-              }
-              if(key.merchantId){
-                localStorage.setItem('merchantId', `${key.merchantId}`);
-                localStorage.setItem('MCHIDFist', `${key.merchantId}`);
-              }
+                const reqDataString = '{"' + result + '"}';
+                const key = JSON.parse(reqDataString); 
+                let merchantId = localStorage.getItem('merchantId');
+                if(key.merchantId){
+                    localStorage.setItem('merchantId', `${key.merchantId}`);
+                    localStorage.setItem('MCHIDFist', `${key.merchantId}`);
+                }
+                localStorage.setItem('search', `?keywords`);
+        
+                try {
+                    this.init(true, parseInt(key.merchantId|| BASE_PARAM.MCHID));
+                    // orderAction.orderAllStatus(this.props.dispatch);
+                } catch (error) {
+                    Taro.showToast({
+                        title: error.message,
+                        icon: 'none'
+                    })
+                }
+                if( key.merchantId && merchantId && parseInt(merchantId) !== parseInt(key.merchantId)){
+                    LoginManager.logout(this.props.dispatch);
+                }
               
-              localStorage.setItem('search', `?keywords`);
+            }
+        } else {
+            try {
+                this.init(true, merchantId);
+                // orderAction.orderAllStatus(this.props.dispatch);
+            } catch (error) {
+                Taro.showToast({
+                    title: error.message,
+                    icon: 'none'
+                })
             }
         }
-        try {
-            
-            this.init(true);
-            // orderAction.orderAllStatus(this.props.dispatch);
-        } catch (error) {
-            Taro.showToast({
-                title: error.message,
-                icon: 'none'
-            })
-        }
+        
         // const { userinfo, dispatch } = this.props;
         // if (userinfo.phone && userinfo.phone.length > 0) {
         //     UserAction.getMemberInfo(dispatch);
@@ -116,27 +128,28 @@ class Index extends Component<any> {
         this.setState({couponModalShow: true})
     }
     async componentDidShow() {
-        let cart = Taro.getStorageSync('productCartList');
-        if(cart) cart = JSON.parse(cart);
-        const {dispatch, productCartList} = this.props;
+        // let cart = Taro.getStorageSync('productCartList');
+        // if(cart) cart = JSON.parse(cart);
+        // const {dispatch, productCartList} = this.props;
         
-        if(productCartList.length === 0 && cart){
-            dispatch({
-                type: ProductSDK.reducerInterface.MANAGE_CART,
-                payload: {
-                  productCartList: cart
-                }
-            })
-            dispatch({
-                type: ProductSDK.reducerInterface.SELECT_INDEX,
-                payload: {
-                    type: 'all',
-                }
-            })
-        }
+        // if(productCartList.length === 0 && cart){
+        //     dispatch({
+        //         type: ProductSDK.reducerInterface.MANAGE_CART,
+        //         payload: {
+        //           productCartList: cart
+        //         }
+        //     })
+        //     dispatch({
+        //         type: ProductSDK.reducerInterface.SELECT_INDEX,
+        //         payload: {
+        //             type: 'all',
+        //         }
+        //     })
+        // }
       
-        this.init(true);
+        // this.init(true);
         this.changeRefrash();
+
     }
     async getNewData (self) {
         const {dispatch, address} = self.props;
@@ -244,6 +257,24 @@ class Index extends Component<any> {
         })
         
     }
+    componentWillReceiveProps (nextProps) {
+        if(this.props.productCartList !== nextProps.productCartList){
+            const {productCartList} = nextProps;
+            let total = 0;
+            productCartList.forEach(element => {
+                total += element.sellNum;
+            });
+            
+            if (total !== 0) {
+                Taro.setTabBarBadge({
+                    index: 2,
+                    text: `${total}`
+                });
+            } else {
+                Taro.removeTabBarBadge({index: 2});
+            }
+        }
+    }
     handleClose () {
         this.setState({
             showStore: false
@@ -267,7 +298,7 @@ class Index extends Component<any> {
             showStore: type
         })
     }
-    public init = async (firstTime?: boolean): Promise<void> => {
+    public init = async (firstTime?: boolean, merchantId?: any): Promise<void> => {
         const {dispatch, address} = this.props;
         try {
 
@@ -282,8 +313,9 @@ class Index extends Component<any> {
                     this.setState({obtainCouponList: res.data.rows})
                 }
             }
+            console.log('init', merchantId || (currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID))
             const productTypeResult = await ProductAction.productInfoType(dispatch, {
-                merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID
+                merchantId: merchantId || (currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID)
             });
             invariant(productTypeResult.code === ResponseCode.success, productTypeResult.msg || ' ');
             const {data} = productTypeResult;
@@ -291,14 +323,16 @@ class Index extends Component<any> {
             if (firstTime) {
                 this.changeCurrentType(firstType);
             }
-            await WeixinSdk.initAddress(dispatch, address);
+            if( BASE_PARAM.ishomeAdress ){
+                await WeixinSdk.initAddress(dispatch, address);
+            }
             const param = {
-                merchantId: BASE_PARAM.MCHIDFist,
+                merchantId: merchantId || BASE_PARAM.MCHIDFist,
                 latitude: this.props.address.latitude,
                 longitude: this.props.address.longitude
             }
-            const resMear = await MerchantAction.merchantList(dispatch, param, currentMerchantDetail);
-            if(resMear && resMear.data && resMear.data.total === 0){
+            const resMear = await MerchantAction.merchantList(dispatch, param, merchantId ? {id: merchantId} : currentMerchantDetail);
+            if(resMear && resMear.data && resMear.data.total === 0 && BASE_PARAM.ishomeAdress){
                 // this.setState({
                 //     chooseAddressModal: true,
                 // })
@@ -468,7 +502,7 @@ class Index extends Component<any> {
         const {changeRefrash, getNewData} = this;
         return (
             <View className={`container ${cssPrefix}`}>
-                <IndexAddress initDit={this.initDit} changeModalStroe={process.env.TARO_ENV === 'weapp' ? this.changeModalStroe : () => {}}/>
+                <IndexAddress advertisement={advertisement} initDit={this.initDit} changeModalStroe={process.env.TARO_ENV === 'weapp' ? this.changeModalStroe : () => {}}/>
                 {/* <ScrollView scrollY={true}> */}
                 {
                     showActivity && (

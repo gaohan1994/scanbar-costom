@@ -13,13 +13,15 @@ import numeral from 'numeral';
 import { Dispatch } from 'redux';
 import { getCurrentMerchantDetail } from '../../reducers/app.merchant';
 import { BASE_PARAM } from '../../common/util/config';
+import { getProductCartList } from '../../common/sdk/product/product.sdk.reducer';
 
 const Rows = [
-    {
+    ...BASE_PARAM.isPayAdressTime ? [{
         title: '我的地址',
         url: '/pages/address/address.list',
         icon: '//net.huanmusic.com/weapp/customer/icon_mine_location.png',
-    },
+    }] : []
+    ,
     {
         title: '设置',
         url: '/pages/user/user.set',
@@ -31,6 +33,7 @@ const cssPrefix = 'user';
 
 interface Props {
     dispatch: Dispatch;
+    productCartList: any;
     couponListCenter: any;
     currentMerchantDetail: any;
     userinfo: UserInterface.UserInfo;
@@ -61,6 +64,20 @@ class User extends Taro.Component<Props, State> {
                 LoginManager.logout(dispatch);
               }
             })
+            const {productCartList} = this.props;
+            let total = 0;
+            productCartList.forEach(element => {
+                total += element.sellNum;
+            });
+            
+            if (total !== 0) {
+                Taro.setTabBarBadge({
+                    index: 2,
+                    text: `${total}`
+                });
+            } else {
+                Taro.removeTabBarBadge({index: 2});
+            }
         } catch (error) {
             Taro.showToast({
                 title: error.message,
@@ -79,6 +96,7 @@ class User extends Taro.Component<Props, State> {
         setTimeout(() => Taro.stopPullDownRefresh(),100)
     
       }
+
     async componentDidShow() {
         const { userinfo } = this.props;
         if (userinfo.phone && userinfo.phone.length > 0) {
@@ -343,6 +361,7 @@ const select = (state: any) => ({
     userinfo: getUserinfo(state),
     memberInfo: getMemberInfo(state),
     couponListCenter: getcouponListCenter(state),
+    productCartList: getProductCartList(state),
     currentMerchantDetail: getCurrentMerchantDetail(state)
 });
 

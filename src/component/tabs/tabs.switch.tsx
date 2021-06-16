@@ -43,7 +43,7 @@ class TabsSwitch extends Taro.Component<Props, State> {
                   {tab.title}
                   {
                     tab.num && tab.num > 0 ? (
-                      <View className={`${cssPrefix}-tab-badge`}>{tab.num}</View>
+                      <View className={`${cssPrefix}-tab-badge`} style={{right: '2rem'}}>{tab.num}</View>
                     ) : null
                   }
                   

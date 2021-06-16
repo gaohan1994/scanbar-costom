@@ -82,7 +82,10 @@ class Page extends Taro.Component<Props, State> {
     async componentDidMount() {
         const {dispatch, currentMerchantDetail, payOrderDetail, payOrderAddress, DeliveryFee} = this.props;
         merchantAction.activityInfoList(dispatch, currentMerchantDetail.id);
-        this.getDateList();
+        if(BASE_PARAM.isPayAdressTime){
+            this.getDateList();
+        }
+       
         const {payOrderProductList, activityList, memberInfo, productSDKObj} = this.props;
         let productIds: any[] = [];
 
@@ -100,24 +103,30 @@ class Page extends Taro.Component<Props, State> {
         };
         orderAction.getAbleToUseCoupon(dispatch, params);
         UserAction.getMemberInfo(this.props.dispatch);
-        orderAction.getPointConfig(this.props.dispatch);
+        if(BASE_PARAM.isPointsdeduction){
+            orderAction.getPointConfig(this.props.dispatch);
+        }
+   
         this.getComputeData(this.props);
         // /api/cashier/compute
     }
     async componentWillUpdate(newProps) {
-        const {dispatch, payOrderAddress, currentMerchantDetail, user} = this.props; 
+        const {dispatch, payOrderAddress, currentMerchantDetail, user} = newProps; 
         if(payOrderAddress.id && this.state.iscomponentWillUpdate === true){
-            console.log('componentWillUpdate', user)
-            const param = {
-                latitude:  payOrderAddress.latitude,
-                longitude: payOrderAddress.longitude,
-                merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
+            if(BASE_PARAM.isPayAdressTime){
+                const param = {
+                    latitude:  payOrderAddress.latitude,
+                    longitude: payOrderAddress.longitude,
+                    merchantId: currentMerchantDetail && currentMerchantDetail.id ? currentMerchantDetail.id : BASE_PARAM.MCHID,
+                }
+                const result = await orderAction.getDeliveryFee(dispatch, param);
+                if(result.code !== ResponseCode.success){
+                    productSdk.preparePayOrderAddress({}, dispatch);
+                }
+                  
+                this.getComputeData(this.props, result.data);
             }
-            const result = await orderAction.getDeliveryFee(dispatch, param);
-            if(result.code !== ResponseCode.success){
-                productSdk.preparePayOrderAddress({}, dispatch);
-            }
-            this.getComputeData(this.props, result.data);
+          
             this.setState({
                 iscomponentWillUpdate: false
             })
@@ -183,9 +192,9 @@ class Page extends Taro.Component<Props, State> {
             const {payOrderAddress, payOrderProductList, payOrderDetail} = this.props;
             invariant(payOrderProductList.length > 0, '请选择要下单的商品')
 
-            if (payOrderDetail && payOrderDetail.deliveryType === 1) {
-                invariant(payOrderAddress.id, '请选择地址');
-            }
+            // if (payOrderDetail && payOrderDetail.deliveryType === 1) {
+            //     invariant(payOrderAddress.id, '请选择地址');
+            // }
             this.createOrder();
 
         } catch (error) {
@@ -208,107 +217,115 @@ class Page extends Taro.Component<Props, State> {
                 const result = await productSdk.cashierOrder(payload)
                 invariant(result.code === ResponseCode.success, result.msg || ' ');
                 Taro.hideLoading();
-                const payment = await productSdk.requestPayment(result.data.order.orderNo, orderPayType, (res) => {
-                })
-                const callB  = () => {
-                    
-                    setTimeout(function(){
-                        productSdk.cashierOrderCallback(dispatch, result.data, orderPayType,productSDKObj.productCartList, payOrderProductList);
-                    
-                        // if(process.env.TARO_ENV === 'h5') {
-                        //     Taro.redirectTo({
-                        //         url: `/pages/order/order.detail?id=${result.data.order.orderNo || result.data.orderNo}`
-                        //     });
-                        // } else {
-                        //     Taro.navigateTo({
-                        //         url: '/pages/orderList/order'
-                        //     }).catch((error) => {
-                        //         /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
-                        //         const {order} = result.data;
-                        //         Taro.redirectTo({
-                        //             url: `/pages/order/order.detail?id=${order.orderNo}`
-                        //         });
-                        //         // Taro.switchTab({url: '/pages/orderList/order'})
-                        //     })
+                const fail = () => {
+                    Taro.showLoading();
+                        // Taro.switchTab({url: '/pages/orderList/order'})
+                        // setTimeout(function(){
                             
+                        // }, 1000);
+                        productSdk.cashierOrderCallbackOnly(this.props.dispatch, result.data, orderPayType, productSDKObj.productCartList, payOrderProductList)
+                        const {order} = result.data;
+                        Taro.redirectTo({
+                            url: `/pages/order/order.detail?id=${order.orderNo}`
+                        });
                             
-                        // }
-                        
-                
+                        productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, this.props.dispatch)
+                        UserAction.getMemberInfo(this.props.dispatch);
                         this.setState({
                             isOnClick: true
                         })
-                    }, 1000);
-                    return;
+                        Taro.hideLoading();
                 }
-                if (payment.code === ResponseCode.success || payment.errMsg === "requestPayment:ok") {
-                    if(payment.data && payment.data.msg === '余额不足') {
-                        Taro.showModal({
-                            title: "提示",
-                            content: "余额不足，是否充值？",
-                            success: function(res) {
-                                if (res.confirm) {
-                                    setTimeout(() => {
-                                        if(process.env.TARO_ENV === 'h5'){
-                                            Taro.redirectTo({
-                                                url: `/pages/TopUp/TopUp?id=${result.data.order.orderNo || result.data.orderNo}`
-                                            });
-                                        } else {
-                                            const {order} = result.data;
-                                            Taro.redirectTo({
-                                                url: `/pages/TopUp/TopUp?id=${order.orderNo}`
-                                            });
-                                        }
-            
-                                    }, 500);
-            
-                                    productSdk.cashierOrderCallbackOnly(dispatch,result.data, orderPayType, productSDKObj.productCartList,  payOrderProductList);
-                                    productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, dispatch)
-                                    UserAction.getMemberInfo(dispatch);
-                                    this.setState({
-                                        isOnClick: true
-                                    })
-                                    return;
-                                } else if (res.cancel) {
-                                    callB();
-                                }
-                                
-                            },
-
-                        });
-                        
-                        
-                    }  else {
-                        if(orderPayType === 7){
-                            Taro.showToast({
-                                title: '储值支付成功',
-                                icon: 'success',
-                                duration: 2000
-                            })
-                            
-                        }
-                        callB();
-                    }
-                    
-                } else {
-                    Taro.showLoading();
-                    Taro.switchTab({url: '/pages/orderList/order'})
-                    // setTimeout(function(){
-                        
-                    // }, 1000);
-                    productSdk.cashierOrderCallbackOnly(this.props.dispatch, result.data, orderPayType, productSDKObj.productCartList, payOrderProductList)
-                        // const {order} = result.data;
-                        // Taro.redirectTo({
-                        //     url: `/pages/order/order.detail?id=${order.orderNo}`
-                        // });
-                        
-                    productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, this.props.dispatch)
-                    UserAction.getMemberInfo(this.props.dispatch);
-                    this.setState({
-                        isOnClick: true
+                if(BASE_PARAM.ishavePay){
+                    const payment = await productSdk.requestPayment(result.data.order.orderNo, orderPayType, (res) => {
                     })
-                    Taro.hideLoading();
+                    const callB  = () => {
+                        
+                        setTimeout(function(){
+                            productSdk.cashierOrderCallback(dispatch, result.data, orderPayType,productSDKObj.productCartList, payOrderProductList);
+                        
+                            // if(process.env.TARO_ENV === 'h5') {
+                            //     Taro.redirectTo({
+                            //         url: `/pages/order/order.detail?id=${result.data.order.orderNo || result.data.orderNo}`
+                            //     });
+                            // } else {
+                            //     Taro.navigateTo({
+                            //         url: '/pages/orderList/order'
+                            //     }).catch((error) => {
+                            //         /* 跳转到 tabBar 页面，并关闭其他所有非 tabBar 页面 */
+                            //         const {order} = result.data;
+                            //         Taro.redirectTo({
+                            //             url: `/pages/order/order.detail?id=${order.orderNo}`
+                            //         });
+                            //         // Taro.switchTab({url: '/pages/orderList/order'})
+                            //     })
+                                
+                                
+                            // }
+                            
+                    
+                            this.setState({
+                                isOnClick: true
+                            })
+                        }, 1000);
+                        return;
+                    }
+                    if (payment.code === ResponseCode.success || payment.errMsg === "requestPayment:ok") {
+                        if(payment.data && payment.data.msg === '余额不足') {
+                            Taro.showModal({
+                                title: "提示",
+                                content: "余额不足，是否充值？",
+                                success: function(res) {
+                                    if (res.confirm) {
+                                        setTimeout(() => {
+                                            if(process.env.TARO_ENV === 'h5'){
+                                                Taro.redirectTo({
+                                                    url: `/pages/TopUp/TopUp?id=${result.data.order.orderNo || result.data.orderNo}`
+                                                });
+                                            } else {
+                                                const {order} = result.data;
+                                                Taro.redirectTo({
+                                                    url: `/pages/TopUp/TopUp?id=${order.orderNo}`
+                                                });
+                                            }
+                
+                                        }, 500);
+                
+                                        productSdk.cashierOrderCallbackOnly(dispatch,result.data, orderPayType, productSDKObj.productCartList,  payOrderProductList);
+                                        productSdk.preparePayOrderDetail({remark: '', selectedCoupon: {}}, dispatch)
+                                        UserAction.getMemberInfo(dispatch);
+                                        this.setState({
+                                            isOnClick: true
+                                        })
+                                        return;
+                                    } else if (res.cancel) {
+                                        callB();
+                                    }
+                                    
+                                },
+    
+                            });
+                            
+                            
+                        }  else {
+                            if(orderPayType === 7){
+                                Taro.showToast({
+                                    title: '储值支付成功',
+                                    icon: 'success',
+                                    duration: 2000
+                                })
+                                
+                            }
+                            callB();
+                        }
+                        
+                    } else {
+                        fail()
+                    }
+                } else {
+                    fail()
                 }
+                
                 
             } catch (error) {
                 Taro.hideLoading();
@@ -361,7 +378,7 @@ class Page extends Taro.Component<Props, State> {
         // if (selectTime !== '立即送出') {
             
         const selectTimeStr =
-            `${(time === '立即自提' || time === '立即送出') ? '' : (currentDate.date || '')}${time !== '立即自提' && time !== '立即送出' ? ' ' : ''}${time}`;
+            `${(time === '立即用餐' || time === '立即送出') ? '' : (currentDate.date || '')}${time !== '立即用餐' && time !== '立即送出' ? ' ' : ''}${time}`;
         productSdk.preparePayOrderDetail({planDeliveryTime: selectTimeStr}, dispatch);
         // }
     }
@@ -373,11 +390,12 @@ class Page extends Taro.Component<Props, State> {
         if (currentDate.id === undefined) {
             return;
         }
+       
         if (currentDate.id === 0) {
             if (payOrderDetail.deliveryType === 1) {
-                timeList.push('立即送出');
+                timeList.push('立即用餐');
             } else {
-                timeList.push('立即自提');
+                timeList.push('立即送出');
             }
             const currentHour = dayJs().hour();
             const currentMinute = dayJs().minute();
@@ -395,15 +413,16 @@ class Page extends Taro.Component<Props, State> {
             }
         }
         this.onChangeValue('timeList', timeList);
+        console.log(selectTime,payOrderDetail.deliveryType, 'deliveryType' )
         if (
             selectTime === '' ||
-            (selectTime === '立即自提' && payOrderDetail.deliveryType === 1) ||
-            (selectTime === '立即送出' && payOrderDetail.deliveryType === 0)
+            (payOrderDetail.deliveryType === 1) ||
+            (payOrderDetail.deliveryType === 0)
         ) {
             this.onChangeValue('selectTime', timeList[0]);
             this.setState({selectTime: timeList[0]}, () => {
                 const selectTimeStr =
-                    `${(timeList[0] === '立即自提' || timeList[0] === '立即送出') ? '' : (currentDate.date || '')}${timeList[0] !== '立即自提' && timeList[0] !== '立即送出' ? ' ' : ''}${timeList[0]}`;
+                    `${(timeList[0] === '立即用餐' || timeList[0] === '立即送出') ? '' : (currentDate.date || '')}${timeList[0] !== '立即用餐' && timeList[0] !== '立即送出' ? ' ' : ''}${timeList[0]}`;
                 productSdk.preparePayOrderDetail({planDeliveryTime: selectTimeStr}, dispatch);
             })
         }
@@ -484,10 +503,10 @@ class Page extends Taro.Component<Props, State> {
         }
         let priceDiscountPay = countTotal() - numeral(tarnsPrice).value();
  
-        const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即自提') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
+        const selectTimeStr = (selectTime === '立即送出' || selectTime === '立即用餐') ? selectTime : `${selectDate.date || ''} ${selectTime}`;
 
         return (
-            <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: 'auto'}}>
+            <View className='container container-color' style={{backgroundColor: '#f2f2f2', height: 'calc(120%)'}}>
                 <View className={`${cssPrefix}-bg`}/>
                 <PickAddress
                     isPay={true}
