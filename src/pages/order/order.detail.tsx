@@ -21,6 +21,7 @@ import { Dispatch } from 'redux';
 import icon_order_time from '../../assets/icon_order_time.png';
 import { BASE_PARAM } from '../../common/util/config';
 import { QRCode } from 'taro-code'
+import { OrderInterfaceMap } from '../../constants/index';
 
 const cssPrefix = 'order-detail';
 
@@ -71,49 +72,28 @@ class OrderDetail extends Taro.Component<Props, State> {
     if (this.timer) {
       clearInterval(this.timer);
     }
+    const {dispatch} = this.props;
+    const reducer =  {
+      type: OrderInterfaceMap.reducerInterfaces.RECEIVE_ORDER_DETAIL,
+      payload: {
+        data: {}
+      }
+    };
+    dispatch(reducer);
   }
 
   public init = async (id: string) => {
+    Taro.showLoading();
     try {
-      const result = await OrderAction.orderDetail(this.props.dispatch, { orderNo: id });
-      invariant(result.code === ResponseCode.success, result.msg || ' ');
-      const { orderDetail, orderAllStatus } = this.props;
-      const status = OrderAction.orderStatus(orderAllStatus, orderDetail);
-      if (status.title === '待支付') {
-        const second = dayjs(dayjs().format('YYYY-MM-DD HH:mm:ss')).diff(dayjs(orderDetail.order.createTime), 'second');
-        const expireMinute = orderDetail.order.expireMinute || 20;
-        const expireSecond = expireMinute * 60;
-        const restSecond = expireSecond - second;
-        if (restSecond > 0) {
-          this.setState({
-            time: restSecond
-          }, () => {
-            this.timer = setInterval(() => {
-              const { time } = this.state
-              if (time > 0) {
-                this.setState({
-                  time: time - 1
-                });
-              } else {
-                this.setState({
-                  time: - 1
-                });
-                clearInterval(this.timer);
-              }
-            }, 1000);
-          });
-        } else {
-          this.setState({
-            time: -1
-          });
-        }
-      }
+      await OrderAction.orderDetail(this.props.dispatch, { orderNo: id });
+    
     } catch (error) {
       Taro.showToast({
         title: error.message,
         icon: 'none'
       });
     }
+    Taro.hideLoading();
   }
 
   public getTimeStr = (second: number) => {
@@ -322,7 +302,7 @@ class OrderDetail extends Taro.Component<Props, State> {
     }
     
     return (
-      <View className={`${cssPrefix}-card ${cssPrefix}-card-status`} style={process.env.TARO_ENV === 'h5' ? {paddingBottom: '3.8rem', height: '4.5rem'} : {}}>
+      <View className={`${cssPrefix}-card ${cssPrefix}-card-status`} style={process.env.TARO_ENV === 'h5' ? {paddingBottom: '3.8rem', height: '5.5rem'} : {}}>
         {
           res.title === '待支付' || res.title === '待发货' || res.title === '等待商家处理'
             ? (

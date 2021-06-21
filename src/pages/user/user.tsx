@@ -92,10 +92,6 @@ class User extends Taro.Component<Props, State> {
             })
         }
     }
-    onPullDownRefresh () {
-        setTimeout(() => Taro.stopPullDownRefresh(),100)
-    
-      }
 
     async componentDidShow() {
         const { userinfo } = this.props;
@@ -235,7 +231,11 @@ class User extends Taro.Component<Props, State> {
                                                 </View>
                                                 : <View
                                                     className={`${cssPrefix}-user-name ${cssPrefix}-user-name-get`}
-                                                >点击获取微信头像和昵称</View>
+                                                    style={{
+                                                        textAlign: 'left',
+                                                        display: 'block'
+                                                    }}
+                                                >微信用户</View>
                                         }
                                         <View className={`${cssPrefix}-user-phone`}>{userinfo.phone}</View>
                                     </View>

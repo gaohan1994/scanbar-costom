@@ -156,9 +156,9 @@ class App extends Component {
     }
     
       
-    if(process.env.TARO_ENV === 'h5'){
-      this.initWx();
-    }
+    // if(process.env.TARO_ENV === 'h5'){
+    //   this.initWx();
+    // }
     if(process.env.TARO_ENV === 'weapp'){
       if (Taro.canIUse("getUpdateManager")) {
         const updateManager = Taro.getUpdateManager();
@@ -207,7 +207,7 @@ class App extends Component {
         'content-type': contentType
       },
       success: (res) => {
-        // console.log('success++++++++++++++++++++++++++++++', res)
+        console.log('success++++++++++++++++++++++++++++++', res)
         if(res.statusCode === 200 && res.data && res.data.code === "response.success"){
           const data = res.data.data;
           wx.config({

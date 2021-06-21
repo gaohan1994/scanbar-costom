@@ -85,7 +85,7 @@ class LoginH5 extends Taro.Component<Props, State> {
         const saveResult: any = await UserAction.userInfoSave(userinfo);
         invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
         if(process.env.TARO_ENV === 'h5'){
-          Taro.navigateTo({url: '/pages/index/index'})
+          Taro.switchTab({url: '/pages/index/index'})
         } else {
           Taro.navigateBack();
         }

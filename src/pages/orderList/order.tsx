@@ -51,6 +51,7 @@ class Order extends Taro.Component<Props, State> {
   async componentDidMount() {
     // this.loginCheck();;
     const {currentType} = this.props;
+
     try {
         await LoginManager.getUserInfo(this.props.dispatch);
         this.fetchOrder(currentType, 1);
@@ -76,10 +77,7 @@ class Order extends Taro.Component<Props, State> {
         });
     }
   }
-  onPullDownRefresh () {
-    setTimeout(() => Taro.stopPullDownRefresh(),100)
 
-  }
   async componentDidShow() {
     const { userinfo } = this.props;
     if (userinfo.nickname === undefined || userinfo.nickname.length === 0) {
@@ -127,6 +125,7 @@ class Order extends Taro.Component<Props, State> {
 
   public fetchOrder = async (tabNum: number, page?: number) => {
     const { dispatch } = this.props;
+    Taro.showLoading();
     try {
       let payload: OrderInterface.OrderListFetchFidle = {
         pageNum: typeof page === 'number' ? page : pageNum,
@@ -147,6 +146,7 @@ class Order extends Taro.Component<Props, State> {
       //   icon: 'none'
       // });
     }
+    Taro.hideLoading()
   }
 
   // getPhoneNumber = (userinfo: any) => {
@@ -195,7 +195,6 @@ class Order extends Taro.Component<Props, State> {
               </ScrollView>
             )
             : (
-              userinfo.nickname === undefined || userinfo.nickname.length === 0 ||
                 userinfo.phone === undefined || userinfo.phone.length === 0 ? (
                   <Empty
                     img='//net.huanmusic.com/scanbar-c/v1/img_cart.png'

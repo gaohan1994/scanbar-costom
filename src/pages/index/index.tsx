@@ -62,12 +62,7 @@ class Index extends Component<any> {
     config: Config = {
         navigationBarTitleText: '首页'
     }
-    onShareAppMessage = () => {
-        return {
-            title: BASE_PARAM.MCHID === 28 ? '21号生活馆': '一米阳光便利店',
-            path: `/pages/index/index`,
-        };
-    };
+
     async componentDidMount() {
          
         this.initDit();
@@ -103,6 +98,15 @@ class Index extends Component<any> {
                     LoginManager.logout(this.props.dispatch);
                 }
               
+            }
+            try {
+                this.init(true, BASE_PARAM.MCHID);
+                // orderAction.orderAllStatus(this.props.dispatch);
+            } catch (error) {
+                Taro.showToast({
+                    title: error.message,
+                    icon: 'none'
+                })
             }
         } else {
             try {
@@ -245,11 +249,7 @@ class Index extends Component<any> {
         });
         return total;
     }
-    onPullDownRefresh () {
-        this.initDit();
-        setTimeout(() => Taro.stopPullDownRefresh(),100)
 
-    }
     componentWillUnmount () {
         this.setState({
             obtainCouponList: [],
