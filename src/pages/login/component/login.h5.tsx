@@ -35,12 +35,28 @@ class LoginH5 extends Taro.Component<Props, State> {
   }
   async componentDidMount () {
     const {dispatch, currentMerchantDetail} = this.props;
-    const param = {
-      merchantId: BASE_PARAM.MCHID,
-    }
-    if(!currentMerchantDetail.name){
-      await MerchantAction.merchantList(dispatch, param, {id: BASE_PARAM.MCHID});
-
+    const hash = window.location.hash.split('?')
+    const keywords = hash[1] ? hash[1] : '';
+    const result = keywords.replace(/&/g, '","').replace(/=/g, '":"');
+    if(result){
+        const reqDataString = '{"' + result + '"}';
+        const key = JSON.parse(reqDataString); 
+        if(key.merchantId){
+          const param = {
+            merchantId: parseInt(key.merchantId),
+          }
+          localStorage.setItem('merchantId', `${key.merchantId}`);
+          localStorage.setItem('MCHIDFist', `${key.merchantId}`);
+          await MerchantAction.merchantList(dispatch, param, {id: parseInt(key.merchantId)});
+        }
+    } else {
+      const param = {
+        merchantId: BASE_PARAM.MCHID,
+      }
+      if(!currentMerchantDetail.name){
+        await MerchantAction.merchantList(dispatch, param, {id: BASE_PARAM.MCHID});
+  
+      }
     }
    
   }
@@ -81,10 +97,12 @@ class LoginH5 extends Taro.Component<Props, State> {
         
         const setResult: any = await LoginManager.setUserInfo(userinfo, dispatch);
         invariant(setResult.success, setResult.msg || '存储用户信息失败');
-        console.log(userinfo, 'userinfo')
         const saveResult: any = await UserAction.userInfoSave(userinfo);
         invariant(saveResult.code === ResponseCode.success, saveResult.msg || '保存用户信息失败');
+        // const url = '/pages/index/index?merchantId='+currentMerchantDetail.id;
+        Taro.getApp().globalData.merchantId = currentMerchantDetail.id
         if(process.env.TARO_ENV === 'h5'){
+          console.log('switchTab')
           Taro.switchTab({url: '/pages/index/index'})
         } else {
           Taro.navigateBack();

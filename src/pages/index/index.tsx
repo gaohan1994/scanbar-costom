@@ -94,20 +94,26 @@ class Index extends Component<any> {
                         icon: 'none'
                     })
                 }
+                console.log(key.merchantId, merchantId ,  merchantId && parseInt(merchantId) !== parseInt(key.merchantId), 'key.merchantId && merchantId && parseInt(merchantId) !== parseInt(key.merchantId)');
+                
                 if( key.merchantId && merchantId && parseInt(merchantId) !== parseInt(key.merchantId)){
                     LoginManager.logout(this.props.dispatch);
+                    Taro.navigateTo({url: key.merchantId ? '/pages/login/login.userinfo?merchantId=' + key.merchantId : '/pages/login/login.userinfo'})
+
                 }
               
+            } else {
+                try {
+                    this.init(true, Taro.getApp().globalData.merchantId || BASE_PARAM.MCHID);
+                    // orderAction.orderAllStatus(this.props.dispatch);
+                } catch (error) {
+                    Taro.showToast({
+                        title: error.message,
+                        icon: 'none'
+                    })
+                }
             }
-            try {
-                this.init(true, BASE_PARAM.MCHID);
-                // orderAction.orderAllStatus(this.props.dispatch);
-            } catch (error) {
-                Taro.showToast({
-                    title: error.message,
-                    icon: 'none'
-                })
-            }
+            
         } else {
             try {
                 this.init(true, merchantId);

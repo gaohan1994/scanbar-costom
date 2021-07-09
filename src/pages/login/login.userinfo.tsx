@@ -89,6 +89,7 @@ class GetUserinfo extends Taro.Component<Props, State> {
   }
 
   render() {
+    console.log(window.location, 'aaaa')
     if(process.env.TARO_ENV === 'h5') {
       return <Login_h5 />;
     }
